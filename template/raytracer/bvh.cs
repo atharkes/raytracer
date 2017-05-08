@@ -2,17 +2,14 @@
 using System;
 using System.Collections.Generic;
 
-namespace template
-{
-    class BVHNode
-    {
+namespace template {
+    class BVHNode {
         BVHNode left, right;
         List<Vector3> bounds;
         bool leaf;
-        List<primitive> primitives;
+        List<Primitive> primitives;
 
-        public BVHNode(List<primitive> primitives)
-        {
+        public BVHNode(List<Primitive> primitives) {
             this.primitives = primitives;
             bounds = CalculateBounds(primitives);
             leaf = true;
@@ -20,13 +17,11 @@ namespace template
         }
 
         // Intersect this Node and it's children
-        public Tuple<float, primitive> IntersectTree(ray ray)
-        {
+        public Tuple<float, Primitive> IntersectTree(Ray ray) {
             bool intersectBool = IntersectAABB(ray);
-            if (intersectBool && !leaf)
-            {
-                Tuple<float, primitive> intersectionLeft = left.IntersectTree(ray);
-                Tuple<float, primitive> intersectionRight = right.IntersectTree(ray);
+            if (intersectBool && !leaf) {
+                Tuple<float, Primitive> intersectionLeft = left.IntersectTree(ray);
+                Tuple<float, Primitive> intersectionRight = right.IntersectTree(ray);
                 if (intersectionRight.Item2 == null)
                     return intersectionLeft;
                 else if (intersectionLeft.Item2 == null)
@@ -35,55 +30,43 @@ namespace template
                     return intersectionLeft;
                 else
                     return intersectionRight;
-            }
-            else if (intersectBool && leaf)
-            {
-                Tuple<float, primitive> intersection = new Tuple<float, primitive>(ray.length, null);
-                foreach (primitive primitive in primitives)
-                {
+            } else if (intersectBool && leaf) {
+                Tuple<float, Primitive> intersection = new Tuple<float, Primitive>(ray.length, null);
+                foreach (Primitive primitive in primitives) {
                     float intersectDistance = primitive.Intersect(ray);
                     if (intersectDistance > 0 && intersectDistance < intersection.Item1)
-                        intersection = new Tuple<float, primitive>(intersectDistance, primitive);
+                        intersection = new Tuple<float, Primitive>(intersectDistance, primitive);
                 }
                 if (intersection.Item1 == ray.length)
-                    intersection = new Tuple<float, primitive>(-1f, null);
+                    intersection = new Tuple<float, Primitive>(-1f, null);
                 return intersection;
-            }
-            else
-            {
-                return new Tuple<float, primitive>(-1f, null);
+            } else {
+                return new Tuple<float, Primitive>(-1f, null);
             }
         }
 
         // Intersect this Node and it's children; returns bool
-        public bool IntersectTreeBool(ray ray)
-        {
+        public bool IntersectTreeBool(Ray ray) {
             bool intersectBool = IntersectAABB(ray);
-            if (intersectBool && !leaf)
-            {
+            if (intersectBool && !leaf) {
                 bool intersectLeft = left.IntersectTreeBool(ray);
                 bool intersectRight = right.IntersectTreeBool(ray);
                 if (intersectLeft || intersectRight)
                     return true;
                 else
                     return false;
-            }
-            else if (intersectBool && leaf)
-            {
-                foreach (primitive primitive in primitives)
-                {
+            } else if (intersectBool && leaf) {
+                foreach (Primitive primitive in primitives) {
                     if (primitive.IntersectBool(ray))
                         return true;
                 }
                 return false;
-            }
-            else
+            } else
                 return false;
         }
 
         // Intersect the AABB of the Node
-        public bool IntersectAABB(ray ray)
-        {
+        public bool IntersectAABB(Ray ray) {
             float tx1 = (bounds[0].X - ray.origin.X) * ray.directionInverted.X;
             float tx2 = (bounds[1].X - ray.origin.X) * ray.directionInverted.X;
             float tmin = Math.Min(tx1, tx2);
@@ -120,37 +103,32 @@ namespace template
         }
 
         // Try split the Node into 2 smaller Nodes
-        void Split()
-        {
+        void Split() {
             if (primitives.Count < 3)
                 return;
-            Tuple<List<primitive>, List<primitive>> splitPrimitives = CalculateSplit();
+            Tuple<List<Primitive>, List<Primitive>> splitPrimitives = CalculateSplit();
             if (splitPrimitives == null)
                 return;
-            List<primitive> primitivesLeft = splitPrimitives.Item1;
-            List<primitive> primitivesRight = splitPrimitives.Item2;
+            List<Primitive> primitivesLeft = splitPrimitives.Item1;
+            List<Primitive> primitivesRight = splitPrimitives.Item2;
             left = new BVHNode(primitivesLeft);
             right = new BVHNode(primitivesRight);
         }
 
         // Calculate Cheapest Split
-        Tuple<List<primitive>, List<primitive>> CalculateSplit()
-        {
+        Tuple<List<Primitive>, List<Primitive>> CalculateSplit() {
             float costBegin = CalculateSurfaceArea(bounds) * primitives.Count;
             float cost = costBegin;
-            Tuple<List<primitive>, List<primitive>> splitPrimitives = null;
-            foreach (primitive primitive in primitives)
-            {
-                List<Tuple<List<primitive>, List<primitive>>> splits = new List<Tuple<List<primitive>, List<primitive>>>(3);
+            Tuple<List<Primitive>, List<Primitive>> splitPrimitives = null;
+            foreach (Primitive primitive in primitives) {
+                List<Tuple<List<Primitive>, List<Primitive>>> splits = new List<Tuple<List<Primitive>, List<Primitive>>>(3);
                 splits.Add(SplitX(primitive));
                 splits.Add(SplitY(primitive));
                 splits.Add(SplitZ(primitive));
 
-                foreach (Tuple<List<primitive>, List<primitive>> split in splits)
-                {
+                foreach (Tuple<List<Primitive>, List<Primitive>> split in splits) {
                     float splitCost = CalculateCost(split);
-                    if (splitCost < cost)
-                    {
+                    if (splitCost < cost) {
                         cost = splitCost;
                         splitPrimitives = split;
                     }
@@ -161,56 +139,49 @@ namespace template
         }
 
         // Split on X-axis
-        Tuple<List<primitive>, List<primitive>> SplitX(primitive primitive)
-        {
+        Tuple<List<Primitive>, List<Primitive>> SplitX(Primitive primitive) {
             float split = primitive.GetCenter().X;
-            List<primitive> primitivesLeft = new List<primitive>();
-            List<primitive> primitivesRight = new List<primitive>();
-            foreach (primitive primitiveCheck in primitives)
-            {
+            List<Primitive> primitivesLeft = new List<Primitive>();
+            List<Primitive> primitivesRight = new List<Primitive>();
+            foreach (Primitive primitiveCheck in primitives) {
                 if (primitiveCheck.GetCenter().X <= split)
                     primitivesLeft.Add(primitiveCheck);
                 else
                     primitivesRight.Add(primitiveCheck);
             }
-            return new Tuple<List<primitive>, List<primitive>>(primitivesLeft, primitivesRight);
+            return new Tuple<List<Primitive>, List<Primitive>>(primitivesLeft, primitivesRight);
         }
 
         // Split on Y-axis
-        Tuple<List<primitive>, List<primitive>> SplitY(primitive primitive)
-        {
+        Tuple<List<Primitive>, List<Primitive>> SplitY(Primitive primitive) {
             float split = primitive.GetCenter().Y;
-            List<primitive> primitivesLeft = new List<primitive>();
-            List<primitive> primitivesRight = new List<primitive>();
-            foreach (primitive primitiveCheck in primitives)
-            {
+            List<Primitive> primitivesLeft = new List<Primitive>();
+            List<Primitive> primitivesRight = new List<Primitive>();
+            foreach (Primitive primitiveCheck in primitives) {
                 if (primitiveCheck.GetCenter().Y <= split)
                     primitivesLeft.Add(primitiveCheck);
                 else
                     primitivesRight.Add(primitiveCheck);
             }
-            return new Tuple<List<primitive>, List<primitive>>(primitivesLeft, primitivesRight);
+            return new Tuple<List<Primitive>, List<Primitive>>(primitivesLeft, primitivesRight);
         }
 
         // Split on Z-axis
-        Tuple<List<primitive>, List<primitive>> SplitZ(primitive primitive)
-        {
+        Tuple<List<Primitive>, List<Primitive>> SplitZ(Primitive primitive) {
             float split = primitive.GetCenter().Z;
-            List<primitive> primitivesLeft = new List<primitive>();
-            List<primitive> primitivesRight = new List<primitive>();
-            foreach (primitive primitiveCheck in primitives)
-            {
+            List<Primitive> primitivesLeft = new List<Primitive>();
+            List<Primitive> primitivesRight = new List<Primitive>();
+            foreach (Primitive primitiveCheck in primitives) {
                 if (primitiveCheck.GetCenter().Z <= split)
                     primitivesLeft.Add(primitiveCheck);
                 else
                     primitivesRight.Add(primitiveCheck);
             }
-            return new Tuple<List<primitive>, List<primitive>>(primitivesLeft, primitivesRight);
+            return new Tuple<List<Primitive>, List<Primitive>>(primitivesLeft, primitivesRight);
         }
 
         // Calculate Cost of a Split
-        float CalculateCost(Tuple<List<primitive>, List<primitive>> split)
-        {
+        float CalculateCost(Tuple<List<Primitive>, List<Primitive>> split) {
             List<Vector3> boundsLeft = CalculateBounds(split.Item1);
             float surfaceArea1 = CalculateSurfaceArea(boundsLeft);
             List<Vector3> boundsRight = CalculateBounds(split.Item2);
@@ -219,13 +190,11 @@ namespace template
         }
 
         // Calculate Bounds of a List of Primitives
-        List<Vector3> CalculateBounds(List<primitive> primitives)
-        {
+        List<Vector3> CalculateBounds(List<Primitive> primitives) {
             List<Vector3> bounds = new List<Vector3>(2);
             Vector3 boundMin = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
             Vector3 boundMax = new Vector3(float.MinValue, float.MinValue, float.MinValue);
-            foreach (primitive primitive in primitives)
-            {
+            foreach (Primitive primitive in primitives) {
                 List<Vector3> boundPrimitives = primitive.GetBounds();
                 boundMin = Vector3.ComponentMin(boundPrimitives[0], boundMin);
                 boundMax = Vector3.ComponentMax(boundPrimitives[1], boundMax);
@@ -236,8 +205,7 @@ namespace template
         }
 
         // Calculate Surface Area from Bounds
-        float CalculateSurfaceArea(List<Vector3> bounds)
-        {
+        float CalculateSurfaceArea(List<Vector3> bounds) {
             float a = bounds[1].X - bounds[0].X;
             float b = bounds[1].Y - bounds[0].Y;
             float c = bounds[1].Z - bounds[0].Z;

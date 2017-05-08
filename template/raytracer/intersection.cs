@@ -1,14 +1,11 @@
 ﻿using OpenTK;
 
-namespace template
-{
-    class intersection
-    {
+namespace template {
+    class Intersection {
         public Vector3 position;
-        public primitive primitive;
+        public Primitive primitive;
 
-        public intersection(Vector3 position, primitive primitive)
-        {
+        public Intersection(Vector3 position, Primitive primitive) {
             this.position = position;
             this.primitive = primitive;
         }

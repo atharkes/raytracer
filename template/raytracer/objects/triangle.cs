@@ -1,16 +1,13 @@
 ﻿using OpenTK;
 using System.Collections.Generic;
 
-namespace template
-{
-    class triangle : primitive
-    {
+namespace template {
+    class Triangle : Primitive {
         Vector3 p1, p2, p3;
         Vector3 normal, center;
         float epsilon = 0.000001f;
 
-        public triangle(Vector3 p1, Vector3 p2, Vector3 p3, Vector3 color, float specularity = 0, float glossyness = 0, float glossSpecularity = 0)
-        {
+        public Triangle(Vector3 p1, Vector3 p2, Vector3 p3, Vector3 color, float specularity = 0, float glossyness = 0, float glossSpecularity = 0) {
             this.p1 = p1;
             this.p2 = p2;
             this.p3 = p3;
@@ -22,8 +19,7 @@ namespace template
             center = (p1 + p2 + p3) * 0.333333f;
         }
 
-        public override float Intersect(ray ray)
-        {
+        public override float Intersect(Ray ray) {
             // Get vectors for two edges sharing V1
             Vector3 e1 = p2 - p1;
             Vector3 e2 = p3 - p1;
@@ -57,8 +53,7 @@ namespace template
             return -1f;
         }
 
-        public override bool IntersectBool(ray ray)
-        {
+        public override bool IntersectBool(Ray ray) {
             float intersectDistance = Intersect(ray);
             if (intersectDistance > 0 && intersectDistance < ray.length)
                 return true;
@@ -66,18 +61,15 @@ namespace template
                 return false;
         }
 
-        public override Vector3 GetNormal(Vector3 intersectionPoint)
-        {
+        public override Vector3 GetNormal(Vector3 intersectionPoint) {
             return normal;
         }
 
-        public override Vector3 GetCenter()
-        {
+        public override Vector3 GetCenter() {
             return center;
         }
 
-        public override List<Vector3> GetBounds()
-        {
+        public override List<Vector3> GetBounds() {
             List<Vector3> bounds = new List<Vector3>(2);
             bounds.Add(Vector3.ComponentMin(p1, Vector3.ComponentMin(p2, p3)));
             bounds.Add(Vector3.ComponentMax(p1, Vector3.ComponentMax(p2, p3)));

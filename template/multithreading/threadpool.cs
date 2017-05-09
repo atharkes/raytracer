@@ -11,7 +11,7 @@ namespace template.multithreading {
         int threadCount;
 
         public Threadpool() {
-            threadCount = getCoreCount();
+            threadCount = GetCoreCount();
             remaining = 0;
             workerThreads = new Thread[threadCount];
             go = new EventWaitHandle[threadCount];
@@ -20,12 +20,12 @@ namespace template.multithreading {
                 int threadNumber = i;
                 go[i] = new EventWaitHandle(false, EventResetMode.AutoReset);
                 done[i] = true;
-                Thread workerThread = new Thread(() => threadMain(threadNumber));
+                Thread workerThread = new Thread(() => ThreadMain(threadNumber));
                 workerThread.Start();
             }
         }
 
-        public void threadMain(int i) {
+        public void ThreadMain(int i) {
             int threadId = i;
             while (true) {
                 // Wait for the Go Signal
@@ -44,7 +44,7 @@ namespace template.multithreading {
             }
         }
 
-        public void doTasks(Action[] tasks) {
+        public void DoTasks(Action[] tasks) {
             // Early Out if Still Busy
             if (remaining > 0) {
                 Console.WriteLine("Still Busy: Skipped Work");
@@ -61,15 +61,14 @@ namespace template.multithreading {
                 waitHandle.Set();
         }
 
-        public bool workDone() {
-            //System.Diagnostics.Debug.WriteLine("check");
+        public bool WorkDone() {
             for (var i = 0; i < threadCount; i++)
                 if (!done[i])
                     return false;
             return true;
         }
 
-        public int getCoreCount() {
+        public int GetCoreCount() {
             return Environment.ProcessorCount;
         }
     }

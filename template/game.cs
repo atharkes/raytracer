@@ -17,7 +17,7 @@ namespace template {
 
         Threadpool threadpool;
         Action[] tasks;
-        int taskAmount = 256;
+        int taskAmount = 64;
 
         float debugCamX;
         float debugCamZ;
@@ -125,11 +125,11 @@ namespace template {
                 int taskUpper = (int)taskBounds[n + 1];
                 tasks[n] = () => TraceRays(0, raytracerWidth, taskLower, taskUpper);
             }
-            Console.WriteLine(divideTime.ElapsedTicks);
+            Console.WriteLine("Divide Tasks Ticks: " + divideTime.ElapsedTicks);
             Stopwatch traceTime = Stopwatch.StartNew();
-            threadpool.doTasks(tasks);
-            while (!threadpool.workDone()) { /* Wait */ };
-            Console.WriteLine("tracetime: " + traceTime.ElapsedTicks);
+            threadpool.DoTasks(tasks);
+            while (!threadpool.WorkDone()) { /* Wait */ };
+            Console.WriteLine("Trace Ticks: " + traceTime.ElapsedTicks);
         }
 
         void TraceRays(int xMin, int xMax, int yMin, int yMax) {

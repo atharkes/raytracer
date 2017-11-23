@@ -3,22 +3,25 @@ using System.Threading;
 
 namespace template.multithreading {
     class Threadpool {
+        public int ThreadCount { get; set; }
         Thread[] workerThreads;
         EventWaitHandle[] go;
+        EventWaitHandle[] doneHandle;
         bool[] done;
         int remaining;
         Action[] tasks;
-        int threadCount;
 
         public Threadpool() {
-            threadCount = GetCoreCount();
+            ThreadCount = GetCoreCount();
             remaining = 0;
-            workerThreads = new Thread[threadCount];
-            go = new EventWaitHandle[threadCount];
-            done = new bool[threadCount];
-            for (var i = 0; i < threadCount; i++) {
+            workerThreads = new Thread[ThreadCount];
+            go = new EventWaitHandle[ThreadCount];
+            doneHandle = new EventWaitHandle[ThreadCount];
+            done = new bool[ThreadCount];
+            for (var i = 0; i < ThreadCount; i++) {
                 int threadNumber = i;
                 go[i] = new EventWaitHandle(false, EventResetMode.AutoReset);
+                doneHandle[i] = new EventWaitHandle(false, EventResetMode.AutoReset);
                 done[i] = true;
                 Thread workerThread = new Thread(() => ThreadMain(threadNumber));
                 workerThread.Start();
@@ -41,6 +44,7 @@ namespace template.multithreading {
                 }
                 // Signal Done
                 done[threadId] = true;
+                doneHandle[threadId].Set();
             }
         }
 
@@ -54,7 +58,7 @@ namespace template.multithreading {
             this.tasks = tasks;
             remaining = tasks.Length;
             // Set Done to False
-            for (var i = 0; i < threadCount; i++)
+            for (var i = 0; i < ThreadCount; i++)
                 done[i] = false;
             // Give Go Signal
             foreach (EventWaitHandle waitHandle in go)
@@ -62,10 +66,14 @@ namespace template.multithreading {
         }
 
         public bool WorkDone() {
-            for (var i = 0; i < threadCount; i++)
+            for (var i = 0; i < ThreadCount; i++)
                 if (!done[i])
                     return false;
             return true;
+        }
+
+        public void WaitTillDone() {
+            WaitHandle.WaitAll(doneHandle);
         }
 
         public int GetCoreCount() {

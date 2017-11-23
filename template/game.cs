@@ -128,7 +128,7 @@ namespace template {
             Console.WriteLine("Divide Tasks Ticks: " + divideTime.ElapsedTicks);
             Stopwatch traceTime = Stopwatch.StartNew();
             threadpool.DoTasks(tasks);
-            while (!threadpool.WorkDone()) { /* Wait */ };
+            threadpool.WaitTillDone();
             Console.WriteLine("Trace Ticks: " + traceTime.ElapsedTicks);
         }
 

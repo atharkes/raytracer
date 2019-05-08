@@ -17,7 +17,7 @@ namespace template {
         public void Draw(float x, float y, float scale = 1.0f) {
             GL.BindTexture(TextureTarget.Texture2D, textureID);
             GL.Enable(EnableCap.Blend);
-            GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
+            GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
             GL.Begin(PrimitiveType.Quads);
             float u1 = (x * 2 - 0.5f * scale * bitmap.width) / target.width - 1;
             float v1 = 1 - (y * 2 - 0.5f * scale * bitmap.height) / target.height;

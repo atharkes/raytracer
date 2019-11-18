@@ -1,6 +1,6 @@
 ﻿using OpenTK;
 
-namespace raytracer {
+namespace Raytracer {
     class Intersection {
         public Vector3 Position;
         public Primitive Primitive;

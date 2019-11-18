@@ -1,7 +1,7 @@
 ﻿using OpenTK;
 using System.Collections.Generic;
 
-namespace raytracer {
+namespace Raytracer {
     class Triangle : Primitive {
         Vector3 p1, p2, p3;
         Vector3 normal;

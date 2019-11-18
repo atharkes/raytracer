@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace raytracer.multithreading {
+namespace Raytracer.Multithreading {
     class CPUaffinity {
         [DllImport("kernel32.dll")]
         static extern IntPtr GetCurrentThread();

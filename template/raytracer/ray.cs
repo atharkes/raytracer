@@ -1,6 +1,6 @@
 ﻿using OpenTK;
 
-namespace raytracer {
+namespace Raytracer {
     class Ray {
         public Vector3 Origin;
         public Vector3 Direction;

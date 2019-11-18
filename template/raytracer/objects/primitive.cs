@@ -1,7 +1,7 @@
 ﻿using OpenTK;
 using System.Collections.Generic;
 
-namespace raytracer {
+namespace Raytracer {
     abstract class Primitive {
         public Vector3 Position;
         public Vector3 Color;

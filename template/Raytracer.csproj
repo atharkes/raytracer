@@ -7,9 +7,9 @@
     <ProjectGuid>{9354EB6E-D674-4763-A589-3631FABE7654}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>template</RootNamespace>
-    <AssemblyName>template</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <RootNamespace>raytracer</RootNamespace>
+    <AssemblyName>raytracer</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
     <PublishUrl>publish\</PublishUrl>
@@ -72,16 +72,20 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>Raytracer.OpenTKApp</StartupObject>
+  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="OpenTK, Version=3.0.1.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
-      <HintPath>packages\OpenTK.3.0.1\lib\net20\OpenTK.dll</HintPath>
+    <Reference Include="OpenTK, Version=3.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
+      <HintPath>packages\OpenTK.3.1.0\lib\net20\OpenTK.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Management" />
+    <Reference Include="System.Numerics" />
     <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>packages\System.Numerics.Vectors.4.5.0\lib\portable-net45+win8+wp8+wpa81\System.Numerics.Vectors.dll</HintPath>
+      <HintPath>packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
     </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -91,21 +95,21 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="multithreading\cpuaffinity.cs" />
-    <Compile Include="multithreading\threadpool.cs" />
-    <Compile Include="raytracer\bvh.cs" />
-    <Compile Include="raytracer\objects\triangle.cs" />
-    <Compile Include="raytracer\ray.cs" />
-    <Compile Include="raytracer\intersection.cs" />
-    <Compile Include="raytracer\objects\camera.cs" />
-    <Compile Include="game.cs" />
-    <Compile Include="raytracer\objects\lightsource.cs" />
-    <Compile Include="raytracer\objects\plane.cs" />
-    <Compile Include="raytracer\objects\primitive.cs" />
-    <Compile Include="raytracer\objects\sphere.cs" />
-    <Compile Include="raytracer\scene.cs" />
-    <Compile Include="template\surface.cs" />
-    <Compile Include="template\template.cs" />
+    <Compile Include="Multithreading\CPUaffinity.cs" />
+    <Compile Include="Multithreading\Threadpool.cs" />
+    <Compile Include="Raytracer\BVH.cs" />
+    <Compile Include="Raytracer\Objects\Triangle.cs" />
+    <Compile Include="Raytracer\Ray.cs" />
+    <Compile Include="Raytracer\Intersection.cs" />
+    <Compile Include="Raytracer\Camera.cs" />
+    <Compile Include="Raytracer.cs" />
+    <Compile Include="Raytracer\Objects\Lightsource.cs" />
+    <Compile Include="Raytracer\Objects\Plane.cs" />
+    <Compile Include="Raytracer\Objects\Primitive.cs" />
+    <Compile Include="Raytracer\Objects\Sphere.cs" />
+    <Compile Include="Raytracer\Scene.cs" />
+    <Compile Include="Surface.cs" />
+    <Compile Include="OpenTKApp.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

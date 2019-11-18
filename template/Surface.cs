@@ -3,7 +3,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using OpenTK.Graphics.OpenGL;
 
-namespace raytracer {
+namespace Raytracer {
     public class Sprite {
         static public Surface Target;
         
@@ -169,9 +169,11 @@ namespace raytracer {
                 int f = fontRedir[t[i] & 255];
                 int dest = x + i * 12 + y * Width;
                 int src = f * 12;
-                for (int v = 0; v < font.Height; v++, src += font.Width, dest += Width) for (int u = 0; u < 12; u++) {
+                for (int v = 0; v < font.Height; v++, src += font.Width, dest += Width) {
+                    for (int u = 0; u < 12; u++) {
                         if ((font.Pixels[src + u] & 0xffffff) != 0) Pixels[dest + u] = c;
                     }
+                }
             }
         }
 

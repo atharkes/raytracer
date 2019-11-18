@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace raytracer {
+namespace Raytracer {
     class Sphere : Primitive {
         public float Radius;
 

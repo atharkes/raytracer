@@ -2,16 +2,17 @@
 using OpenTK.Input;
 using System;
 using System.Diagnostics;
-using raytracer.multithreading;
+using Raytracer.Multithreading;
+using Raytracer.Objects;
 
-namespace raytracer {
-    class Game {
+namespace Raytracer {
+    class Raytracer {
         public Surface Screen;
         public Camera Camera;
         public Scene Scene;
         public BVHNode PrimitiveTree;
 
-        OpenTKApp template;
+        OpenTKApp openTKApp;
         readonly int raytracerWidth = 512;
         readonly int raytracerHeight = 512;
         readonly int recursionDepthMax = 5;
@@ -34,9 +35,9 @@ namespace raytracer {
 
         float lightStartPos = (float)Math.PI / 2;
 
-        public void Init(OpenTKApp template) {
-            this.template = template;
-            Camera = new Camera(new Vector3(0, 0, -1), new Vector3(0, 0, 1));
+        public void Init(OpenTKApp openTKApp) {
+            this.openTKApp = openTKApp;
+            Camera = new Camera();
             Scene = new Scene();
             PrimitiveTree = new BVHNode(Scene.Primitives);
             tasks = new Action[taskAmount];
@@ -79,7 +80,7 @@ namespace raytracer {
                     if (primitive is Sphere)
                         DrawSphere((Sphere)primitive);
             }
-            Screen.Print("FPS: " + (int)template.RenderFrequency, 1, 1, 0xffffff);
+            Screen.Print("FPS: " + (int)openTKApp.RenderFrequency, 1, 1, 0xffffff);
             Screen.Print("FOV: " + Camera.Fov, 1, 16, 0xffffff);
         }
 
@@ -169,11 +170,9 @@ namespace raytracer {
         // Intersect primary ray with primitives and fire a new ray if object is specular
         Vector3 CastPrimaryRay(Ray ray, int recursionDepth = 0) {
             // Intersect with Scene
-            Tuple<float, Primitive> rayIntersection = PrimitiveTree.IntersectTree(ray);
-            float intersectDistance = rayIntersection.Item1;
-            Primitive intersectPrimitive = rayIntersection.Item2;
-            ray.Length = intersectDistance;
-            Intersection intersection = new Intersection(ray.Origin + ray.Direction * ray.Length, intersectPrimitive);
+            (float distance, Primitive primitive) = PrimitiveTree.IntersectTree(ray);
+            ray.Length = distance;
+            Intersection intersection = new Intersection(ray.Origin + ray.Direction * ray.Length, primitive);
             Vector3 color = CastShadowRay(intersection, ray);
 
             // Debug: Primary Rays

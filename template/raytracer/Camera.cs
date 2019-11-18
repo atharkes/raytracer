@@ -1,7 +1,7 @@
 ﻿using OpenTK;
 using System;
 
-namespace raytracer {
+namespace Raytracer {
     class Camera {
         public Vector3 Position, Direction;
         public Vector3 PlaneCenter;
@@ -12,9 +12,9 @@ namespace raytracer {
         public float Sensitivity = 0.004f;
         public float MoveSpeed = 0.1f;
 
-        public Camera(Vector3 position, Vector3 direction) {
-            Position = position;
-            Direction = direction;
+        public Camera(Vector3? position = null, Vector3? direction = null) {
+            Position = position ?? new Vector3(0, -1, -1);
+            Direction = direction ?? new Vector3(0, 0, 1);
             UpdatePlane();
         }
 

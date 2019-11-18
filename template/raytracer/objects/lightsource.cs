@@ -1,6 +1,6 @@
 ﻿using OpenTK;
 
-namespace raytracer {
+namespace Raytracer.Objects {
     class Lightsource {
         public Vector3 Position;
         public Vector3 Color;

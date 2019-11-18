@@ -1,7 +1,7 @@
 ﻿using OpenTK;
 using System;
 
-namespace template {
+namespace raytracer {
     class Camera {
         public Vector3 Position, Direction;
         public Vector3 PlaneCenter;

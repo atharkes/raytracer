@@ -90,6 +90,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="multithreading\cpuaffinity.cs" />
     <Compile Include="multithreading\threadpool.cs" />
     <Compile Include="raytracer\bvh.cs" />
@@ -100,7 +101,7 @@
     <Compile Include="game.cs" />
     <Compile Include="raytracer\objects\lightsource.cs" />
     <Compile Include="raytracer\objects\plane.cs" />
-    <Compile Include="raytracer\primitive.cs" />
+    <Compile Include="raytracer\objects\primitive.cs" />
     <Compile Include="raytracer\objects\sphere.cs" />
     <Compile Include="raytracer\scene.cs" />
     <Compile Include="template\surface.cs" />

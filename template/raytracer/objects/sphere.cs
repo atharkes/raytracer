@@ -2,18 +2,13 @@
 using System;
 using System.Collections.Generic;
 
-namespace template {
+namespace raytracer {
     class Sphere : Primitive {
-        public Vector3 Position;
         public float Radius;
 
-        public Sphere(Vector3 position, float radius, Vector3 color, float specularity = 0, float glossyness = 0, float glossSpecularity = 0) {
-            Position = position;
+        public Sphere(Vector3 position, float radius, Vector3 color, float specularity = 0, float glossyness = 0, float glossSpecularity = 0)
+            : base(position, color, specularity, glossyness, glossSpecularity) {
             Radius = radius;
-            Color = color;
-            Specularity = specularity;
-            Glossyness = glossyness;
-            GlossSpecularity = glossSpecularity;
         }
 
         public override float Intersect(Ray ray) {
@@ -21,8 +16,7 @@ namespace template {
             float rayCircleDot = Vector3.Dot(circlePos, ray.Direction);
             Vector3 rayNormal = circlePos - rayCircleDot * ray.Direction;
             float rayNormalDot = Vector3.Dot(rayNormal, rayNormal);
-            if (rayNormalDot > Radius * Radius)
-                return -1f;
+            if (rayNormalDot > Radius * Radius) return -1f;
             rayCircleDot -= (float)Math.Sqrt(Radius * Radius - rayNormalDot);
             return rayCircleDot;
         }
@@ -32,10 +26,11 @@ namespace template {
             float rayCircleDot = Vector3.Dot(circlePos, ray.Direction);
             Vector3 rayNormal = circlePos - rayCircleDot * ray.Direction;
             float rayNormalDot = Vector3.Dot(rayNormal, rayNormal);
-            if (rayNormalDot > Radius * Radius || rayCircleDot < 0 || rayCircleDot > ray.Length)
+            if (rayNormalDot > Radius * Radius || rayCircleDot < 0 || rayCircleDot > ray.Length) {
                 return false;
-            else
+            } else {
                 return true;
+            }   
         }
 
         public override Vector3 GetNormal(Vector3 intersectionPoint) {

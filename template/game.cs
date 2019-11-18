@@ -2,9 +2,9 @@
 using OpenTK.Input;
 using System;
 using System.Diagnostics;
-using template.multithreading;
+using raytracer.multithreading;
 
-namespace template {
+namespace raytracer {
     class Game {
         public Surface Screen;
         public Camera Camera;
@@ -25,7 +25,7 @@ namespace template {
         readonly float debugCamWidth = 20f;
         readonly float debugCamHeight = 20f;
         bool debugRay;
-        bool debug = false;
+        bool debug = true;
         readonly bool debugPrimaryRay = true;
         readonly bool debugShadowRay = true;
 
@@ -145,10 +145,11 @@ namespace template {
         void TraceRay(int x, int y) {
             // Debug: Check if ray has to be drawn
             if (debug) {
-                if ((x == 0 || (x + 1) % 16 == 0) && y == (raytracerHeight - 1) / 2)
+                if ((x == 0 || (x + 1) % 16 == 0) && y == (raytracerHeight - 1) / 2) {
                     debugRay = true;
-                else
+                } else {
                     debugRay = false;
+                }
             }
 
             // Cast Ray
@@ -177,17 +178,18 @@ namespace template {
 
             // Debug: Primary Rays
             if (debug && debugRay && debugPrimaryRay) {
-                if (ray.Length < 0 || intersection.Primitive is Plane)
+                if (ray.Length < 0 || intersection.Primitive is Plane) {
                     DrawRay(ray, 1.5f, 0xffff00);
-                else
+                } else {
                     DrawRay(ray, ray.Length, 0xffff00);
+                }
             }
             // Specularity
             if (intersection.Primitive != null) {
                 if (intersection.Primitive.Specularity > 0 && recursionDepth < recursionDepthMax) {
                     recursionDepth += 1;
                     // Cast Reflected Ray
-                    Vector3 normal = intersection.Primitive.GetNormal(intersection.Position);
+                    Vector3 normal = intersection.Normal;
                     Vector3 newDirection = ray.Direction - 2 * Vector3.Dot(ray.Direction, normal) * normal;
                     ray = new Ray(intersection.Position, newDirection);
                     Vector3 colorReflection = CastPrimaryRay(ray, recursionDepth);
@@ -202,8 +204,7 @@ namespace template {
         // Intersect shadow ray with primitives for each light and calculating the color
         Vector3 CastShadowRay(Intersection intersection, Ray primaryRay) {
             Vector3 totalColor = new Vector3(0, 0, 0);
-            if (intersection.Primitive == null)
-                return totalColor;
+            if (intersection.Primitive == null) return totalColor;
 
             foreach (Lightsource light in Scene.Lights) {
                 Vector3 color = intersection.Primitive.Color;
@@ -211,18 +212,18 @@ namespace template {
                 Ray shadowRay = new Ray(intersection.Position, light.Position - intersection.Position);
                 shadowRay.Length = (float)Math.Sqrt(Vector3.Dot(light.Position - shadowRay.Origin, light.Position - shadowRay.Origin));
 
-                if (PrimitiveTree.IntersectTreeBool(shadowRay))
+                if (PrimitiveTree.IntersectTreeBool(shadowRay)) {
                     continue;
-                else {
+                } else {
                     // Light Absorption
                     color = color * light.Color;
                     // N dot L
-                    Vector3 normal = intersection.Primitive.GetNormal(intersection.Position);
+                    Vector3 normal = intersection.Normal;
                     float NdotL = Vector3.Dot(normal, shadowRay.Direction);
-                    if (intersection.Primitive.Glossyness == 0)
+                    if (intersection.Primitive.Glossyness == 0) {
                         color = color * NdotL;
-                    // Glossyness
-                    else if (intersection.Primitive.Glossyness > 0) {
+                    } else if (intersection.Primitive.Glossyness > 0) {
+                        // Glossyness
                         Vector3 glossyDirection = (-shadowRay.Direction - 2 * (Vector3.Dot(-shadowRay.Direction, normal)) * normal);
                         float dot = Vector3.Dot(glossyDirection, -primaryRay.Direction);
                         if (dot > 0) {
@@ -231,8 +232,9 @@ namespace template {
                             color = color * (1 - intersection.Primitive.Glossyness) * NdotL + intersection.Primitive.Glossyness * glossyness * light.Color;
                             // Phong-Shading (Official)
                             //color = color * ((1 - intersection.primitive.glossyness) * NdotL + intersection.primitive.glossyness * glossyness);
-                        } else
+                        } else {
                             color = color * (1 - intersection.Primitive.Glossyness) * NdotL;
+                        } 
                     }
                     // Distance Attenuation
                     color = color * (1 / (shadowRay.Length * shadowRay.Length));
@@ -241,17 +243,16 @@ namespace template {
                     totalColor += color;
 
                     // Debug: Shadow Rays
-                    if (debug && debugRay && debugShadowRay && !(intersection.Primitive is Plane))
+                    if (debug && debugRay && debugShadowRay && !(intersection.Primitive is Plane)) {
                         DrawRay(shadowRay, shadowRay.Length, GetColor(light.Color));
+                    }
                 }
 
             }
             // Triangle Texture
             if (intersection.Primitive is Triangle) {
-                if (Math.Abs(intersection.Position.X % 2) < 1)
-                    totalColor = totalColor * 0.5f;
-                if (Math.Abs(intersection.Position.Z % 2) > 1)
-                    totalColor = totalColor * 0.5f;
+                if (Math.Abs(intersection.Position.X % 2) < 1) totalColor = totalColor * 0.5f;
+                if (Math.Abs(intersection.Position.Z % 2) > 1) totalColor = totalColor * 0.5f;
             }
 
             return totalColor;
@@ -272,8 +273,9 @@ namespace template {
             int y1 = TZ(ray.Origin.Z);
             int x2 = TX(ray.Origin.X + ray.Direction.X * length);
             int y2 = TZ(ray.Origin.Z + ray.Direction.Z * length);
-            if (CheckDebugBounds(x1, y1) && CheckDebugBounds(x2, y2))
+            if (CheckDebugBounds(x1, y1) && CheckDebugBounds(x2, y2)) {
                 Screen.Line(x1, y1, x2, y2, color);
+            }
         }
 
         // Debug: Draw Camera
@@ -282,8 +284,9 @@ namespace template {
             int y1 = TZ(camera.Position.Z) - 1;
             int x2 = x1 + 2;
             int y2 = y1 + 2;
-            if (CheckDebugBounds(x1, y1) && CheckDebugBounds(x2, y2))
+            if (CheckDebugBounds(x1, y1) && CheckDebugBounds(x2, y2)) {
                 Screen.Box(x1, y1, x2, y2, 0xffffff);
+            }
         }
 
         // Debug: Draw Lightsource
@@ -292,8 +295,9 @@ namespace template {
             int y1 = TZ(light.Position.Z) - 1;
             int x2 = x1 + 2;
             int y2 = y1 + 2;
-            if (CheckDebugBounds(x1, y1) && CheckDebugBounds(x2, y2))
+            if (CheckDebugBounds(x1, y1) && CheckDebugBounds(x2, y2)) {
                 Screen.Box(x1, y1, x2, y2, GetColor(light.Color));
+            }
         }
 
         // Debug: Draw Screen Plane
@@ -311,17 +315,19 @@ namespace template {
                 int y1 = TZ(sphere.Position.Z + (float)Math.Sin(i / 128f * 2 * Math.PI) * sphere.Radius);
                 int x2 = TX(sphere.Position.X + (float)Math.Cos((i + 1) / 128f * 2 * Math.PI) * sphere.Radius);
                 int y2 = TZ(sphere.Position.Z + (float)Math.Sin((i + 1) / 128f * 2 * Math.PI) * sphere.Radius);
-                if (CheckDebugBounds(x1, y1) && CheckDebugBounds(x2, y2))
+                if (CheckDebugBounds(x1, y1) && CheckDebugBounds(x2, y2)) {
                     Screen.Line(x1, y1, x2, y2, GetColor(sphere.Color));
+                }
             }
         }
 
         // Debug: Check if outside debug screen bounds
         bool CheckDebugBounds(int x, int y) {
-            if (x < raytracerWidth || x > raytracerWidth + 511 || y < 0 || y > 511)
+            if (x < raytracerWidth || x > raytracerWidth + 511 || y < 0 || y > 511) {
                 return false;
-            else
+            } else {
                 return true;
+            }
         }
 
         // Debug: Transform X coord to X on debug screen

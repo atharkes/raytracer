@@ -3,7 +3,7 @@ using System.Drawing;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 
-namespace template {
+namespace raytracer {
     public class OpenTKApp : GameWindow {
         static int screenID;
         static Game game;

@@ -1,6 +1,6 @@
 ﻿using OpenTK;
 
-namespace template {
+namespace raytracer {
     class Lightsource {
         public Vector3 Position;
         public Vector3 Color;

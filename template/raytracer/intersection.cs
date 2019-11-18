@@ -2,12 +2,12 @@
 
 namespace template {
     class Intersection {
-        public Vector3 position;
-        public Primitive primitive;
+        public Vector3 Position;
+        public Primitive Primitive;
 
         public Intersection(Vector3 position, Primitive primitive) {
-            this.position = position;
-            this.primitive = primitive;
+            Position = position;
+            Primitive = primitive;
         }
     }
 }

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace template {
     class BVHNode {
         BVHNode left, right;
-        List<Vector3> bounds;
+        readonly List<Vector3> bounds;
         bool leaf;
         List<Primitive> primitives;
 
@@ -31,13 +31,13 @@ namespace template {
                 else
                     return intersectionRight;
             } else if (intersectBool && leaf) {
-                Tuple<float, Primitive> intersection = new Tuple<float, Primitive>(ray.length, null);
+                Tuple<float, Primitive> intersection = new Tuple<float, Primitive>(ray.Length, null);
                 foreach (Primitive primitive in primitives) {
                     float intersectDistance = primitive.Intersect(ray);
                     if (intersectDistance > 0 && intersectDistance < intersection.Item1)
                         intersection = new Tuple<float, Primitive>(intersectDistance, primitive);
                 }
-                if (intersection.Item1 == ray.length)
+                if (intersection.Item1 == ray.Length)
                     intersection = new Tuple<float, Primitive>(-1f, null);
                 return intersection;
             } else {
@@ -67,13 +67,13 @@ namespace template {
 
         // Intersect the AABB of the Node
         public bool IntersectAABB(Ray ray) {
-            float tx1 = (bounds[0].X - ray.origin.X) * ray.directionInverted.X;
-            float tx2 = (bounds[1].X - ray.origin.X) * ray.directionInverted.X;
+            float tx1 = (bounds[0].X - ray.Origin.X) * ray.DirectionInverted.X;
+            float tx2 = (bounds[1].X - ray.Origin.X) * ray.DirectionInverted.X;
             float tmin = Math.Min(tx1, tx2);
             float tmax = Math.Max(tx1, tx2);
 
-            float ty1 = (bounds[0].Y - ray.origin.Y) * ray.directionInverted.Y;
-            float ty2 = (bounds[1].Y - ray.origin.Y) * ray.directionInverted.Y;
+            float ty1 = (bounds[0].Y - ray.Origin.Y) * ray.DirectionInverted.Y;
+            float ty2 = (bounds[1].Y - ray.Origin.Y) * ray.DirectionInverted.Y;
             float tymin = Math.Min(ty1, ty2);
             float tymax = Math.Max(ty1, ty2);
 
@@ -84,8 +84,8 @@ namespace template {
             if (tymax < tmax)
                 tmax = tymax;
 
-            float tz1 = (bounds[0].Z - ray.origin.Z) * ray.directionInverted.Z;
-            float tz2 = (bounds[1].Z - ray.origin.Z) * ray.directionInverted.Z;
+            float tz1 = (bounds[0].Z - ray.Origin.Z) * ray.DirectionInverted.Z;
+            float tz2 = (bounds[1].Z - ray.Origin.Z) * ray.DirectionInverted.Z;
             float tzmin = Math.Min(tz1, tz2);
             float tzmax = Math.Max(tz1, tz2);
 
@@ -121,10 +121,12 @@ namespace template {
             float cost = costBegin;
             Tuple<List<Primitive>, List<Primitive>> splitPrimitives = null;
             foreach (Primitive primitive in primitives) {
-                List<Tuple<List<Primitive>, List<Primitive>>> splits = new List<Tuple<List<Primitive>, List<Primitive>>>(3);
-                splits.Add(SplitX(primitive));
-                splits.Add(SplitY(primitive));
-                splits.Add(SplitZ(primitive));
+                List<Tuple<List<Primitive>, List<Primitive>>> splits = new List<Tuple<List<Primitive>, List<Primitive>>>(3)
+                {
+                    SplitX(primitive),
+                    SplitY(primitive),
+                    SplitZ(primitive)
+                };
 
                 foreach (Tuple<List<Primitive>, List<Primitive>> split in splits) {
                     float splitCost = CalculateCost(split);

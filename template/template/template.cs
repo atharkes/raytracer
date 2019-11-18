@@ -7,7 +7,7 @@ namespace template {
     public class OpenTKApp : GameWindow {
         static int screenID;
         static Game game;
-        static bool terminated = false;
+        static readonly bool terminated = false;
 
         protected override void OnLoad(EventArgs e) {
             // called upon app init
@@ -17,10 +17,10 @@ namespace template {
             GL.Hint(HintTarget.PerspectiveCorrectionHint, HintMode.Nicest);
             game = new Game();
             game.SetScreen();
-            ClientSize = new Size(game.screen.width, game.screen.height);
+            ClientSize = new Size(game.Screen.Width, game.Screen.Height);
             Location = new Point(0, 30);
-            Sprite.target = game.screen;
-            screenID = game.screen.GenTexture();
+            Sprite.Target = game.Screen;
+            screenID = game.Screen.GenTexture();
             game.Init(this);
         }
 
@@ -54,9 +54,9 @@ namespace template {
             // convert Game.screen to OpenGL texture
             GL.BindTexture(TextureTarget.Texture2D, screenID);
             GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba,
-                           game.screen.width, game.screen.height, 0,
+                           game.Screen.Width, game.Screen.Height, 0,
                            OpenTK.Graphics.OpenGL.PixelFormat.Bgra,
-                           PixelType.UnsignedByte, game.screen.pixels
+                           PixelType.UnsignedByte, game.Screen.Pixels
                          );
             // clear window contents
             GL.Clear(ClearBufferMask.ColorBufferBit);

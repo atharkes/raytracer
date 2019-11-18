@@ -3,39 +3,39 @@ using System;
 
 namespace template {
     class Camera {
-        public Vector3 position, direction;
-        public Vector3 planeCenter;
-        public Vector3 planeCorner1, planeCorner2, planeCorner3, planeCorner4;
-        public Vector3 up = new Vector3(0, -1, 0);
-        public Vector3 left;
-        public float fov = 90;
-        public float sensitivity = 0.004f;
-        public float moveSpeed = 0.1f;
+        public Vector3 Position, Direction;
+        public Vector3 PlaneCenter;
+        public Vector3 PlaneCorner1, PlaneCorner2, PlaneCorner3, PlaneCorner4;
+        public Vector3 Up = new Vector3(0, -1, 0);
+        public Vector3 Left;
+        public float Fov = 90;
+        public float Sensitivity = 0.004f;
+        public float MoveSpeed = 0.1f;
 
         public Camera(Vector3 position, Vector3 direction) {
-            this.position = position;
-            this.direction = direction;
+            Position = position;
+            Direction = direction;
             UpdatePlane();
         }
 
         void UpdatePlane() {
-            planeCenter = position + direction * 1 / ((float)Math.Tan(fov / 360 * Math.PI));
-            left = new Vector3(-direction.Z, 0, direction.X).Normalized();
-            up = Vector3.Cross(direction, left);
-            planeCorner1 = planeCenter + left + up;
-            planeCorner2 = planeCenter - left + up;
-            planeCorner3 = planeCenter + left - up;
-            planeCorner4 = planeCenter - left - up;
+            PlaneCenter = Position + Direction * 1 / ((float)Math.Tan(Fov / 360 * Math.PI));
+            Left = new Vector3(-Direction.Z, 0, Direction.X).Normalized();
+            Up = Vector3.Cross(Direction, Left);
+            PlaneCorner1 = PlaneCenter + Left + Up;
+            PlaneCorner2 = PlaneCenter - Left + Up;
+            PlaneCorner3 = PlaneCenter + Left - Up;
+            PlaneCorner4 = PlaneCenter - Left - Up;
         }
 
         public void Move(Vector3 move) {
-            position += move * moveSpeed;
+            Position += move * MoveSpeed;
             UpdatePlane();
         }
 
         public void Turn(Vector3 turn) {
-            direction += turn * sensitivity;
-            direction.Normalize();
+            Direction += turn * Sensitivity;
+            Direction.Normalize();
             UpdatePlane();
         }
     }

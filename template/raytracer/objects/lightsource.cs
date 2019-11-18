@@ -2,12 +2,12 @@
 
 namespace template {
     class Lightsource {
-        public Vector3 position;
-        public Vector3 color;
+        public Vector3 Position;
+        public Vector3 Color;
 
         public Lightsource(Vector3 position, Vector3 color) {
-            this.position = position;
-            this.color = color;
+            Position = position;
+            Color = color;
         }
     }
 }

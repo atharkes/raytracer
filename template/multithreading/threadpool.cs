@@ -4,10 +4,11 @@ using System.Threading;
 namespace template.multithreading {
     class Threadpool {
         public int ThreadCount { get; set; }
-        Thread[] workerThreads;
-        EventWaitHandle[] go;
-        EventWaitHandle[] doneHandle;
-        bool[] done;
+
+        readonly Thread[] workerThreads;
+        readonly EventWaitHandle[] go;
+        readonly EventWaitHandle[] doneHandle;
+        readonly bool[] done;
         int remaining;
         Action[] tasks;
 

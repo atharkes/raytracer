@@ -6,27 +6,28 @@ using template.multithreading;
 
 namespace template {
     class Game {
-        public Surface screen;
-        public Camera camera;
-        public Scene scene;
-        public BVHNode primitiveTree;
+        public Surface Screen;
+        public Camera Camera;
+        public Scene Scene;
+        public BVHNode PrimitiveTree;
+
         OpenTKApp template;
-        int raytracerWidth = 512;
-        int raytracerHeight = 512;
-        int recursionDepthMax = 5;
+        readonly int raytracerWidth = 512;
+        readonly int raytracerHeight = 512;
+        readonly int recursionDepthMax = 5;
 
         Threadpool threadpool;
         Action[] tasks;
-        int taskAmount = 64;
+        readonly int taskAmount = 64;
 
         float debugCamX;
         float debugCamZ;
-        float debugCamWidth = 20f;
-        float debugCamHeight = 20f;
+        readonly float debugCamWidth = 20f;
+        readonly float debugCamHeight = 20f;
         bool debugRay;
         bool debug = false;
-        bool debugPrimaryRay = true;
-        bool debugShadowRay = true;
+        readonly bool debugPrimaryRay = true;
+        readonly bool debugShadowRay = true;
 
         KeyboardState keyboardState;
         MouseState mouseStatePrevious, mouseStateCurrent;
@@ -35,9 +36,9 @@ namespace template {
 
         public void Init(OpenTKApp template) {
             this.template = template;
-            camera = new Camera(new Vector3(0, 0, -1), new Vector3(0, 0, 1));
-            scene = new Scene();
-            primitiveTree = new BVHNode(scene.primitives);
+            Camera = new Camera(new Vector3(0, 0, -1), new Vector3(0, 0, 1));
+            Scene = new Scene();
+            PrimitiveTree = new BVHNode(Scene.Primitives);
             tasks = new Action[taskAmount];
             threadpool = new Threadpool();
         }
@@ -47,17 +48,17 @@ namespace template {
             int screenHeight = raytracerHeight;
             if (debug)
                 screenWidth += 512;
-            screen = new Surface(screenWidth, screenHeight);
+            Screen = new Surface(screenWidth, screenHeight);
         }
 
         public void Tick() {
             // Moving Light
             lightStartPos += 0.1f;
             float move = (float)Math.Sin(lightStartPos) * 0.5f;
-            scene.lights[0].position += new Vector3(move, 0, 0);
+            Scene.Lights[0].Position += new Vector3(move, 0, 0);
 
             // Clear the screen
-            screen.Clear(0);
+            Screen.Clear(0);
 
             // Check Input
             InputCheck();
@@ -67,19 +68,19 @@ namespace template {
 
             // Debug
             if (debug) {
-                screen.Line(512, 0, 512, 511, 0xffffff);
-                debugCamX = camera.position.X - debugCamHeight / 2;
-                debugCamZ = camera.position.Z - debugCamWidth / 2;
-                DrawCamera(camera);
-                foreach (Lightsource light in scene.lights)
+                Screen.Line(512, 0, 512, 511, 0xffffff);
+                debugCamX = Camera.Position.X - debugCamHeight / 2;
+                debugCamZ = Camera.Position.Z - debugCamWidth / 2;
+                DrawCamera(Camera);
+                foreach (Lightsource light in Scene.Lights)
                     DrawLight(light);
-                DrawScreenPlane(camera);
-                foreach (Primitive primitive in scene.primitives)
+                DrawScreenPlane(Camera);
+                foreach (Primitive primitive in Scene.Primitives)
                     if (primitive is Sphere)
                         DrawSphere((Sphere)primitive);
             }
-            screen.Print("FPS: " + (int)template.RenderFrequency, 1, 1, 0xffffff);
-            screen.Print("FOV: " + camera.fov, 1, 16, 0xffffff);
+            Screen.Print("FPS: " + (int)template.RenderFrequency, 1, 1, 0xffffff);
+            Screen.Print("FOV: " + Camera.Fov, 1, 16, 0xffffff);
         }
 
         void InputCheck() {
@@ -88,27 +89,27 @@ namespace template {
             if (keyboardState[Key.F1])
                 debug = !debug;
             if (keyboardState[Key.Space])
-                camera.Move(camera.up);
+                Camera.Move(Camera.Up);
             if (keyboardState[Key.LShift])
-                camera.Move(-camera.up);
+                Camera.Move(-Camera.Up);
             if (keyboardState[Key.W])
-                camera.Move(camera.direction);
+                Camera.Move(Camera.Direction);
             if (keyboardState[Key.S])
-                camera.Move(-camera.direction);
+                Camera.Move(-Camera.Direction);
             if (keyboardState[Key.A])
-                camera.Move(camera.left);
+                Camera.Move(Camera.Left);
             if (keyboardState[Key.D])
-                camera.Move(-camera.left);
+                Camera.Move(-Camera.Left);
             if (keyboardState[Key.KeypadPlus])
-                camera.fov += 1f;
+                Camera.Fov += 1f;
             if (keyboardState[Key.KeypadMinus])
-                camera.fov -= 1f;
+                Camera.Fov -= 1f;
             // Input: Mouse
             mouseStateCurrent = Mouse.GetState();
             if (mouseStatePrevious != null) {
                 float xDelta = mouseStateCurrent.X - mouseStatePrevious.X;
                 float yDelta = mouseStateCurrent.Y - mouseStatePrevious.Y;
-                camera.Turn(-xDelta * camera.left + -yDelta * camera.up);
+                Camera.Turn(-xDelta * Camera.Left + -yDelta * Camera.Up);
             }
             mouseStatePrevious = mouseStateCurrent;
         }
@@ -155,44 +156,44 @@ namespace template {
             Vector3 pixelColor = CastPrimaryRay(ray);
 
             // Draw Pixel
-            screen.Plot(x, y, GetColor(pixelColor));
+            Screen.Plot(x, y, GetColor(pixelColor));
         }
 
         // Create primary ray from camera origin trough screen plane
         Ray GetPrimaryRay(int x, int y) {
-            Vector3 planePoint = camera.planeCorner1 + ((float)x / (raytracerWidth - 1)) * (camera.planeCorner2 - camera.planeCorner1) + ((float)y / (raytracerHeight - 1)) * (camera.planeCorner3 - camera.planeCorner1);
-            return new Ray(camera.position, planePoint - camera.position);
+            Vector3 planePoint = Camera.PlaneCorner1 + ((float)x / (raytracerWidth - 1)) * (Camera.PlaneCorner2 - Camera.PlaneCorner1) + ((float)y / (raytracerHeight - 1)) * (Camera.PlaneCorner3 - Camera.PlaneCorner1);
+            return new Ray(Camera.Position, planePoint - Camera.Position);
         }
 
         // Intersect primary ray with primitives and fire a new ray if object is specular
         Vector3 CastPrimaryRay(Ray ray, int recursionDepth = 0) {
             // Intersect with Scene
-            Tuple<float, Primitive> rayIntersection = primitiveTree.IntersectTree(ray);
+            Tuple<float, Primitive> rayIntersection = PrimitiveTree.IntersectTree(ray);
             float intersectDistance = rayIntersection.Item1;
             Primitive intersectPrimitive = rayIntersection.Item2;
-            ray.length = intersectDistance;
-            Intersection intersection = new Intersection(ray.origin + ray.direction * ray.length, intersectPrimitive);
+            ray.Length = intersectDistance;
+            Intersection intersection = new Intersection(ray.Origin + ray.Direction * ray.Length, intersectPrimitive);
             Vector3 color = CastShadowRay(intersection, ray);
 
             // Debug: Primary Rays
             if (debug && debugRay && debugPrimaryRay) {
-                if (ray.length < 0 || intersection.primitive is Plane)
+                if (ray.Length < 0 || intersection.Primitive is Plane)
                     DrawRay(ray, 1.5f, 0xffff00);
                 else
-                    DrawRay(ray, ray.length, 0xffff00);
+                    DrawRay(ray, ray.Length, 0xffff00);
             }
             // Specularity
-            if (intersection.primitive != null) {
-                if (intersection.primitive.specularity > 0 && recursionDepth < recursionDepthMax) {
+            if (intersection.Primitive != null) {
+                if (intersection.Primitive.Specularity > 0 && recursionDepth < recursionDepthMax) {
                     recursionDepth += 1;
                     // Cast Reflected Ray
-                    Vector3 normal = intersection.primitive.GetNormal(intersection.position);
-                    Vector3 newDirection = ray.direction - 2 * Vector3.Dot(ray.direction, normal) * normal;
-                    ray = new Ray(intersection.position, newDirection);
+                    Vector3 normal = intersection.Primitive.GetNormal(intersection.Position);
+                    Vector3 newDirection = ray.Direction - 2 * Vector3.Dot(ray.Direction, normal) * normal;
+                    ray = new Ray(intersection.Position, newDirection);
                     Vector3 colorReflection = CastPrimaryRay(ray, recursionDepth);
 
                     // Calculate Specularity
-                    color = color * (1 - intersection.primitive.specularity) + colorReflection * intersection.primitive.specularity * intersection.primitive.color;
+                    color = color * (1 - intersection.Primitive.Specularity) + colorReflection * intersection.Primitive.Specularity * intersection.Primitive.Color;
                 }
             }
             return color;
@@ -201,55 +202,55 @@ namespace template {
         // Intersect shadow ray with primitives for each light and calculating the color
         Vector3 CastShadowRay(Intersection intersection, Ray primaryRay) {
             Vector3 totalColor = new Vector3(0, 0, 0);
-            if (intersection.primitive == null)
+            if (intersection.Primitive == null)
                 return totalColor;
 
-            foreach (Lightsource light in scene.lights) {
-                Vector3 color = intersection.primitive.color;
+            foreach (Lightsource light in Scene.Lights) {
+                Vector3 color = intersection.Primitive.Color;
 
-                Ray shadowRay = new Ray(intersection.position, light.position - intersection.position);
-                shadowRay.length = (float)Math.Sqrt(Vector3.Dot(light.position - shadowRay.origin, light.position - shadowRay.origin));
+                Ray shadowRay = new Ray(intersection.Position, light.Position - intersection.Position);
+                shadowRay.Length = (float)Math.Sqrt(Vector3.Dot(light.Position - shadowRay.Origin, light.Position - shadowRay.Origin));
 
-                if (primitiveTree.IntersectTreeBool(shadowRay))
+                if (PrimitiveTree.IntersectTreeBool(shadowRay))
                     continue;
                 else {
                     // Light Absorption
-                    color = color * light.color;
+                    color = color * light.Color;
                     // N dot L
-                    Vector3 normal = intersection.primitive.GetNormal(intersection.position);
-                    float NdotL = Vector3.Dot(normal, shadowRay.direction);
-                    if (intersection.primitive.glossyness == 0)
+                    Vector3 normal = intersection.Primitive.GetNormal(intersection.Position);
+                    float NdotL = Vector3.Dot(normal, shadowRay.Direction);
+                    if (intersection.Primitive.Glossyness == 0)
                         color = color * NdotL;
                     // Glossyness
-                    else if (intersection.primitive.glossyness > 0) {
-                        Vector3 glossyDirection = (-shadowRay.direction - 2 * (Vector3.Dot(-shadowRay.direction, normal)) * normal);
-                        float dot = Vector3.Dot(glossyDirection, -primaryRay.direction);
+                    else if (intersection.Primitive.Glossyness > 0) {
+                        Vector3 glossyDirection = (-shadowRay.Direction - 2 * (Vector3.Dot(-shadowRay.Direction, normal)) * normal);
+                        float dot = Vector3.Dot(glossyDirection, -primaryRay.Direction);
                         if (dot > 0) {
-                            float glossyness = (float)Math.Pow(dot, intersection.primitive.glossSpecularity);
+                            float glossyness = (float)Math.Pow(dot, intersection.Primitive.GlossSpecularity);
                             // Phong-Shading (My Version)
-                            color = color * (1 - intersection.primitive.glossyness) * NdotL + intersection.primitive.glossyness * glossyness * light.color;
+                            color = color * (1 - intersection.Primitive.Glossyness) * NdotL + intersection.Primitive.Glossyness * glossyness * light.Color;
                             // Phong-Shading (Official)
                             //color = color * ((1 - intersection.primitive.glossyness) * NdotL + intersection.primitive.glossyness * glossyness);
                         } else
-                            color = color * (1 - intersection.primitive.glossyness) * NdotL;
+                            color = color * (1 - intersection.Primitive.Glossyness) * NdotL;
                     }
                     // Distance Attenuation
-                    color = color * (1 / (shadowRay.length * shadowRay.length));
+                    color = color * (1 / (shadowRay.Length * shadowRay.Length));
 
                     // Add Color to Total
                     totalColor += color;
 
                     // Debug: Shadow Rays
-                    if (debug && debugRay && debugShadowRay && !(intersection.primitive is Plane))
-                        DrawRay(shadowRay, shadowRay.length, GetColor(light.color));
+                    if (debug && debugRay && debugShadowRay && !(intersection.Primitive is Plane))
+                        DrawRay(shadowRay, shadowRay.Length, GetColor(light.Color));
                 }
 
             }
             // Triangle Texture
-            if (intersection.primitive is Triangle) {
-                if (Math.Abs(intersection.position.X % 2) < 1)
+            if (intersection.Primitive is Triangle) {
+                if (Math.Abs(intersection.Position.X % 2) < 1)
                     totalColor = totalColor * 0.5f;
-                if (Math.Abs(intersection.position.Z % 2) > 1)
+                if (Math.Abs(intersection.Position.Z % 2) > 1)
                     totalColor = totalColor * 0.5f;
             }
 
@@ -267,51 +268,51 @@ namespace template {
 
         // Debug: Draw Ray
         void DrawRay(Ray ray, float length, int color) {
-            int x1 = TX(ray.origin.X);
-            int y1 = TZ(ray.origin.Z);
-            int x2 = TX(ray.origin.X + ray.direction.X * length);
-            int y2 = TZ(ray.origin.Z + ray.direction.Z * length);
+            int x1 = TX(ray.Origin.X);
+            int y1 = TZ(ray.Origin.Z);
+            int x2 = TX(ray.Origin.X + ray.Direction.X * length);
+            int y2 = TZ(ray.Origin.Z + ray.Direction.Z * length);
             if (CheckDebugBounds(x1, y1) && CheckDebugBounds(x2, y2))
-                screen.Line(x1, y1, x2, y2, color);
+                Screen.Line(x1, y1, x2, y2, color);
         }
 
         // Debug: Draw Camera
         void DrawCamera(Camera camera) {
-            int x1 = TX(camera.position.X) - 1;
-            int y1 = TZ(camera.position.Z) - 1;
+            int x1 = TX(camera.Position.X) - 1;
+            int y1 = TZ(camera.Position.Z) - 1;
             int x2 = x1 + 2;
             int y2 = y1 + 2;
             if (CheckDebugBounds(x1, y1) && CheckDebugBounds(x2, y2))
-                screen.Box(x1, y1, x2, y2, 0xffffff);
+                Screen.Box(x1, y1, x2, y2, 0xffffff);
         }
 
         // Debug: Draw Lightsource
         void DrawLight(Lightsource light) {
-            int x1 = TX(light.position.X) - 1;
-            int y1 = TZ(light.position.Z) - 1;
+            int x1 = TX(light.Position.X) - 1;
+            int y1 = TZ(light.Position.Z) - 1;
             int x2 = x1 + 2;
             int y2 = y1 + 2;
             if (CheckDebugBounds(x1, y1) && CheckDebugBounds(x2, y2))
-                screen.Box(x1, y1, x2, y2, GetColor(light.color));
+                Screen.Box(x1, y1, x2, y2, GetColor(light.Color));
         }
 
         // Debug: Draw Screen Plane
         void DrawScreenPlane(Camera camera) {
-            screen.Line(TX(camera.planeCorner1.X), TZ(camera.planeCorner1.Z), TX(camera.planeCorner2.X), TZ(camera.planeCorner2.Z), 0xffffff);
-            screen.Line(TX(camera.planeCorner2.X), TZ(camera.planeCorner2.Z), TX(camera.planeCorner4.X), TZ(camera.planeCorner4.Z), 0xffffff);
-            screen.Line(TX(camera.planeCorner3.X), TZ(camera.planeCorner3.Z), TX(camera.planeCorner4.X), TZ(camera.planeCorner4.Z), 0xffffff);
-            screen.Line(TX(camera.planeCorner3.X), TZ(camera.planeCorner3.Z), TX(camera.planeCorner1.X), TZ(camera.planeCorner1.Z), 0xffffff);
+            Screen.Line(TX(camera.PlaneCorner1.X), TZ(camera.PlaneCorner1.Z), TX(camera.PlaneCorner2.X), TZ(camera.PlaneCorner2.Z), 0xffffff);
+            Screen.Line(TX(camera.PlaneCorner2.X), TZ(camera.PlaneCorner2.Z), TX(camera.PlaneCorner4.X), TZ(camera.PlaneCorner4.Z), 0xffffff);
+            Screen.Line(TX(camera.PlaneCorner3.X), TZ(camera.PlaneCorner3.Z), TX(camera.PlaneCorner4.X), TZ(camera.PlaneCorner4.Z), 0xffffff);
+            Screen.Line(TX(camera.PlaneCorner3.X), TZ(camera.PlaneCorner3.Z), TX(camera.PlaneCorner1.X), TZ(camera.PlaneCorner1.Z), 0xffffff);
         }
 
         // Debug: Draw Sphere
         void DrawSphere(Sphere sphere) {
             for (int i = 0; i < 128; i++) {
-                int x1 = TX(sphere.position.X + (float)Math.Cos(i / 128f * 2 * Math.PI) * sphere.radius);
-                int y1 = TZ(sphere.position.Z + (float)Math.Sin(i / 128f * 2 * Math.PI) * sphere.radius);
-                int x2 = TX(sphere.position.X + (float)Math.Cos((i + 1) / 128f * 2 * Math.PI) * sphere.radius);
-                int y2 = TZ(sphere.position.Z + (float)Math.Sin((i + 1) / 128f * 2 * Math.PI) * sphere.radius);
+                int x1 = TX(sphere.Position.X + (float)Math.Cos(i / 128f * 2 * Math.PI) * sphere.Radius);
+                int y1 = TZ(sphere.Position.Z + (float)Math.Sin(i / 128f * 2 * Math.PI) * sphere.Radius);
+                int x2 = TX(sphere.Position.X + (float)Math.Cos((i + 1) / 128f * 2 * Math.PI) * sphere.Radius);
+                int y2 = TZ(sphere.Position.Z + (float)Math.Sin((i + 1) / 128f * 2 * Math.PI) * sphere.Radius);
                 if (CheckDebugBounds(x1, y1) && CheckDebugBounds(x2, y2))
-                    screen.Line(x1, y1, x2, y2, GetColor(sphere.color));
+                    Screen.Line(x1, y1, x2, y2, GetColor(sphere.Color));
             }
         }
 

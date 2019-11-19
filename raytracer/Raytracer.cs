@@ -81,36 +81,27 @@ namespace Raytracer {
                         DrawSphere((Sphere)primitive);
             }
             Screen.Print("FPS: " + (int)openTKApp.RenderFrequency, 1, 1, 0xffffff);
-            Screen.Print("FOV: " + Camera.Fov, 1, 16, 0xffffff);
+            Screen.Print("FOV: " + Camera.FOV, 1, 16, 0xffffff);
         }
 
         void InputCheck() {
             // Input: Keyboard
             keyboardState = Keyboard.GetState();
-            if (keyboardState[Key.F1])
-                debug = !debug;
-            if (keyboardState[Key.Space])
-                Camera.Move(Camera.Up);
-            if (keyboardState[Key.LShift])
-                Camera.Move(-Camera.Up);
-            if (keyboardState[Key.W])
-                Camera.Move(Camera.Direction);
-            if (keyboardState[Key.S])
-                Camera.Move(-Camera.Direction);
-            if (keyboardState[Key.A])
-                Camera.Move(Camera.Left);
-            if (keyboardState[Key.D])
-                Camera.Move(-Camera.Left);
-            if (keyboardState[Key.KeypadPlus])
-                Camera.Fov += 1f;
-            if (keyboardState[Key.KeypadMinus])
-                Camera.Fov -= 1f;
+            if (keyboardState[Key.F1]) debug = !debug;
+            if (keyboardState[Key.Space]) Camera.Move(Camera.Up);
+            if (keyboardState[Key.LShift]) Camera.Move(Camera.Down);
+            if (keyboardState[Key.W]) Camera.Move(Camera.Front);
+            if (keyboardState[Key.S]) Camera.Move(Camera.Back);
+            if (keyboardState[Key.A]) Camera.Move(Camera.Left);
+            if (keyboardState[Key.D]) Camera.Move(Camera.Right);
+            if (keyboardState[Key.KeypadPlus]) Camera.FOV *= 1.1f;
+            if (keyboardState[Key.KeypadMinus]) Camera.FOV *= 0.9f;
             // Input: Mouse
             mouseStateCurrent = Mouse.GetState();
             if (mouseStatePrevious != null) {
                 float xDelta = mouseStateCurrent.X - mouseStatePrevious.X;
                 float yDelta = mouseStateCurrent.Y - mouseStatePrevious.Y;
-                Camera.Turn(-xDelta * Camera.Left + -yDelta * Camera.Up);
+                Camera.Turn(xDelta * Camera.Right + yDelta * Camera.Down);
             }
             mouseStatePrevious = mouseStateCurrent;
         }
@@ -163,7 +154,7 @@ namespace Raytracer {
 
         // Create primary ray from camera origin trough screen plane
         Ray GetPrimaryRay(int x, int y) {
-            Vector3 planePoint = Camera.PlaneCorner1 + ((float)x / (raytracerWidth - 1)) * (Camera.PlaneCorner2 - Camera.PlaneCorner1) + ((float)y / (raytracerHeight - 1)) * (Camera.PlaneCorner3 - Camera.PlaneCorner1);
+            Vector3 planePoint = Camera.ScreenPlane.TopLeft + ((float)x / (raytracerWidth - 1)) * (Camera.ScreenPlane.TopRight - Camera.ScreenPlane.TopLeft) + ((float)y / (raytracerHeight - 1)) * (Camera.ScreenPlane.BottomLeft - Camera.ScreenPlane.TopLeft);
             return new Ray(Camera.Position, planePoint - Camera.Position);
         }
 
@@ -301,10 +292,10 @@ namespace Raytracer {
 
         // Debug: Draw Screen Plane
         void DrawScreenPlane(Camera camera) {
-            Screen.Line(TX(camera.PlaneCorner1.X), TZ(camera.PlaneCorner1.Z), TX(camera.PlaneCorner2.X), TZ(camera.PlaneCorner2.Z), 0xffffff);
-            Screen.Line(TX(camera.PlaneCorner2.X), TZ(camera.PlaneCorner2.Z), TX(camera.PlaneCorner4.X), TZ(camera.PlaneCorner4.Z), 0xffffff);
-            Screen.Line(TX(camera.PlaneCorner3.X), TZ(camera.PlaneCorner3.Z), TX(camera.PlaneCorner4.X), TZ(camera.PlaneCorner4.Z), 0xffffff);
-            Screen.Line(TX(camera.PlaneCorner3.X), TZ(camera.PlaneCorner3.Z), TX(camera.PlaneCorner1.X), TZ(camera.PlaneCorner1.Z), 0xffffff);
+            Screen.Line(TX(camera.ScreenPlane.TopLeft.X), TZ(camera.ScreenPlane.TopLeft.Z), TX(camera.ScreenPlane.TopRight.X), TZ(camera.ScreenPlane.TopRight.Z), 0xffffff);
+            Screen.Line(TX(camera.ScreenPlane.TopRight.X), TZ(camera.ScreenPlane.TopRight.Z), TX(camera.ScreenPlane.BottomRight.X), TZ(camera.ScreenPlane.BottomRight.Z), 0xffffff);
+            Screen.Line(TX(camera.ScreenPlane.BottomRight.X), TZ(camera.ScreenPlane.BottomRight.Z), TX(camera.ScreenPlane.BottomLeft.X), TZ(camera.ScreenPlane.BottomLeft.Z), 0xffffff);
+            Screen.Line(TX(camera.ScreenPlane.BottomLeft.X), TZ(camera.ScreenPlane.BottomLeft.Z), TX(camera.ScreenPlane.TopLeft.X), TZ(camera.ScreenPlane.TopLeft.Z), 0xffffff);
         }
 
         // Debug: Draw Sphere

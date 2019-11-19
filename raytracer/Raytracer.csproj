@@ -108,6 +108,7 @@
     <Compile Include="Raytracer\Objects\Primitive.cs" />
     <Compile Include="Raytracer\Objects\Sphere.cs" />
     <Compile Include="Raytracer\Scene.cs" />
+    <Compile Include="Raytracer\ScreenPlane.cs" />
     <Compile Include="Surface.cs" />
     <Compile Include="OpenTKApp.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

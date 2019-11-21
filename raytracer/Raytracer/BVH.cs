@@ -108,7 +108,7 @@ namespace Raytracer {
             if (tzmin > tmin) tmin = tzmin;
             if (tzmax < tmax) tmax = tzmax;
 
-            return true;
+            return tmin > 0 || tmax > 0;
         }
 
         /// <summary> Try split the Node into 2 smaller Nodes </summary>

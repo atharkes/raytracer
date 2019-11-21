@@ -20,7 +20,7 @@ namespace Raytracer {
         /// <param name="specularity">The specularity of the triangle</param>
         /// <param name="glossyness">The glossyness of the triangle</param>
         /// <param name="glossSpecularity">The gloss specularity of the triangle</param>
-        public Triangle(Vector3 p1, Vector3 p2, Vector3 p3, Vector3 color, float specularity = 0, float glossyness = 0, float glossSpecularity = 0)
+        public Triangle(Vector3 p1, Vector3 p2, Vector3 p3, Vector3? color = null, float specularity = 0, float glossyness = 0, float glossSpecularity = 0)
             : base (null, color, specularity, glossyness, glossSpecularity) {
             P1 = p1;
             P2 = p2;

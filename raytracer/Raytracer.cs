@@ -163,7 +163,7 @@ namespace Raytracer {
             // Intersect with Scene
             (float distance, Primitive primitive) = PrimitiveTree.IntersectTree(ray);
             ray.Length = distance;
-            Intersection intersection = new Intersection(ray.Origin + ray.Direction * ray.Length, primitive);
+            Intersection intersection = new Intersection(ray, primitive, distance);
             Vector3 color = CastShadowRay(intersection, ray);
 
             // Debug: Primary Rays

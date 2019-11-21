@@ -7,7 +7,7 @@ namespace Raytracer {
     /// <summary> The main class derived from an OpenTK gamewindow </summary>
     public class OpenTKApp : GameWindow {
         static int screenID;
-        static Raytracer game;
+        static Main raytracer;
         static readonly bool terminated = false;
 
         /// <summary> Called upon app init </summary>
@@ -17,13 +17,13 @@ namespace Raytracer {
             GL.Enable(EnableCap.Texture2D);
             GL.Disable(EnableCap.DepthTest);
             GL.Hint(HintTarget.PerspectiveCorrectionHint, HintMode.Nicest);
-            game = new Raytracer();
-            game.SetScreen();
-            ClientSize = new Size(game.Screen.Width, game.Screen.Height);
+            raytracer = new Main();
+            raytracer.SetScreen();
+            ClientSize = new Size(raytracer.Screen.Width, raytracer.Screen.Height);
             Location = new Point(0, 30);
-            Sprite.Target = game.Screen;
-            screenID = game.Screen.GenTexture();
-            game.Init(this);
+            Sprite.Target = raytracer.Screen;
+            screenID = raytracer.Screen.GenTexture();
+            raytracer.Init(this);
         }
 
         /// <summary> Called upon app close </summary>
@@ -52,7 +52,7 @@ namespace Raytracer {
         /// <summary> Called once per frame; render </summary>
         /// <param name="e">Arguments given</param>
         protected override void OnRenderFrame(FrameEventArgs e) {
-            game.Tick();
+            raytracer.Tick();
             if (terminated) {
                 Exit();
                 return;
@@ -60,8 +60,8 @@ namespace Raytracer {
             // Convert Game.screen to OpenGL texture
             GL.BindTexture(TextureTarget.Texture2D, screenID);
             GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba,
-                           game.Screen.Width, game.Screen.Height, 0, PixelFormat.Bgra,
-                           PixelType.UnsignedByte, game.Screen.Pixels);
+                           raytracer.Screen.Width, raytracer.Screen.Height, 0, PixelFormat.Bgra,
+                           PixelType.UnsignedByte, raytracer.Screen.Pixels);
             // Clear window contents
             GL.Clear(ClearBufferMask.ColorBufferBit);
             // Setup camera

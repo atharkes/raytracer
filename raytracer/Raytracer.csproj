@@ -102,7 +102,7 @@
     <Compile Include="Raytracer\Ray.cs" />
     <Compile Include="Raytracer\Intersection.cs" />
     <Compile Include="Raytracer\Camera.cs" />
-    <Compile Include="Raytracer.cs" />
+    <Compile Include="Main.cs" />
     <Compile Include="Raytracer\Objects\Lightsource.cs" />
     <Compile Include="Raytracer\Objects\Plane.cs" />
     <Compile Include="Raytracer\Objects\Primitive.cs" />

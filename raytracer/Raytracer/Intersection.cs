@@ -29,7 +29,7 @@ namespace Raytracer {
             Ray = ray;
             Primitive = primitive;
             Distance = distance;
-            Position = Ray.Origin + Ray.Direction * Ray.Length;
+            Position = Ray.Origin + Ray.Direction * distance;
             Normal = primitive?.GetNormal(Position) ?? Vector3.Zero;
             Position += Normal * RaiseEpsilon;
         }

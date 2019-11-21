@@ -6,7 +6,7 @@ using Raytracer.Multithreading;
 using Raytracer.Objects;
 
 namespace Raytracer {
-    class Raytracer {
+    class Main {
         public Surface Screen;
         public Camera Camera;
         public Scene Scene;
@@ -15,7 +15,7 @@ namespace Raytracer {
         OpenTKApp openTKApp;
         readonly int raytracerWidth = 512;
         readonly int raytracerHeight = 512;
-        readonly int recursionDepthMax = 5;
+        public const int RecursionDepth = 5;
 
         Threadpool threadpool;
         Action[] tasks;
@@ -145,7 +145,7 @@ namespace Raytracer {
             }
 
             // Cast Ray
-            Ray ray = GetPrimaryRay(x, y);
+            Ray ray = CreatePrimaryRay(x, y);
             Vector3 pixelColor = CastPrimaryRay(ray);
 
             // Draw Pixel
@@ -153,54 +153,47 @@ namespace Raytracer {
         }
 
         // Create primary ray from camera origin trough screen plane
-        Ray GetPrimaryRay(int x, int y) {
-            Vector3 planePoint = Camera.ScreenPlane.TopLeft + ((float)x / (raytracerWidth - 1)) * (Camera.ScreenPlane.TopRight - Camera.ScreenPlane.TopLeft) + ((float)y / (raytracerHeight - 1)) * (Camera.ScreenPlane.BottomLeft - Camera.ScreenPlane.TopLeft);
+        Ray CreatePrimaryRay(int x, int y) {
+            Vector3 planePoint = Camera.ScreenPlane.TopLeft + ((float)x / (raytracerWidth - 1)) * (Camera.ScreenPlane.TopRight - Camera.ScreenPlane.TopLeft) + (float)y / (raytracerHeight - 1) * (Camera.ScreenPlane.BottomLeft - Camera.ScreenPlane.TopLeft);
             return new Ray(Camera.Position, planePoint - Camera.Position);
         }
 
         // Intersect primary ray with primitives and fire a new ray if object is specular
         Vector3 CastPrimaryRay(Ray ray, int recursionDepth = 0) {
             // Intersect with Scene
-            (float distance, Primitive primitive) = PrimitiveTree.IntersectTree(ray);
-            ray.Length = distance;
-            Intersection intersection = new Intersection(ray, primitive, distance);
-            Vector3 color = CastShadowRay(intersection, ray);
+            Intersection intersection = PrimitiveTree.IntersectTree(ray);
+            Vector3 color = intersection != null ? CastShadowRays(intersection) : Vector3.Zero;
 
             // Debug: Primary Rays
-            if (debug && debugRay && debugPrimaryRay) {
-                if (ray.Length < 0 || intersection.Primitive is Plane) {
-                    DrawRay(ray, 1.5f, 0xffff00);
-                } else {
-                    DrawRay(ray, ray.Length, 0xffff00);
-                }
+            if (debug && debugRay && debugPrimaryRay && intersection != null) {
+                DrawRay(ray, intersection.Distance, 0xffff00);
             }
-            // Specularity
-            if (intersection.Primitive != null) {
-                if (intersection.Primitive.Specularity > 0 && recursionDepth < recursionDepthMax) {
-                    recursionDepth += 1;
-                    // Cast Reflected Ray
-                    Vector3 normal = intersection.Normal;
-                    Vector3 newDirection = ray.Direction - 2 * Vector3.Dot(ray.Direction, normal) * normal;
-                    ray = new Ray(intersection.Position, newDirection);
-                    Vector3 colorReflection = CastPrimaryRay(ray, recursionDepth);
 
-                    // Calculate Specularity
-                    color = color * (1 - intersection.Primitive.Specularity) + colorReflection * intersection.Primitive.Specularity * intersection.Primitive.Color;
-                }
+            // Specularity
+            if (intersection != null && intersection.Primitive.Specularity > 0 && recursionDepth < RecursionDepth) {
+                recursionDepth += 1;
+                // Cast Reflected Ray
+                Vector3 normal = intersection.Normal;
+                Vector3 newDirection = ray.Direction - 2 * Vector3.Dot(ray.Direction, normal) * normal;
+                ray = new Ray(intersection.Position, newDirection);
+                Vector3 colorReflection = CastPrimaryRay(ray, recursionDepth);
+
+                // Calculate Specularity
+                color = color * (1 - intersection.Primitive.Specularity) + colorReflection * intersection.Primitive.Specularity * intersection.Primitive.Color;
             }
+
             return color;
         }
 
-        // Intersect shadow ray with primitives for each light and calculating the color
-        Vector3 CastShadowRay(Intersection intersection, Ray primaryRay) {
-            Vector3 totalColor = new Vector3(0, 0, 0);
-            if (intersection.Primitive == null) return totalColor;
+        // Intersect a shadow ray with the scene for each light and calculate the color
+        Vector3 CastShadowRays(Intersection intersection) {
+            if (intersection == null) return Vector3.Zero;
 
+            Vector3 totalColor = new Vector3(0, 0, 0);
             foreach (Lightsource light in Scene.Lights) {
                 Vector3 color = intersection.Primitive.Color;
 
-                Ray shadowRay = new Ray(intersection.Position, light.Position - intersection.Position);
-                shadowRay.Length = (float)Math.Sqrt(Vector3.Dot(light.Position - shadowRay.Origin, light.Position - shadowRay.Origin));
+                Ray shadowRay = Ray.CreateShadowRay(intersection.Position, light.Position);
 
                 if (PrimitiveTree.IntersectTreeBool(shadowRay)) {
                     continue;
@@ -215,7 +208,7 @@ namespace Raytracer {
                     } else if (intersection.Primitive.Glossyness > 0) {
                         // Glossyness
                         Vector3 glossyDirection = (-shadowRay.Direction - 2 * (Vector3.Dot(-shadowRay.Direction, normal)) * normal);
-                        float dot = Vector3.Dot(glossyDirection, -primaryRay.Direction);
+                        float dot = Vector3.Dot(glossyDirection, -intersection.Ray.Direction);
                         if (dot > 0) {
                             float glossyness = (float)Math.Pow(dot, intersection.Primitive.GlossSpecularity);
                             // Phong-Shading (My Version)

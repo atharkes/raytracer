@@ -3,7 +3,9 @@ using System;
 using System.Collections.Generic;
 
 namespace Raytracer {
-    /// <summary> A node of a bounding volume hierarchy tree </summary>
+    /// <summary> A node of a bounding volume hierarchy tree
+    /// (Ordered traversal can be added)
+    /// (Can be optimized using two arrays for primitives and BHV nodes, and using only a Left index and Count) </summary>
     class BVHNode {
         /// <summary> The left child node if it has one </summary>
         public BVHNode Left { get; private set; }
@@ -28,17 +30,17 @@ namespace Raytracer {
         /// <summary> Intersect this Node and it's children </summary>
         /// <param name="ray">The ray to calculate intersections for</param>
         /// <returns>A pair of the distance and the primitive that it intersects</returns>
-        public (float distance, Primitive primitive) IntersectTree(Ray ray) {
+        public Intersection IntersectTree(Ray ray) {
             if (!IntersectAABB(ray)) {
-                return (-1f, null);
+                return null;
             } else if (!Leaf) {
-                (float, Primitive) intersectionLeft = Left.IntersectTree(ray);
-                (float, Primitive) intersectionRight = Right.IntersectTree(ray);
-                if (intersectionLeft.Item2 == null) {
+                Intersection intersectionLeft = Left.IntersectTree(ray);
+                Intersection intersectionRight = Right.IntersectTree(ray);
+                if (intersectionLeft == null) {
                     return intersectionRight;
-                } else if (intersectionRight.Item2 == null) {
+                } else if (intersectionRight == null) {
                     return intersectionLeft;
-                } else if (intersectionLeft.Item1 < intersectionRight.Item1) {
+                } else if (intersectionLeft.Distance < intersectionRight.Distance) {
                     return intersectionLeft;
                 } else {
                     return intersectionRight;
@@ -53,7 +55,8 @@ namespace Raytracer {
                         intersectionDistance = distance;
                     }
                 }
-                return (intersectionDistance, intersectionPrimitive);
+                if (intersectionPrimitive == null) return null;
+                else return new Intersection(ray, intersectionPrimitive, intersectionDistance);
             }
         }
 

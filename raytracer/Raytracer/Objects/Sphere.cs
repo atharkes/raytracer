@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 
 namespace Raytracer {
+    /// <summary> A sphere primitive for the 3d scene </summary>
     class Sphere : Primitive {
         public float Radius;
 

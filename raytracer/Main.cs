@@ -47,8 +47,7 @@ namespace Raytracer {
         public void SetScreen() {
             int screenWidth = raytracerWidth;
             int screenHeight = raytracerHeight;
-            if (debug)
-                screenWidth += 512;
+            if (debug) screenWidth += 512;
             Screen = new Surface(screenWidth, screenHeight);
         }
 

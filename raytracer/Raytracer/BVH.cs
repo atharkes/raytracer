@@ -83,26 +83,21 @@ namespace Raytracer {
             }   
         }
 
-        /// <summary> Intersect the axis aligned bounding box of this Node </summary>
+        /// <summary> Intersect the axis aligned bounding box of this Node (Amy Williams's An Efficient and Robust Ray–Box Intersection Algorithm) </summary>
         /// <param name="ray">The ray to calculate intersection for</param>
         /// <returns>Whether the ray intersects the bounding box</returns>
         public bool IntersectAABB(Ray ray) {
-            float tx1 = (Bounds[0].X - ray.Origin.X) * ray.DirectionInverted.X;
-            float tx2 = (Bounds[1].X - ray.Origin.X) * ray.DirectionInverted.X;
-            float tmin = Math.Min(tx1, tx2);
-            float tmax = Math.Max(tx1, tx2);
-
-            float ty1 = (Bounds[0].Y - ray.Origin.Y) * ray.DirectionInverted.Y;
-            float ty2 = (Bounds[1].Y - ray.Origin.Y) * ray.DirectionInverted.Y;
-            float tymin = Math.Min(ty1, ty2);
-            float tymax = Math.Max(ty1, ty2);
+            float tmin = (Bounds[ray.Sign[0]].X - ray.Origin.X) * ray.DirectionInverted.X;
+            float tmax = (Bounds[1 - ray.Sign[0]].X - ray.Origin.X) * ray.DirectionInverted.X;
+            float tymin = (Bounds[ray.Sign[1]].Y - ray.Origin.Y) * ray.DirectionInverted.Y;
+            float tymax = (Bounds[1 - ray.Sign[1]].Y - ray.Origin.Y) * ray.DirectionInverted.Y;
 
             if ((tmin > tymax) || (tymin > tmax)) return false;
             if (tymin > tmin) tmin = tymin;
             if (tymax < tmax) tmax = tymax;
 
-            float tz1 = (Bounds[0].Z - ray.Origin.Z) * ray.DirectionInverted.Z;
-            float tz2 = (Bounds[1].Z - ray.Origin.Z) * ray.DirectionInverted.Z;
+            float tz1 = (Bounds[ray.Sign[2]].Z - ray.Origin.Z) * ray.DirectionInverted.Z;
+            float tz2 = (Bounds[1 - ray.Sign[2]].Z - ray.Origin.Z) * ray.DirectionInverted.Z;
             float tzmin = Math.Min(tz1, tz2);
             float tzmax = Math.Max(tz1, tz2);
 

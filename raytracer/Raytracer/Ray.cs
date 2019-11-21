@@ -7,8 +7,11 @@ namespace Raytracer {
         public Vector3 Origin { get; }
         /// <summary> The direction of the ray. This should always be normalized </summary>
         public Vector3 Direction { get; }
-        /// <summary> The inverted direction </summary>
+
+        /// <summary> The inverted direction. Used for quick AABB intersection </summary>
         public Vector3 DirectionInverted { get; }
+        /// <summary> Whether the individual components of the inverted direction of the ray is negative </summary>
+        public readonly int[] Sign;
 
         /// <summary> The length that the ray is travelling </summary>
         public float Length { get; set; }
@@ -22,6 +25,11 @@ namespace Raytracer {
             Direction = direction.Normalized();
             DirectionInverted = new Vector3(1 / direction.X, 1 / direction.Y, 1 / direction.Z);
             Length = length;
+            Sign = new int[] {
+                DirectionInverted.X < 0 ? 1 : 0,
+                DirectionInverted.Y < 0 ? 1 : 0,
+                DirectionInverted.Z < 0 ? 1 : 0
+            };
         }
 
         /// <summary> Create a new ray using origin and destination </summary>

@@ -3,7 +3,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using OpenTK.Graphics.OpenGL;
 
-namespace Raytracer {
+namespace WhittedStyleRaytracer {
     public class Sprite {
         static public Surface Target;
         

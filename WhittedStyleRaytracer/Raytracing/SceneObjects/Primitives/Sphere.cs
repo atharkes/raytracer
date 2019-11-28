@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Raytracer {
+namespace WhittedStyleRaytracer.Raytracing.SceneObjects.Primitives {
     /// <summary> A sphere primitive for the 3d scene </summary>
     class Sphere : Primitive {
         /// <summary> The radius of the sphere </summary>

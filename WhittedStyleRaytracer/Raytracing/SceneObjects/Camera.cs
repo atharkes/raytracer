@@ -1,20 +1,20 @@
 ﻿using OpenTK;
 
-namespace Raytracer {
+namespace WhittedStyleRaytracer.Raytracing.SceneObjects {
     /// <summary> The camera object in the 3d scene </summary>
-    class Camera {
+    class Camera : ISceneObject {
         /// <summary> The screen plane in front of the camera </summary>
-        public readonly ScreenPlane ScreenPlane = new ScreenPlane();
+        public readonly ScreenPlane ScreenPlane;
         /// <summary> The position of the camera </summary>
-        public Vector3 Position { get; private set; }
+        public Vector3 Position { get => position; set => Move(value - position); }
         /// <summary> The direction the camera is facing </summary>
-        public Vector3 ViewDirection { get; private set; }
+        public Vector3 ViewDirection { get => viewDirection; set => SetViewDirection(value); }
         /// <summary> The field of view of the camera. It determines the distance to the screen plane </summary>
         public float FOV = 90;
         /// <summary> The sensitivity of turning </summary>
-        public float Sensitivity = 0.004f;
+        public readonly float Sensitivity = 0.004f;
         /// <summary> The speed at which the camera moves </summary>
-        public float MoveSpeed = 0.1f;
+        public readonly float MoveSpeed = 0.1f;
 
         /// <summary> Vector going up from the view direction of the camera </summary>
         public Vector3 Up => Vector3.Cross(ViewDirection, Left).Normalized();
@@ -29,28 +29,36 @@ namespace Raytracer {
         /// <summary> Vector going from the view direction of the camera </summary>
         public Vector3 Back => -ViewDirection;
 
+        Vector3 position;
+        Vector3 viewDirection;
+
         /// <summary> Create a new camera object </summary>
         /// <param name="position">The position of the camera</param>
         /// <param name="viewDirection">The direction the camera is facing</param>
         public Camera(Vector3? position = null, Vector3? viewDirection = null) {
-            Position = position ?? new Vector3(0, -1, -1);
-            ViewDirection = viewDirection?.Normalized() ?? new Vector3(0, 0, 1);
-            ScreenPlane.UpdatePosition(this);
+            this.position = position ?? new Vector3(0, -1, -1);
+            this.viewDirection = viewDirection?.Normalized() ?? new Vector3(0, 0, 1);
+            ScreenPlane = new ScreenPlane(this);
         }
 
         /// <summary> Move the camera in a direction </summary>
         /// <param name="direction">The direction to move the camera in</param>
         public void Move(Vector3 direction) {
-            Position += direction * MoveSpeed;
-            ScreenPlane.UpdatePosition(this);
+            position += direction * MoveSpeed;
+            ScreenPlane.UpdatePosition();
         }
         
         /// <summary> Turn the view direction of the camera </summary>
         /// <param name="direction">The direction to turn the camera in</param>
         public void Turn(Vector3 direction) {
-            ViewDirection += direction * Sensitivity;
-            ViewDirection.Normalize();
-            ScreenPlane.UpdatePosition(this);
+            viewDirection += direction * Sensitivity;
+            viewDirection.Normalize();
+            ScreenPlane.UpdatePosition();
+        }
+
+        public void SetViewDirection(Vector3 newViewDirection) {
+            viewDirection = newViewDirection.Normalized();
+            ScreenPlane.UpdatePosition();
         }
     }
 }

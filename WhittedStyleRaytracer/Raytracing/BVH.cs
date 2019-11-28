@@ -1,8 +1,9 @@
 ﻿using OpenTK;
 using System;
 using System.Collections.Generic;
+using WhittedStyleRaytracer.Raytracing.SceneObjects;
 
-namespace Raytracer {
+namespace WhittedStyleRaytracer.Raytracing {
     /// <summary> A node of a bounding volume hierarchy tree
     /// (Ordered traversal can be added)
     /// (Can be optimized using two arrays for primitives and BHV nodes, and using only a Left index and Count) </summary>

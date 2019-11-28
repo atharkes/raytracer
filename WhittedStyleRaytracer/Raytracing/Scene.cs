@@ -1,9 +1,10 @@
 ﻿using OpenTK;
-using Raytracer.Objects;
 using System;
 using System.Collections.Generic;
+using WhittedStyleRaytracer.Raytracing.SceneObjects;
+using WhittedStyleRaytracer.Raytracing.SceneObjects.Primitives;
 
-namespace Raytracer {
+namespace WhittedStyleRaytracer.Raytracing {
     class Scene {
         public List<Primitive> Primitives;
         public List<Lightsource> Lights;

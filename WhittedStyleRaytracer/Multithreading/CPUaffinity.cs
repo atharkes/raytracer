@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace Raytracer.Multithreading {
+namespace WhittedStyleRaytracer.Multithreading {
     class CPUaffinity {
         [DllImport("kernel32.dll")]
         static extern IntPtr GetCurrentThread();

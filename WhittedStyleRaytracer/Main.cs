@@ -2,17 +2,19 @@
 using OpenTK.Input;
 using System;
 using System.Diagnostics;
-using Raytracer.Multithreading;
-using Raytracer.Objects;
+using WhittedStyleRaytracer.Multithreading;
+using WhittedStyleRaytracer.Raytracing;
+using WhittedStyleRaytracer.Raytracing.SceneObjects;
+using WhittedStyleRaytracer.Raytracing.SceneObjects.Primitives;
 
-namespace Raytracer {
+namespace WhittedStyleRaytracer {
     class Main {
         public Surface Screen;
         public Camera Camera;
         public Scene Scene;
         public BVHNode PrimitiveTree;
 
-        OpenTKApp openTKApp;
+        OpenTKProgram openTKApp;
         readonly int raytracerWidth = 512;
         readonly int raytracerHeight = 512;
         public const int RecursionDepth = 5;
@@ -35,7 +37,7 @@ namespace Raytracer {
 
         float lightStartPos = (float)Math.PI / 2;
 
-        public void Init(OpenTKApp openTKApp) {
+        public void Init(OpenTKProgram openTKApp) {
             this.openTKApp = openTKApp;
             Camera = new Camera();
             Scene = new Scene();
@@ -72,12 +74,9 @@ namespace Raytracer {
                 debugCamX = Camera.Position.X - debugCamHeight / 2;
                 debugCamZ = Camera.Position.Z - debugCamWidth / 2;
                 DrawCamera(Camera);
-                foreach (Lightsource light in Scene.Lights)
-                    DrawLight(light);
+                Scene.Lights.ForEach(light => DrawLight(light));
                 DrawScreenPlane(Camera);
-                foreach (Primitive primitive in Scene.Primitives)
-                    if (primitive is Sphere)
-                        DrawSphere((Sphere)primitive);
+                Scene.Primitives.ForEach(primitive => { if (primitive is Sphere) DrawSphere(primitive as Sphere); });
             }
             Screen.Print("FPS: " + (int)openTKApp.RenderFrequency, 1, 1, 0xffffff);
             Screen.Print("FOV: " + Camera.FOV, 1, 16, 0xffffff);

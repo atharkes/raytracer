@@ -1,12 +1,12 @@
 ﻿using OpenTK;
 
-namespace Raytracer.Objects {
+namespace WhittedStyleRaytracer.Raytracing.SceneObjects {
     /// <summary> A lightsource for the 3d scene </summary>
-    class Lightsource {
+    class Lightsource : ISceneObject {
         /// <summary> The position of the lightsource </summary>
-        public Vector3 Position;
+        public Vector3 Position { get; set; }
         /// <summary> The color of the lightsource </summary>
-        public Vector3 Color;
+        public Vector3 Color { get; set; }
 
         /// <summary> Create a new lightsource for the 3d scene </summary>
         /// <param name="position">The position of the lightsource</param>

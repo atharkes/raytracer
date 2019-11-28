@@ -1,6 +1,6 @@
 ﻿using OpenTK;
 
-namespace Raytracer {
+namespace WhittedStyleRaytracer.Raytracing {
     /// <summary> A datastructure to store a ray </summary>
     class Ray {
         /// <summary> The origin of the ray </summary>

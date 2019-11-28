@@ -3,9 +3,9 @@ using System.Drawing;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 
-namespace Raytracer {
+namespace WhittedStyleRaytracer {
     /// <summary> The main class derived from an OpenTK gamewindow </summary>
-    public class OpenTKApp : GameWindow {
+    public class OpenTKProgram : GameWindow {
         static int screenID;
         static Main raytracer;
         static readonly bool terminated = false;
@@ -83,7 +83,7 @@ namespace Raytracer {
         /// <summary> Entry point of the application </summary>
         /// <param name="args">Arguments given</param>
         public static void Main(string[] args) {
-            using (OpenTKApp app = new OpenTKApp()) { app.Run(30.0, 0.0); }
+            using (OpenTKProgram app = new OpenTKProgram()) { app.Run(30.0, 0.0); }
         }
     }
 }

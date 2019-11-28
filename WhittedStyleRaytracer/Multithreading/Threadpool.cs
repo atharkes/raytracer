@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 
-namespace Raytracer.Multithreading {
+namespace WhittedStyleRaytracer.Multithreading {
     class Threadpool {
         public int ThreadCount { get; set; }
 

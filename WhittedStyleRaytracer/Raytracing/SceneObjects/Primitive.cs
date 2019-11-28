@@ -1,19 +1,19 @@
 ﻿using OpenTK;
 using System.Collections.Generic;
 
-namespace Raytracer {
+namespace WhittedStyleRaytracer.Raytracing.SceneObjects {
     /// <summary> A abstract primitive for the 3d scene </summary>
-    abstract class Primitive {
+    abstract class Primitive : ISceneObject {
         /// <summary> The position of the primitive </summary>
-        public Vector3 Position;
+        public Vector3 Position { get; set; }
         /// <summary> The color of the primitive </summary>
-        public Vector3 Color;
+        public Vector3 Color { get; set; }
         /// <summary> The specularity of the primitive </summary>
-        public float Specularity;
+        public float Specularity { get; set; }
         /// <summary> The glossyness of the primitive </summary>
-        public float Glossyness;
+        public float Glossyness { get; set; }
         /// <summary> The gloss specularity of the primitive </summary>
-        public float GlossSpecularity;
+        public float GlossSpecularity { get; set; }
 
         /// <summary> Create a new primitive for the 3d scene </summary>
         /// <param name="position">The position of the primitive</param>

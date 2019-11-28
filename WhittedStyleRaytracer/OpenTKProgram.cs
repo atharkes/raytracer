@@ -18,11 +18,11 @@ namespace WhittedStyleRaytracer {
             GL.Disable(EnableCap.DepthTest);
             GL.Hint(HintTarget.PerspectiveCorrectionHint, HintMode.Nicest);
             raytracer = new Main();
-            raytracer.SetScreen();
+            raytracer.SetScreen(new Surface(512, 512));
             ClientSize = new Size(raytracer.Screen.Width, raytracer.Screen.Height);
             Location = new Point(0, 30);
-            Sprite.Target = raytracer.Screen;
-            screenID = raytracer.Screen.GenTexture();
+            Sprite.Target = raytracer.Screen as Surface;
+            screenID = (raytracer.Screen as Surface).GenTexture();
             raytracer.Init(this);
         }
 
@@ -61,7 +61,7 @@ namespace WhittedStyleRaytracer {
             GL.BindTexture(TextureTarget.Texture2D, screenID);
             GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba,
                            raytracer.Screen.Width, raytracer.Screen.Height, 0, PixelFormat.Bgra,
-                           PixelType.UnsignedByte, raytracer.Screen.Pixels);
+                           PixelType.UnsignedByte, (raytracer.Screen as Surface).Pixels);
             // Clear window contents
             GL.Clear(ClearBufferMask.ColorBufferBit);
             // Setup camera

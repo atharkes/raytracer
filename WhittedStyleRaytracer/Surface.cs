@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Drawing.Imaging;
 using OpenTK.Graphics.OpenGL;
+using WhittedStyleRaytracer.Raytracing.SceneObjects;
 
 namespace WhittedStyleRaytracer {
     public class Sprite {
@@ -33,18 +34,19 @@ namespace WhittedStyleRaytracer {
         }
     }
 
-    public class Surface {
-        public int Width, Height;
+    public class Surface : IScreen {
+        public int Width { get; }
+        public int Height { get; }
         public int[] Pixels;
 
         static bool fontReady = false;
         static Surface font;
         static int[] fontRedir;
 
-        public Surface(int w, int h) {
-            Width = w;
-            Height = h;
-            Pixels = new int[w * h];
+        public Surface(int width = 512, int height = 512) {
+            Width = width;
+            Height = height;
+            Pixels = new int[width * height];
         }
 
         public Surface(string fileName) {
@@ -116,14 +118,15 @@ namespace WhittedStyleRaytracer {
 
         public void Bar(int x1, int y1, int x2, int y2, int c) {
             int dest = y1 * Width;
-            for (int y = y1; y <= y2; y++, dest += Width) for (int x = x1; x <= x2; x++) {
+            for (int y = y1; y <= y2; y++, dest += Width) {
+                for (int x = x1; x <= x2; x++) {
                     Pixels[dest + x] = c;
                 }
+            }
         }
 
         public void Line(int x1, int y1, int x2, int y2, int c) {
-            if ((x1 < 0) || (y1 < 0) || (x2 < 0) || (y2 < 0) ||
-                (x1 >= Width) || (x2 >= Width) || (y1 >= Height) || (y2 >= Height)) return;
+            if ((x1 < 0) || (y1 < 0) || (x2 < 0) || (y2 < 0) || (x1 >= Width) || (x2 >= Width) || (y1 >= Height) || (y2 >= Height)) return;
             if (Math.Abs(x2 - x1) >= Math.Abs(y2 - y1)) {
                 if (x2 < x1) { int h = x1; x1 = x2; x2 = h; h = y2; y2 = y1; y1 = h; }
                 int l = x2 - x1;
@@ -148,9 +151,7 @@ namespace WhittedStyleRaytracer {
         }
 
         public void Plot(int x, int y, int c) {
-            if ((x >= 0) && (y >= 0) && (x < Width) && (y < Height)) {
-                Pixels[x + y * Width] = c;
-            }
+            if ((x >= 0) && (y >= 0) && (x < Width) && (y < Height)) Pixels[x + y * Width] = c;
         }
 
         public void Print(string t, int x, int y, int c) {
@@ -177,5 +178,6 @@ namespace WhittedStyleRaytracer {
             }
         }
 
+        
     }
 }

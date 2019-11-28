@@ -2,21 +2,21 @@
 using OpenTK.Input;
 using System;
 using System.Diagnostics;
+using System.Linq;
 using WhittedStyleRaytracer.Multithreading;
 using WhittedStyleRaytracer.Raytracing;
 using WhittedStyleRaytracer.Raytracing.SceneObjects;
 using WhittedStyleRaytracer.Raytracing.SceneObjects.Primitives;
 
 namespace WhittedStyleRaytracer {
+    /// <summary> Main class of the raytracer </summary>
     class Main {
-        public Surface Screen;
-        public Camera Camera;
+        /// <summary> The screen the raytracer is drawing to </summary>
+        public IScreen Screen;
+        /// <summary> The 3d scene in which the raytracing takes place </summary>
         public Scene Scene;
-        public BVHNode PrimitiveTree;
 
         OpenTKProgram openTKApp;
-        readonly int raytracerWidth = 512;
-        readonly int raytracerHeight = 512;
         public const int RecursionDepth = 5;
 
         Threadpool threadpool;
@@ -28,7 +28,7 @@ namespace WhittedStyleRaytracer {
         readonly float debugCamWidth = 20f;
         readonly float debugCamHeight = 20f;
         bool debugRay;
-        bool debug = true;
+        bool debug = false;
         readonly bool debugPrimaryRay = true;
         readonly bool debugShadowRay = true;
 
@@ -37,27 +37,22 @@ namespace WhittedStyleRaytracer {
 
         float lightStartPos = (float)Math.PI / 2;
 
-        public void Init(OpenTKProgram openTKApp) {
-            this.openTKApp = openTKApp;
-            Camera = new Camera();
-            Scene = new Scene();
-            PrimitiveTree = new BVHNode(Scene.Primitives);
-            tasks = new Action[taskAmount];
-            threadpool = new Threadpool();
+        public void SetScreen(IScreen screen) {
+            Screen = screen;
         }
 
-        public void SetScreen() {
-            int screenWidth = raytracerWidth;
-            int screenHeight = raytracerHeight;
-            if (debug) screenWidth += 512;
-            Screen = new Surface(screenWidth, screenHeight);
+        public void Init(OpenTKProgram openTKApp) {
+            this.openTKApp = openTKApp;
+            Scene = new Scene(Screen);
+            tasks = new Action[taskAmount];
+            threadpool = new Threadpool();
         }
 
         public void Tick() {
             // Moving Light
             lightStartPos += 0.1f;
             float move = (float)Math.Sin(lightStartPos) * 0.5f;
-            Scene.Lights[0].Position += new Vector3(move, 0, 0);
+            Scene.Lights.First().Position += new Vector3(move, 0, 0);
 
             // Clear the screen
             Screen.Clear(0);
@@ -70,36 +65,35 @@ namespace WhittedStyleRaytracer {
 
             // Debug
             if (debug) {
-                Screen.Line(512, 0, 512, 511, 0xffffff);
-                debugCamX = Camera.Position.X - debugCamHeight / 2;
-                debugCamZ = Camera.Position.Z - debugCamWidth / 2;
-                DrawCamera(Camera);
+                debugCamX = Scene.Camera.Position.X - debugCamHeight / 2;
+                debugCamZ = Scene.Camera.Position.Z - debugCamWidth / 2;
+                DrawCamera(Scene.Camera);
                 Scene.Lights.ForEach(light => DrawLight(light));
-                DrawScreenPlane(Camera);
+                DrawScreenPlane(Scene.Camera);
                 Scene.Primitives.ForEach(primitive => { if (primitive is Sphere) DrawSphere(primitive as Sphere); });
             }
             Screen.Print("FPS: " + (int)openTKApp.RenderFrequency, 1, 1, 0xffffff);
-            Screen.Print("FOV: " + Camera.FOV, 1, 16, 0xffffff);
+            Screen.Print("FOV: " + Scene.Camera.FOV, 1, 16, 0xffffff);
         }
 
         void InputCheck() {
             // Input: Keyboard
             keyboardState = Keyboard.GetState();
             if (keyboardState[Key.F1]) debug = !debug;
-            if (keyboardState[Key.Space]) Camera.Move(Camera.Up);
-            if (keyboardState[Key.LShift]) Camera.Move(Camera.Down);
-            if (keyboardState[Key.W]) Camera.Move(Camera.Front);
-            if (keyboardState[Key.S]) Camera.Move(Camera.Back);
-            if (keyboardState[Key.A]) Camera.Move(Camera.Left);
-            if (keyboardState[Key.D]) Camera.Move(Camera.Right);
-            if (keyboardState[Key.KeypadPlus]) Camera.FOV *= 1.1f;
-            if (keyboardState[Key.KeypadMinus]) Camera.FOV *= 0.9f;
+            if (keyboardState[Key.Space]) Scene.Camera.Move(Scene.Camera.Up);
+            if (keyboardState[Key.LShift]) Scene.Camera.Move(Scene.Camera.Down);
+            if (keyboardState[Key.W]) Scene.Camera.Move(Scene.Camera.Front);
+            if (keyboardState[Key.S]) Scene.Camera.Move(Scene.Camera.Back);
+            if (keyboardState[Key.A]) Scene.Camera.Move(Scene.Camera.Left);
+            if (keyboardState[Key.D]) Scene.Camera.Move(Scene.Camera.Right);
+            if (keyboardState[Key.KeypadPlus]) Scene.Camera.FOV *= 1.1f;
+            if (keyboardState[Key.KeypadMinus]) Scene.Camera.FOV *= 0.9f;
             // Input: Mouse
             mouseStateCurrent = Mouse.GetState();
             if (mouseStatePrevious != null) {
                 float xDelta = mouseStateCurrent.X - mouseStatePrevious.X;
                 float yDelta = mouseStateCurrent.Y - mouseStatePrevious.Y;
-                Camera.Turn(xDelta * Camera.Right + yDelta * Camera.Down);
+                Scene.Camera.Turn(xDelta * Scene.Camera.Right + yDelta * Scene.Camera.Down);
             }
             mouseStatePrevious = mouseStateCurrent;
         }
@@ -107,14 +101,14 @@ namespace WhittedStyleRaytracer {
         // Multithreading
         void DivideRays() {
             Stopwatch divideTime = Stopwatch.StartNew();
-            float size = (float)raytracerHeight / taskAmount;
+            float size = (float)Screen.Height / taskAmount;
             float[] taskBounds = new float[taskAmount + 1];
             taskBounds[0] = 0;
             for (int n = 0; n < taskAmount; n++) {
                 taskBounds[n + 1] = taskBounds[n] + size;
                 int taskLower = (int)taskBounds[n];
                 int taskUpper = (int)taskBounds[n + 1];
-                tasks[n] = () => TraceRays(0, raytracerWidth, taskLower, taskUpper);
+                tasks[n] = () => TraceRays(0, Screen.Width, taskLower, taskUpper);
             }
             Console.WriteLine("Divide Tasks Ticks: " + divideTime.ElapsedTicks);
             Stopwatch traceTime = Stopwatch.StartNew();
@@ -135,7 +129,7 @@ namespace WhittedStyleRaytracer {
         void TraceRay(int x, int y) {
             // Debug: Check if ray has to be drawn
             if (debug) {
-                if ((x == 0 || (x + 1) % 16 == 0) && y == (raytracerHeight - 1) / 2) {
+                if ((x == 0 || (x + 1) % 16 == 0) && y == (Screen.Height - 1) / 2) {
                     debugRay = true;
                 } else {
                     debugRay = false;
@@ -143,23 +137,17 @@ namespace WhittedStyleRaytracer {
             }
 
             // Cast Ray
-            Ray ray = CreatePrimaryRay(x, y);
+            Ray ray = Scene.Camera.CreatePrimaryRay(x, y);
             Vector3 pixelColor = CastPrimaryRay(ray);
 
             // Draw Pixel
             Screen.Plot(x, y, GetColor(pixelColor));
         }
 
-        // Create primary ray from camera origin trough screen plane
-        Ray CreatePrimaryRay(int x, int y) {
-            Vector3 planePoint = Camera.ScreenPlane.TopLeft + ((float)x / (raytracerWidth - 1)) * (Camera.ScreenPlane.TopRight - Camera.ScreenPlane.TopLeft) + (float)y / (raytracerHeight - 1) * (Camera.ScreenPlane.BottomLeft - Camera.ScreenPlane.TopLeft);
-            return new Ray(Camera.Position, planePoint - Camera.Position);
-        }
-
         // Intersect primary ray with primitives and fire a new ray if object is specular
         Vector3 CastPrimaryRay(Ray ray, int recursionDepth = 0) {
             // Intersect with Scene
-            Intersection intersection = PrimitiveTree.IntersectTree(ray);
+            Intersection intersection = Scene.AccelerationStructure.IntersectTree(ray);
             Vector3 color = intersection != null ? CastShadowRays(intersection) : Vector3.Zero;
 
             // Debug: Primary Rays
@@ -193,7 +181,7 @@ namespace WhittedStyleRaytracer {
 
                 Ray shadowRay = Ray.CreateShadowRay(intersection.Position, light.Position);
 
-                if (PrimitiveTree.IntersectTreeBool(shadowRay)) {
+                if (Scene.AccelerationStructure.IntersectTreeBool(shadowRay)) {
                     continue;
                 } else {
                     // Light Absorption
@@ -248,15 +236,14 @@ namespace WhittedStyleRaytracer {
             return r + g + b;
         }
 
+        #region Debug Drawing
         // Debug: Draw Ray
         void DrawRay(Ray ray, float length, int color) {
             int x1 = TX(ray.Origin.X);
             int y1 = TZ(ray.Origin.Z);
             int x2 = TX(ray.Origin.X + ray.Direction.X * length);
             int y2 = TZ(ray.Origin.Z + ray.Direction.Z * length);
-            if (CheckDebugBounds(x1, y1) && CheckDebugBounds(x2, y2)) {
-                Screen.Line(x1, y1, x2, y2, color);
-            }
+            Screen.Line(x1, y1, x2, y2, color);
         }
 
         // Debug: Draw Camera
@@ -265,9 +252,7 @@ namespace WhittedStyleRaytracer {
             int y1 = TZ(camera.Position.Z) - 1;
             int x2 = x1 + 2;
             int y2 = y1 + 2;
-            if (CheckDebugBounds(x1, y1) && CheckDebugBounds(x2, y2)) {
-                Screen.Box(x1, y1, x2, y2, 0xffffff);
-            }
+             Screen.Box(x1, y1, x2, y2, 0xffffff);
         }
 
         // Debug: Draw Lightsource
@@ -276,9 +261,7 @@ namespace WhittedStyleRaytracer {
             int y1 = TZ(light.Position.Z) - 1;
             int x2 = x1 + 2;
             int y2 = y1 + 2;
-            if (CheckDebugBounds(x1, y1) && CheckDebugBounds(x2, y2)) {
-                Screen.Box(x1, y1, x2, y2, GetColor(light.Color));
-            }
+            Screen.Box(x1, y1, x2, y2, GetColor(light.Color));
         }
 
         // Debug: Draw Screen Plane
@@ -296,18 +279,7 @@ namespace WhittedStyleRaytracer {
                 int y1 = TZ(sphere.Position.Z + (float)Math.Sin(i / 128f * 2 * Math.PI) * sphere.Radius);
                 int x2 = TX(sphere.Position.X + (float)Math.Cos((i + 1) / 128f * 2 * Math.PI) * sphere.Radius);
                 int y2 = TZ(sphere.Position.Z + (float)Math.Sin((i + 1) / 128f * 2 * Math.PI) * sphere.Radius);
-                if (CheckDebugBounds(x1, y1) && CheckDebugBounds(x2, y2)) {
-                    Screen.Line(x1, y1, x2, y2, GetColor(sphere.Color));
-                }
-            }
-        }
-
-        // Debug: Check if outside debug screen bounds
-        bool CheckDebugBounds(int x, int y) {
-            if (x < raytracerWidth || x > raytracerWidth + 511 || y < 0 || y > 511) {
-                return false;
-            } else {
-                return true;
+                Screen.Line(x1, y1, x2, y2, GetColor(sphere.Color));
             }
         }
 
@@ -315,7 +287,7 @@ namespace WhittedStyleRaytracer {
         public int TX(float x) {
             x -= debugCamX;
             int xDraw = (int)((512 / debugCamWidth) * x);
-            return xDraw + raytracerWidth;
+            return xDraw;
         }
 
         // Debug: Transform Z coord to Y on debug screen
@@ -324,5 +296,6 @@ namespace WhittedStyleRaytracer {
             int yDraw = (int)((512 / debugCamHeight) * z);
             return yDraw;
         }
+        #endregion
     }
 }

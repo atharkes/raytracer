@@ -35,10 +35,10 @@ namespace WhittedStyleRaytracer.Raytracing.SceneObjects {
         /// <summary> Create a new camera object </summary>
         /// <param name="position">The position of the camera</param>
         /// <param name="viewDirection">The direction the camera is facing</param>
-        public Camera(Vector3? position = null, Vector3? viewDirection = null) {
+        public Camera(IScreen screen, Vector3? position = null, Vector3? viewDirection = null) {
             this.position = position ?? new Vector3(0, -1, -1);
             this.viewDirection = viewDirection?.Normalized() ?? new Vector3(0, 0, 1);
-            ScreenPlane = new ScreenPlane(this);
+            ScreenPlane = new ScreenPlane(this, screen);
         }
 
         /// <summary> Move the camera in a direction </summary>
@@ -56,9 +56,17 @@ namespace WhittedStyleRaytracer.Raytracing.SceneObjects {
             ScreenPlane.UpdatePosition();
         }
 
+        /// <summary> Set the view direction of the camera </summary>
+        /// <param name="newViewDirection">The new view direction of the camera</param>
         public void SetViewDirection(Vector3 newViewDirection) {
             viewDirection = newViewDirection.Normalized();
             ScreenPlane.UpdatePosition();
+        }
+
+
+        public Ray CreatePrimaryRay(int x, int y) {
+            Vector3 planePoint = ScreenPlane.TopLeft + ((float)x / (ScreenPlane.Screen.Width - 1)) * (ScreenPlane.TopRight - ScreenPlane.TopLeft) + (float)y / (ScreenPlane.Screen.Height - 1) * (ScreenPlane.BottomLeft - ScreenPlane.TopLeft);
+            return new Ray(Position, planePoint - Position);
         }
     }
 }

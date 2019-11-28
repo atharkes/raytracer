@@ -6,6 +6,9 @@ namespace WhittedStyleRaytracer.Raytracing.SceneObjects {
     class ScreenPlane : ISceneObject {
         /// <summary> The camera the screen plane is linked to </summary>
         public readonly Camera Camera;
+        /// <summary> The 2d window the screen plane is linked to </summary>
+        public readonly IScreen Screen;
+
         /// <summary> The position of the screen plane. Equals the center of the screen plane </summary>
         public Vector3 Position { get => Center; set => Center = value; }
         /// <summary> The center of the screen plane </summary>
@@ -24,8 +27,9 @@ namespace WhittedStyleRaytracer.Raytracing.SceneObjects {
 
         /// <summary> Create a new screen plane linked to a camera </summary>
         /// <param name="camera">The camera to link the screen plane to</param>
-        public ScreenPlane(Camera camera) {
+        public ScreenPlane(Camera camera, IScreen screen) {
             Camera = camera;
+            Screen = screen;
             UpdatePosition();
         }
 

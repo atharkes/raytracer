@@ -20,7 +20,8 @@ namespace WhittedStyleRaytracer.Raytracing {
         readonly Random r = new Random();
 
         /// <summary> Create a new scene with some default objects </summary>
-        public Scene(IScreen screen) {
+        /// <param name="screen">The screen to draw the raytracing to</param>
+        public Scene(IScreen screen) { 
             Camera = new Camera(screen);
             AddDefaultLights();
             AddDefaultPrimitives();

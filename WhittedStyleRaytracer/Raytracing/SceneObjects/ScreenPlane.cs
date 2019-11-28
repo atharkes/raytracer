@@ -27,6 +27,7 @@ namespace WhittedStyleRaytracer.Raytracing.SceneObjects {
 
         /// <summary> Create a new screen plane linked to a camera </summary>
         /// <param name="camera">The camera to link the screen plane to</param>
+        /// <param name="screen">The screen to draw the 2d projection to</param>
         public ScreenPlane(Camera camera, IScreen screen) {
             Camera = camera;
             Screen = screen;
@@ -48,6 +49,14 @@ namespace WhittedStyleRaytracer.Raytracing.SceneObjects {
             TopRight = center - Camera.Left + Camera.Up;
             BottomLeft = center + Camera.Left - Camera.Up;
             BottomRight = center - Camera.Left - Camera.Up;
+        }
+
+        /// <summary> Get the position of a pixel on the screen plane in worldspace </summary>
+        /// <param name="x">The x position of the pixel</param>
+        /// <param name="y">The y position of the pixel</param>
+        /// <returns>The position of the pixel in worldspace</returns>
+        public Vector3 GetPixelPosition(int x, int y) {
+            return TopLeft + (float)x / (Screen.Width - 1) * (TopRight - TopLeft) + (float)y / (Screen.Height - 1) * (BottomLeft - TopLeft);
         }
     }
 }

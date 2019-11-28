@@ -4,12 +4,12 @@ namespace WhittedStyleRaytracer.Raytracing {
     /// <summary> A datastructure to store a ray </summary>
     class Ray {
         /// <summary> The origin of the ray </summary>
-        public Vector3 Origin { get; }
+        public readonly Vector3 Origin;
         /// <summary> The direction of the ray. This should always be normalized </summary>
-        public Vector3 Direction { get; }
+        public readonly Vector3 Direction;
 
         /// <summary> The inverted direction. Used for quick AABB intersection </summary>
-        public Vector3 DirectionInverted { get; }
+        public readonly Vector3 DirectionInverted;
         /// <summary> Whether the individual components of the inverted direction of the ray is negative </summary>
         public readonly int[] Sign;
 

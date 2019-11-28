@@ -16,17 +16,23 @@ namespace WhittedStyleRaytracer {
         /// <summary> The 3d scene in which the raytracing takes place </summary>
         public Scene Scene;
 
-        OpenTKProgram openTKApp;
+        /// <summary> Constant that defines the maximum recursion for secondary rays </summary>
         public const int MaxRecursionDepth = 5;
+
+        /// <summary> Whether it is drawing debug information </summary>
+        public bool Debug = false;
+        /// <summary> Whether it is drawing primary rays as debug information </summary>
+        public bool DebugPrimaryRay = true;
+        /// <summary> Whether it is drawing shadow rays as debug information </summary>
+        public bool DebugShadowRay = true;
+        /// <summary> The scale to draw the debug information </summary>
+        public float DebugScale = 50f;
+
+        OpenTKProgram openTKApp;  
 
         Threadpool threadpool;
         Action[] tasks;
-        readonly int taskAmount = 512;
-
-        public bool Debug = false;
-        public const float DebugScale = 50f;
-        readonly bool debugPrimaryRay = true;
-        readonly bool debugShadowRay = true;
+        const int taskAmount = 512;
 
         KeyboardState keyboardState;
         MouseState mouseStatePrevious, mouseStateCurrent;
@@ -141,8 +147,8 @@ namespace WhittedStyleRaytracer {
             Vector3 color = CastShadowRays(intersection, debugRay);
 
             // Debug: Primary Rays
-            if (Debug && debugRay && debugPrimaryRay) {
-                DrawRay(ray, intersection.Distance, 0xffff00);
+            if (Debug && debugRay && DebugPrimaryRay) {
+                DrawRay(ray, 0xffff00);
             }
 
             // Specularity
@@ -200,8 +206,8 @@ namespace WhittedStyleRaytracer {
                     totalColor += color;
 
                     // Debug: Shadow Rays
-                    if (Debug && debugRay && debugShadowRay && !(intersection.Primitive is Plane)) {
-                        DrawRay(shadowRay, shadowRay.Length, GetColor(light.Color));
+                    if (Debug && debugRay && DebugShadowRay && !(intersection.Primitive is Plane)) {
+                        DrawRay(shadowRay, GetColor(light.Color));
                     }
                 }
 
@@ -215,7 +221,9 @@ namespace WhittedStyleRaytracer {
             return totalColor;
         }
 
-        // Convert Color from Vector3 to int
+        /// <summary> Convert Color from Vector3 to integer </summary>
+        /// <param name="color">The color in Vector3 format</param>
+        /// <returns>The color in integer format</returns>
         int GetColor(Vector3 color) {
             color = Vector3.Clamp(color, new Vector3(0, 0, 0), new Vector3(1, 1, 1));
             int r = (int)(color.X * 255) << 16;
@@ -226,11 +234,11 @@ namespace WhittedStyleRaytracer {
 
         #region Debug Drawing
         // Debug: Draw Ray
-        void DrawRay(Ray ray, float length, int color) {
+        void DrawRay(Ray ray, int color) {
             int x1 = TX(ray.Origin.X);
             int y1 = TZ(ray.Origin.Z);
-            int x2 = TX(ray.Origin.X + ray.Direction.X * length);
-            int y2 = TZ(ray.Origin.Z + ray.Direction.Z * length);
+            int x2 = TX(ray.Origin.X + ray.Direction.X * ray.Length);
+            int y2 = TZ(ray.Origin.Z + ray.Direction.Z * ray.Length);
             Screen.Line(x1, y1, x2, y2, color);
         }
 

@@ -1,9 +1,14 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 
 namespace WhittedStyleRaytracer.Multithreading {
+    /// <summary> A threadpool for dividing work between threads </summary>
     class Threadpool {
-        public int ThreadCount { get; set; }
+        /// <summary> Amount of threads used for the threadpool </summary>
+        public readonly int ThreadCount;
+        /// <summary> Amount of cores on this system </summary>
+        public int CoreCount => Environment.ProcessorCount;
 
         readonly Thread[] workerThreads;
         readonly EventWaitHandle[] go;
@@ -12,8 +17,10 @@ namespace WhittedStyleRaytracer.Multithreading {
         int remaining;
         Action[] tasks;
 
-        public Threadpool() {
-            ThreadCount = GetCoreCount();
+        /// <summary> Create a new threadpool </summary>
+        /// <param name="threadCount">Amount of threads used for the threadpool</param>
+        public Threadpool(int threadCount = 0) {
+            ThreadCount = threadCount == 0 ? CoreCount : threadCount;
             remaining = 0;
             workerThreads = new Thread[ThreadCount];
             go = new EventWaitHandle[ThreadCount];
@@ -29,26 +36,8 @@ namespace WhittedStyleRaytracer.Multithreading {
             }
         }
 
-        public void ThreadMain(int i) {
-            int threadId = i;
-            while (true) {
-                // Wait for the Go Signal
-                go[threadId].WaitOne();
-                // Lock to Core
-                CPUaffinity.RunOnCore(threadId);
-                // Do Tasks
-                while (remaining > 0) {
-                    int task = Interlocked.Decrement(ref remaining);
-                    if (task >= 0) {
-                        tasks[task].Invoke();
-                    }
-                }
-                // Signal Done
-                done[threadId] = true;
-                doneHandle[threadId].Set();
-            }
-        }
-
+        /// <summary> Let the threadpool do some tasks </summary>
+        /// <param name="tasks">The tasks to do with the threadpool</param>
         public void DoTasks(Action[] tasks) {
             // Early Out if Still Busy
             if (remaining > 0) {
@@ -59,26 +48,41 @@ namespace WhittedStyleRaytracer.Multithreading {
             this.tasks = tasks;
             remaining = tasks.Length;
             // Set Done to False
-            for (var i = 0; i < ThreadCount; i++)
-                done[i] = false;
+            for (var i = 0; i < ThreadCount; i++) done[i] = false;
             // Give Go Signal
-            foreach (EventWaitHandle waitHandle in go)
-                waitHandle.Set();
+            foreach (EventWaitHandle waitHandle in go) waitHandle.Set();
         }
 
+        /// <summary> Check if the work is done </summary>
+        /// <returns>Whether the work is done</returns>
         public bool WorkDone() {
-            for (var i = 0; i < ThreadCount; i++)
-                if (!done[i])
-                    return false;
-            return true;
+            return done.All(b => b);
         }
 
+        /// <summary> Wait till all threads are done </summary>
         public void WaitTillDone() {
             WaitHandle.WaitAll(doneHandle);
         }
 
-        public int GetCoreCount() {
-            return Environment.ProcessorCount;
+        /// <summary> Main method for the worker threads </summary>
+        /// <param name="threadID">The identifier of the thread</param>
+        void ThreadMain(int threadID) {
+            while (true) {
+                // Wait for the Go Signal
+                go[threadID].WaitOne();
+                // Lock to Core
+                CPUaffinity.RunOnCore(threadID);
+                // Do Tasks
+                while (remaining > 0) {
+                    int task = Interlocked.Decrement(ref remaining);
+                    if (task >= 0) {
+                        tasks[task].Invoke();
+                    }
+                }
+                // Signal Done
+                done[threadID] = true;
+                doneHandle[threadID].Set();
+            }
         }
     }
 }

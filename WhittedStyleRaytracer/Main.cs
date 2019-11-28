@@ -60,7 +60,7 @@ namespace WhittedStyleRaytracer {
             Screen.Clear(0);
 
             // Check Input
-            InputCheck();
+            //InputCheck();
 
             // Trace Rays
             DivideRays();

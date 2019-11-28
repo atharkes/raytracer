@@ -94,6 +94,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ExtensionMethods.cs" />
     <Compile Include="Multithreading\GlobalSuppressions.cs" />
     <Compile Include="Multithreading\CPUaffinity.cs" />
     <Compile Include="Multithreading\Threadpool.cs" />

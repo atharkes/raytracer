@@ -101,13 +101,11 @@ namespace WhittedStyleRaytracer.Raytracing.AccelerationStructures {
             if (tymin > tmin) tmin = tymin;
             if (tymax < tmax) tmax = tymax;
 
-            float tz1 = (Bounds[ray.Sign[2]].Z - ray.Origin.Z) * ray.DirectionInverted.Z;
-            float tz2 = (Bounds[1 - ray.Sign[2]].Z - ray.Origin.Z) * ray.DirectionInverted.Z;
-            float tzmin = Math.Min(tz1, tz2);
-            float tzmax = Math.Max(tz1, tz2);
+            float tzmin = (Bounds[ray.Sign[2]].Z - ray.Origin.Z) * ray.DirectionInverted.Z;
+            float tzmax = (Bounds[1 - ray.Sign[2]].Z - ray.Origin.Z) * ray.DirectionInverted.Z;
 
-            tmin = Math.Max(tmin, Math.Min(tz1, tz2));
-            tmax = Math.Min(tmax, Math.Max(tz1, tz2));
+            tmin = Math.Max(tmin, tzmin);
+            tmax = Math.Min(tmax, tzmax);
 
             if ((tmin > tzmax) || (tzmin > tmax)) return false;
             if (tzmin > tmin) tmin = tzmin;

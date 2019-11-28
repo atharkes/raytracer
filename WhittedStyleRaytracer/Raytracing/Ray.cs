@@ -16,6 +16,9 @@ namespace WhittedStyleRaytracer.Raytracing {
         /// <summary> The length that the ray is travelling </summary>
         public float Length { get; set; }
 
+        /// <summary> Constant that defines the maximum recursion for secondary rays </summary>
+        public const int MaxRecursionDepth = 5;
+
         /// <summary> Create a new ray using an origin and a direction </summary>
         /// <param name="origin">The origin of the ray</param>
         /// <param name="direction">The direction of the ray (it will be normalized)</param>

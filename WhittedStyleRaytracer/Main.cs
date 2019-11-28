@@ -17,25 +17,21 @@ namespace WhittedStyleRaytracer {
         public Scene Scene;
 
         OpenTKProgram openTKApp;
-        public const int RecursionDepth = 5;
+        public const int MaxRecursionDepth = 5;
 
         Threadpool threadpool;
         Action[] tasks;
-        readonly int taskAmount = 64;
+        readonly int taskAmount = 512;
 
-        float debugCamX;
-        float debugCamZ;
-        readonly float debugCamWidth = 20f;
-        readonly float debugCamHeight = 20f;
-        bool debugRay;
-        bool debug = false;
+        public bool Debug = false;
+        public const float DebugScale = 50f;
         readonly bool debugPrimaryRay = true;
         readonly bool debugShadowRay = true;
 
         KeyboardState keyboardState;
         MouseState mouseStatePrevious, mouseStateCurrent;
 
-        float lightStartPos = (float)Math.PI / 2;
+        float lightPosMove = (float)Math.PI / 2;
 
         public void SetScreen(IScreen screen) {
             Screen = screen;
@@ -50,8 +46,8 @@ namespace WhittedStyleRaytracer {
 
         public void Tick() {
             // Moving Light
-            lightStartPos += 0.1f;
-            float move = (float)Math.Sin(lightStartPos) * 0.5f;
+            lightPosMove += 0.1f;
+            float move = (float)Math.Sin(lightPosMove) * 0.5f;
             Scene.Lights.First().Position += new Vector3(move, 0, 0);
 
             // Clear the screen
@@ -64,9 +60,7 @@ namespace WhittedStyleRaytracer {
             DivideRays();
 
             // Debug
-            if (debug) {
-                debugCamX = Scene.Camera.Position.X - debugCamHeight / 2;
-                debugCamZ = Scene.Camera.Position.Z - debugCamWidth / 2;
+            if (Debug) {
                 DrawCamera(Scene.Camera);
                 Scene.Lights.ForEach(light => DrawLight(light));
                 DrawScreenPlane(Scene.Camera);
@@ -79,7 +73,7 @@ namespace WhittedStyleRaytracer {
         void InputCheck() {
             // Input: Keyboard
             keyboardState = Keyboard.GetState();
-            if (keyboardState[Key.F1]) debug = !debug;
+            if (keyboardState[Key.F1]) Debug = !Debug;
             if (keyboardState[Key.Space]) Scene.Camera.Move(Scene.Camera.Up);
             if (keyboardState[Key.LShift]) Scene.Camera.Move(Scene.Camera.Down);
             if (keyboardState[Key.W]) Scene.Camera.Move(Scene.Camera.Front);
@@ -128,35 +122,31 @@ namespace WhittedStyleRaytracer {
         // Raytracer
         void TraceRay(int x, int y) {
             // Debug: Check if ray has to be drawn
-            if (debug) {
-                if ((x == 0 || (x + 1) % 16 == 0) && y == (Screen.Height - 1) / 2) {
-                    debugRay = true;
-                } else {
-                    debugRay = false;
-                }
-            }
+            bool debugRay = Debug && (x == 0 || (x + 1) % 16 == 0) && y == (Screen.Height - 1) / 2;
 
             // Cast Ray
             Ray ray = Scene.Camera.CreatePrimaryRay(x, y);
-            Vector3 pixelColor = CastPrimaryRay(ray);
+            Vector3 pixelColor = CastPrimaryRay(ray, 0, debugRay);
 
             // Draw Pixel
             Screen.Plot(x, y, GetColor(pixelColor));
         }
 
         // Intersect primary ray with primitives and fire a new ray if object is specular
-        Vector3 CastPrimaryRay(Ray ray, int recursionDepth = 0) {
+        Vector3 CastPrimaryRay(Ray ray, int recursionDepth = 0, bool debugRay = false) {
             // Intersect with Scene
-            Intersection intersection = Scene.AccelerationStructure.IntersectTree(ray);
-            Vector3 color = intersection != null ? CastShadowRays(intersection) : Vector3.Zero;
+            Intersection intersection = Scene.AccelerationStructure.Intersect(ray);
+            if (intersection == null) return Vector3.Zero;
+
+            Vector3 color = CastShadowRays(intersection, debugRay);
 
             // Debug: Primary Rays
-            if (debug && debugRay && debugPrimaryRay && intersection != null) {
+            if (Debug && debugRay && debugPrimaryRay) {
                 DrawRay(ray, intersection.Distance, 0xffff00);
             }
 
             // Specularity
-            if (intersection != null && intersection.Primitive.Specularity > 0 && recursionDepth < RecursionDepth) {
+            if (intersection.Primitive.Specularity > 0 && recursionDepth < MaxRecursionDepth) {
                 recursionDepth += 1;
                 // Cast Reflected Ray
                 Vector3 normal = intersection.Normal;
@@ -172,16 +162,14 @@ namespace WhittedStyleRaytracer {
         }
 
         // Intersect a shadow ray with the scene for each light and calculate the color
-        Vector3 CastShadowRays(Intersection intersection) {
-            if (intersection == null) return Vector3.Zero;
-
+        Vector3 CastShadowRays(Intersection intersection, bool debugRay = false) {
             Vector3 totalColor = new Vector3(0, 0, 0);
             foreach (Lightsource light in Scene.Lights) {
                 Vector3 color = intersection.Primitive.Color;
 
                 Ray shadowRay = Ray.CreateShadowRay(intersection.Position, light.Position);
 
-                if (Scene.AccelerationStructure.IntersectTreeBool(shadowRay)) {
+                if (Scene.AccelerationStructure.IntersectBool(shadowRay)) {
                     continue;
                 } else {
                     // Light Absorption
@@ -212,7 +200,7 @@ namespace WhittedStyleRaytracer {
                     totalColor += color;
 
                     // Debug: Shadow Rays
-                    if (debug && debugRay && debugShadowRay && !(intersection.Primitive is Plane)) {
+                    if (Debug && debugRay && debugShadowRay && !(intersection.Primitive is Plane)) {
                         DrawRay(shadowRay, shadowRay.Length, GetColor(light.Color));
                     }
                 }
@@ -285,15 +273,15 @@ namespace WhittedStyleRaytracer {
 
         // Debug: Transform X coord to X on debug screen
         public int TX(float x) {
-            x -= debugCamX;
-            int xDraw = (int)((512 / debugCamWidth) * x);
+            x -= Scene.Camera.Position.X - DebugScale * .5f;
+            int xDraw = (int)(512 / DebugScale * x);
             return xDraw;
         }
 
         // Debug: Transform Z coord to Y on debug screen
         public int TZ(float z) {
-            z -= debugCamZ;
-            int yDraw = (int)((512 / debugCamHeight) * z);
+            z -= Scene.Camera.Position.Z - DebugScale * .5f;
+            int yDraw = (int)(512 / DebugScale * z);
             return yDraw;
         }
         #endregion

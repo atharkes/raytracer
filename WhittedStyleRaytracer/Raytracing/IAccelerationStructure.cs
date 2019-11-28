@@ -1,12 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace WhittedStyleRaytracer.Raytracing {
+﻿namespace WhittedStyleRaytracer.Raytracing {
+    /// <summary> An interface for an acceleration structure </summary>
     interface IAccelerationStructure {
-        Intersection IntersectTree(Ray ray);
-        bool IntersectTreeBool(Ray ray);
+        /// <summary> Intersect the acceleration structure with a ray </summary>
+        /// <param name="ray">The ray to intersect the acceleration structure with</param>
+        /// <returns>An intersection with a primitive if there is any</returns>
+        Intersection Intersect(Ray ray);
+
+        /// <summary> Intersect the acceleration structure with a ray </summary>
+        /// <param name="ray">The ray to intersect the acceleration structure with</param>
+        /// <returns>Whether there is an intersection with a primitive</returns>
+        bool IntersectBool(Ray ray);
     }
 }

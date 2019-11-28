@@ -97,7 +97,7 @@
     <Compile Include="Multithreading\GlobalSuppressions.cs" />
     <Compile Include="Multithreading\CPUaffinity.cs" />
     <Compile Include="Multithreading\Threadpool.cs" />
-    <Compile Include="Raytracing\BVH.cs" />
+    <Compile Include="Raytracing\AccelerationStructures\BVH.cs" />
     <Compile Include="Raytracing\IAccelerationStructure.cs" />
     <Compile Include="Raytracing\ISceneObject.cs" />
     <Compile Include="Raytracing\SceneObjects\IScreen.cs" />
@@ -133,9 +133,7 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Raytracing\AccelerationStructures\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

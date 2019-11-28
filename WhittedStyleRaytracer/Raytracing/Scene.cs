@@ -1,6 +1,7 @@
 ﻿using OpenTK;
 using System;
 using System.Collections.Generic;
+using WhittedStyleRaytracer.Raytracing.AccelerationStructures;
 using WhittedStyleRaytracer.Raytracing.SceneObjects;
 using WhittedStyleRaytracer.Raytracing.SceneObjects.Primitives;
 
@@ -10,7 +11,7 @@ namespace WhittedStyleRaytracer.Raytracing {
         /// <summary> The camera in the scene </summary>
         public readonly Camera Camera;
         /// <summary> The acceleration structure used to find intersections </summary>
-        public readonly BVHNode AccelerationStructure;
+        public readonly IAccelerationStructure AccelerationStructure;
         /// <summary> The primitives in the scene </summary>
         public readonly List<Primitive> Primitives = new List<Primitive>();
         /// <summary> The lightsources in the scene </summary>

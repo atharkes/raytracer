@@ -3,11 +3,15 @@ using System;
 using System.Collections.Generic;
 using WhittedStyleRaytracer.Raytracing.SceneObjects;
 
-namespace WhittedStyleRaytracer.Raytracing {
+namespace WhittedStyleRaytracer.Raytracing.AccelerationStructures {
     /// <summary> A node of a bounding volume hierarchy tree
-    /// (Ordered traversal can be added)
-    /// (Can be optimized using two arrays for primitives and BHV nodes, and using only a Left index and Count) </summary>
-    class BVHNode {
+    /// TODO:
+    /// - Refitting (enable animation/movement)
+    /// - Binning SAH while splitting (increase splitting performance)
+    /// - Geometricly ordered traversal (increase performance)
+    /// - Top-level BHV's for static and non-static parts
+    /// - Use two arrays for primitives and BHV nodes, and using only a Left index and Count (decrease storage and increase performance) </summary>
+    class BVHNode : IAccelerationStructure {
         /// <summary> The left child node if it has one </summary>
         public BVHNode Left { get; private set; }
         /// <summary> The right child node if it has one </summary>
@@ -31,12 +35,12 @@ namespace WhittedStyleRaytracer.Raytracing {
         /// <summary> Intersect this Node and it's children </summary>
         /// <param name="ray">The ray to calculate intersections for</param>
         /// <returns>A pair of the distance and the primitive that it intersects</returns>
-        public Intersection IntersectTree(Ray ray) {
+        public Intersection Intersect(Ray ray) {
             if (!IntersectAABB(ray)) {
                 return null;
             } else if (!Leaf) {
-                Intersection intersectionLeft = Left.IntersectTree(ray);
-                Intersection intersectionRight = Right.IntersectTree(ray);
+                Intersection intersectionLeft = Left.Intersect(ray);
+                Intersection intersectionRight = Right.Intersect(ray);
                 if (intersectionLeft == null) {
                     return intersectionRight;
                 } else if (intersectionRight == null) {
@@ -64,11 +68,11 @@ namespace WhittedStyleRaytracer.Raytracing {
         /// <summary> Intersect this Node and it's children </summary>
         /// <param name="ray">The ray to calculate intersections for</param>
         /// <returns>Whether there is an intersection</returns>
-        public bool IntersectTreeBool(Ray ray) {
+        public bool IntersectBool(Ray ray) {
             bool intersectBool = IntersectAABB(ray);
             if (intersectBool && !Leaf) {
-                bool intersectLeft = Left.IntersectTreeBool(ray);
-                bool intersectRight = Right.IntersectTreeBool(ray);
+                bool intersectLeft = Left.IntersectBool(ray);
+                bool intersectRight = Right.IntersectBool(ray);
                 if (intersectLeft || intersectRight) {
                     return true;
                 } else {
@@ -114,19 +118,18 @@ namespace WhittedStyleRaytracer.Raytracing {
 
         /// <summary> Try split the Node into 2 smaller Nodes </summary>
         void Split() {
-            if (Primitives.Count < 3) return;
-            (List<Primitive> primitivesLeft, List<Primitive> primitivesRight) = CalculateSplit();
-            if (primitivesLeft == null || primitivesRight == null) return;
-            Left = new BVHNode(primitivesLeft);
-            Right = new BVHNode(primitivesRight);
+            (List<Primitive>, List<Primitive>)? split = CalculateSplit();
+            if (!split.HasValue) return;
+            Left = new BVHNode(split.Value.Item1);
+            Right = new BVHNode(split.Value.Item2);
             Leaf = false;
         }
 
         /// <summary> Calculate Cheapest Split </summary>
         /// <returns>A pair with two sides of the split</returns>
-        (List<Primitive> left, List<Primitive> right) CalculateSplit() { 
+        (List<Primitive> left, List<Primitive> right)? CalculateSplit() { 
             float cost = CalculateSurfaceArea(Bounds) * Primitives.Count;
-            (List<Primitive>, List<Primitive>) splitPrimitives = (null, null);
+            (List<Primitive>, List<Primitive>)? splitPrimitives = null;
             foreach (Primitive primitive in Primitives) {
                 List<(List<Primitive>, List<Primitive>)> splits = new List<(List<Primitive>, List<Primitive>)>(3)
                 {
@@ -197,15 +200,15 @@ namespace WhittedStyleRaytracer.Raytracing {
             return (primitivesLeft, primitivesRight);
         }
 
-        /// <summary> Calculate the cost of a split </summary>
+        /// <summary> Calculate the cost of a split using the Surface Area Heuristic </summary>
         /// <param name="split">The split to calculate the cost for</param>
         /// <returns>The cost of the split</returns>
-        float CalculateCost((List<Primitive>, List<Primitive>) split) {
-            List<Vector3> boundsLeft = CalculateBounds(split.Item1);
+        float CalculateCost((List<Primitive> left, List<Primitive> right) split) {
+            List<Vector3> boundsLeft = CalculateBounds(split.left);
             float surfaceArea1 = CalculateSurfaceArea(boundsLeft);
-            List<Vector3> boundsRight = CalculateBounds(split.Item2);
+            List<Vector3> boundsRight = CalculateBounds(split.right);
             float surfaceArea2 = CalculateSurfaceArea(boundsRight);
-            return surfaceArea1 * split.Item1.Count + surfaceArea2 * split.Item2.Count;
+            return surfaceArea1 * split.left.Count + surfaceArea2 * split.right.Count;
         }
 
         /// <summary> Calculate the bounds of a List of Primitives </summary>

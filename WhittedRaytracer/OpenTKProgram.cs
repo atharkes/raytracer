@@ -25,7 +25,7 @@ namespace WhittedRaytracer {
             GameWindow = new Surface();
             GameWindowID = GameWindow.GenTexture();
             ClientSize = new Size(GameWindow.Width, GameWindow.Height);
-            Location = new Point(0, 30);
+            Location = new Point(50, 80);
             main = new Main(GameWindow);
         }
 

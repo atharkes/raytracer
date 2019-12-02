@@ -30,14 +30,14 @@ namespace WhittedRaytracer.Raytracing {
         }
 
         void AddDefaultLights() {
-            Lights.Add(new Lightsource(new Vector3(0, -8, 3), new Vector3(300, 300, 100)));
+            Lights.Add(new Lightsource(new Vector3(0, -8, 3), new Vector3(300, 300, 250)));
         }
 
         void AddDefaultPrimitives() {
-            Primitives.Add(new Sphere(new Vector3(-3, -1, 5), 1, new Vector3(0.5f, 0, 0)));
+            Primitives.Add(new Sphere(new Vector3(-3, -1, 5), 1, new Vector3(1f, 0.9f, 0.9f), 0, 1, 1.62f));
             Primitives.Add(new Sphere(new Vector3(0, -1, 5), 1, new Vector3(1f, 1f, 1f), 1f));
             Primitives.Add(new Sphere(new Vector3(3, -1, 5), 1, new Vector3(0, 0.5f, 0), 0, 0, 1, 0.5f, 10f));
-            Primitives.Add(new Plane(new Vector3(0, -1, 0), -1, new Vector3(1, 1, 1)));
+            Primitives.Add(new Plane(new Vector3(0, -1, 0), -1, new Vector3(1, 1, 0.5f)));
             Primitives.Add(new Triangle(new Vector3(-5, 0, 0), new Vector3(5, 0, 0), new Vector3(5, 0, 10), new Vector3(1, 0.8f, 1), 0.4f, 0, 1, 0.7f, 50f));
             Primitives.Add(new Triangle(new Vector3(-5, 0, 0), new Vector3(5, 0, 10), new Vector3(-5, 0, 10), new Vector3(1, 1, 0.8f), 0, 0, 1, 0.7f, 50f));
         }
@@ -59,28 +59,30 @@ namespace WhittedRaytracer.Raytracing {
             // Intersect with Scene
             Intersection intersection = AccelerationStructure.Intersect(ray);
             if (intersection == null) return Vector3.Zero;
+            Vector3 intersectionLight = intersection.Primitive.Specularity < 1 ? CastShadowRays(intersection, debugRay) : Vector3.Zero;
+            Vector3 outgoingLight = intersectionLight;
 
-            Vector3 color = CastShadowRays(intersection, debugRay);
+            // Specularity
+            if (intersection.Primitive.Specularity > 0 && recursionDepth < Ray.MaxRecursionDepth) {
+                Vector3 outReflectedLight = CastPrimaryRay(intersection.GetReflectedRay(), recursionDepth + 1, debugRay) * intersection.Primitive.Color;
+                outgoingLight = intersectionLight * (1 - intersection.Primitive.Specularity) + outReflectedLight * intersection.Primitive.Specularity;
+            }
+
+            // Dielectrics
+            if (intersection.Primitive.Dielectric > 0 && recursionDepth < Ray.MaxRecursionDepth) {
+                Ray refractedRay = intersection.GetRefractedRay();
+                Vector3 incRefractedLight = refractedRay != null ? CastPrimaryRay(refractedRay, recursionDepth + 1, debugRay) : Vector3.Zero;
+                Vector3 incReflectedLight = CastPrimaryRay(intersection.GetReflectedRay(), recursionDepth + 1, debugRay);
+                float reflected = intersection.GetReflectivity();
+                float refracted = 1 - reflected;
+                outgoingLight = intersectionLight * (1f - intersection.Primitive.Dielectric) + (incRefractedLight * refracted + incReflectedLight * reflected) * intersection.Primitive.Dielectric * intersection.Primitive.Color;
+            }
 
             // Debug: Primary Rays
             if (debugRay) {
                 Camera.ScreenPlane.DrawRay(ray);
             }
-
-            // Specularity
-            if (intersection.Primitive.Specularity > 0 && recursionDepth < Ray.MaxRecursionDepth) {
-                recursionDepth += 1;
-                // Cast Reflected Ray
-                Vector3 normal = intersection.Normal;
-                Vector3 newDirection = ray.Direction - 2 * Vector3.Dot(ray.Direction, normal) * normal;
-                ray = new Ray(intersection.Position, newDirection);
-                Vector3 colorReflection = CastPrimaryRay(ray, recursionDepth);
-
-                // Calculate Specularity
-                color = color * (1 - intersection.Primitive.Specularity) + colorReflection * intersection.Primitive.Specularity * intersection.Primitive.Color;
-            }
-
-            return color;
+            return outgoingLight;
         }
 
         /// <summary> Cast shadow rays from an intersection to every light and calculate the color </summary>
@@ -88,46 +90,39 @@ namespace WhittedRaytracer.Raytracing {
         /// <param name="debugRay">Whether to draw this ray in debug</param>
         /// <returns>The color at the intersection</returns>
         public Vector3 CastShadowRays(Intersection intersection, bool debugRay = false) {
-            Vector3 totalColor = new Vector3(0, 0, 0);
+            Vector3 totalColor = Vector3.Zero;
             foreach (Lightsource light in Lights) {
-                Vector3 color = intersection.Primitive.Color;
+                Ray shadowRay = intersection.GetShadowRay(light);
+                if (AccelerationStructure.IntersectBool(shadowRay)) continue;
 
-                Ray shadowRay = Ray.CreateShadowRay(intersection.Position, light.Position);
-
-                if (AccelerationStructure.IntersectBool(shadowRay)) {
-                    continue;
-                } else {
-                    // Light Absorption
-                    color = color * light.Color;
-                    // N dot L
-                    Vector3 normal = intersection.Normal;
-                    float NdotL = Vector3.Dot(normal, shadowRay.Direction);
-                    if (intersection.Primitive.Glossyness == 0) {
-                        color = color * NdotL;
-                    } else if (intersection.Primitive.Glossyness > 0) {
-                        // Glossyness
-                        Vector3 glossyDirection = (-shadowRay.Direction - 2 * (Vector3.Dot(-shadowRay.Direction, normal)) * normal);
-                        float dot = Vector3.Dot(glossyDirection, -intersection.Ray.Direction);
-                        if (dot > 0) {
-                            float glossyness = (float)Math.Pow(dot, intersection.Primitive.GlossSpecularity);
-                            // Phong-Shading (My Version)
-                            color = color * (1 - intersection.Primitive.Glossyness) * NdotL + intersection.Primitive.Glossyness * glossyness * light.Color;
-                            // Phong-Shading (Official)
-                            //color = color * ((1 - intersection.primitive.glossyness) * NdotL + intersection.primitive.glossyness * glossyness);
-                        } else {
-                            color = color * (1 - intersection.Primitive.Glossyness) * NdotL;
-                        }
+                // Light Absorption
+                Vector3 color = intersection.Primitive.Color * light.Color;
+                // N dot L (Glossyness)
+                float NdotL = Vector3.Dot(intersection.Normal, shadowRay.Direction);
+                if (intersection.Primitive.Glossyness == 0) {
+                    color = color * NdotL;
+                } else if (intersection.Primitive.Glossyness > 0) {
+                    Vector3 glossyDirection = -shadowRay.Direction - 2 * Vector3.Dot(-shadowRay.Direction, intersection.Normal) * intersection.Normal;
+                    float dot = Vector3.Dot(glossyDirection, -intersection.Ray.Direction);
+                    if (dot > 0) {
+                        float glossyness = (float)Math.Pow(dot, intersection.Primitive.GlossSpecularity);
+                        // Phong-Shading (My Version)
+                        color = color * (1 - intersection.Primitive.Glossyness) * NdotL + intersection.Primitive.Glossyness * glossyness * light.Color;
+                        // Phong-Shading (Official)
+                        //color = color * ((1 - intersection.primitive.glossyness) * NdotL + intersection.primitive.glossyness * glossyness);
+                    } else {
+                        color = color * (1 - intersection.Primitive.Glossyness) * NdotL;
                     }
-                    // Distance Attenuation
-                    color = color * (1 / (shadowRay.Length * shadowRay.Length));
+                }
+                // Distance Attenuation
+                color = color * (1 / (shadowRay.Length * shadowRay.Length));
 
-                    // Add Color to Total
-                    totalColor += color;
+                // Add Color to Total
+                totalColor += color;
 
-                    // Debug: Shadow Rays
-                    if (debugRay) {
-                        Camera.ScreenPlane.DrawRay(shadowRay, light.Color.ToIntColor());
-                    }
+                // Debug: Shadow Rays
+                if (debugRay) {
+                    Camera.ScreenPlane.DrawRay(shadowRay, light.Color.ToIntColor());
                 }
 
             }

@@ -26,9 +26,8 @@ namespace WhittedRaytracer {
         readonly Action[] tasks;
 
         KeyboardState keyboardState;
-        MouseState mouseStatePrevious, mouseStateCurrent;
-
-        float lightPosMove = (float)Math.PI / 2;
+        MouseState mouseStatePrevious;
+        MouseState mouseStateCurrent;
 
         public Main(IScreen screen) {
             Scene = new Scene(screen);
@@ -37,10 +36,8 @@ namespace WhittedRaytracer {
         }
 
         public void Tick() {
-            // Moving Light
-            lightPosMove += 0.1f;
-            float move = (float)Math.Sin(lightPosMove) * 0.5f;
-            Scene.Lights.First().Position += new Vector3(move, 0, 0);
+            // Move Light
+            Scene.Lights.First().Position += new Vector3((float)Math.Sin(DateTime.Now.TimeOfDay.TotalSeconds) * 0.5f, 0, 0);
 
             // Clear the screen
             Scene.Camera.ScreenPlane.Screen.Clear(0);

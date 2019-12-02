@@ -17,7 +17,7 @@ namespace WhittedRaytracer.Raytracing {
         public float Length { get; set; }
 
         /// <summary> Constant that defines the maximum recursion for secondary rays </summary>
-        public const int MaxRecursionDepth = 5;
+        public const int MaxRecursionDepth = 3;
 
         /// <summary> Create a new ray using an origin and a direction </summary>
         /// <param name="origin">The origin of the ray</param>
@@ -33,16 +33,6 @@ namespace WhittedRaytracer.Raytracing {
                 DirectionInverted.Y < 0 ? 1 : 0,
                 DirectionInverted.Z < 0 ? 1 : 0
             };
-        }
-
-        /// <summary> Create a new ray using origin and destination </summary>
-        /// <param name="origin">The origin of the ray</param>
-        /// <param name="destination">The destination of the ray</param>
-        /// <returns>A ray with the length from the origin to the destination</returns>
-        public static Ray CreateShadowRay(Vector3 origin, Vector3 destination) {
-            Vector3 direction = (destination - origin).Normalized();
-            float length = (destination - origin).Length;
-            return new Ray(origin, direction, length);
         }
     }
 }

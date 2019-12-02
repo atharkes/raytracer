@@ -1,11 +1,11 @@
 ﻿using OpenTK;
 using System;
 using System.Collections.Generic;
-using WhittedStyleRaytracer.Raytracing.AccelerationStructures;
-using WhittedStyleRaytracer.Raytracing.SceneObjects;
-using WhittedStyleRaytracer.Raytracing.SceneObjects.Primitives;
+using WhittedRaytracer.Raytracing.AccelerationStructures;
+using WhittedRaytracer.Raytracing.SceneObjects;
+using WhittedRaytracer.Raytracing.SceneObjects.Primitives;
 
-namespace WhittedStyleRaytracer.Raytracing {
+namespace WhittedRaytracer.Raytracing {
     /// <summary> The 3d scene in which the ray tracing takes place </summary>
     class Scene {
         /// <summary> The camera in the scene </summary>

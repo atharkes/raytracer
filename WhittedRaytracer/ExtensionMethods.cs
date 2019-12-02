@@ -1,6 +1,6 @@
 ﻿using OpenTK;
 
-namespace WhittedStyleRaytracer {
+namespace WhittedRaytracer {
     /// <summary> Extension methods for classes in OpenTK </summary>
     static class ExtensionMethods {
         /// <summary> Get the integer color from a vector3 color </summary>

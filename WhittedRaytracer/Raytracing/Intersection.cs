@@ -1,7 +1,7 @@
 ﻿using OpenTK;
-using WhittedStyleRaytracer.Raytracing.SceneObjects;
+using WhittedRaytracer.Raytracing.SceneObjects;
 
-namespace WhittedStyleRaytracer.Raytracing {
+namespace WhittedRaytracer.Raytracing {
     /// <summary> A data structure to store an intersection between a ray and a primitive </summary>
     class Intersection {
         /// <summary> The ray that intersects the primitive </summary>

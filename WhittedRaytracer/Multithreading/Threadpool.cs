@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Threading;
 
-namespace WhittedStyleRaytracer.Multithreading {
+namespace WhittedRaytracer.Multithreading {
     /// <summary> A threadpool for dividing work between threads </summary>
     class Threadpool {
         /// <summary> Amount of threads used for the threadpool </summary>

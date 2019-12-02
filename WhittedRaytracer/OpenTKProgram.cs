@@ -3,7 +3,7 @@ using System.Drawing;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
 
-namespace WhittedStyleRaytracer {
+namespace WhittedRaytracer {
     /// <summary> The main class derived from an OpenTK gamewindow </summary>
     public class OpenTKProgram : GameWindow {
         static int screenID;

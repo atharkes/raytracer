@@ -1,7 +1,7 @@
 ﻿using OpenTK;
 using System.Collections.Generic;
 
-namespace WhittedStyleRaytracer.Raytracing.SceneObjects.Primitives {
+namespace WhittedRaytracer.Raytracing.SceneObjects.Primitives {
     /// <summary> A plane for the 3d scene </summary>
     class Plane : Primitive {
         /// <summary> Normal vector of the plane </summary>

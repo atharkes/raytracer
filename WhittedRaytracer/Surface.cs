@@ -2,9 +2,9 @@
 using System.Drawing;
 using System.Drawing.Imaging;
 using OpenTK.Graphics.OpenGL;
-using WhittedStyleRaytracer.Raytracing.SceneObjects;
+using WhittedRaytracer.Raytracing.SceneObjects;
 
-namespace WhittedStyleRaytracer {
+namespace WhittedRaytracer {
     public class Sprite {
         static public Surface Target;
         

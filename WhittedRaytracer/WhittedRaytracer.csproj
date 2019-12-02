@@ -7,8 +7,8 @@
     <ProjectGuid>{9354EB6E-D674-4763-A589-3631FABE7654}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>WhittedStyleRaytracer</RootNamespace>
-    <AssemblyName>WhittedStyleRaytracer</AssemblyName>
+    <RootNamespace>WhittedRaytracer</RootNamespace>
+    <AssemblyName>WhittedRaytracer</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -73,7 +73,7 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>WhittedStyleRaytracer.OpenTKProgram</StartupObject>
+    <StartupObject>WhittedRaytracer.OpenTKProgram</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="OpenTK, Version=3.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">

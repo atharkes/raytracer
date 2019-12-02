@@ -1,8 +1,8 @@
 ﻿using System;
 using OpenTK;
-using WhittedStyleRaytracer.Raytracing.SceneObjects.Primitives;
+using WhittedRaytracer.Raytracing.SceneObjects.Primitives;
 
-namespace WhittedStyleRaytracer.Raytracing.SceneObjects {
+namespace WhittedRaytracer.Raytracing.SceneObjects {
     /// <summary> The screen plane object in the 3d scene </summary>
     class ScreenPlane : ISceneObject {
         /// <summary> The camera the screen plane is linked to </summary>

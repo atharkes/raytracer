@@ -1,7 +1,7 @@
 ﻿using OpenTK;
 using System.Collections.Generic;
 
-namespace WhittedStyleRaytracer.Raytracing.SceneObjects.Primitives {
+namespace WhittedRaytracer.Raytracing.SceneObjects.Primitives {
     /// <summary> A triangle primitive for the 3d scene </summary>
     class Triangle : Primitive {
         /// <summary> A point of the triangle </summary>

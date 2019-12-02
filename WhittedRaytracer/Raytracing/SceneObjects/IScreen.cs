@@ -1,4 +1,4 @@
-﻿namespace WhittedStyleRaytracer.Raytracing.SceneObjects {
+﻿namespace WhittedRaytracer.Raytracing.SceneObjects {
     /// <summary> An interface for a 2d screen used for displaying the 3d scene using raytracing </summary>
     public interface IScreen {
         /// <summary> The width of the screen </summary>

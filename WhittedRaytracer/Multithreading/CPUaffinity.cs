@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace WhittedStyleRaytracer.Multithreading {
+namespace WhittedRaytracer.Multithreading {
     /// <summary> Class to set cpu affinity of a thread </summary>
     class CPUaffinity {
         [DllImport("kernel32.dll")]

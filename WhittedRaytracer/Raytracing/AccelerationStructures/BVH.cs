@@ -1,9 +1,9 @@
 ﻿using OpenTK;
 using System;
 using System.Collections.Generic;
-using WhittedStyleRaytracer.Raytracing.SceneObjects;
+using WhittedRaytracer.Raytracing.SceneObjects;
 
-namespace WhittedStyleRaytracer.Raytracing.AccelerationStructures {
+namespace WhittedRaytracer.Raytracing.AccelerationStructures {
     /// <summary> A node of a bounding volume hierarchy tree
     /// TODO:
     /// - Refitting (enable animation/movement)

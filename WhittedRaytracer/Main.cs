@@ -3,12 +3,12 @@ using OpenTK.Input;
 using System;
 using System.Diagnostics;
 using System.Linq;
-using WhittedStyleRaytracer.Multithreading;
-using WhittedStyleRaytracer.Raytracing;
-using WhittedStyleRaytracer.Raytracing.SceneObjects;
-using WhittedStyleRaytracer.Raytracing.SceneObjects.Primitives;
+using WhittedRaytracer.Multithreading;
+using WhittedRaytracer.Raytracing;
+using WhittedRaytracer.Raytracing.SceneObjects;
+using WhittedRaytracer.Raytracing.SceneObjects.Primitives;
 
-namespace WhittedStyleRaytracer {
+namespace WhittedRaytracer {
     /// <summary> Main class of the raytracer </summary>
     class Main {
         /// <summary> The screen the raytracer is drawing to </summary>

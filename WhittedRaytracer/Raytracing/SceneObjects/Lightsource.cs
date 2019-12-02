@@ -1,6 +1,6 @@
 ﻿using OpenTK;
 
-namespace WhittedStyleRaytracer.Raytracing.SceneObjects {
+namespace WhittedRaytracer.Raytracing.SceneObjects {
     /// <summary> A lightsource for the 3d scene </summary>
     class Lightsource : ISceneObject {
         /// <summary> The position of the lightsource </summary>

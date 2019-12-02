@@ -1,6 +1,6 @@
 ﻿using OpenTK;
 
-namespace WhittedStyleRaytracer.Raytracing.SceneObjects {
+namespace WhittedRaytracer.Raytracing.SceneObjects {
     /// <summary> The camera object in the 3d scene </summary>
     class Camera : ISceneObject {
         /// <summary> The screen plane in front of the camera </summary>

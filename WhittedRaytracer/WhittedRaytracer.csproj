@@ -91,6 +91,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Drawing\Sprite.cs" />
     <Compile Include="ExtensionMethods.cs" />
     <Compile Include="Multithreading\GlobalSuppressions.cs" />
     <Compile Include="Multithreading\CPUaffinity.cs" />
@@ -110,7 +111,7 @@
     <Compile Include="Raytracing\SceneObjects\Primitives\Sphere.cs" />
     <Compile Include="Raytracing\Scene.cs" />
     <Compile Include="Raytracing\SceneObjects\ScreenPlane.cs" />
-    <Compile Include="Surface.cs" />
+    <Compile Include="Drawing\Surface.cs" />
     <Compile Include="OpenTKProgram.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

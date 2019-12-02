@@ -4,51 +4,31 @@ using System.Drawing.Imaging;
 using OpenTK.Graphics.OpenGL;
 using WhittedRaytracer.Raytracing.SceneObjects;
 
-namespace WhittedRaytracer {
-    public class Sprite {
-        static public Surface Target;
-        
-        readonly int textureID;
-        Surface bitmap;
-
-        public Sprite(string fileName) {
-            bitmap = new Surface(fileName);
-            textureID = bitmap.GenTexture();
-        }
-
-        public void Draw(float x, float y, float scale = 1.0f) {
-            GL.BindTexture(TextureTarget.Texture2D, textureID);
-            GL.Enable(EnableCap.Blend);
-            GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
-            GL.Begin(PrimitiveType.Quads);
-            float u1 = (x * 2 - 0.5f * scale * bitmap.Width) / Target.Width - 1;
-            float v1 = 1 - (y * 2 - 0.5f * scale * bitmap.Height) / Target.Height;
-            float u2 = ((x + 0.5f * scale * bitmap.Width) * 2) / Target.Width - 1;
-            float v2 = 1 - ((y + 0.5f * scale * bitmap.Height) * 2) / Target.Height;
-            GL.TexCoord2(0.0f, 1.0f); GL.Vertex2(u1, v2);
-            GL.TexCoord2(1.0f, 1.0f); GL.Vertex2(u2, v2);
-            GL.TexCoord2(1.0f, 0.0f); GL.Vertex2(u2, v1);
-            GL.TexCoord2(0.0f, 0.0f); GL.Vertex2(u1, v1);
-            GL.End();
-            GL.Disable(EnableCap.Blend);
-        }
-    }
-
+namespace WhittedRaytracer.Drawing {
+    /// <summary> A pixel surface to display </summary>
     public class Surface : IScreen {
+        /// <summary> The width of the surface </summary>
         public int Width { get; }
+        /// <summary> The height of the surface </summary>
         public int Height { get; }
-        public int[] Pixels;
+        /// <summary> The pixels of the surface </summary>
+        public readonly int[] Pixels;
 
         static bool fontReady = false;
         static Surface font;
         static int[] fontRedir;
 
+        /// <summary> Create a new empty surface </summary>
+        /// <param name="width">The width of the surface</param>
+        /// <param name="height">The height of the surface</param>
         public Surface(int width = 512, int height = 512) {
             Width = width;
             Height = height;
             Pixels = new int[width * height];
         }
 
+        /// <summary> Create a new surface from a file </summary>
+        /// <param name="fileName">The name of the file to create a surface of</param>
         public Surface(string fileName) {
             Bitmap bmp = new Bitmap(fileName);
             Width = bmp.Width;
@@ -69,6 +49,8 @@ namespace WhittedRaytracer {
             return id;
         }
 
+        /// <summary> Clear the surface </summary>
+        /// <param name="c">The color to clear the surface with</param>
         public void Clear(int c) {
             for (int s = Width * Height, p = 0; p < s; p++) Pixels[p] = c;
         }
@@ -177,7 +159,5 @@ namespace WhittedRaytracer {
                 }
             }
         }
-
-        
     }
 }

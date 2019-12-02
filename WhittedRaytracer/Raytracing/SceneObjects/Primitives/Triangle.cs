@@ -17,11 +17,13 @@ namespace WhittedRaytracer.Raytracing.SceneObjects.Primitives {
         /// <param name="p2">The second point of the triangle</param>
         /// <param name="p3">The third point of the triangle</param>
         /// <param name="color">The color of the triangle</param>
-        /// <param name="specularity">The specularity of the triangle</param>
+        /// <param name="specularity">How specular the triangle is. A specular object reflects light like a mirror.</param>
+        /// <param name="dielectric">How dielectric the triangle is. A dielectric object both passes light and reflects it like water or glass.</param>
+        /// <param name="refractionIndex">The refraction index of the triangle if it is a dielectric. This is typically a value between 1 and 3.</param>
         /// <param name="glossyness">The glossyness of the triangle</param>
         /// <param name="glossSpecularity">The gloss specularity of the triangle</param>
-        public Triangle(Vector3 p1, Vector3 p2, Vector3 p3, Vector3? color = null, float specularity = 0, float glossyness = 0, float glossSpecularity = 0)
-            : base (null, color, specularity, glossyness, glossSpecularity) {
+        public Triangle(Vector3 p1, Vector3 p2, Vector3 p3, Vector3? color = null, float specularity = 0, float dielectric = 0, float refractionIndex = 1, float glossyness = 0, float glossSpecularity = 0)
+            : base (null, color, specularity, dielectric, refractionIndex, glossyness, glossSpecularity) {
             P1 = p1;
             P2 = p2;
             P3 = p3;

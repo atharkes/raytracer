@@ -8,8 +8,18 @@ namespace WhittedRaytracer.Raytracing.SceneObjects {
         public Vector3 Position { get; set; }
         /// <summary> The color of the primitive </summary>
         public Vector3 Color { get; set; }
-        /// <summary> The specularity of the primitive </summary>
+        /// <summary> How specular this primitive is. A specular object reflects light like a mirror. </summary>
         public float Specularity { get; set; }
+        /// <summary> How dielectric this primitive is. A dielectric object both passes light and reflects it like water or glass. </summary>
+        public float Dielectric { get; set; }
+        /// <summary> The refraction index of this primitive if it is a dielectric. This is typically a value between 1 and 3.
+        /// <para> Vacuum 1 </para>
+        /// <para> Gases at 0 °C: Air 1.000293, Helium 1.000036, Hydrogen 1.000132, Carbon dioxide 1.00045 </para>
+        /// <para> Liquids at 20 °C: Water 1.333, Ethanol 1.36, Olive oil 1.47 </para>
+        /// <para> Solids: Ice 1.31, Fused silica(quartz) 1.46, Plexiglas 1.49, Window glass 1.52, 
+        /// Flint glass 1.62, Sapphire 1.77, Cubic zirconia 2.15, Diamond 2.42, Moissanite 2.65 </para>
+        /// </summary>
+        public float RefractionIndex { get; set; }
         /// <summary> The glossyness of the primitive </summary>
         public float Glossyness { get; set; }
         /// <summary> The gloss specularity of the primitive </summary>
@@ -18,13 +28,17 @@ namespace WhittedRaytracer.Raytracing.SceneObjects {
         /// <summary> Create a new primitive for the 3d scene </summary>
         /// <param name="position">The position of the primitive</param>
         /// <param name="color">The color of the primitive</param>
-        /// <param name="specularity">The specularity of the primitive</param>
+        /// <param name="specularity">How specular this primitive is. A specular object reflects light like a mirror.</param>
+        /// <param name="dielectric">How dielectric this primitive is. A dielectric object both passes light and reflects it like water or glass.</param>
+        /// <param name="refractionIndex">The refraction index of this primitive if it is a dielectric. This is typically a value between 1 and 3.</param>
         /// <param name="glossyness">The glossyness of the primitive</param>
         /// <param name="glossSpecularity">The gloss specularity of the primitive</param>
-        protected Primitive(Vector3? position = null, Vector3? color = null, float specularity = 0, float glossyness = 0, float glossSpecularity = 0) {
+        protected Primitive(Vector3? position = null, Vector3? color = null, float specularity = 0, float dielectric = 0, float refractionIndex = 1, float glossyness = 0, float glossSpecularity = 0) {
             Position = position ?? Vector3.Zero;
             Color = color ?? Vector3.One;
             Specularity = specularity;
+            Dielectric = dielectric;
+            RefractionIndex = refractionIndex;
             Glossyness = glossyness;
             GlossSpecularity = glossSpecularity;
         }

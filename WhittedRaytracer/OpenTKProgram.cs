@@ -2,11 +2,16 @@
 using System.Drawing;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
+using WhittedRaytracer.Drawing;
 
 namespace WhittedRaytracer {
     /// <summary> The main class derived from an OpenTK gamewindow </summary>
     public class OpenTKProgram : GameWindow {
-        static int screenID;
+        /// <summary> The identifier of the gamewindow </summary>
+        public static int GameWindowID { get; private set; }
+        /// <summary> The gamewindow </summary>
+        public static Surface GameWindow { get; private set; }
+
         static Main main;
         static readonly bool terminated = false;
 
@@ -17,17 +22,18 @@ namespace WhittedRaytracer {
             GL.Enable(EnableCap.Texture2D);
             GL.Disable(EnableCap.DepthTest);
             GL.Hint(HintTarget.PerspectiveCorrectionHint, HintMode.Nicest);
-            main = new Main(new Surface(), this);
-            ClientSize = new Size(main.Screen.Width, main.Screen.Height);
+            GameWindow = new Surface();
+            GameWindowID = GameWindow.GenTexture();
+            ClientSize = new Size(GameWindow.Width, GameWindow.Height);
             Location = new Point(0, 30);
-            Sprite.Target = main.Screen as Surface;
-            screenID = (main.Screen as Surface).GenTexture();
+            main = new Main(GameWindow);
         }
 
         /// <summary> Called upon app close </summary>
         /// <param name="e">Arguments given</param>
         protected override void OnUnload(EventArgs e) {
-            GL.DeleteTextures(1, ref screenID);
+            int texture = GameWindowID;
+            GL.DeleteTextures(1, ref texture);
             Environment.Exit(0); // bypass wait for key on CTRL-F5
         }
 
@@ -56,10 +62,10 @@ namespace WhittedRaytracer {
                 return;
             }
             // Convert Game.screen to OpenGL texture
-            GL.BindTexture(TextureTarget.Texture2D, screenID);
+            GL.BindTexture(TextureTarget.Texture2D, GameWindowID);
             GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba,
-                           main.Screen.Width, main.Screen.Height, 0, PixelFormat.Bgra,
-                           PixelType.UnsignedByte, (main.Screen as Surface).Pixels);
+                          GameWindow.Width, GameWindow.Height, 0, PixelFormat.Bgra,
+                          PixelType.UnsignedByte, GameWindow.Pixels);
             // Clear window contents
             GL.Clear(ClearBufferMask.ColorBufferBit);
             // Setup camera

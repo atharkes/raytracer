@@ -15,11 +15,13 @@ namespace WhittedRaytracer.Raytracing.SceneObjects.Primitives {
         /// <param name="normal">The normal of the plane</param>
         /// <param name="distance">The distance of the plane from the origin</param>
         /// <param name="color">The color of the plane</param>
-        /// <param name="specularity">The specularity of the plane</param>
+        /// <param name="specularity">How specular the plane is. A specular object reflects light like a mirror.</param>
+        /// <param name="dielectric">How dielectric the plane is. A dielectric object both passes light and reflects it like water or glass.</param>
+        /// <param name="refractionIndex">The refraction index of the plane if it is a dielectric. This is typically a value between 1 and 3.</param>
         /// <param name="glossyness">The glossyness of the plane</param>
         /// <param name="glossSpecularity">The specularity of the glossyness of the plane</param>
-        public Plane(Vector3 normal, float distance, Vector3? color = null, float specularity = 0, float glossyness = 0, float glossSpecularity = 0)
-            : base (null, color, specularity, glossyness, glossSpecularity) {
+        public Plane(Vector3 normal, float distance, Vector3? color = null, float specularity = 0, float dielectric = 0, float refractionIndex = 1, float glossyness = 0, float glossSpecularity = 0)
+            : base (null, color, specularity, dielectric, refractionIndex, glossyness, glossSpecularity) {
             Normal = normal.Normalized();
             Distance = distance;
         }

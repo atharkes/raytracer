@@ -18,7 +18,7 @@ namespace WhittedRaytracer.Raytracing.SceneObjects.Primitives {
         /// <param name="glossyness">The glossyness of the sphere</param>
         /// <param name="glossSpecularity">The gloss specularity of the sphere</param>
         public Sphere(Vector3 position, float radius, Vector3? color = null, float specularity = 0, float dielectric = 0, float refractionIndex = 1, float glossyness = 0, float glossSpecularity = 0)
-            : base(position, color, specularity, dielectric, glossyness, refractionIndex, glossSpecularity) {
+            : base(position, color, specularity, dielectric, refractionIndex, glossyness, glossSpecularity) {
             Radius = radius;
         }
 

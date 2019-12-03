@@ -58,9 +58,9 @@ namespace WhittedRaytracer.Raytracing.SceneObjects.Primitives {
             float sphereInDirectionOfRay = Vector3.Dot(sphereFromRayOrigin, ray.Direction);
             float rayNormalDistance = Vector3.Dot(sphereFromRayOrigin, sphereFromRayOrigin) - sphereInDirectionOfRay * sphereInDirectionOfRay;
             if (rayNormalDistance > Radius * Radius) return -1f;
-            float thc = (float)Math.Sqrt(Radius * Radius - rayNormalDistance);
-            float intersection1 = sphereInDirectionOfRay - thc;
-            float intersection2 = sphereInDirectionOfRay + thc;
+            float raySphereDist = (float)Math.Sqrt(Radius * Radius - rayNormalDistance);
+            float intersection1 = sphereInDirectionOfRay - raySphereDist;
+            float intersection2 = sphereInDirectionOfRay + raySphereDist;
             if (intersection1 > 0 && intersection1 < ray.Length) return intersection1;
             if (intersection2 > 0 && intersection2 < ray.Length) return intersection2;
             return -1f;

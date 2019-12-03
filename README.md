@@ -26,10 +26,10 @@ References:
 - AABB Intersection: https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-box-intersection
 
 Controls:
-- Arrow keys	Rotate Camera
-- W,A,S,D		Move Camera
-- Space		    Move Camera Up
-- Shift		    Move Camera Down
-- F1 		    Disable/Enable Debug
-- Numpad '+' 	Increase FOV
-- Numpad '-' 	Decrease FOV
+- Arrow keys:   Rotate Camera
+- W,A,S,D:      Move Camera
+- Space:        Move Camera Up
+- Shift:        Move Camera Down
+- F1:           Disable/Enable Debug
+- Numpad '+':   Increase FOV
+- Numpad '-':   Decrease FOV

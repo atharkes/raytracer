@@ -46,7 +46,7 @@ namespace WhittedRaytracer.Raytracing.SceneObjects {
         /// <param name="direction">The direction to move the camera in</param>
         public void Move(Vector3 direction) {
             position += direction * MoveSpeed;
-            ScreenPlane.UpdatePosition();
+            ScreenPlane.Update();
         }
         
         /// <summary> Turn the view direction of the camera </summary>
@@ -54,14 +54,14 @@ namespace WhittedRaytracer.Raytracing.SceneObjects {
         public void Turn(Vector3 direction) {
             viewDirection += direction * Sensitivity;
             viewDirection.Normalize();
-            ScreenPlane.UpdatePosition();
+            ScreenPlane.Update();
         }
 
         /// <summary> Set the view direction of the camera </summary>
         /// <param name="newViewDirection">The new view direction of the camera</param>
         public void SetViewDirection(Vector3 newViewDirection) {
             viewDirection = newViewDirection.Normalized();
-            ScreenPlane.UpdatePosition();
+            ScreenPlane.Update();
         }
 
         /// <summary> Create a primary ray from the camera through a pixel on the screen plane </summary>

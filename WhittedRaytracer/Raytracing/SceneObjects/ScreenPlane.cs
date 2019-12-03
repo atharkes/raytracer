@@ -9,6 +9,8 @@ namespace WhittedRaytracer.Raytracing.SceneObjects {
         public readonly Camera Camera;
         /// <summary> The 2d window the screen plane is linked to </summary>
         public readonly IScreen Screen;
+        /// <summary> The aspect ratio of the screen plane </summary>
+        public float AspectRatio => (float)Screen.Width / Screen.Height;
 
         /// <summary> The position of the screen plane. Equals the center of the screen plane </summary>
         public Vector3 Position { get => Center; set => Center = value; }
@@ -25,7 +27,7 @@ namespace WhittedRaytracer.Raytracing.SceneObjects {
         public Vector3 BottomRight { get; private set; }
 
         /// <summary> The scale to draw the debug information </summary>
-        public float DebugScale = 20f;
+        public float DebugScale => Math.Min(Screen.Width, Screen.Height) / 16f;
 
         Vector3 center;
 
@@ -35,24 +37,24 @@ namespace WhittedRaytracer.Raytracing.SceneObjects {
         public ScreenPlane(Camera camera, IScreen screen) {
             Camera = camera;
             Screen = screen;
-            UpdatePosition();
+            Update();
         }
 
         /// <summary> Set the position of the screen plane and move the camera with it </summary>
         /// <param name="newPosition">The new position of the screen plane</param>
         public void SetCenter(Vector3 newPosition) {
             Camera.Position = newPosition - Camera.ViewDirection * 1 / ((float)Math.Tan(Camera.FOV / 360 * Math.PI));
-            UpdatePosition();
+            Update();
         }
 
         /// <summary> Update the position of the screen plane </summary>
         /// <param name="cam">The camera the screen plane is in front of</param>
-        public void UpdatePosition() {
+        public void Update() {
             center = Camera.Position + Camera.ViewDirection * 1 / ((float)Math.Tan(Camera.FOV / 360 * Math.PI));
-            TopLeft = center + Camera.Left + Camera.Up;
-            TopRight = center - Camera.Left + Camera.Up;
-            BottomLeft = center + Camera.Left - Camera.Up;
-            BottomRight = center - Camera.Left - Camera.Up;
+            TopLeft = Center + Camera.Left * AspectRatio + Camera.Up;
+            TopRight = Center - Camera.Left * AspectRatio + Camera.Up;
+            BottomLeft = Center + Camera.Left * AspectRatio - Camera.Up;
+            BottomRight = Center - Camera.Left * AspectRatio - Camera.Up;
         }
 
         /// <summary> Get the position of a pixel on the screen plane in worldspace </summary>
@@ -68,7 +70,7 @@ namespace WhittedRaytracer.Raytracing.SceneObjects {
         /// <param name="ray">The ray to draw</param>
         /// <param name="color">The color to draw the ray with</param>
         public void DrawRay(Ray ray, int color = 0xffffff) {
-            if (ray.RecursionDepth > 0) color -= ray.RecursionDepth * 0x444400;
+            if (ray.RecursionDepth > 0) color -= ray.RecursionDepth * 0x555511;
             int x1 = TX(ray.Origin.X);
             int y1 = TZ(ray.Origin.Z);
             int x2 = TX(ray.Origin.X + ray.Direction.X * ray.Length);
@@ -117,23 +119,18 @@ namespace WhittedRaytracer.Raytracing.SceneObjects {
             }
         }
 
-        // Debug: Transform X coord to X on debug screen
         /// <summary> Transform the x coordinate from the 3d scene to the 2d screen in topview </summary>
         /// <param name="x">The x coordinate in the 3d scene</param>
         /// <returns>The x coordinate on the 2d screen</returns>
         public int TX(float x) {
-            x -= Camera.Position.X - DebugScale * .5f;
-            int xDraw = (int)(512 / DebugScale * x);
-            return xDraw;
+            return Screen.Width / 2 + (int)(DebugScale * (x - Camera.Position.X));
         }
 
         /// <summary> Transform the z coordinate from the 3d scene to the 2d screen in topview </summary>
         /// <param name="z">The z coordinate in the 3d scene</param>
         /// <returns>The z coordinate on the 2d screen</returns>
         public int TZ(float z) {
-            z -= Camera.Position.Z - DebugScale * .5f;
-            int yDraw = (int)(512 / DebugScale * z);
-            return yDraw;
+            return Screen.Height / 2 + (int)(DebugScale * (z - Camera.Position.Z));
         }
         #endregion
     }

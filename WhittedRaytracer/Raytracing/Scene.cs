@@ -25,7 +25,7 @@ namespace WhittedRaytracer.Raytracing {
             Camera = new Camera(screen);
             AddDefaultLights();
             AddDefaultPrimitives();
-            AddRandomSpeheres(10);
+            //AddRandomSpeheres(10);
             AccelerationStructure = new BVHNode(Primitives);
         }
 
@@ -34,9 +34,10 @@ namespace WhittedRaytracer.Raytracing {
         }
 
         void AddDefaultPrimitives() {
-            Primitives.Add(new Sphere(new Vector3(-3, -1, 5), 1, new Vector3(1f, 0.9f, 0.9f), 0, 1, 1.62f));
-            Primitives.Add(new Sphere(new Vector3(0, -1, 5), 1, new Vector3(1f, 1f, 1f), 1f));
-            Primitives.Add(new Sphere(new Vector3(3, -1, 5), 1, new Vector3(0, 0.5f, 0), 0, 0, 1, 0.5f, 10f));
+            Primitives.Add(Sphere.DiffuseGreen(new Vector3(-3, -1, 5)));
+            Primitives.Add(Sphere.GlossyRed(new Vector3(3, -1, 5)));
+            Primitives.Add(Sphere.Mirror(new Vector3(0, -1, 5)));
+            Primitives.Add(Sphere.Glass(new Vector3(0, -1, 2)));
             //Primitives.Add(new Plane(new Vector3(0, -1, 0), -1, new Vector3(1, 1, 0.5f)));
             Primitives.Add(new Triangle(new Vector3(-5, 0, 0), new Vector3(5, 0, 0), new Vector3(5, 0, 10), new Vector3(1, 0.8f, 1), 0.4f, 0, 1, 0.7f, 50f));
             Primitives.Add(new Triangle(new Vector3(-5, 0, 0), new Vector3(5, 0, 10), new Vector3(-5, 0, 10), new Vector3(1, 1, 0.8f), 0, 0, 1, 0.7f, 50f));
@@ -59,6 +60,8 @@ namespace WhittedRaytracer.Raytracing {
             // Intersect with Scene
             Intersection intersection = AccelerationStructure.Intersect(ray);
             if (intersection == null) return Vector3.Zero;
+
+            ray.Length = intersection.Distance;
             Vector3 intersectionLight = intersection.Primitive.Specularity < 1 ? CastShadowRays(intersection, debugRay) : Vector3.Zero;
             Vector3 outgoingLight = intersectionLight;
 
@@ -122,7 +125,7 @@ namespace WhittedRaytracer.Raytracing {
 
                 // Debug: Shadow Rays
                 if (debugRay) {
-                    Camera.ScreenPlane.DrawRay(shadowRay, light.Color.ToIntColor());
+                    //Camera.ScreenPlane.DrawRay(shadowRay, light.Color.ToIntColor());
                 }
 
             }

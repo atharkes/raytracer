@@ -21,7 +21,7 @@ namespace WhittedRaytracer.Drawing {
         /// <summary> Create a new empty surface </summary>
         /// <param name="width">The width of the surface</param>
         /// <param name="height">The height of the surface</param>
-        public Surface(int width = 512, int height = 512) {
+        public Surface(int width = 1280, int height = 720) {
             Width = width;
             Height = height;
             Pixels = new int[width * height];

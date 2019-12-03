@@ -2,7 +2,6 @@
 using OpenTK.Input;
 using System;
 using System.Diagnostics;
-using System.Linq;
 using WhittedRaytracer.Multithreading;
 using WhittedRaytracer.Raytracing;
 using WhittedRaytracer.Raytracing.SceneObjects;
@@ -37,7 +36,7 @@ namespace WhittedRaytracer {
 
         public void Tick() {
             // Move Light
-            Scene.Lights.First().Position += new Vector3((float)Math.Sin(DateTime.Now.TimeOfDay.TotalSeconds) * 0.5f, 0, 0);
+            //Scene.Lights.First().Position += new Vector3((float)Math.Sin(DateTime.Now.TimeOfDay.TotalSeconds) * 0.5f, 0, 0);
 
             // Clear the screen
             Scene.Camera.ScreenPlane.Screen.Clear(0);
@@ -114,7 +113,7 @@ namespace WhittedRaytracer {
 
         void TraceRay(int x, int y) {
             // Debug: Check if ray has to be drawn
-            bool debugRay = Debug && DebugShowRays && (x % 16 == 0 || x == Scene.Camera.ScreenPlane.Screen.Width) && y == Scene.Camera.ScreenPlane.Screen.Height / 2;
+            bool debugRay = Debug && DebugShowRays && (x % 64 == 0 || x == Scene.Camera.ScreenPlane.Screen.Width) && y == Scene.Camera.ScreenPlane.Screen.Height / 2;
 
             // Cast Ray
             Ray ray = Scene.Camera.CreatePrimaryRay(x, y);

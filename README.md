@@ -10,6 +10,7 @@ Features:
 - Primitives: Planes, Spheres, Triangles
 - Materials: Diffuse, Specular, Dielectric, Glossy (floats)
 - Scene showing off all primitives and materials
+
 Extra:
 - Dielectrics: Snell & Fresnel
 - Multithreading: Threadpool with worker threads

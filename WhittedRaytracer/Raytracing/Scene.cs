@@ -30,7 +30,7 @@ namespace WhittedRaytracer.Raytracing {
         }
 
         void AddDefaultLights() {
-            Lights.Add(new PointLight(new Vector3(0, -8, 3), new Vector3(300, 300, 250)));
+            Lights.Add(new PointLight(new Vector3(0, -8, 3), new Vector3(200, 200, 150)));
         }
 
         void AddDefaultPrimitives() {
@@ -45,9 +45,15 @@ namespace WhittedRaytracer.Raytracing {
 
         void AddRandomSpeheres(int amount) {
             for (int i = 0; i < amount; i++) {
-                Vector3 pos = new Vector3((float)r.NextDouble() * 60 - 30, (float)r.NextDouble() * 30 - 40, (float)r.NextDouble() * 60 - 30);
+                Vector3 pos = new Vector3((float)r.NextDouble() * 60f - 30f, (float)r.NextDouble() * 30f - 40f, (float)r.NextDouble() * 60f - 30f);
+                float radius = (float)r.NextDouble() * 2f;
                 Vector3 color = new Vector3((float)r.NextDouble(), (float)r.NextDouble(), (float)r.NextDouble());
-                Primitives.Add(new Sphere(pos, (float)r.NextDouble(), color, (float)r.NextDouble(), (float)r.NextDouble(), 1, (float)r.NextDouble(), (float)r.NextDouble()));
+                float specularity = r.NextDouble() > 0.5f ? (float)r.NextDouble() : 0;
+                float dielectric = r.NextDouble() > 0.5f ? (float)r.NextDouble() : 0;
+                float refractionIndex = (float)r.NextDouble() * 2f + 1f;
+                float glossyness = r.NextDouble() > 0.5f ? (float)r.NextDouble() : 0;
+                float glossSpecularity = (float)r.NextDouble() * 10f;
+                Primitives.Add(new Sphere(pos, radius, color, specularity, dielectric, refractionIndex, glossyness, glossSpecularity));
             }
         }
 
@@ -93,49 +99,42 @@ namespace WhittedRaytracer.Raytracing {
         /// <param name="debugRay">Whether to draw this ray in debug</param>
         /// <returns>The color at the intersection</returns>
         public Vector3 CastShadowRays(Intersection intersection, bool debugRay = false) {
-            Vector3 totalColor = Vector3.Zero;
+            Vector3 radianceOut = Vector3.Zero;
             foreach (PointLight light in Lights) {
                 Ray shadowRay = intersection.GetShadowRay(light);
                 if (AccelerationStructure.IntersectBool(shadowRay)) continue;
-
-                // Light Absorption
-                Vector3 color = intersection.Primitive.Color * light.Color;
-                // N dot L (Glossyness)
+                Vector3 radianceIn = light.Color * shadowRay.DistanceAttenuation;
+                Vector3 irradiance;
+                // N dot L
                 float NdotL = Vector3.Dot(intersection.Normal, shadowRay.Direction);
-                if (intersection.Primitive.Glossyness == 0) {
-                    color = color * NdotL;
-                } else if (intersection.Primitive.Glossyness > 0) {
+                if (intersection.Primitive.Glossyness > 0) {
+                    // Glossy Object: Phong-Shading
                     Vector3 glossyDirection = -shadowRay.Direction - 2 * Vector3.Dot(-shadowRay.Direction, intersection.Normal) * intersection.Normal;
                     float dot = Vector3.Dot(glossyDirection, -intersection.Ray.Direction);
                     if (dot > 0) {
                         float glossyness = (float)Math.Pow(dot, intersection.Primitive.GlossSpecularity);
-                        // Phong-Shading (My Version)
-                        color = color * (1 - intersection.Primitive.Glossyness) * NdotL + intersection.Primitive.Glossyness * glossyness * light.Color;
-                        // Phong-Shading (Official)
-                        //color = color * ((1 - intersection.primitive.glossyness) * NdotL + intersection.primitive.glossyness * glossyness);
+                        irradiance = radianceIn * ((1 - intersection.Primitive.Glossyness) * NdotL + intersection.Primitive.Glossyness * glossyness);
                     } else {
-                        color = color * (1 - intersection.Primitive.Glossyness) * NdotL;
+                        irradiance = radianceIn * (1 - intersection.Primitive.Glossyness) * NdotL;
                     }
+                } else {
+                    // Diffuse
+                    irradiance = radianceIn * NdotL;
                 }
-                // Distance Attenuation
-                color = color * (1 / (shadowRay.Length * shadowRay.Length));
-
-                // Add Color to Total
-                totalColor += color;
-
-                // Debug: Shadow Rays
+                // Absorption
+                radianceOut += irradiance * intersection.Primitive.Color;
                 if (debugRay) {
-                    //Camera.ScreenPlane.DrawRay(shadowRay, light.Color.ToIntColor());
+                    Camera.ScreenPlane.DrawRay(shadowRay, light.Color.ToIntColor());
                 }
 
             }
             // Triangle Texture
             if (intersection.Primitive is Triangle) {
-                if (Math.Abs(intersection.Position.X % 2) < 1) totalColor = totalColor * 0.5f;
-                if (Math.Abs(intersection.Position.Z % 2) > 1) totalColor = totalColor * 0.5f;
+                if (Math.Abs(intersection.Position.X % 2) < 1) radianceOut = radianceOut * 0.5f;
+                if (Math.Abs(intersection.Position.Z % 2) > 1) radianceOut = radianceOut * 0.5f;
             }
 
-            return totalColor;
+            return radianceOut;
         }
     }
 }

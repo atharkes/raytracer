@@ -26,21 +26,21 @@ namespace WhittedRaytracer.Raytracing.SceneObjects.Primitives {
         /// <param name="position">The position of the sphere</param>
         /// <returns>A glossy red unit sphere</returns>
         public static Sphere GlossyRed(Vector3 position) {
-            return new Sphere(position, 1, new Vector3(0.5f, 0, 0), 0, 0, 1, 0.5f, 10f);
+            return new Sphere(position, 1, new Vector3(0.4f, 0.1f, 0.1f), 0, 0, 1, 0.5f, 15f);
         }
 
         /// <summary> Create a diffuse green unit sphere </summary>
         /// <param name="position">The position of the sphere</param>
         /// <returns>A diffuse green unit sphere</returns>
         public static Sphere DiffuseGreen(Vector3 position) {
-            return new Sphere(position, 1, new Vector3(0, 0.5f, 0));
+            return new Sphere(position, 1, new Vector3(0.1f, 0.4f, 0.1f));
         }
 
         /// <summary> Create a mirror unit sphere </summary>
         /// <param name="position">The position of the sphere</param>
         /// <returns>A mirror unit sphere</returns>
         public static Sphere Mirror(Vector3 position) {
-            return new Sphere(position, 1, new Vector3(1f, 1f, 1f), 1f);
+            return new Sphere(position, 1, new Vector3(0.9f, 0.9f, 0.9f), 0.97f);
         }
 
         /// <summary> Create a glass half-unit sphere </summary>

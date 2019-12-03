@@ -17,6 +17,8 @@ namespace WhittedRaytracer.Raytracing {
 
         /// <summary> The length that the ray is travelling </summary>
         public float Length { get; set; }
+        /// <summary> The distance attenuation of a point light when this is a shadow ray </summary>
+        public float DistanceAttenuation => 1f / (Length * Length);
 
         /// <summary> Constant that defines the maximum recursion for secondary rays </summary>
         public const int MaxRecursionDepth = 3;

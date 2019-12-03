@@ -33,19 +33,20 @@ namespace WhittedRaytracer {
         }
 
         public void Tick() {
-            // Move Light
             //Scene.Lights.First().Position += new Vector3((float)Math.Sin(DateTime.Now.TimeOfDay.TotalSeconds) * 0.5f, 0, 0);
-
-            // Clear the screen
             Scene.Camera.ScreenPlane.Screen.Clear(0);
-
-            // Check Input
             InputCheck();
+            Console.WriteLine($"{stopwatch.ElapsedMilliseconds}\t| OpenTK ms");
+            stopwatch.Restart();
+            DivideRayTracingWork();
+            Console.WriteLine($"{stopwatch.ElapsedMilliseconds}\t| Divide Tasks ms");
+            stopwatch.Restart();
+            threadpool.DoTasks(tasks);
+            threadpool.WaitTillDone();
+            Console.WriteLine($"{stopwatch.ElapsedMilliseconds}\t| Tracing ms");
+            stopwatch.Restart();
 
-            // Trace Rays
-            DivideRays();
-
-            // Debug
+            // Debug drawing
             if (Debug) {
                 Scene.Primitives.ForEach(primitive => { if (primitive is Sphere) Scene.Camera.ScreenPlane.DrawSphere(primitive as Sphere); });
                 Scene.Lights.ForEach(light => Scene.Camera.ScreenPlane.DrawLight(light));
@@ -75,10 +76,7 @@ namespace WhittedRaytracer {
             if (keyboardState[Key.Down]) Scene.Camera.Turn(Scene.Camera.Down);
         }
 
-        // Multithreading
-        void DivideRays() {
-            Console.WriteLine($"{stopwatch.ElapsedMilliseconds}\t| OpenTK ms");
-            stopwatch.Restart();
+        void DivideRayTracingWork() {
             float size = (float)Scene.Camera.ScreenPlane.Screen.Height / TaskAmount;
             float[] taskBounds = new float[TaskAmount + 1];
             taskBounds[0] = 0;
@@ -88,12 +86,6 @@ namespace WhittedRaytracer {
                 int taskUpper = (int)taskBounds[n + 1];
                 tasks[n] = () => TraceRays(0, Scene.Camera.ScreenPlane.Screen.Width, taskLower, taskUpper);
             }
-            Console.WriteLine($"{stopwatch.ElapsedMilliseconds}\t| Divide Tasks ms");
-            stopwatch.Restart();
-            threadpool.DoTasks(tasks);
-            threadpool.WaitTillDone();
-            Console.WriteLine($"{stopwatch.ElapsedMilliseconds}\t| Tracing ms");
-            stopwatch.Restart();
         }
 
         void TraceRays(int xMin, int xMax, int yMin, int yMax) {
@@ -105,14 +97,9 @@ namespace WhittedRaytracer {
         }
 
         void TraceRay(int x, int y) {
-            // Debug: Check if ray has to be drawn
             bool debugRay = Debug && DebugShowRays && (x % 64 == 0 || x == Scene.Camera.ScreenPlane.Screen.Width) && y == Scene.Camera.ScreenPlane.Screen.Height / 2;
-
-            // Cast Ray
             Ray ray = Scene.Camera.CreatePrimaryRay(x, y);
             Vector3 pixelColor = Scene.CastRay(ray, 0, debugRay);
-
-            // Draw Pixel
             Scene.Camera.ScreenPlane.Screen.Plot(x, y, pixelColor.ToIntColor());
         }
     }

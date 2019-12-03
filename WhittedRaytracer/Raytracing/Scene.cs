@@ -25,7 +25,7 @@ namespace WhittedRaytracer.Raytracing {
             Camera = new Camera(screen);
             AddDefaultLights();
             AddDefaultPrimitives();
-            AddRandomSpeheres(100);
+            AddRandomSpeheres(500);
             AccelerationStructure = new BVHNode(Primitives);
         }
 
@@ -46,12 +46,12 @@ namespace WhittedRaytracer.Raytracing {
         void AddRandomSpeheres(int amount) {
             for (int i = 0; i < amount; i++) {
                 Vector3 pos = new Vector3((float)r.NextDouble() * 60f - 30f, (float)r.NextDouble() * 30f - 40f, (float)r.NextDouble() * 60f - 30f);
-                float radius = (float)r.NextDouble() * 2f;
+                float radius = (float)r.NextDouble();
                 Vector3 color = new Vector3((float)r.NextDouble(), (float)r.NextDouble(), (float)r.NextDouble());
-                float specularity = r.NextDouble() > 0.5f ? (float)r.NextDouble() : 0;
-                float dielectric = r.NextDouble() > 0.5f ? (float)r.NextDouble() : 0;
+                float specularity = r.NextDouble() < 0.3f ? (float)r.NextDouble() : 0;
+                float dielectric = r.NextDouble() < 0.1f ? (float)r.NextDouble() : 0;
                 float refractionIndex = (float)r.NextDouble() * 2f + 1f;
-                float glossyness = r.NextDouble() > 0.5f ? (float)r.NextDouble() : 0;
+                float glossyness = r.NextDouble() < 0.5f ? (float)r.NextDouble() : 0;
                 float glossSpecularity = (float)r.NextDouble() * 10f;
                 Primitives.Add(new Sphere(pos, radius, color, specularity, dielectric, refractionIndex, glossyness, glossSpecularity));
             }

@@ -68,12 +68,13 @@ namespace WhittedRaytracer.Raytracing {
             if (intersection == null) return Vector3.Zero;
             ray.Length = intersection.Distance; // Set ray length because BHV doesn't handle it correctly atm
             Vector3 directIllumination = intersection.Primitive.Specularity < 1 ? CastShadowRays(intersection, debugRay) : Vector3.Zero;
-            Vector3 outgoingLight;
+            Vector3 radianceOut;
             
             if (intersection.Primitive.Specularity > 0 && recursionDepth < Ray.MaxRecursionDepth) {
                 // Specular
-                Vector3 outReflectedLight = CastRay(intersection.GetReflectedRay(), recursionDepth + 1, debugRay) * intersection.Primitive.Color;
-                outgoingLight = directIllumination * (1 - intersection.Primitive.Specularity) + outReflectedLight * intersection.Primitive.Specularity;
+                Vector3 reflectedIn = CastRay(intersection.GetReflectedRay(), recursionDepth + 1, debugRay);
+                Vector3 reflectedOut = reflectedIn * intersection.Primitive.Color;
+                radianceOut = directIllumination * (1 - intersection.Primitive.Specularity) + reflectedOut * intersection.Primitive.Specularity;
             } else if (intersection.Primitive.Dielectric > 0 && recursionDepth < Ray.MaxRecursionDepth) {
                 // Dielectric
                 float reflected = intersection.GetReflectivity();
@@ -81,17 +82,17 @@ namespace WhittedRaytracer.Raytracing {
                 Ray refractedRay = intersection.GetRefractedRay();
                 Vector3 incRefractedLight = refractedRay != null ? CastRay(refractedRay, recursionDepth + 1, debugRay) : Vector3.Zero;
                 Vector3 incReflectedLight = CastRay(intersection.GetReflectedRay(), recursionDepth + 1, debugRay);
-                outgoingLight = directIllumination * (1f - intersection.Primitive.Dielectric) + (incRefractedLight * refracted + incReflectedLight * reflected) * intersection.Primitive.Dielectric * intersection.Primitive.Color;
+                radianceOut = directIllumination * (1f - intersection.Primitive.Dielectric) + (incRefractedLight * refracted + incReflectedLight * reflected) * intersection.Primitive.Dielectric * intersection.Primitive.Color;
             } else {
                 // Diffuse
-                outgoingLight = directIllumination;
+                radianceOut = directIllumination;
             }
 
             // Debug: Primary Rays
             if (debugRay) {
                 Camera.ScreenPlane.DrawRay(ray);
             }
-            return outgoingLight;
+            return radianceOut;
         }
 
         /// <summary> Cast shadow rays from an intersection to every light and calculate the color </summary>

@@ -10,7 +10,7 @@ namespace WhittedRaytracer.Raytracing.SceneObjects {
         /// <summary> The direction the camera is facing </summary>
         public Vector3 ViewDirection { get => viewDirection; set => SetViewDirection(value); }
         /// <summary> The field of view of the camera. It determines the distance to the screen plane </summary>
-        public float FOV = 90;
+        public float FOV { get => fov; set => SetFOV(value); } 
         /// <summary> The sensitivity of turning </summary>
         public readonly float Sensitivity = 0.05f;
         /// <summary> The speed at which the camera moves </summary>
@@ -31,6 +31,7 @@ namespace WhittedRaytracer.Raytracing.SceneObjects {
 
         Vector3 position;
         Vector3 viewDirection;
+        float fov = 90f;
 
         /// <summary> Create a new camera object </summary>
         /// <param name="screen">The screen to draw the raytracing to</param>
@@ -61,6 +62,13 @@ namespace WhittedRaytracer.Raytracing.SceneObjects {
         /// <param name="newViewDirection">The new view direction of the camera</param>
         public void SetViewDirection(Vector3 newViewDirection) {
             viewDirection = newViewDirection.Normalized();
+            ScreenPlane.Update();
+        }
+
+        /// <summary> Set the field of view of the camera </summary>
+        /// <param name="newFOV">The new field of view</param>
+        public void SetFOV(float newFOV) {
+            fov = newFOV;
             ScreenPlane.Update();
         }
 

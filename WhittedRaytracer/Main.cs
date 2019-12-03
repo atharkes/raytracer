@@ -25,8 +25,6 @@ namespace WhittedRaytracer {
         readonly Action[] tasks;
 
         KeyboardState keyboardState;
-        MouseState mouseStatePrevious;
-        MouseState mouseStateCurrent;
 
         public Main(IScreen screen) {
             Scene = new Scene(screen);
@@ -61,7 +59,6 @@ namespace WhittedRaytracer {
         }
 
         void InputCheck() {
-            // Input: Keyboard
             keyboardState = Keyboard.GetState();
             if (keyboardState[Key.F1]) Debug = !Debug;
             if (keyboardState[Key.Space]) Scene.Camera.Move(Scene.Camera.Up);
@@ -72,14 +69,10 @@ namespace WhittedRaytracer {
             if (keyboardState[Key.D]) Scene.Camera.Move(Scene.Camera.Right);
             if (keyboardState[Key.KeypadPlus]) Scene.Camera.FOV *= 1.1f;
             if (keyboardState[Key.KeypadMinus]) Scene.Camera.FOV *= 0.9f;
-            // Input: Mouse
-            mouseStateCurrent = Mouse.GetState();
-            if (mouseStatePrevious != null) {
-                float xDelta = mouseStateCurrent.X - mouseStatePrevious.X;
-                float yDelta = mouseStateCurrent.Y - mouseStatePrevious.Y;
-                Scene.Camera.Turn(xDelta * Scene.Camera.Right + yDelta * Scene.Camera.Down);
-            }
-            mouseStatePrevious = mouseStateCurrent;
+            if (keyboardState[Key.Left]) Scene.Camera.Turn(Scene.Camera.Left);
+            if (keyboardState[Key.Right]) Scene.Camera.Turn(Scene.Camera.Right);
+            if (keyboardState[Key.Up]) Scene.Camera.Turn(Scene.Camera.Up);
+            if (keyboardState[Key.Down]) Scene.Camera.Turn(Scene.Camera.Down);
         }
 
         // Multithreading

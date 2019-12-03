@@ -12,7 +12,7 @@ namespace WhittedRaytracer.Raytracing.SceneObjects {
         /// <summary> The field of view of the camera. It determines the distance to the screen plane </summary>
         public float FOV = 90;
         /// <summary> The sensitivity of turning </summary>
-        public readonly float Sensitivity = 0.004f;
+        public readonly float Sensitivity = 0.05f;
         /// <summary> The speed at which the camera moves </summary>
         public readonly float MoveSpeed = 0.1f;
 

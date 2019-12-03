@@ -60,8 +60,7 @@ namespace WhittedRaytracer.Raytracing {
             // Intersect with Scene
             Intersection intersection = AccelerationStructure.Intersect(ray);
             if (intersection == null) return Vector3.Zero;
-
-            ray.Length = intersection.Distance;
+            ray.Length = intersection.Distance; // Set ray length because BHV doesn't handle it correctly atm
             Vector3 intersectionLight = intersection.Primitive.Specularity < 1 ? CastShadowRays(intersection, debugRay) : Vector3.Zero;
             Vector3 outgoingLight = intersectionLight;
 

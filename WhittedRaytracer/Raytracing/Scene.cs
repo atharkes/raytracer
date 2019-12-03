@@ -25,7 +25,7 @@ namespace WhittedRaytracer.Raytracing {
             Camera = new Camera(screen);
             AddDefaultLights();
             AddDefaultPrimitives();
-            //AddRandomSpeheres(10);
+            AddRandomSpeheres(100);
             AccelerationStructure = new BVHNode(Primitives);
         }
 
@@ -37,8 +37,8 @@ namespace WhittedRaytracer.Raytracing {
             Primitives.Add(Sphere.DiffuseGreen(new Vector3(-3, -1, 5)));
             Primitives.Add(Sphere.GlossyRed(new Vector3(3, -1, 5)));
             Primitives.Add(Sphere.Mirror(new Vector3(0, -1, 5)));
-            Primitives.Add(Sphere.Glass(new Vector3(0, -1, 2)));
-            //Primitives.Add(new Plane(new Vector3(0, -1, 0), -1, new Vector3(1, 1, 0.5f)));
+            Primitives.Add(Sphere.Glass(new Vector3(-1, -1, 2)));
+            Primitives.Add(new Plane(new Vector3(0, -1, 0), -1, new Vector3(1, 1, 0.5f)));
             Primitives.Add(new Triangle(new Vector3(-5, 0, 0), new Vector3(5, 0, 0), new Vector3(5, 0, 10), new Vector3(1, 0.8f, 1), 0.4f, 0, 1, 0.7f, 50f));
             Primitives.Add(new Triangle(new Vector3(-5, 0, 0), new Vector3(5, 0, 10), new Vector3(-5, 0, 10), new Vector3(1, 1, 0.8f), 0, 0, 1, 0.7f, 50f));
         }
@@ -61,23 +61,24 @@ namespace WhittedRaytracer.Raytracing {
             Intersection intersection = AccelerationStructure.Intersect(ray);
             if (intersection == null) return Vector3.Zero;
             ray.Length = intersection.Distance; // Set ray length because BHV doesn't handle it correctly atm
-            Vector3 intersectionLight = intersection.Primitive.Specularity < 1 ? CastShadowRays(intersection, debugRay) : Vector3.Zero;
-            Vector3 outgoingLight = intersectionLight;
-
-            // Specularity
+            Vector3 directIllumination = intersection.Primitive.Specularity < 1 ? CastShadowRays(intersection, debugRay) : Vector3.Zero;
+            Vector3 outgoingLight;
+            
             if (intersection.Primitive.Specularity > 0 && recursionDepth < Ray.MaxRecursionDepth) {
+                // Specular
                 Vector3 outReflectedLight = CastRay(intersection.GetReflectedRay(), recursionDepth + 1, debugRay) * intersection.Primitive.Color;
-                outgoingLight = intersectionLight * (1 - intersection.Primitive.Specularity) + outReflectedLight * intersection.Primitive.Specularity;
-            }
-
-            // Dielectrics
-            if (intersection.Primitive.Dielectric > 0 && recursionDepth < Ray.MaxRecursionDepth) {
+                outgoingLight = directIllumination * (1 - intersection.Primitive.Specularity) + outReflectedLight * intersection.Primitive.Specularity;
+            } else if (intersection.Primitive.Dielectric > 0 && recursionDepth < Ray.MaxRecursionDepth) {
+                // Dielectric
+                float reflected = intersection.GetReflectivity();
+                float refracted = 1 - reflected;
                 Ray refractedRay = intersection.GetRefractedRay();
                 Vector3 incRefractedLight = refractedRay != null ? CastRay(refractedRay, recursionDepth + 1, debugRay) : Vector3.Zero;
                 Vector3 incReflectedLight = CastRay(intersection.GetReflectedRay(), recursionDepth + 1, debugRay);
-                float reflected = intersection.GetReflectivity();
-                float refracted = 1 - reflected;
-                outgoingLight = intersectionLight * (1f - intersection.Primitive.Dielectric) + (incRefractedLight * refracted + incReflectedLight * reflected) * intersection.Primitive.Dielectric * intersection.Primitive.Color;
+                outgoingLight = directIllumination * (1f - intersection.Primitive.Dielectric) + (incRefractedLight * refracted + incReflectedLight * reflected) * intersection.Primitive.Dielectric * intersection.Primitive.Color;
+            } else {
+                // Diffuse
+                outgoingLight = directIllumination;
             }
 
             // Debug: Primary Rays

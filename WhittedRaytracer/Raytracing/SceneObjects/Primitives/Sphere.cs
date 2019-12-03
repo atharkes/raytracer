@@ -43,11 +43,11 @@ namespace WhittedRaytracer.Raytracing.SceneObjects.Primitives {
             return new Sphere(position, 1, new Vector3(1f, 1f, 1f), 1f);
         }
 
-        /// <summary> Create a glass unit sphere </summary>
+        /// <summary> Create a glass half-unit sphere </summary>
         /// <param name="position">The position of the sphere</param>
-        /// <returns>A glass unit sphere</returns>
+        /// <returns>A glass half-unit sphere</returns>
         public static Sphere Glass(Vector3 position) {
-            return new Sphere(position, 1, new Vector3(0.9f, 0.9f, 0.9f), 0, 1, 1.62f);
+            return new Sphere(position, 0.5f, new Vector3(0.4f, 0.4f, 0.9f), 0, 0.97f, 1.62f);
         }
 
         /// <summary> Intersect the sphere with a ray </summary>
@@ -79,8 +79,8 @@ namespace WhittedRaytracer.Raytracing.SceneObjects.Primitives {
             //    t0 = t1; // if t0 is negative, let's use t1 instead 
             //    if (t0 < 0) return false; // both t0 and t1 are negative 
             //}
-            if (t0 > 0) return t0;
-            else if (t1 > 0) return t1;
+            if (t0 > 0 && t0 < ray.Length) return t0;
+            else if (t1 > 0 && t1 < ray.Length) return t1;
             else return - 1f;
         }
 
@@ -106,7 +106,7 @@ namespace WhittedRaytracer.Raytracing.SceneObjects.Primitives {
             //    if (t0 < 0) return false; // both t0 and t1 are negative 
             //}
 
-            return t0 > 0 || t1 > 0;
+            return (t0 > 0 && t0 < ray.Length) || (t1 > 0 && t1 < ray.Length);
         }
 
         /// <summary> Get the normal of the sphere at a point of intersection </summary>

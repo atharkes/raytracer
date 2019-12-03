@@ -33,7 +33,7 @@ namespace WhittedRaytracer {
         }
 
         public void Tick() {
-            //Scene.Lights.First().Position += new Vector3((float)Math.Sin(DateTime.Now.TimeOfDay.TotalSeconds) * 0.5f, 0, 0);
+            Scene.Lights[0].Position += new Vector3((float)Math.Sin(DateTime.Now.TimeOfDay.TotalSeconds) * 0.5f, 0, 0);
             Scene.Camera.ScreenPlane.Screen.Clear(0);
             InputCheck();
             Console.WriteLine($"{stopwatch.ElapsedMilliseconds}\t| OpenTK ms");

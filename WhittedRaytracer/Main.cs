@@ -13,7 +13,7 @@ namespace WhittedRaytracer {
         /// <summary> The 3d scene in which the raytracing takes place </summary>
         public readonly Scene Scene;
         /// <summary> Amount of tasks the raytracing is divided into </summary>
-        public const int TaskAmount = 512;
+        public readonly int TaskAmount;
         /// <summary> Whether it is drawing debug information </summary>
         public bool Debug = false;
         /// <summary> Whether to draw rays in debug </summary>
@@ -28,6 +28,7 @@ namespace WhittedRaytracer {
 
         public Main(IScreen screen) {
             Scene = new Scene(screen);
+            TaskAmount = screen.Height;
             tasks = new Action[TaskAmount];
             threadpool = new Threadpool();
         }

@@ -54,59 +54,23 @@ namespace WhittedRaytracer.Raytracing.SceneObjects.Primitives {
         /// <param name="ray">The ray to intersect the sphere with</param>
         /// <returns>The distance at which the ray intersects the sphere</returns>
         public override float Intersect(Ray ray) {
-            //Vector3 circlePos = Position - ray.Origin;
-            //float rayCircleDot = Vector3.Dot(circlePos, ray.Direction);
-            //Vector3 rayNormal = circlePos - rayCircleDot * ray.Direction;
-            //float rayNormalDot = Vector3.Dot(rayNormal, rayNormal);
-            //if (rayNormalDot > Radius * Radius) return -1f;
-            //rayCircleDot -= (float)Math.Sqrt(Radius * Radius - rayNormalDot);
-            //return rayCircleDot;
-
             Vector3 sphereFromRayOrigin = Position - ray.Origin;
             float sphereInDirectionOfRay = Vector3.Dot(sphereFromRayOrigin, ray.Direction);
-            //Vector3 rayNormal = sphereFromRayOrigin - sphereInDirectionOfRay * ray.Direction;
-            //float rayNormalLengthSquared = Vector3.Dot(rayNormal, rayNormal);
-            //return rayNormalLengthSquared > Radius * Radius || sphereInDirectionOfRay < 0 || sphereInDirectionOfRay > ray.Length;
-
             float rayNormalDistance = Vector3.Dot(sphereFromRayOrigin, sphereFromRayOrigin) - sphereInDirectionOfRay * sphereInDirectionOfRay;
             if (rayNormalDistance > Radius * Radius) return -1f;
             float thc = (float)Math.Sqrt(Radius * Radius - rayNormalDistance);
-            float t0 = sphereInDirectionOfRay - thc;
-            float t1 = sphereInDirectionOfRay + thc;
-            //if (t0 > t1) std::swap(t0, t1);
-
-            //if (t0 < 0) {
-            //    t0 = t1; // if t0 is negative, let's use t1 instead 
-            //    if (t0 < 0) return false; // both t0 and t1 are negative 
-            //}
-            if (t0 > 0 && t0 < ray.Length) return t0;
-            else if (t1 > 0 && t1 < ray.Length) return t1;
-            else return - 1f;
+            float intersection1 = sphereInDirectionOfRay - thc;
+            float intersection2 = sphereInDirectionOfRay + thc;
+            if (intersection1 > 0 && intersection1 < ray.Length) return intersection1;
+            if (intersection2 > 0 && intersection2 < ray.Length) return intersection2;
+            return -1f;
         }
 
         /// <summary> Intersect the sphere with a ray </summary>
         /// <param name="ray">The ray to intersect the sphere with</param>
         /// <returns>Whether the ray intersects the sphere</returns>
         public override bool IntersectBool(Ray ray) {
-            Vector3 sphereFromRayOrigin = Position - ray.Origin;
-            float sphereInDirectionOfRay = Vector3.Dot(sphereFromRayOrigin, ray.Direction);
-            //Vector3 rayNormal = sphereFromRayOrigin - sphereInDirectionOfRay * ray.Direction;
-            //float rayNormalLengthSquared = Vector3.Dot(rayNormal, rayNormal);
-            //return rayNormalLengthSquared > Radius * Radius || sphereInDirectionOfRay < 0 || sphereInDirectionOfRay > ray.Length;
-
-            float rayNormalDistance = Vector3.Dot(sphereFromRayOrigin, sphereFromRayOrigin) - sphereInDirectionOfRay * sphereInDirectionOfRay;
-            if (rayNormalDistance > Radius * Radius) return false;
-            float thc = (float)Math.Sqrt(Radius * Radius - rayNormalDistance);
-            float t0 = sphereInDirectionOfRay - thc;
-            float t1 = sphereInDirectionOfRay + thc;
-            //if (t0 > t1) std::swap(t0, t1);
-
-            //if (t0 < 0) {
-            //    t0 = t1; // if t0 is negative, let's use t1 instead 
-            //    if (t0 < 0) return false; // both t0 and t1 are negative 
-            //}
-
-            return (t0 > 0 && t0 < ray.Length) || (t1 > 0 && t1 < ray.Length);
+            return Intersect(ray) > 0;
         }
 
         /// <summary> Get the normal of the sphere at a point of intersection </summary>

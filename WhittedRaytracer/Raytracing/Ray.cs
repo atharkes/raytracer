@@ -19,7 +19,7 @@ namespace WhittedRaytracer.Raytracing {
         public float Length { get; set; }
 
         /// <summary> Constant that defines the maximum recursion for secondary rays </summary>
-        public const int MaxRecursionDepth = 4;
+        public const int MaxRecursionDepth = 3;
 
         /// <summary> Create a new ray using an origin and a direction </summary>
         /// <param name="origin">The origin of the ray</param>

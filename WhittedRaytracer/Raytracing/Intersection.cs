@@ -23,7 +23,7 @@ namespace WhittedRaytracer.Raytracing {
         /// Epsilon used to raise the intersection away from the primitive.
         /// Used to avoid the intersection falling behind the primitive by rounding errors.
         /// </summary>
-        public const float RaiseEpsilon = 0.0001f;
+        public const float RaiseEpsilon = 0.001f;
 
         /// <summary> Create a new intersection between a ray and a primitive </summary>
         /// <param name="ray">The ray that intersects the primitive</param>

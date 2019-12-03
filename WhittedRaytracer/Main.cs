@@ -118,7 +118,7 @@ namespace WhittedRaytracer {
 
             // Cast Ray
             Ray ray = Scene.Camera.CreatePrimaryRay(x, y);
-            Vector3 pixelColor = Scene.CastPrimaryRay(ray, 0, debugRay);
+            Vector3 pixelColor = Scene.CastRay(ray, 0, debugRay);
 
             // Draw Pixel
             Scene.Camera.ScreenPlane.Screen.Plot(x, y, pixelColor.ToIntColor());

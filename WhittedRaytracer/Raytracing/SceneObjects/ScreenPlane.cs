@@ -25,7 +25,7 @@ namespace WhittedRaytracer.Raytracing.SceneObjects {
         public Vector3 BottomRight { get; private set; }
 
         /// <summary> The scale to draw the debug information </summary>
-        public float DebugScale = 50f;
+        public float DebugScale = 20f;
 
         Vector3 center;
 
@@ -68,6 +68,7 @@ namespace WhittedRaytracer.Raytracing.SceneObjects {
         /// <param name="ray">The ray to draw</param>
         /// <param name="color">The color to draw the ray with</param>
         public void DrawRay(Ray ray, int color = 0xffffff) {
+            if (ray.RecursionDepth > 0) color -= ray.RecursionDepth * 0x444400;
             int x1 = TX(ray.Origin.X);
             int y1 = TZ(ray.Origin.Z);
             int x2 = TX(ray.Origin.X + ray.Direction.X * ray.Length);
@@ -96,7 +97,7 @@ namespace WhittedRaytracer.Raytracing.SceneObjects {
 
         /// <summary> Draw a lightsource from topview for debug purposes </summary>
         /// <param name="light">The light to draw</param>
-        public void DrawLight(Lightsource light) {
+        public void DrawLight(PointLight light) {
             int x1 = TX(light.Position.X) - 1;
             int y1 = TZ(light.Position.Z) - 1;
             int x2 = x1 + 2;

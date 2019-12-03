@@ -15,7 +15,7 @@ namespace WhittedRaytracer.Raytracing {
         /// <summary> The primitives in the scene </summary>
         public readonly List<Primitive> Primitives = new List<Primitive>();
         /// <summary> The lightsources in the scene </summary>
-        public readonly List<Lightsource> Lights = new List<Lightsource>();
+        public readonly List<PointLight> Lights = new List<PointLight>();
 
         readonly Random r = new Random();
 
@@ -25,19 +25,19 @@ namespace WhittedRaytracer.Raytracing {
             Camera = new Camera(screen);
             AddDefaultLights();
             AddDefaultPrimitives();
-            AddRandomSpeheres(1000);
+            AddRandomSpeheres(10);
             AccelerationStructure = new BVHNode(Primitives);
         }
 
         void AddDefaultLights() {
-            Lights.Add(new Lightsource(new Vector3(0, -8, 3), new Vector3(300, 300, 250)));
+            Lights.Add(new PointLight(new Vector3(0, -8, 3), new Vector3(300, 300, 250)));
         }
 
         void AddDefaultPrimitives() {
             Primitives.Add(new Sphere(new Vector3(-3, -1, 5), 1, new Vector3(1f, 0.9f, 0.9f), 0, 1, 1.62f));
             Primitives.Add(new Sphere(new Vector3(0, -1, 5), 1, new Vector3(1f, 1f, 1f), 1f));
             Primitives.Add(new Sphere(new Vector3(3, -1, 5), 1, new Vector3(0, 0.5f, 0), 0, 0, 1, 0.5f, 10f));
-            Primitives.Add(new Plane(new Vector3(0, -1, 0), -1, new Vector3(1, 1, 0.5f)));
+            //Primitives.Add(new Plane(new Vector3(0, -1, 0), -1, new Vector3(1, 1, 0.5f)));
             Primitives.Add(new Triangle(new Vector3(-5, 0, 0), new Vector3(5, 0, 0), new Vector3(5, 0, 10), new Vector3(1, 0.8f, 1), 0.4f, 0, 1, 0.7f, 50f));
             Primitives.Add(new Triangle(new Vector3(-5, 0, 0), new Vector3(5, 0, 10), new Vector3(-5, 0, 10), new Vector3(1, 1, 0.8f), 0, 0, 1, 0.7f, 50f));
         }
@@ -50,12 +50,12 @@ namespace WhittedRaytracer.Raytracing {
             }
         }
 
-        /// <summary> Intersect the scene with a primary ray and calculate the color found by the ray </summary>
+        /// <summary> Intersect the scene with a ray and calculate the color found by the ray </summary>
         /// <param name="ray">The ray to intersect the scene with</param>
         /// <param name="recursionDepth">The recursion depth if this is a secondary ray</param>
         /// <param name="debugRay">Whether to draw this ray in debug</param>
         /// <returns>The color at the origin of the ray</returns>
-        public Vector3 CastPrimaryRay(Ray ray, int recursionDepth = 0, bool debugRay = false) {
+        public Vector3 CastRay(Ray ray, int recursionDepth = 0, bool debugRay = false) {
             // Intersect with Scene
             Intersection intersection = AccelerationStructure.Intersect(ray);
             if (intersection == null) return Vector3.Zero;
@@ -64,15 +64,15 @@ namespace WhittedRaytracer.Raytracing {
 
             // Specularity
             if (intersection.Primitive.Specularity > 0 && recursionDepth < Ray.MaxRecursionDepth) {
-                Vector3 outReflectedLight = CastPrimaryRay(intersection.GetReflectedRay(), recursionDepth + 1, debugRay) * intersection.Primitive.Color;
+                Vector3 outReflectedLight = CastRay(intersection.GetReflectedRay(), recursionDepth + 1, debugRay) * intersection.Primitive.Color;
                 outgoingLight = intersectionLight * (1 - intersection.Primitive.Specularity) + outReflectedLight * intersection.Primitive.Specularity;
             }
 
             // Dielectrics
             if (intersection.Primitive.Dielectric > 0 && recursionDepth < Ray.MaxRecursionDepth) {
                 Ray refractedRay = intersection.GetRefractedRay();
-                Vector3 incRefractedLight = refractedRay != null ? CastPrimaryRay(refractedRay, recursionDepth + 1, debugRay) : Vector3.Zero;
-                Vector3 incReflectedLight = CastPrimaryRay(intersection.GetReflectedRay(), recursionDepth + 1, debugRay);
+                Vector3 incRefractedLight = refractedRay != null ? CastRay(refractedRay, recursionDepth + 1, debugRay) : Vector3.Zero;
+                Vector3 incReflectedLight = CastRay(intersection.GetReflectedRay(), recursionDepth + 1, debugRay);
                 float reflected = intersection.GetReflectivity();
                 float refracted = 1 - reflected;
                 outgoingLight = intersectionLight * (1f - intersection.Primitive.Dielectric) + (incRefractedLight * refracted + incReflectedLight * reflected) * intersection.Primitive.Dielectric * intersection.Primitive.Color;
@@ -91,7 +91,7 @@ namespace WhittedRaytracer.Raytracing {
         /// <returns>The color at the intersection</returns>
         public Vector3 CastShadowRays(Intersection intersection, bool debugRay = false) {
             Vector3 totalColor = Vector3.Zero;
-            foreach (Lightsource light in Lights) {
+            foreach (PointLight light in Lights) {
                 Ray shadowRay = intersection.GetShadowRay(light);
                 if (AccelerationStructure.IntersectBool(shadowRay)) continue;
 

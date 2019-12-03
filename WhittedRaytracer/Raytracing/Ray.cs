@@ -7,6 +7,8 @@ namespace WhittedRaytracer.Raytracing {
         public readonly Vector3 Origin;
         /// <summary> The direction of the ray. This should always be normalized </summary>
         public readonly Vector3 Direction;
+        /// <summary> How many bounces this ray made so far </summary>
+        public readonly int RecursionDepth;
 
         /// <summary> The inverted direction. Used for quick AABB intersection </summary>
         public readonly Vector3 DirectionInverted;
@@ -23,9 +25,11 @@ namespace WhittedRaytracer.Raytracing {
         /// <param name="origin">The origin of the ray</param>
         /// <param name="direction">The direction of the ray (it will be normalized)</param>
         /// <param name="length">The length of the ray</param>
-        public Ray(Vector3 origin, Vector3 direction, float length = float.MaxValue) {
+        /// <param name="recursionDepth">How manny bounces this ray made so far</param>
+        public Ray(Vector3 origin, Vector3 direction, float length = float.MaxValue, int recursionDepth = 0) {
             Origin = origin;
             Direction = direction.Normalized();
+            RecursionDepth = recursionDepth;
             DirectionInverted = new Vector3(1 / direction.X, 1 / direction.Y, 1 / direction.Z);
             Length = length;
             Sign = new int[] {

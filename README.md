@@ -3,6 +3,9 @@ Whitted Raytracer for the course Advanced Graphics in 2019-2020 at Utrecht Unive
 Created by:
 Theo Harkes (5672120)
 
+Required:
+- .Net Framework 4.7.2
+
 Features:
 - Raytracing architecture
 - Camera: Position, Orientation, FOV, Aspect ratio

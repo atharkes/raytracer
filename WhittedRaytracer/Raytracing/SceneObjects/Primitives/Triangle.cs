@@ -91,13 +91,10 @@ namespace WhittedRaytracer.Raytracing.SceneObjects.Primitives {
 
         /// <summary> Get the bounds of the triangle </summary>
         /// <returns>The bounds of the triangle</returns>
-        public override List<Vector3> GetBounds() {
-            List<Vector3> bounds = new List<Vector3>(2)
-            {
-                Vector3.ComponentMin(P1, Vector3.ComponentMin(P2, P3)),
-                Vector3.ComponentMax(P1, Vector3.ComponentMax(P2, P3))
-            };
-            return bounds;
+        public override (Vector3 min, Vector3 max) GetBounds() {
+            Vector3 min = Vector3.ComponentMin(P1, Vector3.ComponentMin(P2, P3));
+            Vector3 max = Vector3.ComponentMax(P1, Vector3.ComponentMax(P2, P3));
+            return (min, max);
         }
     }
 }

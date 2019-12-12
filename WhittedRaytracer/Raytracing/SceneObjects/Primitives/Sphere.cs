@@ -88,13 +88,8 @@ namespace WhittedRaytracer.Raytracing.SceneObjects.Primitives {
 
         /// <summary> Get the bounds of the sphere </summary>
         /// <returns>The bounds of the sphere</returns>
-        public override List<Vector3> GetBounds() {
-            List<Vector3> bounds = new List<Vector3>(2)
-            {
-                Position - Vector3.One * Radius,
-                Position + Vector3.One * Radius
-            };
-            return bounds;
+        public override (Vector3 min, Vector3 max) GetBounds() {
+            return (Position - Vector3.One * Radius, Position + Vector3.One * Radius);
         }
     }
 }

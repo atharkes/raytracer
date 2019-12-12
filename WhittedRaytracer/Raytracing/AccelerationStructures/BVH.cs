@@ -228,9 +228,9 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructures {
             Vector3 boundMin = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
             Vector3 boundMax = new Vector3(float.MinValue, float.MinValue, float.MinValue);
             foreach (Primitive primitive in primitives) {
-                List<Vector3> boundPrimitives = primitive.GetBounds();
-                boundMin = Vector3.ComponentMin(boundPrimitives[0], boundMin);
-                boundMax = Vector3.ComponentMax(boundPrimitives[1], boundMax);
+                (Vector3 primitiveMin, Vector3 primitiveMax) = primitive.GetBounds();
+                boundMin = Vector3.ComponentMin(primitiveMin, boundMin);
+                boundMax = Vector3.ComponentMax(primitiveMax, boundMax);
             }
             return new Vector3[] { boundMin, boundMax };
         }

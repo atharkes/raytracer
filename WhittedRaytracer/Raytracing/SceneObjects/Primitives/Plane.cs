@@ -60,13 +60,10 @@ namespace WhittedRaytracer.Raytracing.SceneObjects.Primitives {
 
         /// <summary> Returns some arbitrary bounds of the plane </summary>
         /// <returns>The bounds of the plane</returns>
-        public override List<Vector3> GetBounds() {
-            List<Vector3> bounds = new List<Vector3>(2)
-            {
-                GetCenter() - (Vector3.One - Normal) * Size,
-                GetCenter() + (Vector3.One - Normal) * Size
-            };
-            return bounds;
+        public override (Vector3 min, Vector3 max) GetBounds() {
+            Vector3 center = GetCenter();
+            Vector3 orthogonal = Vector3.One - Normal;
+            return (center - orthogonal * Size, center + orthogonal * Size);
         }
     }
 }

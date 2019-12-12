@@ -64,6 +64,6 @@ namespace WhittedRaytracer.Raytracing.SceneObjects {
 
         /// <summary> Get the axis-alinged bounding box bounds of this primitive </summary>
         /// <returns>The axis-alinged bounds of this primitive</returns>
-        public abstract List<Vector3> GetBounds();
+        public abstract (Vector3 min, Vector3 max) GetBounds();
     }
 }

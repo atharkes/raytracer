@@ -19,7 +19,7 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructures {
         /// <summary> The primitives that are contained in this node or any of it's children </summary>
         public readonly List<Primitive> Primitives;
         /// <summary> The bounds of the axis alinged bounding box of this node </summary>
-        public readonly List<Vector3> Bounds;
+        public readonly Vector3[] Bounds = new Vector3[2];
         /// <summary> Whether this node is a leaf or not </summary>
         public bool Leaf { get; private set; }
 
@@ -32,42 +32,22 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructures {
             Split();
         }
 
-        /// <summary> Intersect this Node and it's children </summary>
-        /// <param name="ray">The ray to calculate intersections for</param>
-        /// <returns>A pair of the distance and the primitive that it intersects</returns>
+        /// <summary> Intersect and traverse the BVH with a ray </summary>
+        /// <param name="ray">The ray to intersect the BVH with</param>
+        /// <returns>The intersection in the BVH</returns>
         public Intersection Intersect(Ray ray) {
             if (!IntersectAABB(ray)) {
                 return null;
-            } else if (!Leaf) {
-                Intersection intersectionLeft = Left.Intersect(ray);
-                Intersection intersectionRight = Right.Intersect(ray);
-                if (intersectionLeft == null) {
-                    return intersectionRight;
-                } else if (intersectionRight == null) {
-                    return intersectionLeft;
-                } else if (intersectionLeft.Distance < intersectionRight.Distance) {
-                    return intersectionLeft;
-                } else {
-                    return intersectionRight;
-                }
+            } else if (Leaf) {
+                return IntersectPrimitives(ray);
             } else {
-                float intersectionDistance = float.MaxValue;
-                Primitive intersectionPrimitive = null;
-                foreach (Primitive primitive in Primitives) {
-                    float distance = primitive.Intersect(ray);
-                    if (distance > 0 && distance < intersectionDistance) {
-                        intersectionPrimitive = primitive;
-                        intersectionDistance = distance;
-                    }
-                }
-                if (intersectionPrimitive == null) return null;
-                else return new Intersection(ray, intersectionPrimitive, intersectionDistance);
+                return IntersectChildren(ray); 
             }
         }
 
-        /// <summary> Intersect this Node and it's children </summary>
-        /// <param name="ray">The ray to calculate intersections for</param>
-        /// <returns>Whether there is an intersection</returns>
+        /// <summary> Intersect and traverse the BVH with a ray </summary>
+        /// <param name="ray">The ray to intersect the BVH with</param>
+        /// <returns>Whether there is an intersection with the BVH and the ray</returns>
         public bool IntersectBool(Ray ray) {
             bool intersectBool = IntersectAABB(ray);
             if (intersectBool && !Leaf) {
@@ -110,19 +90,55 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructures {
             return tmin > 0 || tmax > 0;
         }
 
-        /// <summary> Try split the Node into 2 smaller Nodes </summary>
+        
+
+        /// <summary> Intersect the children of this BHV node </summary>
+        /// <param name="ray">The ray to intersect the children with</param>
+        /// <returns>The intersection in the children if there is any</returns>
+        Intersection IntersectChildren(Ray ray) {
+            Intersection intersectionLeft = Left.Intersect(ray);
+            Intersection intersectionRight = Right.Intersect(ray);
+            if (intersectionLeft == null) {
+                return intersectionRight;
+            } else if (intersectionRight == null) {
+                return intersectionLeft;
+            } else if (intersectionLeft.Distance < intersectionRight.Distance) {
+                return intersectionLeft;
+            } else {
+                return intersectionRight;
+            }
+        }
+
+        /// <summary> Intersect the primitives of this BHV node </summary>
+        /// <param name="ray">The ray to intersect the primitives with</param>
+        /// <returns>The intersection if there is any</returns>
+        Intersection IntersectPrimitives(Ray ray) {
+            float intersectionDistance = ray.Length;
+            Primitive intersectionPrimitive = null;
+            foreach (Primitive primitive in Primitives) {
+                float distance = primitive.Intersect(ray);
+                if (0 < distance && distance < intersectionDistance) {
+                    intersectionPrimitive = primitive;
+                    intersectionDistance = distance;
+                }
+            }
+            if (intersectionPrimitive == null) return null;
+            else return new Intersection(ray, intersectionPrimitive, intersectionDistance);
+        }
+
+        /// <summary> Try split the BVH Node into 2 smaller Nodes </summary>
         void Split() {
-            (List<Primitive>, List<Primitive>)? split = CalculateSplit();
+            (List<Primitive> left, List<Primitive> right)? split = CalculateSplit();
             if (!split.HasValue) return;
-            Left = new BVHNode(split.Value.Item1);
-            Right = new BVHNode(split.Value.Item2);
+            Left = new BVHNode(split.Value.left);
+            Right = new BVHNode(split.Value.right);
             Leaf = false;
         }
 
         /// <summary> Calculate Cheapest Split </summary>
         /// <returns>A pair with two sides of the split</returns>
         (List<Primitive> left, List<Primitive> right)? CalculateSplit() { 
-            float cost = CalculateSurfaceArea(Bounds) * Primitives.Count;
+            float cost = SurfaceArea() * Primitives.Count;
             (List<Primitive>, List<Primitive>)? splitPrimitives = null;
             foreach (Primitive primitive in Primitives) {
                 List<(List<Primitive>, List<Primitive>)> splits = new List<(List<Primitive>, List<Primitive>)>(3)
@@ -144,63 +160,63 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructures {
         }
 
         /// <summary> Split on X-axis </summary>
-        /// <param name="primitive">The primitive to split on</param>
+        /// <param name="splitPrimitive">The primitive to split on</param>
         /// <returns>A pair with primitives on both sides</returns>
-        (List<Primitive> left, List<Primitive> right) SplitX(Primitive primitive) {
-            float split = primitive.GetCenter().X;
+        (List<Primitive> left, List<Primitive> right) SplitX(Primitive splitPrimitive) {
+            float split = splitPrimitive.GetCenter().X;
             List<Primitive> primitivesLeft = new List<Primitive>();
             List<Primitive> primitivesRight = new List<Primitive>();
-            foreach (Primitive primitiveCheck in Primitives) {
-                if (primitiveCheck.GetCenter().X <= split) {
-                    primitivesLeft.Add(primitiveCheck);
+            foreach (Primitive primitive in Primitives) {
+                if (primitive.GetCenter().X <= split) {
+                    primitivesLeft.Add(primitive);
                 } else {
-                    primitivesRight.Add(primitiveCheck);
+                    primitivesRight.Add(primitive);
                 }
             }
             return (primitivesLeft, primitivesRight);
         }
 
         /// <summary> Split on Y-axis </summary>
-        /// <param name="primitive">The primitive to split on</param>
+        /// <param name="splitPrimitive">The primitive to split on</param>
         /// <returns>A pair with primitives on both sides</returns>
-        (List<Primitive> left, List<Primitive> right) SplitY(Primitive primitive) {
-            float split = primitive.GetCenter().Y;
+        (List<Primitive> left, List<Primitive> right) SplitY(Primitive splitPrimitive) {
+            float split = splitPrimitive.GetCenter().Y;
             List<Primitive> primitivesLeft = new List<Primitive>();
             List<Primitive> primitivesRight = new List<Primitive>();
-            foreach (Primitive primitiveCheck in Primitives) {
-                if (primitiveCheck.GetCenter().Y <= split) {
-                    primitivesLeft.Add(primitiveCheck);
+            foreach (Primitive primitive in Primitives) {
+                if (primitive.GetCenter().Y <= split) {
+                    primitivesLeft.Add(primitive);
                 } else {
-                    primitivesRight.Add(primitiveCheck);
+                    primitivesRight.Add(primitive);
                 }
             }
             return (primitivesLeft, primitivesRight);
         }
 
         /// <summary> Split on Z-axis </summary>
-        /// <param name="primitive">The primitive to split on</param>
+        /// <param name="splitPrimitive">The primitive to split on</param>
         /// <returns>A pair with primitives on both sides</returns>
-        (List<Primitive> left, List<Primitive> right) SplitZ(Primitive primitive) {
-            float split = primitive.GetCenter().Z;
+        (List<Primitive> left, List<Primitive> right) SplitZ(Primitive splitPrimitive) {
+            float split = splitPrimitive.GetCenter().Z;
             List<Primitive> primitivesLeft = new List<Primitive>();
             List<Primitive> primitivesRight = new List<Primitive>();
-            foreach (Primitive primitiveCheck in Primitives) {
-                if (primitiveCheck.GetCenter().Z <= split) {
-                    primitivesLeft.Add(primitiveCheck);
+            foreach (Primitive primitive in Primitives) {
+                if (primitive.GetCenter().Z <= split) {
+                    primitivesLeft.Add(primitive);
                 } else {
-                    primitivesRight.Add(primitiveCheck);
+                    primitivesRight.Add(primitive);
                 }
             }
             return (primitivesLeft, primitivesRight);
         }
 
-        /// <summary> Calculate the cost of a split using the Surface Area Heuristic </summary>
+        /// <summary> Calculate the cost of a split. Uses the Surface Area Heuristic </summary>
         /// <param name="split">The split to calculate the cost for</param>
         /// <returns>The cost of the split</returns>
         float CalculateCost((List<Primitive> left, List<Primitive> right) split) {
-            List<Vector3> boundsLeft = CalculateBounds(split.left);
+            Vector3[] boundsLeft = CalculateBounds(split.left);
             float surfaceArea1 = CalculateSurfaceArea(boundsLeft);
-            List<Vector3> boundsRight = CalculateBounds(split.right);
+            Vector3[] boundsRight = CalculateBounds(split.right);
             float surfaceArea2 = CalculateSurfaceArea(boundsRight);
             return surfaceArea1 * split.left.Count + surfaceArea2 * split.right.Count;
         }
@@ -208,8 +224,7 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructures {
         /// <summary> Calculate the bounds of a List of Primitives </summary>
         /// <param name="primitives">The primitives the calculate the bounds for</param>
         /// <returns>The bounds of the primitives</returns>
-        List<Vector3> CalculateBounds(List<Primitive> primitives) {
-            List<Vector3> bounds = new List<Vector3>(2);
+        Vector3[] CalculateBounds(List<Primitive> primitives) {
             Vector3 boundMin = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
             Vector3 boundMax = new Vector3(float.MinValue, float.MinValue, float.MinValue);
             foreach (Primitive primitive in primitives) {
@@ -217,20 +232,33 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructures {
                 boundMin = Vector3.ComponentMin(boundPrimitives[0], boundMin);
                 boundMax = Vector3.ComponentMax(boundPrimitives[1], boundMax);
             }
-            bounds.Add(boundMin);
-            bounds.Add(boundMax);
-            return bounds;
+            return new Vector3[] { boundMin, boundMax };
+        }
+
+        /// <summary> Calculate the surface area of the AABB of this BVH node </summary>
+        /// <returns>The surface area of the AABB</returns>
+        public float SurfaceArea() {
+            return CalculateSurfaceArea(Bounds);
         }
 
         /// <summary> Calculate the surface area for some bounds </summary>
         /// <param name="bounds">The bounds to calculate the surface area for</param>
         /// <returns>The surface area of the bounds</returns>
-        float CalculateSurfaceArea(List<Vector3> bounds) {
+        public static float CalculateSurfaceArea(Vector3[] bounds) {
             float a = bounds[1].X - bounds[0].X;
             float b = bounds[1].Y - bounds[0].Y;
             float c = bounds[1].Z - bounds[0].Z;
-            float surfaceArea = 2 * (a * b + b * c + a * c);
-            return surfaceArea;
+            return 2 * (a * b + b * c + a * c);
+        }
+
+        /// <summary> Get the distance from a point to the AABB </summary>
+        /// <param name="point">To point to get the distance from the AABB to</param>
+        /// <returns>The distance from the point to the AABB</returns>
+        public float DistanceSquared(Vector3 point) {
+            float dx = Math.Max(Bounds[0].X - point.X, point.X - Bounds[1].X);
+            float dy = Math.Max(Bounds[0].Y - point.Y, point.Y - Bounds[1].Y);
+            float dz = Math.Max(Bounds[0].Z - point.Z, point.Z - Bounds[1].Z);
+            return dx * dx + dy * dy + dz * dz;
         }
     }
 }

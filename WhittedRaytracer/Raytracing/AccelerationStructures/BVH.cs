@@ -94,22 +94,18 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructures {
         public bool IntersectAABB(Ray ray) {
             float tmin = (Bounds[ray.Sign[0]].X - ray.Origin.X) * ray.DirectionInverted.X;
             float tmax = (Bounds[1 - ray.Sign[0]].X - ray.Origin.X) * ray.DirectionInverted.X;
+
             float tymin = (Bounds[ray.Sign[1]].Y - ray.Origin.Y) * ray.DirectionInverted.Y;
             float tymax = (Bounds[1 - ray.Sign[1]].Y - ray.Origin.Y) * ray.DirectionInverted.Y;
-
-            if ((tmin > tymax) || (tymin > tmax)) return false;
-            if (tymin > tmin) tmin = tymin;
-            if (tymax < tmax) tmax = tymax;
+            if ((tmin > tymax) || (tmax < tymin)) return false;
+            tmin = Math.Max(tmin, tymin);
+            tmax = Math.Min(tmax, tymax);
 
             float tzmin = (Bounds[ray.Sign[2]].Z - ray.Origin.Z) * ray.DirectionInverted.Z;
             float tzmax = (Bounds[1 - ray.Sign[2]].Z - ray.Origin.Z) * ray.DirectionInverted.Z;
-
+            if ((tmin > tzmax) || (tmax < tzmin)) return false;
             tmin = Math.Max(tmin, tzmin);
             tmax = Math.Min(tmax, tzmax);
-
-            if ((tmin > tzmax) || (tzmin > tmax)) return false;
-            if (tzmin > tmin) tmin = tzmin;
-            if (tzmax < tmax) tmax = tzmax;
 
             return tmin > 0 || tmax > 0;
         }

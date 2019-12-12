@@ -1,5 +1,4 @@
 ﻿using OpenTK;
-using System.Collections.Generic;
 
 namespace WhittedRaytracer.Raytracing.SceneObjects.Primitives {
     /// <summary> A plane for the 3d scene </summary>

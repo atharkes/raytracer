@@ -49,23 +49,16 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructures {
         /// <param name="ray">The ray to intersect the BVH with</param>
         /// <returns>Whether there is an intersection with the BVH and the ray</returns>
         public bool IntersectBool(Ray ray) {
-            bool intersectBool = IntersectAABB(ray);
-            if (intersectBool && !Leaf) {
-                bool intersectLeft = Left.IntersectBool(ray);
-                bool intersectRight = Right.IntersectBool(ray);
-                if (intersectLeft || intersectRight) {
-                    return true;
-                } else {
-                    return false;
-                }
-            } else if (intersectBool && Leaf) {
+            if (!IntersectAABB(ray)) {
+                return false;
+            } else if (Leaf) {
                 foreach (Primitive primitive in Primitives) {
                     if (primitive.IntersectBool(ray)) return true;
                 }
                 return false;
             } else {
-                return false;
-            }   
+                return Left.IntersectBool(ray) || Right.IntersectBool(ray);
+            }
         }
 
         /// <summary> Intersect the axis aligned bounding box of this Node (Amy Williams's An Efficient and Robust Ray–Box Intersection Algorithm) </summary>

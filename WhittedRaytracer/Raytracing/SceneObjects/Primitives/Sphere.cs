@@ -1,6 +1,5 @@
 ﻿using OpenTK;
 using System;
-using System.Collections.Generic;
 
 namespace WhittedRaytracer.Raytracing.SceneObjects.Primitives {
     /// <summary> A sphere primitive for the 3d scene </summary>

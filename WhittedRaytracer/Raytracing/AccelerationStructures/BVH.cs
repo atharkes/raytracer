@@ -23,6 +23,14 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructures {
         /// <summary> Whether this node is a leaf or not </summary>
         public bool Leaf { get; private set; }
 
+        /// <summary> Calculate the surface area of the AABB of this BVH node </summary>
+        public float SurfaceArea => CalculateSurfaceArea(Bounds);
+
+        /// <summary> The estimated cost of traversing the BVH for the SAH </summary>
+        public const float TraversalCost = 1f;
+        /// <summary> The estimated cost of intersecting a primitive for the SAH </summary>
+        public const float IntersectionCost = 1f;
+
         /// <summary> Construct a bounding volume hierarchy tree, it will split into smaller nodes if needed </summary>
         /// <param name="primitives">The primitives in the tree</param>
         public BVHNode(ICollection<Primitive> primitives) {
@@ -83,8 +91,6 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructures {
             return tmin > 0 || tmax > 0;
         }
 
-        
-
         /// <summary> Intersect the children of this BHV node </summary>
         /// <param name="ray">The ray to intersect the children with</param>
         /// <returns>The intersection in the children if there is any</returns>
@@ -131,18 +137,17 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructures {
         /// <summary> Calculate Cheapest Split </summary>
         /// <returns>A pair with two sides of the split</returns>
         (ICollection<Primitive> left, ICollection<Primitive> right)? CalculateSplit() { 
-            float cost = SurfaceArea() * Primitives.Count;
+            float cost = IntersectionCost * SurfaceArea * Primitives.Count;
             (ICollection<Primitive>, ICollection<Primitive>)? splitPrimitives = null;
             foreach (Primitive primitive in Primitives) {
-                ICollection<(ICollection<Primitive>, ICollection<Primitive>)> splits = new List<(ICollection<Primitive>, ICollection<Primitive>)>(3)
-                {
+                ICollection<(ICollection<Primitive>, ICollection<Primitive>)> splits = new List<(ICollection<Primitive>, ICollection<Primitive>)>(3) {
                     SplitX(primitive),
                     SplitY(primitive),
                     SplitZ(primitive)
                 };
 
                 foreach ((ICollection<Primitive>, ICollection<Primitive>) split in splits) {
-                    float splitCost = CalculateCost(split);
+                    float splitCost = SurfaceAreaHeuristic(split);
                     if (splitCost < cost) {
                         cost = splitCost;
                         splitPrimitives = split;
@@ -206,12 +211,12 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructures {
         /// <summary> Calculate the cost of a split. Uses the Surface Area Heuristic </summary>
         /// <param name="split">The split to calculate the cost for</param>
         /// <returns>The cost of the split</returns>
-        float CalculateCost((ICollection<Primitive> left, ICollection<Primitive> right) split) {
+        float SurfaceAreaHeuristic((ICollection<Primitive> left, ICollection<Primitive> right) split) {
             Vector3[] boundsLeft = CalculateBounds(split.left);
-            float surfaceArea1 = CalculateSurfaceArea(boundsLeft);
+            float surfaceAreaLeft = CalculateSurfaceArea(boundsLeft);
             Vector3[] boundsRight = CalculateBounds(split.right);
-            float surfaceArea2 = CalculateSurfaceArea(boundsRight);
-            return surfaceArea1 * split.left.Count + surfaceArea2 * split.right.Count;
+            float surfaceAreaRight = CalculateSurfaceArea(boundsRight);
+            return TraversalCost + IntersectionCost * (surfaceAreaLeft * split.left.Count + surfaceAreaRight * split.right.Count);
         }
 
         /// <summary> Calculate the bounds of a List of Primitives </summary>
@@ -226,12 +231,6 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructures {
                 boundMax = Vector3.ComponentMax(primitiveMax, boundMax);
             }
             return new Vector3[] { boundMin, boundMax };
-        }
-
-        /// <summary> Calculate the surface area of the AABB of this BVH node </summary>
-        /// <returns>The surface area of the AABB</returns>
-        public float SurfaceArea() {
-            return CalculateSurfaceArea(Bounds);
         }
 
         /// <summary> Calculate the surface area for some bounds </summary>

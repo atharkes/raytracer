@@ -68,7 +68,7 @@ namespace WhittedRaytracer.Raytracing {
             new Sphere(new Vector3(3, -1, 5), 1, Material.GlossyRed),
             new Sphere(new Vector3(0, -1, 5), 1, Material.Mirror),
             new Sphere(new Vector3(-1, -1, 2), 0.5f, Material.Glass),
-            new Plane(new Vector3(0, -1, 0), -1, new Material(new Vector3(1, 1, 0.5f))),
+            new Plane(new Vector3(0, -1, 0), -1, Material.DiffuseYellow),
             new Triangle(new Vector3(-5, 0, 0), new Vector3(5, 0, 0), new Vector3(5, 0, 10), null, Material.GlossyPurpleMirror),
             new Triangle(new Vector3(-5, 0, 0), new Vector3(5, 0, 10), new Vector3(-5, 0, 10), null, Material.GlossyGreen)
         };

@@ -216,7 +216,7 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructures {
             float surfaceAreaLeft = CalculateSurfaceArea(boundsLeft);
             Vector3[] boundsRight = CalculateBounds(split.right);
             float surfaceAreaRight = CalculateSurfaceArea(boundsRight);
-            return TraversalCost + IntersectionCost * (surfaceAreaLeft * split.left.Count + surfaceAreaRight * split.right.Count);
+            return TraversalCost * SurfaceArea + IntersectionCost * (surfaceAreaLeft * split.left.Count + surfaceAreaRight * split.right.Count);
         }
 
         /// <summary> Calculate the bounds of a List of Primitives </summary>

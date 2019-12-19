@@ -17,7 +17,7 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructures {
         /// <summary> The right child node if it has one </summary>
         public BVHNode Right { get; private set; }
         /// <summary> The primitives that are contained in this node or any of it's children </summary>
-        public readonly List<Primitive> Primitives;
+        public readonly ICollection<Primitive> Primitives;
         /// <summary> The bounds of the axis alinged bounding box of this node </summary>
         public readonly Vector3[] Bounds = new Vector3[2];
         /// <summary> Whether this node is a leaf or not </summary>
@@ -25,7 +25,7 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructures {
 
         /// <summary> Construct a bounding volume hierarchy tree, it will split into smaller nodes if needed </summary>
         /// <param name="primitives">The primitives in the tree</param>
-        public BVHNode(List<Primitive> primitives) {
+        public BVHNode(ICollection<Primitive> primitives) {
             Primitives = primitives;
             Bounds = CalculateBounds(primitives);
             Leaf = true;
@@ -121,7 +121,7 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructures {
 
         /// <summary> Try split the BVH Node into 2 smaller Nodes </summary>
         void Split() {
-            (List<Primitive> left, List<Primitive> right)? split = CalculateSplit();
+            (ICollection<Primitive> left, ICollection<Primitive> right)? split = CalculateSplit();
             if (!split.HasValue) return;
             Left = new BVHNode(split.Value.left);
             Right = new BVHNode(split.Value.right);
@@ -130,18 +130,18 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructures {
 
         /// <summary> Calculate Cheapest Split </summary>
         /// <returns>A pair with two sides of the split</returns>
-        (List<Primitive> left, List<Primitive> right)? CalculateSplit() { 
+        (ICollection<Primitive> left, ICollection<Primitive> right)? CalculateSplit() { 
             float cost = SurfaceArea() * Primitives.Count;
-            (List<Primitive>, List<Primitive>)? splitPrimitives = null;
+            (ICollection<Primitive>, ICollection<Primitive>)? splitPrimitives = null;
             foreach (Primitive primitive in Primitives) {
-                List<(List<Primitive>, List<Primitive>)> splits = new List<(List<Primitive>, List<Primitive>)>(3)
+                ICollection<(ICollection<Primitive>, ICollection<Primitive>)> splits = new List<(ICollection<Primitive>, ICollection<Primitive>)>(3)
                 {
                     SplitX(primitive),
                     SplitY(primitive),
                     SplitZ(primitive)
                 };
 
-                foreach ((List<Primitive>, List<Primitive>) split in splits) {
+                foreach ((ICollection<Primitive>, ICollection<Primitive>) split in splits) {
                     float splitCost = CalculateCost(split);
                     if (splitCost < cost) {
                         cost = splitCost;
@@ -155,10 +155,10 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructures {
         /// <summary> Split on X-axis </summary>
         /// <param name="splitPrimitive">The primitive to split on</param>
         /// <returns>A pair with primitives on both sides</returns>
-        (List<Primitive> left, List<Primitive> right) SplitX(Primitive splitPrimitive) {
+        (ICollection<Primitive> left, ICollection<Primitive> right) SplitX(Primitive splitPrimitive) {
             float split = splitPrimitive.GetCenter().X;
-            List<Primitive> primitivesLeft = new List<Primitive>();
-            List<Primitive> primitivesRight = new List<Primitive>();
+            ICollection<Primitive> primitivesLeft = new List<Primitive>();
+            ICollection<Primitive> primitivesRight = new List<Primitive>();
             foreach (Primitive primitive in Primitives) {
                 if (primitive.GetCenter().X <= split) {
                     primitivesLeft.Add(primitive);
@@ -172,10 +172,10 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructures {
         /// <summary> Split on Y-axis </summary>
         /// <param name="splitPrimitive">The primitive to split on</param>
         /// <returns>A pair with primitives on both sides</returns>
-        (List<Primitive> left, List<Primitive> right) SplitY(Primitive splitPrimitive) {
+        (ICollection<Primitive> left, ICollection<Primitive> right) SplitY(Primitive splitPrimitive) {
             float split = splitPrimitive.GetCenter().Y;
-            List<Primitive> primitivesLeft = new List<Primitive>();
-            List<Primitive> primitivesRight = new List<Primitive>();
+            ICollection<Primitive> primitivesLeft = new List<Primitive>();
+            ICollection<Primitive> primitivesRight = new List<Primitive>();
             foreach (Primitive primitive in Primitives) {
                 if (primitive.GetCenter().Y <= split) {
                     primitivesLeft.Add(primitive);
@@ -189,10 +189,10 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructures {
         /// <summary> Split on Z-axis </summary>
         /// <param name="splitPrimitive">The primitive to split on</param>
         /// <returns>A pair with primitives on both sides</returns>
-        (List<Primitive> left, List<Primitive> right) SplitZ(Primitive splitPrimitive) {
+        (ICollection<Primitive> left, ICollection<Primitive> right) SplitZ(Primitive splitPrimitive) {
             float split = splitPrimitive.GetCenter().Z;
-            List<Primitive> primitivesLeft = new List<Primitive>();
-            List<Primitive> primitivesRight = new List<Primitive>();
+            ICollection<Primitive> primitivesLeft = new List<Primitive>();
+            ICollection<Primitive> primitivesRight = new List<Primitive>();
             foreach (Primitive primitive in Primitives) {
                 if (primitive.GetCenter().Z <= split) {
                     primitivesLeft.Add(primitive);
@@ -206,7 +206,7 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructures {
         /// <summary> Calculate the cost of a split. Uses the Surface Area Heuristic </summary>
         /// <param name="split">The split to calculate the cost for</param>
         /// <returns>The cost of the split</returns>
-        float CalculateCost((List<Primitive> left, List<Primitive> right) split) {
+        float CalculateCost((ICollection<Primitive> left, ICollection<Primitive> right) split) {
             Vector3[] boundsLeft = CalculateBounds(split.left);
             float surfaceArea1 = CalculateSurfaceArea(boundsLeft);
             Vector3[] boundsRight = CalculateBounds(split.right);
@@ -217,7 +217,7 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructures {
         /// <summary> Calculate the bounds of a List of Primitives </summary>
         /// <param name="primitives">The primitives the calculate the bounds for</param>
         /// <returns>The bounds of the primitives</returns>
-        Vector3[] CalculateBounds(List<Primitive> primitives) {
+        Vector3[] CalculateBounds(ICollection<Primitive> primitives) {
             Vector3 boundMin = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
             Vector3 boundMax = new Vector3(float.MinValue, float.MinValue, float.MinValue);
             foreach (Primitive primitive in primitives) {

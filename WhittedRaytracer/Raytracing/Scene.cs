@@ -13,49 +13,65 @@ namespace WhittedRaytracer.Raytracing {
         /// <summary> The acceleration structure used to find intersections </summary>
         public readonly IAccelerationStructure AccelerationStructure;
         /// <summary> The primitives in the scene </summary>
-        public readonly List<Primitive> Primitives = new List<Primitive>();
+        public readonly ICollection<Primitive> Primitives;
         /// <summary> The lightsources in the scene </summary>
-        public readonly List<PointLight> Lights = new List<PointLight>();
-
-        readonly Random r = new Random();
+        public readonly ICollection<PointLight> Lights;
 
         /// <summary> Create a new scene with some default objects </summary>
         /// <param name="screen">The screen to draw the raytracing to</param>
-        public Scene(IScreen screen) { 
+        /// <param name="primitives">The primitives in the scene</param>
+        /// <param name="lights">The lights in the scene</param>
+        public Scene(IScreen screen, ICollection<Primitive> primitives, ICollection<PointLight> lights) { 
             Camera = new Camera(screen);
-            AddDefaultLights();
-            AddDefaultPrimitives();
-            AddRandomSpeheres(500);
+            Primitives = primitives;
+            Lights = lights;
             AccelerationStructure = new BVHNode(Primitives);
         }
 
-        void AddDefaultLights() {
-            Lights.Add(new PointLight(new Vector3(0, -8, 3), new Vector3(200, 200, 150)));
+        /// <summary> Create an empty scene </summary>
+        /// <param name="screen">The screen to draw the raytracing</param>
+        /// <returns>An empty scene</returns>
+        public static Scene Empty(IScreen screen) {
+            return new Scene(screen, new List<Primitive>(), new List<PointLight>());
+        }
+        
+        /// <summary> Create the default scene </summary>
+        /// <param name="screen">The screen to draw the raytracing to</param>
+        /// <returns>A default scene</returns>
+        public static Scene Default(IScreen screen) {
+            return new Scene(screen, DefaultPrimitives, DefaultLights);
         }
 
-        void AddDefaultPrimitives() {
-            Primitives.Add(Sphere.DiffuseGreen(new Vector3(-3, -1, 5)));
-            Primitives.Add(Sphere.GlossyRed(new Vector3(3, -1, 5)));
-            Primitives.Add(Sphere.Mirror(new Vector3(0, -1, 5)));
-            Primitives.Add(Sphere.Glass(new Vector3(-1, -1, 2)));
-            Primitives.Add(new Plane(new Vector3(0, -1, 0), -1, new Vector3(1, 1, 0.5f)));
-            Primitives.Add(new Triangle(new Vector3(-5, 0, 0), new Vector3(5, 0, 0), new Vector3(5, 0, 10), new Vector3(1, 0.8f, 1), 0.4f, 0, 1, 0.7f, 50f));
-            Primitives.Add(new Triangle(new Vector3(-5, 0, 0), new Vector3(5, 0, 10), new Vector3(-5, 0, 10), new Vector3(1, 1, 0.8f), 0, 0, 1, 0.7f, 50f));
-        }
-
-        void AddRandomSpeheres(int amount) {
-            for (int i = 0; i < amount; i++) {
+        /// <summary> Create the default scene with random spheres </summary>
+        /// <param name="screen">Te screen to draw the raytracing to</param>
+        /// <param name="randomSpheres">The amount of random spheres in the scene</param>
+        /// <returns>A default scene with random spheres</returns>
+        public static Scene DefaultWithRandomSpheres(IScreen screen, int randomSpheres) {
+            ICollection<Primitive> defaultPrimitives = DefaultPrimitives;
+            Primitive[] primitives = new Primitive[defaultPrimitives.Count + randomSpheres];
+            defaultPrimitives.CopyTo(primitives, 0);
+            Random r = new Random((int)DateTime.Now.Ticks);
+            for (int i = 0; i < randomSpheres; i++) {
                 Vector3 pos = new Vector3((float)r.NextDouble() * 60f - 30f, (float)r.NextDouble() * 30f - 40f, (float)r.NextDouble() * 60f - 30f);
                 float radius = (float)r.NextDouble();
-                Vector3 color = new Vector3((float)r.NextDouble(), (float)r.NextDouble(), (float)r.NextDouble());
-                float specularity = r.NextDouble() < 0.3f ? (float)r.NextDouble() : 0;
-                float dielectric = r.NextDouble() < 0.1f ? (float)r.NextDouble() : 0;
-                float refractionIndex = (float)r.NextDouble() * 2f + 1f;
-                float glossyness = r.NextDouble() < 0.5f ? (float)r.NextDouble() : 0;
-                float glossSpecularity = (float)r.NextDouble() * 10f;
-                Primitives.Add(new Sphere(pos, radius, color, specularity, dielectric, refractionIndex, glossyness, glossSpecularity));
+                primitives[defaultPrimitives.Count + i] = new Sphere(pos, radius);
             }
+            return new Scene(screen, primitives, DefaultLights);
         }
+
+        /// <summary> The lights in the default scene </summary>
+        public static ICollection<PointLight> DefaultLights => new PointLight[] { new PointLight(new Vector3(0, -8, 3), new Vector3(200, 200, 150)) };
+
+        /// <summary> The primitives in the default scene </summary>
+        public static ICollection<Primitive> DefaultPrimitives => new Primitive[] {
+            new Sphere(new Vector3(-3, -1, 5), 1, Material.DiffuseGreen),
+            new Sphere(new Vector3(3, -1, 5), 1, Material.GlossyRed),
+            new Sphere(new Vector3(0, -1, 5), 1, Material.Mirror),
+            new Sphere(new Vector3(-1, -1, 2), 0.5f, Material.Glass),
+            new Plane(new Vector3(0, -1, 0), -1, new Material(new Vector3(1, 1, 0.5f))),
+            new Triangle(new Vector3(-5, 0, 0), new Vector3(5, 0, 0), new Vector3(5, 0, 10), null, Material.GlossyPurpleMirror),
+            new Triangle(new Vector3(-5, 0, 0), new Vector3(5, 0, 10), new Vector3(-5, 0, 10), null, Material.GlossyGreen)
+        };
 
         /// <summary> Intersect the scene with a ray and calculate the color found by the ray </summary>
         /// <param name="ray">The ray to intersect the scene with</param>
@@ -66,22 +82,22 @@ namespace WhittedRaytracer.Raytracing {
             // Intersect with Scene
             Intersection intersection = AccelerationStructure.Intersect(ray);
             if (intersection == null) return Vector3.Zero;
-            Vector3 directIllumination = intersection.Primitive.Specularity < 1 ? CastShadowRays(intersection, debugRay) : Vector3.Zero;
+            Vector3 directIllumination = intersection.Primitive.Material.Specularity < 1 ? CastShadowRays(intersection, debugRay) : Vector3.Zero;
             Vector3 radianceOut;
             
-            if (intersection.Primitive.Specularity > 0 && recursionDepth < Ray.MaxRecursionDepth) {
+            if (intersection.Primitive.Material.Specularity > 0 && recursionDepth < Ray.MaxRecursionDepth) {
                 // Specular
                 Vector3 reflectedIn = CastRay(intersection.GetReflectedRay(), recursionDepth + 1, debugRay);
-                Vector3 reflectedOut = reflectedIn * intersection.Primitive.Color;
-                radianceOut = directIllumination * (1 - intersection.Primitive.Specularity) + reflectedOut * intersection.Primitive.Specularity;
-            } else if (intersection.Primitive.Dielectric > 0 && recursionDepth < Ray.MaxRecursionDepth) {
+                Vector3 reflectedOut = reflectedIn * intersection.Primitive.Material.Color;
+                radianceOut = directIllumination * (1 - intersection.Primitive.Material.Specularity) + reflectedOut * intersection.Primitive.Material.Specularity;
+            } else if (intersection.Primitive.Material.Dielectric > 0 && recursionDepth < Ray.MaxRecursionDepth) {
                 // Dielectric
                 float reflected = intersection.GetReflectivity();
                 float refracted = 1 - reflected;
                 Ray refractedRay = intersection.GetRefractedRay();
                 Vector3 incRefractedLight = refractedRay != null ? CastRay(refractedRay, recursionDepth + 1, debugRay) : Vector3.Zero;
                 Vector3 incReflectedLight = CastRay(intersection.GetReflectedRay(), recursionDepth + 1, debugRay);
-                radianceOut = directIllumination * (1f - intersection.Primitive.Dielectric) + (incRefractedLight * refracted + incReflectedLight * reflected) * intersection.Primitive.Dielectric * intersection.Primitive.Color;
+                radianceOut = directIllumination * (1f - intersection.Primitive.Material.Dielectric) + (incRefractedLight * refracted + incReflectedLight * reflected) * intersection.Primitive.Material.Dielectric * intersection.Primitive.Material.Color;
             } else {
                 // Diffuse
                 radianceOut = directIllumination;
@@ -107,22 +123,22 @@ namespace WhittedRaytracer.Raytracing {
                 Vector3 irradiance;
                 // N dot L
                 float NdotL = Vector3.Dot(intersection.Normal, shadowRay.Direction);
-                if (intersection.Primitive.Glossyness > 0) {
+                if (intersection.Primitive.Material.Glossyness > 0) {
                     // Glossy Object: Phong-Shading
                     Vector3 glossyDirection = -shadowRay.Direction - 2 * Vector3.Dot(-shadowRay.Direction, intersection.Normal) * intersection.Normal;
                     float dot = Vector3.Dot(glossyDirection, -intersection.Ray.Direction);
                     if (dot > 0) {
-                        float glossyness = (float)Math.Pow(dot, intersection.Primitive.GlossSpecularity);
-                        irradiance = radianceIn * ((1 - intersection.Primitive.Glossyness) * NdotL + intersection.Primitive.Glossyness * glossyness);
+                        float glossyness = (float)Math.Pow(dot, intersection.Primitive.Material.GlossSpecularity);
+                        irradiance = radianceIn * ((1 - intersection.Primitive.Material.Glossyness) * NdotL + intersection.Primitive.Material.Glossyness * glossyness);
                     } else {
-                        irradiance = radianceIn * (1 - intersection.Primitive.Glossyness) * NdotL;
+                        irradiance = radianceIn * (1 - intersection.Primitive.Material.Glossyness) * NdotL;
                     }
                 } else {
                     // Diffuse
                     irradiance = radianceIn * NdotL;
                 }
                 // Absorption
-                radianceOut += irradiance * intersection.Primitive.Color;
+                radianceOut += irradiance * intersection.Primitive.Material.Color;
                 if (debugRay) {
                     Camera.ScreenPlane.DrawRay(shadowRay, light.Color.ToIntColor());
                 }

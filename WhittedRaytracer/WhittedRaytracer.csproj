@@ -100,6 +100,7 @@
     <Compile Include="Raytracing\IAccelerationStructure.cs" />
     <Compile Include="Raytracing\ISceneObject.cs" />
     <Compile Include="Raytracing\SceneObjects\IScreen.cs" />
+    <Compile Include="Raytracing\SceneObjects\Material.cs" />
     <Compile Include="Raytracing\SceneObjects\Primitives\Triangle.cs" />
     <Compile Include="Raytracing\Ray.cs" />
     <Compile Include="Raytracing\Intersection.cs" />

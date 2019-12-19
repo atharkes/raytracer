@@ -58,8 +58,8 @@ namespace WhittedRaytracer.Raytracing {
         /// <summary> Get a refracted ray of the incoming ray at this intersection </summary>
         /// <returns>The refracted ray</returns>
         public Ray GetRefractedRay() {
-            float n1 = IntoPrimitive ? 1 : Primitive.RefractionIndex;
-            float n2 = IntoPrimitive ? Primitive.RefractionIndex : 1;
+            float n1 = IntoPrimitive ? 1 : Primitive.Material.RefractionIndex;
+            float n2 = IntoPrimitive ? Primitive.Material.RefractionIndex : 1;
             float refraction = n1 / n2;
             float cosThetaInc = Vector3.Dot(Normal, -Ray.Direction);
             float k = 1 - refraction * refraction * (1 - cosThetaInc * cosThetaInc);
@@ -71,8 +71,8 @@ namespace WhittedRaytracer.Raytracing {
         /// <summary> Get the reflectivity of the surface of the dielectric </summary>
         /// <returns>The reflectivity</returns>
         public float GetReflectivity() {
-            float n1 = IntoPrimitive ? 1 : Primitive.RefractionIndex;
-            float n2 = IntoPrimitive ? Primitive.RefractionIndex : 1;
+            float n1 = IntoPrimitive ? 1 : Primitive.Material.RefractionIndex;
+            float n2 = IntoPrimitive ? Primitive.Material.RefractionIndex : 1;
             float refraction = n1 / n2;
             float cosThetaInc = Vector3.Dot(Normal, -Ray.Direction);
             float k = 1 - refraction * refraction * (1 - cosThetaInc * cosThetaInc);

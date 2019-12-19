@@ -2,6 +2,7 @@
 using OpenTK.Input;
 using System;
 using System.Diagnostics;
+using System.Linq;
 using WhittedRaytracer.Multithreading;
 using WhittedRaytracer.Raytracing;
 using WhittedRaytracer.Raytracing.SceneObjects;
@@ -27,14 +28,14 @@ namespace WhittedRaytracer {
         KeyboardState keyboardState;
 
         public Main(IScreen screen) {
-            Scene = new Scene(screen);
+            Scene = Scene.DefaultWithRandomSpheres(screen, 1000);
             TaskAmount = screen.Height;
             tasks = new Action[TaskAmount];
             threadpool = new Threadpool();
         }
 
         public void Tick() {
-            Scene.Lights[0].Position += new Vector3((float)Math.Sin(DateTime.Now.TimeOfDay.TotalSeconds) * 0.5f, 0, 0);
+            Scene.Lights.First().Position += new Vector3((float)Math.Sin(DateTime.Now.TimeOfDay.TotalSeconds) * 0.5f, 0, 0);
             Scene.Camera.ScreenPlane.Screen.Clear(0);
             InputCheck();
             Console.WriteLine($"{stopwatch.ElapsedMilliseconds}\t| OpenTK ms");
@@ -49,8 +50,8 @@ namespace WhittedRaytracer {
 
             // Debug drawing
             if (Debug) {
-                Scene.Primitives.ForEach(primitive => { if (primitive is Sphere) Scene.Camera.ScreenPlane.DrawSphere(primitive as Sphere); });
-                Scene.Lights.ForEach(light => Scene.Camera.ScreenPlane.DrawLight(light));
+                foreach (Primitive primitive in Scene.Primitives) if (primitive is Sphere) Scene.Camera.ScreenPlane.DrawSphere(primitive as Sphere);
+                foreach (PointLight light in Scene.Lights) Scene.Camera.ScreenPlane.DrawLight(light);
                 Scene.Camera.ScreenPlane.DrawScreenPlane();
                 Scene.Camera.ScreenPlane.DrawCamera();
             }

@@ -115,7 +115,7 @@ namespace WhittedRaytracer.Raytracing.SceneObjects {
                 int y1 = TZ(sphere.Position.Z + (float)Math.Sin(i / 128f * 2 * Math.PI) * sphere.Radius);
                 int x2 = TX(sphere.Position.X + (float)Math.Cos((i + 1) / 128f * 2 * Math.PI) * sphere.Radius);
                 int y2 = TZ(sphere.Position.Z + (float)Math.Sin((i + 1) / 128f * 2 * Math.PI) * sphere.Radius);
-                Screen.Line(x1, y1, x2, y2, sphere.Color.ToIntColor());
+                Screen.Line(x1, y1, x2, y2, sphere.Material.Color.ToIntColor());
             }
         }
 

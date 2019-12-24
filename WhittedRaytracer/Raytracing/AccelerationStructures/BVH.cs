@@ -12,23 +12,17 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructures {
     /// - Top-level BHV's for static and non-static parts
     /// - Use two arrays for primitives and BHV nodes, and using only a Left index and Count (decrease storage and increase performance) </summary>
     class BVHNode : IAccelerationStructure {
+        /// <summary> The AABB of this BVH node </summary>
+        public readonly AABB AABB;
         /// <summary> The left child node if it has one </summary>
         public BVHNode Left { get; private set; }
         /// <summary> The right child node if it has one </summary>
         public BVHNode Right { get; private set; }
-        /// <summary> The primitives that are contained in this node or any of it's children </summary>
-        public readonly ICollection<Primitive> Primitives;
-        /// <summary> The bounds of the axis alinged bounding box of this node </summary>
-        public readonly Vector3[] Bounds = new Vector3[2];
         /// <summary> Whether this node is a leaf or not </summary>
-        public bool Leaf { get; private set; }
+        public bool Leaf { get; private set; } = true;
 
-        public readonly Bin Bin;
-
-        /// <summary> Calculate the surface area of the AABB of this BVH node </summary>
-        public float SurfaceArea => ComputeSurfaceArea(Bounds);
         /// <summary> The size of the AABB of the node </summary>
-        public Vector3 Size => Bounds[1] - Bounds[0];
+        public Vector3 Size => AABB.MaxBound - AABB.MinBound;
 
         /// <summary> The estimated cost of traversing the BVH for the SAH </summary>
         public const float TraversalCost = 1f;
@@ -39,12 +33,17 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructures {
         /// <summary> An epsilon for the binning process </summary>
         public const float BinningEpsilon = 0.99999f;
 
-        /// <summary> Construct a bounding volume hierarchy tree, it will split into smaller nodes if needed </summary>
+        /// <summary> Create a bounding volume hierarchy tree, splitting into smaller nodes if needed </summary>
         /// <param name="primitives">The primitives in the tree</param>
         public BVHNode(ICollection<Primitive> primitives) {
-            Primitives = primitives;
-            Bounds = CalculateBounds(primitives);
-            Leaf = true;
+            AABB = new AABB(primitives);
+            Split();
+        }
+
+        /// <summary> Create a bounding volume hierarchy tree, splitting into smaller nodes if needed </summary>
+        /// <param name="aabb">The aabb to create the tree from</param>
+        public BVHNode(AABB aabb) {
+            AABB = aabb;
             Split();
         }
 
@@ -68,7 +67,7 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructures {
             if (!IntersectAABB(ray)) {
                 return false;
             } else if (Leaf) {
-                foreach (Primitive primitive in Primitives) {
+                foreach (Primitive primitive in AABB.Primitives) {
                     if (primitive.IntersectBool(ray)) return true;
                 }
                 return false;
@@ -81,17 +80,17 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructures {
         /// <param name="ray">The ray to calculate intersection for</param>
         /// <returns>Whether the ray intersects the bounding box</returns>
         public bool IntersectAABB(Ray ray) {
-            float tmin = (Bounds[ray.Sign[0]].X - ray.Origin.X) * ray.DirectionInverted.X;
-            float tmax = (Bounds[1 - ray.Sign[0]].X - ray.Origin.X) * ray.DirectionInverted.X;
+            float tmin = (AABB.Bounds[ray.Sign[0]].X - ray.Origin.X) * ray.DirectionInverted.X;
+            float tmax = (AABB.Bounds[1 - ray.Sign[0]].X - ray.Origin.X) * ray.DirectionInverted.X;
 
-            float tymin = (Bounds[ray.Sign[1]].Y - ray.Origin.Y) * ray.DirectionInverted.Y;
-            float tymax = (Bounds[1 - ray.Sign[1]].Y - ray.Origin.Y) * ray.DirectionInverted.Y;
+            float tymin = (AABB.Bounds[ray.Sign[1]].Y - ray.Origin.Y) * ray.DirectionInverted.Y;
+            float tymax = (AABB.Bounds[1 - ray.Sign[1]].Y - ray.Origin.Y) * ray.DirectionInverted.Y;
             if ((tmin > tymax) || (tmax < tymin)) return false;
             tmin = Math.Max(tmin, tymin);
             tmax = Math.Min(tmax, tymax);
 
-            float tzmin = (Bounds[ray.Sign[2]].Z - ray.Origin.Z) * ray.DirectionInverted.Z;
-            float tzmax = (Bounds[1 - ray.Sign[2]].Z - ray.Origin.Z) * ray.DirectionInverted.Z;
+            float tzmin = (AABB.Bounds[ray.Sign[2]].Z - ray.Origin.Z) * ray.DirectionInverted.Z;
+            float tzmax = (AABB.Bounds[1 - ray.Sign[2]].Z - ray.Origin.Z) * ray.DirectionInverted.Z;
             if ((tmin > tzmax) || (tmax < tzmin)) return false;
             tmin = Math.Max(tmin, tzmin);
             tmax = Math.Min(tmax, tzmax);
@@ -122,7 +121,7 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructures {
         Intersection IntersectPrimitives(Ray ray) {
             float intersectionDistance = ray.Length;
             Primitive intersectionPrimitive = null;
-            foreach (Primitive primitive in Primitives) {
+            foreach (Primitive primitive in AABB.Primitives) {
                 float distance = primitive.Intersect(ray);
                 if (0 < distance && distance < intersectionDistance) {
                     intersectionPrimitive = primitive;
@@ -135,7 +134,7 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructures {
 
         /// <summary> Try split the BVH Node into 2 smaller Nodes </summary>
         void Split() {
-            (ICollection<Primitive> left, ICollection<Primitive> right)? split = ComputeBestSplit();
+            (AABB left, AABB right)? split = ComputeBestSplit();
             if (!split.HasValue) return;
             Left = new BVHNode(split.Value.left);
             Right = new BVHNode(split.Value.right);
@@ -144,23 +143,23 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructures {
 
         /// <summary> Compute the best split for this BVH node </summary>
         /// <returns>Either a tuple with the best split or null if there is no good split</returns>
-        (ICollection<Primitive> left, ICollection<Primitive> right)? ComputeBestSplit() { 
-            ICollection<(ICollection<Primitive>, ICollection<Primitive>)> splits = BinSplits();
-            float cost = IntersectionCost * SurfaceArea * Primitives.Count;
-            (ICollection<Primitive>, ICollection<Primitive>)? split = null;
-            foreach ((ICollection<Primitive>, ICollection<Primitive>) splitPrimitives in splits) {
-                float splitCost = SurfaceAreaHeuristic(splitPrimitives);
-                if (splitCost < cost) {
-                    cost = splitCost;
-                    split = splitPrimitives;
+        (AABB left, AABB right)? ComputeBestSplit() { 
+            ICollection<(AABB left, AABB right)> splits = BinSplits();
+            float bestCost = IntersectionCost * AABB.SurfaceArea * AABB.Primitives.Count;
+            (AABB left, AABB right)? bestSplit = null;
+            foreach ((AABB, AABB) split in splits) {
+                float splitCost = SurfaceAreaHeuristic(split);
+                if (splitCost < bestCost) {
+                    bestSplit = split;
+                    bestCost = splitCost;
                 }
             }
-            return split;
+            return bestSplit;
         }
 
-        ICollection<(ICollection<Primitive>, ICollection<Primitive>)> AllSplits() {
-            List<(ICollection<Primitive>, ICollection<Primitive>)> splits = new List<(ICollection<Primitive>, ICollection<Primitive>)>();
-            foreach (Primitive primitive in Primitives) {
+        ICollection<(AABB left, AABB right)> AllSplits() {
+            List<(AABB left, AABB right)> splits = new List<(AABB, AABB)>();
+            foreach (Primitive primitive in AABB.Primitives) {
                 splits.Add(SplitX(primitive));
                 splits.Add(SplitY(primitive));
                 splits.Add(SplitZ(primitive));
@@ -168,47 +167,47 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructures {
             return splits;
         }
 
-        ICollection<(ICollection<Primitive>, ICollection<Primitive>)> BinSplits() {
-            Bin[] bins = Size.X > Size.Y && Size.X > Size.Z ? BinX() : (Size.Y > Size.Z ? BinY() : BinZ());
-            List<(ICollection<Primitive>, ICollection<Primitive>)> splits = new List<(ICollection<Primitive>, ICollection<Primitive>)>(bins.Length - 1);
+        ICollection<(AABB left, AABB right)> BinSplits() {
+            AABB[] bins = Size.X > Size.Y && Size.X > Size.Z ? BinX() : (Size.Y > Size.Z ? BinY() : BinZ());
+            List<(AABB, AABB)> splits = new List<(AABB, AABB)>(bins.Length - 1);
             for (int i = 1; i < bins.Length; i++) {
-                List<Primitive> left = new List<Primitive>();
+                AABB left = new AABB();
                 for (int bin = 0; bin < i; bin++) left.AddRange(bins[bin].Primitives);
-                List<Primitive> right = new List<Primitive>();
+                AABB right = new AABB();
                 for (int bin = i; bin < bins.Length; bin++) right.AddRange(bins[bin].Primitives);
                 splits.Add((left, right));
             }
             return splits;
         }
 
-        Bin[] BinX() {
-            Bin[] bins = new Bin[BinAmount];
-            for (int i = 0; i < BinAmount; i++) bins[i] = new Bin();
-            float k1 = BinAmount * BinningEpsilon / (Bounds[1].X - Bounds[0].X);
-            foreach (Primitive primitive in Primitives) {
-                int binID = (int)(k1 * (primitive.GetCenter().X - Bounds[0].X));
+        AABB[] BinX() {
+            AABB[] bins = new AABB[BinAmount];
+            for (int i = 0; i < BinAmount; i++) bins[i] = new AABB();
+            float k1 = BinAmount * BinningEpsilon / (AABB.MaxBound.X - AABB.MinBound.X);
+            foreach (Primitive primitive in AABB.Primitives) {
+                int binID = (int)(k1 * (primitive.GetCenter().X - AABB.MinBound.X));
                 bins[binID].Add(primitive);
             }
             return bins;
         }
 
-        Bin[] BinY() {
-            Bin[] bins = new Bin[BinAmount];
-            for (int i = 0; i < BinAmount; i++) bins[i] = new Bin();
-            float k1 = BinAmount * BinningEpsilon / (Bounds[1].Y - Bounds[0].Y);
-            foreach (Primitive primitive in Primitives) {
-                int binID = (int)(k1 * (primitive.GetCenter().Y - Bounds[0].Y));
+        AABB[] BinY() {
+            AABB[] bins = new AABB[BinAmount];
+            for (int i = 0; i < BinAmount; i++) bins[i] = new AABB();
+            float k1 = BinAmount * BinningEpsilon / (AABB.MaxBound.Y - AABB.MinBound.Y);
+            foreach (Primitive primitive in AABB.Primitives) {
+                int binID = (int)(k1 * (primitive.GetCenter().Y - AABB.MinBound.Y));
                 bins[binID].Add(primitive);
             }
             return bins;
         }
 
-        Bin[] BinZ() {
-            Bin[] bins = new Bin[BinAmount];
-            for (int i = 0; i < BinAmount; i++) bins[i] = new Bin();
-            float k1 = BinAmount * BinningEpsilon / (Bounds[1].Z - Bounds[0].Z);
-            foreach (Primitive primitive in Primitives) {
-                int binID = (int)(k1 * (primitive.GetCenter().Z - Bounds[0].Z));
+        AABB[] BinZ() {
+            AABB[] bins = new AABB[BinAmount];
+            for (int i = 0; i < BinAmount; i++) bins[i] = new AABB();
+            float k1 = BinAmount * BinningEpsilon / (AABB.MaxBound.Z - AABB.MinBound.Z);
+            foreach (Primitive primitive in AABB.Primitives) {
+                int binID = (int)(k1 * (primitive.GetCenter().Z - AABB.MinBound.Z));
                 bins[binID].Add(primitive);
             }
             return bins;
@@ -217,97 +216,50 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructures {
         /// <summary> Split on X-axis </summary>
         /// <param name="splitPrimitive">The primitive to split on</param>
         /// <returns>A pair with primitives on both sides</returns>
-        (ICollection<Primitive> left, ICollection<Primitive> right) SplitX(Primitive splitPrimitive) {
+        (AABB left, AABB right) SplitX(Primitive splitPrimitive) {
             float split = splitPrimitive.GetCenter().X;
-            ICollection<Primitive> primitivesLeft = new List<Primitive>();
-            ICollection<Primitive> primitivesRight = new List<Primitive>();
-            foreach (Primitive primitive in Primitives) {
-                if (primitive.GetCenter().X <= split) {
-                    primitivesLeft.Add(primitive);
-                } else {
-                    primitivesRight.Add(primitive);
-                }
+            AABB left = new AABB();
+            AABB right = new AABB();
+            foreach (Primitive primitive in AABB.Primitives) {
+                if (primitive.GetCenter().X <= split) left.Add(primitive);
+                else right.Add(primitive);
             }
-            return (primitivesLeft, primitivesRight);
+            return (left, right);
         }
 
         /// <summary> Split on Y-axis </summary>
         /// <param name="splitPrimitive">The primitive to split on</param>
         /// <returns>A pair with primitives on both sides</returns>
-        (ICollection<Primitive> left, ICollection<Primitive> right) SplitY(Primitive splitPrimitive) {
+        (AABB left, AABB right) SplitY(Primitive splitPrimitive) {
             float split = splitPrimitive.GetCenter().Y;
-            ICollection<Primitive> primitivesLeft = new List<Primitive>();
-            ICollection<Primitive> primitivesRight = new List<Primitive>();
-            foreach (Primitive primitive in Primitives) {
-                if (primitive.GetCenter().Y <= split) {
-                    primitivesLeft.Add(primitive);
-                } else {
-                    primitivesRight.Add(primitive);
-                }
+            AABB left = new AABB();
+            AABB right = new AABB();
+            foreach (Primitive primitive in AABB.Primitives) {
+                if (primitive.GetCenter().Y <= split) left.Add(primitive);
+                else right.Add(primitive);
             }
-            return (primitivesLeft, primitivesRight);
+            return (left, right);
         }
 
         /// <summary> Split on Z-axis </summary>
         /// <param name="splitPrimitive">The primitive to split on</param>
         /// <returns>A pair with primitives on both sides</returns>
-        (ICollection<Primitive> left, ICollection<Primitive> right) SplitZ(Primitive splitPrimitive) {
+        (AABB left, AABB right) SplitZ(Primitive splitPrimitive) {
             float split = splitPrimitive.GetCenter().Z;
-            ICollection<Primitive> primitivesLeft = new List<Primitive>();
-            ICollection<Primitive> primitivesRight = new List<Primitive>();
-            foreach (Primitive primitive in Primitives) {
-                if (primitive.GetCenter().Z <= split) {
-                    primitivesLeft.Add(primitive);
-                } else {
-                    primitivesRight.Add(primitive);
-                }
+            AABB left = new AABB();
+            AABB right = new AABB();
+            foreach (Primitive primitive in AABB.Primitives) {
+                if (primitive.GetCenter().Z <= split) left.Add(primitive);
+                else right.Add(primitive);
             }
-            return (primitivesLeft, primitivesRight);
+            return (left, right);
         }
 
         /// <summary> Calculate the cost of a split. Uses the Surface Area Heuristic </summary>
         /// <param name="split">The split to calculate the cost for</param>
         /// <returns>The cost of the split</returns>
-        float SurfaceAreaHeuristic((ICollection<Primitive> left, ICollection<Primitive> right) split) {
-            Vector3[] boundsLeft = CalculateBounds(split.left);
-            float surfaceAreaLeft = ComputeSurfaceArea(boundsLeft);
-            Vector3[] boundsRight = CalculateBounds(split.right);
-            float surfaceAreaRight = ComputeSurfaceArea(boundsRight);
-            return TraversalCost * SurfaceArea + IntersectionCost * (surfaceAreaLeft * split.left.Count + surfaceAreaRight * split.right.Count);
-        }
-
-        /// <summary> Calculate the bounds of a List of Primitives </summary>
-        /// <param name="primitives">The primitives the calculate the bounds for</param>
-        /// <returns>The bounds of the primitives</returns>
-        Vector3[] CalculateBounds(ICollection<Primitive> primitives) {
-            Vector3 boundMin = Utils.MaxVector;
-            Vector3 boundMax = Utils.MinVector;
-            foreach (Primitive primitive in primitives) {
-                (Vector3 primitiveMin, Vector3 primitiveMax) = primitive.GetBounds();
-                boundMin = Vector3.ComponentMin(primitiveMin, boundMin);
-                boundMax = Vector3.ComponentMax(primitiveMax, boundMax);
-            }
-            return new Vector3[] { boundMin, boundMax };
-        }
-
-        /// <summary> Calculate the surface area for some bounds </summary>
-        /// <param name="bounds">The bounds to calculate the surface area for</param>
-        /// <returns>The surface area of the bounds</returns>
-        public static float ComputeSurfaceArea(Vector3[] bounds) {
-            float a = bounds[1].X - bounds[0].X;
-            float b = bounds[1].Y - bounds[0].Y;
-            float c = bounds[1].Z - bounds[0].Z;
-            return 2 * (a * b + b * c + a * c);
-        }
-
-        /// <summary> Get the distance from a point to the AABB </summary>
-        /// <param name="point">To point to get the distance from the AABB to</param>
-        /// <returns>The distance from the point to the AABB</returns>
-        public float DistanceSquared(Vector3 point) {
-            float dx = Math.Max(Bounds[0].X - point.X, point.X - Bounds[1].X);
-            float dy = Math.Max(Bounds[0].Y - point.Y, point.Y - Bounds[1].Y);
-            float dz = Math.Max(Bounds[0].Z - point.Z, point.Z - Bounds[1].Z);
-            return dx * dx + dy * dy + dz * dz;
+        public float SurfaceAreaHeuristic((AABB left, AABB right) split) {
+            return TraversalCost * AABB.SurfaceArea + IntersectionCost * (split.left.SurfaceArea * split.left.Primitives.Count + split.right.SurfaceArea * split.right.Primitives.Count);
         }
     }
 }

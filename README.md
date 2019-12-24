@@ -9,10 +9,10 @@ Required:
 Features:
 - Raytracing architecture
 - Camera: Position, Orientation, FOV, Aspect ratio
-- Input handling (see controls)
+- Input handling: see controls
 - Primitives: Planes, Spheres, Triangles
 - Materials: Diffuse, Specular, Dielectric (Snell & Fresnel), Glossy (Phong Shading)
-- Acceleration Structure: Bounding Volume Hierachy
+- Acceleration Structure: Bounding Volume Hierachy (SAH & Binning)
 - Multithreading: Threadpool with worker threads
 - Scene showing off all primitives and materials
 - Debug drawing
@@ -20,6 +20,7 @@ Features:
 Extra:
 - BVH using SAH and Binning
 - BVH construction with 4-Binning on 100k triangles in under 1 second on intel i7 6700K
+	(although performance is dependent on the random triangles that are generated)
 
 References:
 - Course Slides (Graphics & Advanced Graphics)

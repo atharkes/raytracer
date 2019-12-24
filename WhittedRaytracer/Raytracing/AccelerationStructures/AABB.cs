@@ -7,7 +7,7 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructures {
     /// <summary> An Axis-Aligned Bounding Box </summary>
     class AABB {
         /// <summary> The primitives in this AABB </summary>
-        public ICollection<Primitive> Primitives { get; }
+        public ICollection<Primitive> Primitives => primitives;
         /// <summary> The bounds of the AABB of this bin </summary>
         public Vector3[] Bounds { get; } = new Vector3[] { Utils.MaxVector, Utils.MinVector };
 
@@ -20,15 +20,17 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructures {
         /// <summary> The surface area of the AABB of this bin </summary>
         public float SurfaceArea => 2 * (Size.X * Size.Y + Size.Y * Size.Z + Size.X * Size.Z);
 
+        readonly List<Primitive> primitives;
+
         /// <summary> Create a new AABB with no primitives </summary>
         public AABB() {
-            Primitives = new List<Primitive>();
+            primitives = new List<Primitive>();
         }
 
         /// <summary> Create a new AABB with primitives </summary>
         /// <param name="primitives">The primitive to add to the AABB</param>
-        public AABB(ICollection<Primitive> primitives) {
-            Primitives = primitives;
+        public AABB(List<Primitive> primitives) {
+            this.primitives = primitives;
             foreach (Primitive primitive in primitives) {
                 (Vector3 primitiveMin, Vector3 primitiveMax) = primitive.GetBounds();
                 MinBound = Vector3.ComponentMin(primitiveMin, MinBound);
@@ -48,7 +50,12 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructures {
         /// <summary> Add a list of primitives to the AABB </summary>
         /// <param name="primitives">The primitives to add to the AABB</param>
         public void AddRange(IEnumerable<Primitive> primitives) {
-            foreach (Primitive primitive in primitives) Add(primitive);
+            this.primitives.AddRange(primitives);
+            foreach (Primitive primitive in primitives) {
+                (Vector3 min, Vector3 max) = primitive.GetBounds();
+                MinBound = Vector3.ComponentMin(MinBound, min);
+                MaxBound = Vector3.ComponentMax(MaxBound, max);
+            }
         }
 
         /// <summary> Get the distance from a point to the AABB </summary>

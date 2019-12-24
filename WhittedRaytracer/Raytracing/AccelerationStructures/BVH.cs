@@ -29,13 +29,13 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructures {
         /// <summary> The estimated cost of intersecting a primitive for the SAH </summary>
         public const float IntersectionCost = 1f;
         /// <summary> The amount of bins used for the binning process </summary>
-        public const int BinAmount = 16;
+        public const int BinAmount = 4;
         /// <summary> An epsilon for the binning process </summary>
         public const float BinningEpsilon = 0.99999f;
 
         /// <summary> Create a bounding volume hierarchy tree, splitting into smaller nodes if needed </summary>
         /// <param name="primitives">The primitives in the tree</param>
-        public BVHNode(ICollection<Primitive> primitives) {
+        public BVHNode(List<Primitive> primitives) {
             AABB = new AABB(primitives);
             Split();
         }

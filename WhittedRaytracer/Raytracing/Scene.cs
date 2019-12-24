@@ -22,12 +22,12 @@ namespace WhittedRaytracer.Raytracing {
         /// <param name="screen">The screen to draw the raytracing to</param>
         /// <param name="primitives">The primitives in the scene</param>
         /// <param name="lights">The lights in the scene</param>
-        public Scene(IScreen screen, ICollection<Primitive> primitives, ICollection<PointLight> lights) { 
+        public Scene(IScreen screen, List<Primitive> primitives, ICollection<PointLight> lights) { 
             Camera = new Camera(screen);
             Primitives = primitives;
             Lights = lights;
             Stopwatch timer = Stopwatch.StartNew();
-            AccelerationStructure = new BVHNode(Primitives);
+            AccelerationStructure = new BVHNode(primitives);
             Console.WriteLine(timer.ElapsedMilliseconds + "\t| BVH Building");
         }
 
@@ -50,24 +50,23 @@ namespace WhittedRaytracer.Raytracing {
         /// <param name="randomSpheres">The amount of random spheres in the scene</param>
         /// <returns>A default scene with random spheres</returns>
         public static Scene DefaultWithRandomSpheres(IScreen screen, int randomSpheres) {
-            ICollection<Primitive> defaultPrimitives = DefaultPrimitives;
-            Primitive[] primitives = new Primitive[defaultPrimitives.Count + randomSpheres];
-            defaultPrimitives.CopyTo(primitives, 0);
+            List<Primitive> defaultPrimitives = DefaultPrimitives;
+            List<Primitive> primitives = new List<Primitive>(defaultPrimitives);
             for (int i = 0; i < randomSpheres; i++) {
                 Vector3 spheresCenter = new Vector3(0f, -50f, 0f);
                 Vector3 spheresBox = new Vector3(60f, 30f, 60f);
                 Vector3 pos = Utils.RandomVector * spheresBox - 0.5f * spheresBox + spheresCenter;
                 float radius = (float)Utils.Random.NextDouble();
-                primitives[defaultPrimitives.Count + i] = new Sphere(pos, radius);
+                primitives.Add(new Sphere(pos, radius));
             }
             return new Scene(screen, primitives, DefaultLights);
         }
 
         /// <summary> The lights in the default scene </summary>
-        public static ICollection<PointLight> DefaultLights => new PointLight[] { new PointLight(new Vector3(0, -8, 3), new Vector3(200, 200, 150)) };
+        public static List<PointLight> DefaultLights => new List<PointLight>() { new PointLight(new Vector3(0, -8, 3), new Vector3(200, 200, 150)) };
 
         /// <summary> The primitives in the default scene </summary>
-        public static ICollection<Primitive> DefaultPrimitives => new Primitive[] {
+        public static List<Primitive> DefaultPrimitives => new List<Primitive>() {
             new Sphere(new Vector3(-3, -1, 5), 1, Material.DiffuseGreen),
             new Sphere(new Vector3(3, -1, 5), 1, Material.GlossyRed),
             new Sphere(new Vector3(0, -1, 5), 1, Material.Mirror),

@@ -23,13 +23,21 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructures {
         /// <summary> Whether this node is a leaf or not </summary>
         public bool Leaf { get; private set; }
 
+        public readonly Bin Bin;
+
         /// <summary> Calculate the surface area of the AABB of this BVH node </summary>
-        public float SurfaceArea => CalculateSurfaceArea(Bounds);
+        public float SurfaceArea => ComputeSurfaceArea(Bounds);
+        /// <summary> The size of the AABB of the node </summary>
+        public Vector3 Size => Bounds[1] - Bounds[0];
 
         /// <summary> The estimated cost of traversing the BVH for the SAH </summary>
         public const float TraversalCost = 1f;
         /// <summary> The estimated cost of intersecting a primitive for the SAH </summary>
         public const float IntersectionCost = 1f;
+        /// <summary> The amount of bins used for the binning process </summary>
+        public const int BinAmount = 16;
+        /// <summary> An epsilon for the binning process </summary>
+        public const float BinningEpsilon = 0.99999f;
 
         /// <summary> Construct a bounding volume hierarchy tree, it will split into smaller nodes if needed </summary>
         /// <param name="primitives">The primitives in the tree</param>
@@ -127,34 +135,83 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructures {
 
         /// <summary> Try split the BVH Node into 2 smaller Nodes </summary>
         void Split() {
-            (ICollection<Primitive> left, ICollection<Primitive> right)? split = CalculateSplit();
+            (ICollection<Primitive> left, ICollection<Primitive> right)? split = ComputeBestSplit();
             if (!split.HasValue) return;
             Left = new BVHNode(split.Value.left);
             Right = new BVHNode(split.Value.right);
             Leaf = false;
         }
 
-        /// <summary> Calculate Cheapest Split </summary>
-        /// <returns>A pair with two sides of the split</returns>
-        (ICollection<Primitive> left, ICollection<Primitive> right)? CalculateSplit() { 
+        /// <summary> Compute the best split for this BVH node </summary>
+        /// <returns>Either a tuple with the best split or null if there is no good split</returns>
+        (ICollection<Primitive> left, ICollection<Primitive> right)? ComputeBestSplit() { 
+            ICollection<(ICollection<Primitive>, ICollection<Primitive>)> splits = BinSplits();
             float cost = IntersectionCost * SurfaceArea * Primitives.Count;
-            (ICollection<Primitive>, ICollection<Primitive>)? splitPrimitives = null;
-            foreach (Primitive primitive in Primitives) {
-                ICollection<(ICollection<Primitive>, ICollection<Primitive>)> splits = new List<(ICollection<Primitive>, ICollection<Primitive>)>(3) {
-                    SplitX(primitive),
-                    SplitY(primitive),
-                    SplitZ(primitive)
-                };
-
-                foreach ((ICollection<Primitive>, ICollection<Primitive>) split in splits) {
-                    float splitCost = SurfaceAreaHeuristic(split);
-                    if (splitCost < cost) {
-                        cost = splitCost;
-                        splitPrimitives = split;
-                    }
+            (ICollection<Primitive>, ICollection<Primitive>)? split = null;
+            foreach ((ICollection<Primitive>, ICollection<Primitive>) splitPrimitives in splits) {
+                float splitCost = SurfaceAreaHeuristic(splitPrimitives);
+                if (splitCost < cost) {
+                    cost = splitCost;
+                    split = splitPrimitives;
                 }
             }
-            return splitPrimitives;
+            return split;
+        }
+
+        ICollection<(ICollection<Primitive>, ICollection<Primitive>)> AllSplits() {
+            List<(ICollection<Primitive>, ICollection<Primitive>)> splits = new List<(ICollection<Primitive>, ICollection<Primitive>)>();
+            foreach (Primitive primitive in Primitives) {
+                splits.Add(SplitX(primitive));
+                splits.Add(SplitY(primitive));
+                splits.Add(SplitZ(primitive));
+            }
+            return splits;
+        }
+
+        ICollection<(ICollection<Primitive>, ICollection<Primitive>)> BinSplits() {
+            Bin[] bins = Size.X > Size.Y && Size.X > Size.Z ? BinX() : (Size.Y > Size.Z ? BinY() : BinZ());
+            List<(ICollection<Primitive>, ICollection<Primitive>)> splits = new List<(ICollection<Primitive>, ICollection<Primitive>)>(bins.Length - 1);
+            for (int i = 1; i < bins.Length; i++) {
+                List<Primitive> left = new List<Primitive>();
+                for (int bin = 0; bin < i; bin++) left.AddRange(bins[bin].Primitives);
+                List<Primitive> right = new List<Primitive>();
+                for (int bin = i; bin < bins.Length; bin++) right.AddRange(bins[bin].Primitives);
+                splits.Add((left, right));
+            }
+            return splits;
+        }
+
+        Bin[] BinX() {
+            Bin[] bins = new Bin[BinAmount];
+            for (int i = 0; i < BinAmount; i++) bins[i] = new Bin();
+            float k1 = BinAmount * BinningEpsilon / (Bounds[1].X - Bounds[0].X);
+            foreach (Primitive primitive in Primitives) {
+                int binID = (int)(k1 * (primitive.GetCenter().X - Bounds[0].X));
+                bins[binID].Add(primitive);
+            }
+            return bins;
+        }
+
+        Bin[] BinY() {
+            Bin[] bins = new Bin[BinAmount];
+            for (int i = 0; i < BinAmount; i++) bins[i] = new Bin();
+            float k1 = BinAmount * BinningEpsilon / (Bounds[1].Y - Bounds[0].Y);
+            foreach (Primitive primitive in Primitives) {
+                int binID = (int)(k1 * (primitive.GetCenter().Y - Bounds[0].Y));
+                bins[binID].Add(primitive);
+            }
+            return bins;
+        }
+
+        Bin[] BinZ() {
+            Bin[] bins = new Bin[BinAmount];
+            for (int i = 0; i < BinAmount; i++) bins[i] = new Bin();
+            float k1 = BinAmount * BinningEpsilon / (Bounds[1].Z - Bounds[0].Z);
+            foreach (Primitive primitive in Primitives) {
+                int binID = (int)(k1 * (primitive.GetCenter().Z - Bounds[0].Z));
+                bins[binID].Add(primitive);
+            }
+            return bins;
         }
 
         /// <summary> Split on X-axis </summary>
@@ -213,9 +270,9 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructures {
         /// <returns>The cost of the split</returns>
         float SurfaceAreaHeuristic((ICollection<Primitive> left, ICollection<Primitive> right) split) {
             Vector3[] boundsLeft = CalculateBounds(split.left);
-            float surfaceAreaLeft = CalculateSurfaceArea(boundsLeft);
+            float surfaceAreaLeft = ComputeSurfaceArea(boundsLeft);
             Vector3[] boundsRight = CalculateBounds(split.right);
-            float surfaceAreaRight = CalculateSurfaceArea(boundsRight);
+            float surfaceAreaRight = ComputeSurfaceArea(boundsRight);
             return TraversalCost * SurfaceArea + IntersectionCost * (surfaceAreaLeft * split.left.Count + surfaceAreaRight * split.right.Count);
         }
 
@@ -223,8 +280,8 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructures {
         /// <param name="primitives">The primitives the calculate the bounds for</param>
         /// <returns>The bounds of the primitives</returns>
         Vector3[] CalculateBounds(ICollection<Primitive> primitives) {
-            Vector3 boundMin = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
-            Vector3 boundMax = new Vector3(float.MinValue, float.MinValue, float.MinValue);
+            Vector3 boundMin = Utils.MaxVector;
+            Vector3 boundMax = Utils.MinVector;
             foreach (Primitive primitive in primitives) {
                 (Vector3 primitiveMin, Vector3 primitiveMax) = primitive.GetBounds();
                 boundMin = Vector3.ComponentMin(primitiveMin, boundMin);
@@ -236,7 +293,7 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructures {
         /// <summary> Calculate the surface area for some bounds </summary>
         /// <param name="bounds">The bounds to calculate the surface area for</param>
         /// <returns>The surface area of the bounds</returns>
-        public static float CalculateSurfaceArea(Vector3[] bounds) {
+        public static float ComputeSurfaceArea(Vector3[] bounds) {
             float a = bounds[1].X - bounds[0].X;
             float b = bounds[1].Y - bounds[0].Y;
             float c = bounds[1].Z - bounds[0].Z;

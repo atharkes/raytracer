@@ -96,6 +96,7 @@
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Multithreading\CPUaffinity.cs" />
     <Compile Include="Multithreading\Threadpool.cs" />
+    <Compile Include="Raytracing\AccelerationStructures\Bin.cs" />
     <Compile Include="Raytracing\AccelerationStructures\BVH.cs" />
     <Compile Include="Raytracing\IAccelerationStructure.cs" />
     <Compile Include="Raytracing\ISceneObject.cs" />
@@ -115,6 +116,7 @@
     <Compile Include="Drawing\Surface.cs" />
     <Compile Include="OpenTKProgram.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

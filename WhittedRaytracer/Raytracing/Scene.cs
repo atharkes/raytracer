@@ -1,6 +1,7 @@
 ﻿using OpenTK;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using WhittedRaytracer.Raytracing.AccelerationStructures;
 using WhittedRaytracer.Raytracing.SceneObjects;
 using WhittedRaytracer.Raytracing.SceneObjects.Primitives;
@@ -25,7 +26,9 @@ namespace WhittedRaytracer.Raytracing {
             Camera = new Camera(screen);
             Primitives = primitives;
             Lights = lights;
+            Stopwatch timer = Stopwatch.StartNew();
             AccelerationStructure = new BVHNode(Primitives);
+            Console.WriteLine(timer.ElapsedMilliseconds + "\t| BVH Building");
         }
 
         /// <summary> Create an empty scene </summary>
@@ -50,10 +53,11 @@ namespace WhittedRaytracer.Raytracing {
             ICollection<Primitive> defaultPrimitives = DefaultPrimitives;
             Primitive[] primitives = new Primitive[defaultPrimitives.Count + randomSpheres];
             defaultPrimitives.CopyTo(primitives, 0);
-            Random r = new Random((int)DateTime.Now.Ticks);
             for (int i = 0; i < randomSpheres; i++) {
-                Vector3 pos = new Vector3((float)r.NextDouble() * 60f - 30f, (float)r.NextDouble() * 30f - 40f, (float)r.NextDouble() * 60f - 30f);
-                float radius = (float)r.NextDouble();
+                Vector3 spheresCenter = new Vector3(0f, -50f, 0f);
+                Vector3 spheresBox = new Vector3(60f, 30f, 60f);
+                Vector3 pos = Utils.RandomVector * spheresBox - 0.5f * spheresBox + spheresCenter;
+                float radius = (float)Utils.Random.NextDouble();
                 primitives[defaultPrimitives.Count + i] = new Sphere(pos, radius);
             }
             return new Scene(screen, primitives, DefaultLights);
@@ -68,7 +72,7 @@ namespace WhittedRaytracer.Raytracing {
             new Sphere(new Vector3(3, -1, 5), 1, Material.GlossyRed),
             new Sphere(new Vector3(0, -1, 5), 1, Material.Mirror),
             new Sphere(new Vector3(-1, -1, 2), 0.5f, Material.Glass),
-            new Plane(new Vector3(0, -1, 0), -1, Material.DiffuseYellow),
+            //new Plane(new Vector3(0, -1, 0), -1, Material.DiffuseYellow),
             new Triangle(new Vector3(-5, 0, 0), new Vector3(5, 0, 0), new Vector3(5, 0, 10), null, Material.GlossyPurpleMirror),
             new Triangle(new Vector3(-5, 0, 0), new Vector3(5, 0, 10), new Vector3(-5, 0, 10), null, Material.GlossyGreen)
         };

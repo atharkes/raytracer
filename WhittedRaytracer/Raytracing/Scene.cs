@@ -62,6 +62,24 @@ namespace WhittedRaytracer.Raytracing {
             return new Scene(screen, primitives, DefaultLights);
         }
 
+        /// <summary> Create the default scene with random spheres </summary>
+        /// <param name="screen">Te screen to draw the raytracing to</param>
+        /// <param name="randomTriangles">The amount of random triangles in the scene</param>
+        /// <returns>A default scene with random spheres</returns>
+        public static Scene DefaultWithRandomTriangles(IScreen screen, int randomTriangles) {
+            List<Primitive> defaultPrimitives = DefaultPrimitives;
+            List<Primitive> primitives = new List<Primitive>(defaultPrimitives);
+            for (int i = 0; i < randomTriangles; i++) {
+                Vector3 trianglesCenter = new Vector3(0f, -40f, 0f);
+                Vector3 trianglesBox = new Vector3(60f, 40f, 60f);
+                Vector3 p1 = Utils.RandomVector * trianglesBox - 0.5f * trianglesBox + trianglesCenter;
+                Vector3 p2 = p1 + Utils.RandomVector;
+                Vector3 p3 = p1 - Utils.RandomVector;
+                primitives.Add(new Triangle(p1, p2, p3));
+            }
+            return new Scene(screen, primitives, DefaultLights);
+        }
+
         /// <summary> The lights in the default scene </summary>
         public static List<PointLight> DefaultLights => new List<PointLight>() { new PointLight(new Vector3(0, -8, 3), new Vector3(200, 200, 150)) };
 

@@ -11,16 +11,15 @@ Features:
 - Camera: Position, Orientation, FOV, Aspect ratio
 - Input handling (see controls)
 - Primitives: Planes, Spheres, Triangles
-- Materials: Diffuse, Specular, Dielectric, Glossy (floats)
+- Materials: Diffuse, Specular, Dielectric (Snell & Fresnel), Glossy (Phong Shading)
+- Acceleration Structure: Bounding Volume Hierachy
+- Multithreading: Threadpool with worker threads
 - Scene showing off all primitives and materials
+- Debug drawing
 
 Extra:
-- Dielectrics: Snell & Fresnel
-- Multithreading: Threadpool with worker threads
-- Acceleration Structure: BVH
-- Glossyness: Phong Shading
-- Debug drawing
-- Triangle primitives
+- BVH using SAH and Binning
+- BVH construction with 4-Binning on 100k triangles in under 1 second on intel i7 6700K
 
 References:
 - Course Slides (Graphics & Advanced Graphics)
@@ -28,6 +27,7 @@ References:
 - Triangle Intersection: https://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm
 - Sphere Intersection: https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-sphere-intersection
 - AABB Intersection: https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-box-intersection
+- Binning: http://www.sci.utah.edu/~wald/Publications/2007/ParallelBVHBuild/fastbuild.pdf
 
 Controls:
 - Arrow keys:   Rotate Camera

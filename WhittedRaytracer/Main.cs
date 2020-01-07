@@ -29,7 +29,7 @@ namespace WhittedRaytracer {
         KeyboardState keyboardState;
 
         public Main(IScreen screen) {
-            Scene = Scene.DefaultWithRandomSpheres(screen, 1000);
+            Scene = Scene.DefaultWithRandomSpheres(screen, 10000);
             tasks = new Action[RayTaskAmount];
             threadpool = new Threadpool();
         }

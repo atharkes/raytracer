@@ -50,22 +50,6 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructure {
             }
         }
 
-        /// <summary> Intersect and traverse the BVH with a ray </summary>
-        /// <param name="ray">The ray to intersect the BVH with</param>
-        /// <returns>Whether there is an intersection with the BVH and the ray</returns>
-        public bool IntersectBool(Ray ray) {
-            if (!AABB.Intersect(ray)) {
-                return false;
-            } else if (Leaf) {
-                foreach (Primitive primitive in AABB.Primitives) {
-                    if (primitive.IntersectBool(ray)) return true;
-                }
-                return false;
-            } else {
-                return Left.IntersectBool(ray) || Right.IntersectBool(ray);
-            }
-        }
-
         /// <summary> Intersect the children of this BHV node </summary>
         /// <param name="ray">The ray to intersect the children with</param>
         /// <returns>The intersection in the children if there is any</returns>
@@ -83,6 +67,22 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructure {
             }
         }
 
+        /// <summary> Intersect and traverse the BVH with a ray </summary>
+        /// <param name="ray">The ray to intersect the BVH with</param>
+        /// <returns>Whether there is an intersection with the BVH and the ray</returns>
+        public bool IntersectBool(Ray ray) {
+            if (!AABB.Intersect(ray)) {
+                return false;
+            } else if (Leaf) {
+                foreach (Primitive primitive in AABB.Primitives) {
+                    if (primitive.IntersectBool(ray)) return true;
+                }
+                return false;
+            } else {
+                return Left.IntersectBool(ray) || Right.IntersectBool(ray);
+            }
+        }
+
         /// <summary> Compute the best split for this BVH node </summary>
         /// <returns>Either a tuple with the best split or null if there is no good split</returns>
         (AABB left, AABB right)? ComputeBestSplit() { 
@@ -90,7 +90,7 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructure {
             float bestCost = AABB.SurfaceAreaHeuristic;
             (AABB left, AABB right)? bestSplit = null;
             foreach ((AABB, AABB) split in splits) {
-                float splitCost = SurfaceAreaHeuristic(split);
+                float splitCost = SplitSurfaceAreaHeuristic(split);
                 if (splitCost < bestCost) {
                     bestSplit = split;
                     bestCost = splitCost;
@@ -102,7 +102,7 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructure {
         /// <summary> Calculate the cost of a split. Uses the Surface Area Heuristic </summary>
         /// <param name="split">The split to calculate the cost for</param>
         /// <returns>The cost of the split</returns>
-        float SurfaceAreaHeuristic((AABB left, AABB right) split) {
+        float SplitSurfaceAreaHeuristic((AABB left, AABB right) split) {
             return BVH.TraversalCost * AABB.SurfaceArea + split.left.SurfaceAreaHeuristic + split.right.SurfaceAreaHeuristic;
         }
 

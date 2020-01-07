@@ -53,7 +53,7 @@ namespace WhittedRaytracer.Raytracing {
             List<Primitive> defaultPrimitives = DefaultPrimitives;
             List<Primitive> primitives = new List<Primitive>(defaultPrimitives);
             for (int i = 0; i < randomSpheres; i++) {
-                Vector3 spheresCenter = new Vector3(0f, -50f, 0f);
+                Vector3 spheresCenter = new Vector3(0f, -30f, 0f);
                 Vector3 spheresBox = new Vector3(60f, 30f, 60f);
                 Vector3 pos = Utils.RandomVector * spheresBox - 0.5f * spheresBox + spheresCenter;
                 float radius = (float)Utils.Random.NextDouble();
@@ -70,8 +70,8 @@ namespace WhittedRaytracer.Raytracing {
             List<Primitive> defaultPrimitives = DefaultPrimitives;
             List<Primitive> primitives = new List<Primitive>(defaultPrimitives);
             for (int i = 0; i < randomTriangles; i++) {
-                Vector3 trianglesCenter = new Vector3(0f, -40f, 0f);
-                Vector3 trianglesBox = new Vector3(60f, 40f, 60f);
+                Vector3 trianglesCenter = new Vector3(0f, -30f, 0f);
+                Vector3 trianglesBox = new Vector3(60f, 30f, 60f);
                 Vector3 p1 = Utils.RandomVector * trianglesBox - 0.5f * trianglesBox + trianglesCenter;
                 Vector3 p2 = p1 + Utils.RandomVector;
                 Vector3 p3 = p1 - Utils.RandomVector;

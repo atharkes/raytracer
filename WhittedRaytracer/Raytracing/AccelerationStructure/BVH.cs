@@ -6,7 +6,7 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructure {
     /// TODO:
     /// - Refitting (enable animation/movement, adding and removing primitives)
     /// - Top-level BHV's for static and non-static parts
-    /// - Geometricly ordered traversal using Node Split Signs (increase performance). Using DistanceSquared from AABB decreases performance with a random scene
+    /// - Geometricly ordered traversal using Node Split Signs (increase performance). Using DistanceSquared from AABB decreases performance in a random scene
     /// - Use two arrays for primitives and BHV nodes, and using only a Left index and Count (decrease storage and increase performance)
     /// </summary>
     class BVH : IAccelerationStructure {

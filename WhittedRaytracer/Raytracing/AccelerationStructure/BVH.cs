@@ -3,7 +3,7 @@ using WhittedRaytracer.Raytracing.SceneObjects;
 
 namespace WhittedRaytracer.Raytracing.AccelerationStructure {
     /// <summary> A Bounding Volume Hierarchy tree used as acceleration structure for ray intersections in world space
-    /// TODO:
+    /// Possible Additions:
     /// - Refitting (enable animation/movement, adding and removing primitives)
     /// - Top-level BHV's for static and non-static parts
     /// - Geometricly ordered traversal using Node Split Signs (increase performance). Using DistanceSquared from AABB decreases performance in a random scene

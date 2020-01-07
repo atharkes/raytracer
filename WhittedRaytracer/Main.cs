@@ -11,10 +11,11 @@ using WhittedRaytracer.Raytracing.SceneObjects.Primitives;
 namespace WhittedRaytracer {
     /// <summary> Main class of the raytracer </summary>
     class Main {
+        /// <summary> The amount of tasks created for the threadpool </summary>
+        public const int RayTaskAmount = 720;
+
         /// <summary> The 3d scene in which the raytracing takes place </summary>
         public readonly Scene Scene;
-        /// <summary> Amount of tasks the raytracing is divided into </summary>
-        public readonly int TaskAmount;
         /// <summary> Whether it is drawing debug information </summary>
         public bool Debug = false;
         /// <summary> Whether to draw rays in debug </summary>
@@ -29,11 +30,11 @@ namespace WhittedRaytracer {
 
         public Main(IScreen screen) {
             Scene = Scene.DefaultWithRandomSpheres(screen, 1000);
-            TaskAmount = screen.Height;
-            tasks = new Action[TaskAmount];
+            tasks = new Action[RayTaskAmount];
             threadpool = new Threadpool();
         }
 
+        /// <summary> Process a single frame </summary>
         public void Tick() {
             Scene.Lights.First().Position += new Vector3((float)Math.Sin(DateTime.Now.TimeOfDay.TotalSeconds) * 0.5f, 0, 0);
             Scene.Camera.ScreenPlane.Screen.Clear(0);
@@ -61,6 +62,7 @@ namespace WhittedRaytracer {
             frameTimer.Restart();
         }
 
+        /// <summary> Check if there was any input </summary>
         void InputCheck() {
             keyboardState = Keyboard.GetState();
             if (keyboardState[Key.F1]) Debug = !Debug;
@@ -79,22 +81,20 @@ namespace WhittedRaytracer {
         }
 
         void DivideRayTracingWork() {
-            float size = (float)Scene.Camera.ScreenPlane.Screen.Height / TaskAmount;
-            float[] taskBounds = new float[TaskAmount + 1];
+            float size = (float)Scene.Camera.ScreenPlane.Screen.Height * Scene.Camera.ScreenPlane.Screen.Width / RayTaskAmount;
+            float[] taskBounds = new float[RayTaskAmount + 1];
             taskBounds[0] = 0;
-            for (int n = 0; n < TaskAmount; n++) {
+            for (int n = 0; n < RayTaskAmount; n++) {
                 taskBounds[n + 1] = taskBounds[n] + size;
                 int taskLower = (int)taskBounds[n];
                 int taskUpper = (int)taskBounds[n + 1];
-                tasks[n] = () => TraceRays(0, Scene.Camera.ScreenPlane.Screen.Width, taskLower, taskUpper);
+                tasks[n] = () => TraceRays(taskLower, taskUpper);
             }
         }
 
-        void TraceRays(int xMin, int xMax, int yMin, int yMax) {
-            for (int y = yMin; y < yMax; y++) {
-                for (int x = xMin; x < xMax; x++) {
-                    TraceRay(x, y);
-                }
+        void TraceRays(int from, int to) {
+            for (int i = from; i < to; i++) {
+                TraceRay(i % Scene.Camera.ScreenPlane.Screen.Width, i / Scene.Camera.ScreenPlane.Screen.Width);
             }
         }
 

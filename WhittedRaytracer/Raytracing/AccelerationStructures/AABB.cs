@@ -119,8 +119,6 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructures {
             return dx * dx + dy * dy + dz * dz;
         }
 
-        
-
         /// <summary> Calculate the bounds of a List of Primitives </summary>
         /// <param name="primitives">The primitives the calculate the bounds for</param>
         /// <returns>The bounds of the primitives</returns>

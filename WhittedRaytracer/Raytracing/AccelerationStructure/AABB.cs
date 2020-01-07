@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using WhittedRaytracer.Raytracing.SceneObjects;
 
-namespace WhittedRaytracer.Raytracing.AccelerationStructures {
+namespace WhittedRaytracer.Raytracing.AccelerationStructure {
     /// <summary> An Axis-Aligned Bounding Box </summary>
     class AABB {
         /// <summary> The primitives in the AABB </summary>

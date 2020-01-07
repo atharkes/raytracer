@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using WhittedRaytracer.Raytracing.AccelerationStructures;
+using WhittedRaytracer.Raytracing.AccelerationStructure;
 using WhittedRaytracer.Raytracing.SceneObjects;
 using WhittedRaytracer.Raytracing.SceneObjects.Primitives;
 
@@ -28,7 +28,7 @@ namespace WhittedRaytracer.Raytracing {
             Lights = lights;
             Stopwatch timer = Stopwatch.StartNew();
             AccelerationStructure = new BVH(primitives);
-            Console.WriteLine(timer.ElapsedMilliseconds + "\t| BVH Building");
+            Console.WriteLine(timer.ElapsedMilliseconds + "\t| BVH Building ms");
         }
 
         /// <summary> Create an empty scene </summary>

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using WhittedRaytracer.Raytracing.SceneObjects;
 
-namespace WhittedRaytracer.Raytracing.AccelerationStructures {
+namespace WhittedRaytracer.Raytracing.AccelerationStructure {
     /// <summary> A node of a bounding volume hierarchy tree </summary>
     class BVHNode {
         /// <summary> The AABB of this BVH node </summary>

@@ -28,7 +28,7 @@ namespace WhittedRaytracer {
         KeyboardState keyboardState;
 
         public Main(IScreen screen) {
-            Scene = Scene.DefaultWithRandomTriangles(screen, 100000);
+            Scene = Scene.DefaultWithRandomSpheres(screen, 1000);
             TaskAmount = screen.Height;
             tasks = new Action[TaskAmount];
             threadpool = new Threadpool();

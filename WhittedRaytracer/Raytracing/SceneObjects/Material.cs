@@ -23,8 +23,6 @@ namespace WhittedRaytracer.Raytracing.SceneObjects {
         /// <summary> The gloss specularity of the primitive </summary>
         public float GlossSpecularity { get; set; }
 
-        static Random r = new Random();
-
         /// <summary> Create a new material </summary>
         /// <param name="color">The color of the material</param>
         /// <param name="specularity">How specular the material is. A specular object reflects light like a mirror.</param>
@@ -44,6 +42,7 @@ namespace WhittedRaytracer.Raytracing.SceneObjects {
         /// <summary> Create a random material </summary>
         /// <returns>A random material</returns>
         public static Material Random() {
+            Random r = Utils.Random;
             Vector3 color = new Vector3((float)r.NextDouble(), (float)r.NextDouble(), (float)r.NextDouble());
             float specularity = r.NextDouble() < 0.3f ? (float)r.NextDouble() : 0;
             float dielectric = r.NextDouble() < 0.1f ? (float)r.NextDouble() : 0;

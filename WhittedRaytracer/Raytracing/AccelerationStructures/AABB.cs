@@ -6,19 +6,21 @@ using WhittedRaytracer.Raytracing.SceneObjects;
 namespace WhittedRaytracer.Raytracing.AccelerationStructures {
     /// <summary> An Axis-Aligned Bounding Box </summary>
     class AABB {
-        /// <summary> The primitives in this AABB </summary>
+        /// <summary> The primitives in the AABB </summary>
         public ICollection<Primitive> Primitives => primitives;
-        /// <summary> The bounds of the AABB of this bin </summary>
-        public Vector3[] Bounds { get; } = new Vector3[] { Utils.MaxVector, Utils.MinVector };
+        /// <summary> The bounds of the AABB </summary>
+        public readonly Vector3[] Bounds = new Vector3[] { Utils.MaxVector, Utils.MinVector };
 
-        /// <summary> The minimum bound of the AABB of this bin </summary>
+        /// <summary> The minimum bound of the AABB </summary>
         public Vector3 MinBound { get => Bounds[0]; private set => Bounds[0] = value; }
-        /// <summary> The maximum bound of the AABB of this bin </summary>
+        /// <summary> The maximum bound of the AABB </summary>
         public Vector3 MaxBound { get => Bounds[1]; private set => Bounds[1] = value; }
-        /// <summary> The size of the AABB of this bin </summary>
+        /// <summary> The size of the AABB </summary>
         public Vector3 Size => MaxBound - MinBound;
-        /// <summary> The surface area of the AABB of this bin </summary>
+        /// <summary> The surface area of the AABB </summary>
         public float SurfaceArea => 2 * (Size.X * Size.Y + Size.Y * Size.Z + Size.X * Size.Z);
+        /// <summary> The cost of having this AABB as a BVHNode </summary>
+        public float SurfaceAreaHeuristic => BVH.TraversalCost + BVH.IntersectionCost * primitives.Count * SurfaceArea;
 
         readonly List<Primitive> primitives;
 
@@ -36,6 +38,16 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructures {
                 MinBound = Vector3.ComponentMin(primitiveMin, MinBound);
                 MaxBound = Vector3.ComponentMax(primitiveMax, MaxBound);
             }
+        }
+
+        /// <summary> Add (the primitives of) another AABB to this AABB </summary>
+        /// <param name="other">THe other AABB to add to this one</param>
+        /// <returns>This AABB with the added primitives</returns>
+        public AABB Add(AABB other) {
+            foreach (Primitive primitive in other.Primitives) {
+                Add(primitive);
+            }
+            return this;
         }
 
         /// <summary> Add a primitive to the AABB </summary>
@@ -58,6 +70,45 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructures {
             }
         }
 
+        /// <summary> Intersect the AABB (Amy Williams's An Efficient and Robust Ray–Box Intersection Algorithm) </summary>
+        /// <param name="ray">The ray to calculate intersection for</param>
+        /// <returns>Whether the ray intersects the AABB</returns>
+        public bool Intersect(Ray ray) {
+            float tmin = (Bounds[ray.Sign[0]].X - ray.Origin.X) * ray.DirectionInverted.X;
+            float tmax = (Bounds[1 - ray.Sign[0]].X - ray.Origin.X) * ray.DirectionInverted.X;
+
+            float tymin = (Bounds[ray.Sign[1]].Y - ray.Origin.Y) * ray.DirectionInverted.Y;
+            float tymax = (Bounds[1 - ray.Sign[1]].Y - ray.Origin.Y) * ray.DirectionInverted.Y;
+            if ((tmin > tymax) || (tmax < tymin)) return false;
+            tmin = Math.Max(tmin, tymin);
+            tmax = Math.Min(tmax, tymax);
+
+            float tzmin = (Bounds[ray.Sign[2]].Z - ray.Origin.Z) * ray.DirectionInverted.Z;
+            float tzmax = (Bounds[1 - ray.Sign[2]].Z - ray.Origin.Z) * ray.DirectionInverted.Z;
+            if ((tmin > tzmax) || (tmax < tzmin)) return false;
+            tmin = Math.Max(tmin, tzmin);
+            tmax = Math.Min(tmax, tzmax);
+
+            return tmin > 0 || tmax > 0;
+        }
+
+        /// <summary> Intersect the primitives of this AABB </summary>
+        /// <param name="ray">The ray to intersect the primitives with</param>
+        /// <returns>The intersection with the primitive if there is any</returns>
+        public Intersection IntersectPrimitives(Ray ray) {
+            float intersectionDistance = ray.Length;
+            Primitive intersectionPrimitive = null;
+            foreach (Primitive primitive in Primitives) {
+                float distance = primitive.Intersect(ray);
+                if (0 < distance && distance < intersectionDistance) {
+                    intersectionPrimitive = primitive;
+                    intersectionDistance = distance;
+                }
+            }
+            if (intersectionPrimitive == null) return null;
+            else return new Intersection(ray, intersectionPrimitive, intersectionDistance);
+        }
+
         /// <summary> Get the distance from a point to the AABB </summary>
         /// <param name="point">To point to get the distance from the AABB to</param>
         /// <returns>The distance from the point to the AABB</returns>
@@ -68,15 +119,7 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructures {
             return dx * dx + dy * dy + dz * dz;
         }
 
-        /// <summary> Add (the primitives of) another AABB to this AABB </summary>
-        /// <param name="other">THe other AABB to add to this one</param>
-        /// <returns>This AABB with the added primitives</returns>
-        public AABB Add(AABB other) {
-            foreach (Primitive primitive in other.Primitives) {
-                Add(primitive);
-            }
-            return this;
-        }
+        
 
         /// <summary> Calculate the bounds of a List of Primitives </summary>
         /// <param name="primitives">The primitives the calculate the bounds for</param>

@@ -98,6 +98,7 @@
     <Compile Include="Multithreading\Threadpool.cs" />
     <Compile Include="Raytracing\AccelerationStructures\AABB.cs" />
     <Compile Include="Raytracing\AccelerationStructures\BVH.cs" />
+    <Compile Include="Raytracing\AccelerationStructures\BVHNode.cs" />
     <Compile Include="Raytracing\IAccelerationStructure.cs" />
     <Compile Include="Raytracing\ISceneObject.cs" />
     <Compile Include="Raytracing\SceneObjects\IScreen.cs" />

@@ -3,6 +3,9 @@
 namespace WhittedRaytracer.Raytracing {
     /// <summary> A datastructure to store a ray </summary>
     class Ray {
+        /// <summary> Constant that defines the maximum recursion for secondary rays </summary>
+        public const int MaxRecursionDepth = 3;
+
         /// <summary> The origin of the ray </summary>
         public readonly Vector3 Origin;
         /// <summary> The direction of the ray. This should always be normalized </summary>
@@ -19,9 +22,6 @@ namespace WhittedRaytracer.Raytracing {
         public float Length { get; set; }
         /// <summary> The distance attenuation of a point light when this is a shadow ray </summary>
         public float DistanceAttenuation => 1f / (Length * Length);
-
-        /// <summary> Constant that defines the maximum recursion for secondary rays </summary>
-        public const int MaxRecursionDepth = 3;
 
         /// <summary> Create a new ray using an origin and a direction </summary>
         /// <param name="origin">The origin of the ray</param>

@@ -27,7 +27,7 @@ namespace WhittedRaytracer.Raytracing {
             Primitives = primitives;
             Lights = lights;
             Stopwatch timer = Stopwatch.StartNew();
-            AccelerationStructure = new BVHNode(primitives);
+            AccelerationStructure = new BVH(primitives);
             Console.WriteLine(timer.ElapsedMilliseconds + "\t| BVH Building");
         }
 

@@ -2,7 +2,7 @@
 using System.Drawing;
 using System.Drawing.Imaging;
 using OpenTK.Graphics.OpenGL;
-using WhittedRaytracer.Raytracing.SceneObjects.CameraObjects;
+using WhittedRaytracer.Raytracing.SceneObjects.CameraParts;
 
 namespace WhittedRaytracer.Drawing {
     /// <summary> A pixel surface to display </summary>

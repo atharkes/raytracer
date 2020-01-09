@@ -1,6 +1,6 @@
 ﻿using OpenTK;
 
-namespace WhittedRaytracer.Raytracing.SceneObjects.CameraObjects {
+namespace WhittedRaytracer.Raytracing.SceneObjects.CameraParts {
     /// <summary> A cavity of the accumulator that catches light </summary>
     struct Cavity {
         /// <summary> The amount of light in the cavity </summary>

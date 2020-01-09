@@ -6,7 +6,7 @@ using System.Linq;
 using WhittedRaytracer.Multithreading;
 using WhittedRaytracer.Raytracing;
 using WhittedRaytracer.Raytracing.SceneObjects;
-using WhittedRaytracer.Raytracing.SceneObjects.CameraObjects;
+using WhittedRaytracer.Raytracing.SceneObjects.CameraParts;
 using WhittedRaytracer.Raytracing.SceneObjects.Primitives;
 
 namespace WhittedRaytracer {

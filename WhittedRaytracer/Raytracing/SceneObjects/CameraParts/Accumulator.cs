@@ -1,7 +1,7 @@
 ﻿using OpenTK;
 using WhittedRaytracer.Raytracing.SceneObjects;
 
-namespace WhittedRaytracer.Raytracing.SceneObjects.CameraObjects {
+namespace WhittedRaytracer.Raytracing.SceneObjects.CameraParts {
     /// <summary> An accumulator that accumulates the light of photons </summary>
     class Accumulator {
         /// <summary> The width of the accumulator </summary>

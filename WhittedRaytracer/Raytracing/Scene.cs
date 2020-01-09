@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using WhittedRaytracer.Raytracing.AccelerationStructure;
 using WhittedRaytracer.Raytracing.SceneObjects;
+using WhittedRaytracer.Raytracing.SceneObjects.CameraObjects;
 using WhittedRaytracer.Raytracing.SceneObjects.Primitives;
 
 namespace WhittedRaytracer.Raytracing {

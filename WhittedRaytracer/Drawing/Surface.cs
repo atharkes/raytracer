@@ -2,7 +2,7 @@
 using System.Drawing;
 using System.Drawing.Imaging;
 using OpenTK.Graphics.OpenGL;
-using WhittedRaytracer.Raytracing.SceneObjects;
+using WhittedRaytracer.Raytracing.SceneObjects.CameraObjects;
 
 namespace WhittedRaytracer.Drawing {
     /// <summary> A pixel surface to display </summary>
@@ -134,6 +134,10 @@ namespace WhittedRaytracer.Drawing {
 
         public void Plot(int x, int y, int c) {
             if ((x >= 0) && (y >= 0) && (x < Width) && (y < Height)) Pixels[x + y * Width] = c;
+        }
+
+        public void Plot(int i, int c) {
+            if (i < Pixels.Length) Pixels[i] = c;
         }
 
         public void Print(string t, int x, int y, int c) {

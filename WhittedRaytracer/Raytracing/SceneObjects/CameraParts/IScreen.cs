@@ -1,4 +1,4 @@
-﻿namespace WhittedRaytracer.Raytracing.SceneObjects {
+﻿namespace WhittedRaytracer.Raytracing.SceneObjects.CameraObjects {
     /// <summary> An interface for a 2d screen used for displaying the 3d scene using raytracing </summary>
     public interface IScreen {
         /// <summary> The width of the screen </summary>
@@ -15,6 +15,11 @@
         /// <param name="y">The y position to plot</param>
         /// <param name="color">The color to plot at the position</param>
         void Plot(int x, int y, int color);
+
+        /// <summary> Plot a pixel on the screen </summary>
+        /// <param name="i">The position of the pixel in the pixel array</param>
+        /// <param name="color">The color to plot at the position</param>
+        void Plot(int i, int color);
 
         /// <summary> Draw a line on the screen </summary>
         /// <param name="x1">The x position of the first point</param>

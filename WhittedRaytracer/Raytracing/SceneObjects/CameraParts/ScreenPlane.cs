@@ -1,14 +1,17 @@
 ﻿using System;
 using OpenTK;
+using WhittedRaytracer.Drawing;
 using WhittedRaytracer.Raytracing.SceneObjects.Primitives;
 
-namespace WhittedRaytracer.Raytracing.SceneObjects {
+namespace WhittedRaytracer.Raytracing.SceneObjects.CameraObjects {
     /// <summary> The screen plane object in the 3d scene </summary>
     class ScreenPlane : ISceneObject {
         /// <summary> The camera the screen plane is linked to </summary>
         public readonly Camera Camera;
         /// <summary> The 2d window the screen plane is linked to </summary>
         public readonly IScreen Screen;
+        /// <summary> The accumulator that accumulates light </summary>
+        public readonly Accumulator Accumulator;
         /// <summary> The aspect ratio of the screen plane </summary>
         public float AspectRatio => (float)Screen.Width / Screen.Height;
 
@@ -37,7 +40,13 @@ namespace WhittedRaytracer.Raytracing.SceneObjects {
         public ScreenPlane(Camera camera, IScreen screen) {
             Camera = camera;
             Screen = screen;
+            Accumulator = new Accumulator(screen.Width, screen.Height);
             Update();
+        }
+
+        /// <summary> Draw the light that is accumulated by the accumulator </summary>
+        public void DrawAccumulatedLight() {
+            Accumulator.DrawImage(Screen);
         }
 
         /// <summary> Set the position of the screen plane and move the camera with it </summary>
@@ -55,6 +64,7 @@ namespace WhittedRaytracer.Raytracing.SceneObjects {
             TopRight = Center - Camera.Left * AspectRatio + Camera.Up;
             BottomLeft = Center + Camera.Left * AspectRatio - Camera.Up;
             BottomRight = Center - Camera.Left * AspectRatio - Camera.Up;
+            Accumulator.Clear();
         }
 
         /// <summary> Get the position of a pixel on the screen plane in worldspace </summary>

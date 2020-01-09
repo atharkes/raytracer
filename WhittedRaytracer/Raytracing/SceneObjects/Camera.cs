@@ -1,4 +1,5 @@
 ﻿using OpenTK;
+using WhittedRaytracer.Raytracing.SceneObjects.CameraObjects;
 
 namespace WhittedRaytracer.Raytracing.SceneObjects {
     /// <summary> The camera object in the 3d scene </summary>

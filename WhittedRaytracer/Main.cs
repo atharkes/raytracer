@@ -6,6 +6,7 @@ using System.Linq;
 using WhittedRaytracer.Multithreading;
 using WhittedRaytracer.Raytracing;
 using WhittedRaytracer.Raytracing.SceneObjects;
+using WhittedRaytracer.Raytracing.SceneObjects.CameraObjects;
 using WhittedRaytracer.Raytracing.SceneObjects.Primitives;
 
 namespace WhittedRaytracer {
@@ -49,7 +50,8 @@ namespace WhittedRaytracer {
             Console.WriteLine($"{stopwatch.ElapsedMilliseconds}\t| Tracing ms");
             stopwatch.Restart();
 
-            // Debug drawing
+            // Drawing
+            Scene.Camera.ScreenPlane.DrawAccumulatedLight();
             if (Debug) {
                 foreach (Primitive primitive in Scene.Primitives) if (primitive is Sphere) Scene.Camera.ScreenPlane.DrawSphere(primitive as Sphere);
                 foreach (PointLight light in Scene.Lights) Scene.Camera.ScreenPlane.DrawLight(light);
@@ -102,7 +104,7 @@ namespace WhittedRaytracer {
             bool debugRay = Debug && DebugShowRays && (x % 64 == 0 || x == Scene.Camera.ScreenPlane.Screen.Width) && y == Scene.Camera.ScreenPlane.Screen.Height / 2;
             Ray ray = Scene.Camera.CreatePrimaryRay(x, y);
             Vector3 pixelColor = Scene.CastRay(ray, 0, debugRay);
-            Scene.Camera.ScreenPlane.Screen.Plot(x, y, pixelColor.ToIntColor());
+            Scene.Camera.ScreenPlane.Accumulator.AddPhoton(x, y, pixelColor);
         }
     }
 }

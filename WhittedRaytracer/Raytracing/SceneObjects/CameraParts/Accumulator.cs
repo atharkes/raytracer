@@ -1,16 +1,14 @@
 ﻿using OpenTK;
-using WhittedRaytracer.Raytracing.SceneObjects;
 
 namespace WhittedRaytracer.Raytracing.SceneObjects.CameraParts {
     /// <summary> An accumulator that accumulates the light of photons </summary>
     class Accumulator {
-        /// <summary> The width of the accumulator </summary>
-        public readonly int Width;
-        /// <summary> The height of the accumulator </summary>
-        public readonly int Height;
-
         /// <summary> The cavities in which the light is accumulated </summary>
-        Cavity[] cavities;
+        public Cavity[] Cavities { get; }
+        /// <summary> The width of the accumulator </summary>
+        public int Width { get; }
+        /// <summary> The height of the accumulator </summary>
+        public int Height { get; }
 
         /// <summary> Create a new accumulator </summary>
         /// <param name="width">The width of the accumulator</param>
@@ -18,19 +16,25 @@ namespace WhittedRaytracer.Raytracing.SceneObjects.CameraParts {
         public Accumulator(int width, int height) {
             Width = width;
             Height = height;
-            cavities = new Cavity[width * height];
-        }
-
-        /// <summary> Draws an image from the photons in the accumulator to a screen </summary>
-        public void DrawImage(IScreen screen) {
-            for (int i = 0; i < cavities.Length; i++) {
-                screen.Plot(i, (cavities[i].Light / cavities[i].Samples).ToIntColor());
+            Cavities = new Cavity[width * height];
+            for (int i = 0; i < Cavities.Length; i++) {
+                Cavities[i] = new Cavity();
             }
         }
 
-        /// <summary> Clear the accumulator </summary>
+        /// <summary> Draws an image from the photons in the accumulator to a screen </summary>
+        /// <param name="screen">The screen to draw the image to</param>
+        public void DrawImage(IScreen screen) {
+            for (int i = 0; i < Cavities.Length; i++) {
+                screen.Plot(i, (Cavities[i].Light / Cavities[i].Samples).ToIntColor());
+            }
+        }
+
+        /// <summary> Clear the light in the accumulator </summary>
         public void Clear() {
-            cavities = new Cavity[Width * Height];
+            foreach (Cavity cavity in Cavities) {
+                cavity.Clear();
+            }
         }
 
         /// <summary> Add a photon to a cavity in the accumulator </summary>
@@ -38,7 +42,7 @@ namespace WhittedRaytracer.Raytracing.SceneObjects.CameraParts {
         /// <param name="y">The y coordinate of the cavity</param>
         /// <param name="photon">The photon to add to a cavity in the accumulator</param>
         public void AddPhoton(int x, int y, Vector3 photon) {
-            cavities[x + y * Width].AddPhoton(photon);
+            Cavities[x + y * Width].AddPhoton(photon);
         }
     }
 }

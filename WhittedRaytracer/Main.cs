@@ -2,7 +2,6 @@
 using OpenTK.Input;
 using System;
 using System.Diagnostics;
-using System.Linq;
 using WhittedRaytracer.Multithreading;
 using WhittedRaytracer.Raytracing;
 using WhittedRaytracer.Raytracing.SceneObjects;
@@ -30,19 +29,18 @@ namespace WhittedRaytracer {
         KeyboardState keyboardState;
 
         public Main(IScreen screen) {
-            Scene = Scene.DefaultWithRandomSpheres(screen, 10000);
+            Scene = Scene.DefaultWithRandomSpheres(screen, 10_000);
             tasks = new Action[RayTaskAmount];
             threadpool = new Threadpool();
         }
 
         /// <summary> Process a single frame </summary>
         public void Tick() {
-            Scene.Lights.First().Position += new Vector3((float)Math.Sin(DateTime.Now.TimeOfDay.TotalSeconds) * 0.5f, 0, 0);
-            Scene.Camera.ScreenPlane.Screen.Clear(0);
+            //Scene.Lights.First().Position += new Vector3((float)Math.Sin(DateTime.Now.TimeOfDay.TotalSeconds) * 0.5f, 0, 0);
             InputCheck();
             Console.WriteLine($"{stopwatch.ElapsedMilliseconds}\t| OpenTK ms");
             stopwatch.Restart();
-            DivideRayTracingWork();
+            DivideRayTracingTasks();
             Console.WriteLine($"{stopwatch.ElapsedMilliseconds}\t| Divide Tasks ms");
             stopwatch.Restart();
             threadpool.DoTasks(tasks);
@@ -51,6 +49,7 @@ namespace WhittedRaytracer {
             stopwatch.Restart();
 
             // Drawing
+            Scene.Camera.ScreenPlane.Screen.Clear(0);
             Scene.Camera.ScreenPlane.DrawAccumulatedLight();
             if (Debug) {
                 foreach (Primitive primitive in Scene.Primitives) if (primitive is Sphere) Scene.Camera.ScreenPlane.DrawSphere(primitive as Sphere);
@@ -82,29 +81,27 @@ namespace WhittedRaytracer {
             if (keyboardState[Key.Down]) Scene.Camera.Turn(Scene.Camera.Down);
         }
 
-        void DivideRayTracingWork() {
-            float size = (float)Scene.Camera.ScreenPlane.Screen.Height * Scene.Camera.ScreenPlane.Screen.Width / RayTaskAmount;
+        void DivideRayTracingTasks() {
+            CameraRay[] rays = Scene.Camera.GetRandomCameraRays(25_000);
+            float size = rays.Length / RayTaskAmount;
             float[] taskBounds = new float[RayTaskAmount + 1];
             taskBounds[0] = 0;
             for (int n = 0; n < RayTaskAmount; n++) {
                 taskBounds[n + 1] = taskBounds[n] + size;
                 int taskLower = (int)taskBounds[n];
                 int taskUpper = (int)taskBounds[n + 1];
-                tasks[n] = () => TraceRays(taskLower, taskUpper);
+                tasks[n] = () => TraceRays(taskLower, taskUpper, rays);
             }
         }
 
-        void TraceRays(int from, int to) {
+        void TraceRays(int from, int to, CameraRay[] rays) {
             for (int i = from; i < to; i++) {
-                TraceRay(i % Scene.Camera.ScreenPlane.Screen.Width, i / Scene.Camera.ScreenPlane.Screen.Width);
+                int x = i % Scene.Camera.ScreenPlane.Screen.Width;
+                int y = i / Scene.Camera.ScreenPlane.Screen.Width;
+                bool debugRay = Debug && DebugShowRays && (x % 64 == 0 || x == Scene.Camera.ScreenPlane.Screen.Width) && y == Scene.Camera.ScreenPlane.Screen.Height / 2;
+                Vector3 pixelColor = Scene.CastRay(rays[i], 0, debugRay);
+                rays[i].Cavity.AddPhoton(pixelColor);
             }
-        }
-
-        void TraceRay(int x, int y) {
-            bool debugRay = Debug && DebugShowRays && (x % 64 == 0 || x == Scene.Camera.ScreenPlane.Screen.Width) && y == Scene.Camera.ScreenPlane.Screen.Height / 2;
-            Ray ray = Scene.Camera.CreatePrimaryRay(x, y);
-            Vector3 pixelColor = Scene.CastRay(ray, 0, debugRay);
-            Scene.Camera.ScreenPlane.Accumulator.AddPhoton(x, y, pixelColor);
         }
     }
 }

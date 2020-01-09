@@ -1,6 +1,5 @@
 ﻿using System;
 using OpenTK;
-using WhittedRaytracer.Drawing;
 using WhittedRaytracer.Raytracing.SceneObjects.Primitives;
 
 namespace WhittedRaytracer.Raytracing.SceneObjects.CameraParts {

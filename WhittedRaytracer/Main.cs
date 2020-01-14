@@ -29,8 +29,6 @@ namespace WhittedRaytracer {
         readonly Threadpool threadpool;
         readonly Action[] tasks;
 
-        KeyboardState keyboardState;
-
         public Main(IScreen screen) {
             Scene = Scene.DefaultWithRandomSpheres(screen, 10_000);
             tasks = new Action[RayTaskAmount];
@@ -48,10 +46,12 @@ namespace WhittedRaytracer {
             Stats.LogTaskTime(Stats.TracingTime);
             Stats.LogFrameTime();
 
-            // Drawing
+            // Console Output
             Console.WriteLine($"{Stats.OpenTKTime.LastTick.Milliseconds}\t| OpenTK ms");
             Console.WriteLine($"{Stats.MultithreadingOverhead.LastTick.Milliseconds}\t| Divide Tasks ms");
             Console.WriteLine($"{Stats.TracingTime.LastTick.Milliseconds}\t| Tracing ms");
+
+            // Drawing
             Scene.Camera.ScreenPlane.Screen.Clear(0);
             Scene.Camera.ScreenPlane.DrawAccumulatedLight();
             if (Debug) {
@@ -67,7 +67,7 @@ namespace WhittedRaytracer {
 
         /// <summary> Check if there was any input </summary>
         void InputCheck() {
-            keyboardState = Keyboard.GetState();
+            KeyboardState keyboardState = Keyboard.GetState();
             if (keyboardState[Key.F1]) Debug = !Debug;
             if (keyboardState[Key.Space]) Scene.Camera.Move(Scene.Camera.Up);
             if (keyboardState[Key.LShift]) Scene.Camera.Move(Scene.Camera.Down);

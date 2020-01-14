@@ -84,7 +84,9 @@ namespace WhittedRaytracer {
         }
 
         void DivideRayTracingTasks() {
-            CameraRay[] rays = Scene.Camera.GetRandomCameraRays(25_000);
+            int rayCount = 25_000;
+            Stats.LogTickRays(rayCount);
+            CameraRay[] rays = Scene.Camera.GetRandomCameraRays(rayCount);
             float size = rays.Length / RayTaskAmount;
             float[] taskBounds = new float[RayTaskAmount + 1];
             taskBounds[0] = 0;

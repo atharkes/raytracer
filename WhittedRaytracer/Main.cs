@@ -1,28 +1,31 @@
 ﻿using OpenTK;
 using OpenTK.Input;
 using System;
-using System.Diagnostics;
 using WhittedRaytracer.Multithreading;
 using WhittedRaytracer.Raytracing;
 using WhittedRaytracer.Raytracing.SceneObjects;
 using WhittedRaytracer.Raytracing.SceneObjects.CameraParts;
 using WhittedRaytracer.Raytracing.SceneObjects.Primitives;
+using WhittedRaytracer.Statistics;
 
 namespace WhittedRaytracer {
     /// <summary> Main class of the raytracer </summary>
     class Main {
         /// <summary> The amount of tasks created for the threadpool </summary>
         public const int RayTaskAmount = 720;
+        /// <summary> The targeted framerate of the raytracer </summary>
+        public const int TargetFrameRate = 30;
 
         /// <summary> The 3d scene in which the raytracing takes place </summary>
         public readonly Scene Scene;
+        /// <summary> Statistics of the raytracer </summary>
+        public readonly Stats Stats = new Stats();
+
         /// <summary> Whether it is drawing debug information </summary>
         public bool Debug = false;
         /// <summary> Whether to draw rays in debug </summary>
         public bool DebugShowRays = true;
 
-        readonly Stopwatch stopwatch = Stopwatch.StartNew();
-        readonly Stopwatch frameTimer = Stopwatch.StartNew();
         readonly Threadpool threadpool;
         readonly Action[] tasks;
 
@@ -36,19 +39,19 @@ namespace WhittedRaytracer {
 
         /// <summary> Process a single frame </summary>
         public void Tick() {
-            //Scene.Lights.First().Position += new Vector3((float)Math.Sin(DateTime.Now.TimeOfDay.TotalSeconds) * 0.5f, 0, 0);
             InputCheck();
-            Console.WriteLine($"{stopwatch.ElapsedMilliseconds}\t| OpenTK ms");
-            stopwatch.Restart();
+            Stats.LogTaskTime(Stats.OpenTKTime);
             DivideRayTracingTasks();
-            Console.WriteLine($"{stopwatch.ElapsedMilliseconds}\t| Divide Tasks ms");
-            stopwatch.Restart();
+            Stats.LogTaskTime(Stats.MultithreadingOverhead);
             threadpool.DoTasks(tasks);
             threadpool.WaitTillDone();
-            Console.WriteLine($"{stopwatch.ElapsedMilliseconds}\t| Tracing ms");
-            stopwatch.Restart();
+            Stats.LogTaskTime(Stats.TracingTime);
+            Stats.LogFrameTime();
 
             // Drawing
+            Console.WriteLine($"{Stats.OpenTKTime.LastTick.Milliseconds}\t| OpenTK ms");
+            Console.WriteLine($"{Stats.MultithreadingOverhead.LastTick.Milliseconds}\t| Divide Tasks ms");
+            Console.WriteLine($"{Stats.TracingTime.LastTick.Milliseconds}\t| Tracing ms");
             Scene.Camera.ScreenPlane.Screen.Clear(0);
             Scene.Camera.ScreenPlane.DrawAccumulatedLight();
             if (Debug) {
@@ -57,10 +60,9 @@ namespace WhittedRaytracer {
                 Scene.Camera.ScreenPlane.DrawScreenPlane();
                 Scene.Camera.ScreenPlane.DrawCamera();
             }
-            Scene.Camera.ScreenPlane.Screen.Print($"Frametime: {frameTimer.ElapsedMilliseconds}", 1, 1, 0xffffff);
-            Scene.Camera.ScreenPlane.Screen.Print($"FPS: {1000L / frameTimer.ElapsedMilliseconds}", 1, 17, 0xffffff);
+            Scene.Camera.ScreenPlane.Screen.Print($"Frametime: {Stats.FrameTime.LastTick.Milliseconds}", 1, 1, 0xffffff);
+            Scene.Camera.ScreenPlane.Screen.Print($"FPS: {1000 / Stats.FrameTime.LastTick.Milliseconds}", 1, 17, 0xffffff);
             Scene.Camera.ScreenPlane.Screen.Print($"FOV: {Scene.Camera.FOV}", 1, 33, 0xffffff);
-            frameTimer.Restart();
         }
 
         /// <summary> Check if there was any input </summary>

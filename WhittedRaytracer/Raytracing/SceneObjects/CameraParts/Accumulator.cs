@@ -1,4 +1,5 @@
 ﻿using OpenTK;
+using System;
 
 namespace WhittedRaytracer.Raytracing.SceneObjects.CameraParts {
     /// <summary> An accumulator that accumulates the light of photons </summary>
@@ -25,7 +26,19 @@ namespace WhittedRaytracer.Raytracing.SceneObjects.CameraParts {
         /// <summary> Draws an image from the photons in the accumulator to a screen </summary>
         /// <param name="screen">The screen to draw the image to</param>
         public void DrawImage(IScreen screen) {
-            for (int i = 0; i < Cavities.Length; i++) {
+            Action[] tasks = new Action[Main.MultithreadingTaskCount];
+            float size = Cavities.Length / tasks.Length;
+            for (int i = 0; i < tasks.Length; i++) {
+                int lowerbound = (int)(i * size);
+                int higherbound = (int)((i + 1) * size);
+                tasks[i] = () => DrawImageRange(screen, lowerbound, higherbound);
+            }
+            Main.Threadpool.DoTasks(tasks);
+            Main.Threadpool.WaitTillDone();
+        }
+
+        void DrawImageRange(IScreen screen, int from, int to) {
+            for (int i = from; i < to; i++) {
                 screen.Plot(i, Cavities[i].AverageLight.ToIntColor());
             }
         }

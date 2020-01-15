@@ -11,8 +11,9 @@ using WhittedRaytracer.Utilities;
 namespace WhittedRaytracer {
     /// <summary> Main class of the raytracer </summary>
     class Main {
+        public static readonly Threadpool Threadpool = new Threadpool();
         /// <summary> The amount of tasks created for the threadpool </summary>
-        public const int RayTaskAmount = 720;
+        public const int MultithreadingTaskCount = 720;
         /// <summary> The targeted framerate of the raytracer </summary>
         public const int TargetFrameRate = 20;
         /// <summary> The targeted frame time computed from the targeted frame rate </summary>
@@ -29,14 +30,12 @@ namespace WhittedRaytracer {
         public bool Debug = false;
         /// <summary> Whether to draw rays in debug </summary>
         public bool DebugShowRays = true;
-
-        readonly Threadpool threadpool;
+        
         readonly Action[] tasks;
 
         public Main(IScreen screen) {
             Scene = Scene.DefaultWithRandomSpheres(screen, 10_000);
-            tasks = new Action[RayTaskAmount];
-            threadpool = new Threadpool();
+            tasks = new Action[MultithreadingTaskCount];
         }
 
         /// <summary> Process a single frame </summary>
@@ -46,8 +45,8 @@ namespace WhittedRaytracer {
             Stats.LogTaskTime(Stats.OpenTKTime);
             DivideRayTracingTasks();
             Stats.LogTaskTime(Stats.MultithreadingOverhead);
-            threadpool.DoTasks(tasks);
-            threadpool.WaitTillDone();
+            Threadpool.DoTasks(tasks);
+            Threadpool.WaitTillDone();
             Stats.LogTaskTime(Stats.TracingTime);
 
             // Drawing
@@ -91,10 +90,10 @@ namespace WhittedRaytracer {
         void DivideRayTracingTasks() {
             int rayCount = Stats.RayCountNextTick();
             Stats.LogTickRays(rayCount);
-            float size = rayCount / RayTaskAmount;
-            float[] taskBounds = new float[RayTaskAmount + 1];
+            float size = rayCount / MultithreadingTaskCount;
+            float[] taskBounds = new float[MultithreadingTaskCount + 1];
             taskBounds[0] = 0;
-            for (int n = 0; n < RayTaskAmount; n++) {
+            for (int n = 0; n < MultithreadingTaskCount; n++) {
                 taskBounds[n + 1] = taskBounds[n] + size;
                 int taskLower = (int)taskBounds[n];
                 int taskUpper = (int)taskBounds[n + 1];

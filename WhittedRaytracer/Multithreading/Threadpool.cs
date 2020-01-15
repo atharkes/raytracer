@@ -39,15 +39,12 @@ namespace WhittedRaytracer.Multithreading {
         /// <summary> Let the threadpool do some tasks </summary>
         /// <param name="tasks">The tasks to do with the threadpool</param>
         public void DoTasks(Action[] tasks) {
-            // Early Out if Still Busy
             if (remaining > 0) {
-                Console.WriteLine("Still Busy: Skipped Work");
-                return;
+                Console.WriteLine("Still Busy: Waiting till earlier work is done");
+                WaitTillDone();
             }
-            // Ready new Tasks
             this.tasks = tasks;
             remaining = tasks.Length;
-            // Set Done to False
             for (var i = 0; i < ThreadCount; i++) done[i] = false;
             // Give Go Signal
             foreach (EventWaitHandle waitHandle in go) waitHandle.Set();

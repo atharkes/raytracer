@@ -60,11 +60,11 @@ namespace WhittedRaytracer {
             }
             Scene.Camera.ScreenPlane.Screen.Print($"FPS: {1000 / (int)Stats.FrameTime.LastTick.TotalMilliseconds}", 1, 1, 0xffffff);
             Scene.Camera.ScreenPlane.Screen.Print($"Rays Traced: {Stats.RaysTracedLastTick}", 1, 17, 0xffffff);
-            Scene.Camera.ScreenPlane.Screen.Print($"Frame Time: {(int)Stats.FrameTime.LastTick.TotalMilliseconds}", 1, 33, 0xffffff);
-            Scene.Camera.ScreenPlane.Screen.Print($"Tracing Time: {(int)Stats.TracingTime.LastTick.TotalMilliseconds}", 1, 49, 0xffffff);
-            Scene.Camera.ScreenPlane.Screen.Print($"Drawing Time: {(int)Stats.DrawingTime.LastTick.TotalMilliseconds}", 1, 65, 0xffffff);
-            Scene.Camera.ScreenPlane.Screen.Print($"OpenTK Time: {(int)Stats.OpenTKTime.LastTick.TotalMilliseconds}", 1, 81, 0xffffff);
-            Scene.Camera.ScreenPlane.Screen.Print($"Multithreading Overhead: {(int)Stats.MultithreadingOverhead.LastTick.TotalMilliseconds}", 1, 97, 0xffffff);
+            Scene.Camera.ScreenPlane.Screen.Print($"Frame Time (ms): {(int)Stats.FrameTime.LastTick.TotalMilliseconds}", 1, 33, 0xffffff);
+            Scene.Camera.ScreenPlane.Screen.Print($"Tracing Time (ms): {(int)Stats.TracingTime.LastTick.TotalMilliseconds}", 1, 49, 0xffffff);
+            Scene.Camera.ScreenPlane.Screen.Print($"Drawing Time (ms): {(int)Stats.DrawingTime.LastTick.TotalMilliseconds}", 1, 65, 0xffffff);
+            Scene.Camera.ScreenPlane.Screen.Print($"OpenTK Time (ms): {(int)Stats.OpenTKTime.LastTick.TotalMilliseconds}", 1, 81, 0xffffff);
+            Scene.Camera.ScreenPlane.Screen.Print($"Multithreading Overhead (ms): {(int)Stats.MultithreadingOverhead.LastTick.TotalMilliseconds}", 1, 97, 0xffffff);
             Scene.Camera.ScreenPlane.Screen.Print($"FOV: {Scene.Camera.FOV}", 1, 113, 0xffffff);
             Stats.LogTaskTime(Stats.DrawingTime);
         }

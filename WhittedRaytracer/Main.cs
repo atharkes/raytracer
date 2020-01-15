@@ -6,7 +6,7 @@ using WhittedRaytracer.Raytracing;
 using WhittedRaytracer.Raytracing.SceneObjects;
 using WhittedRaytracer.Raytracing.SceneObjects.CameraParts;
 using WhittedRaytracer.Raytracing.SceneObjects.Primitives;
-using WhittedRaytracer.Statistics;
+using WhittedRaytracer.Utilities;
 
 namespace WhittedRaytracer {
     /// <summary> Main class of the raytracer </summary>
@@ -14,12 +14,16 @@ namespace WhittedRaytracer {
         /// <summary> The amount of tasks created for the threadpool </summary>
         public const int RayTaskAmount = 720;
         /// <summary> The targeted framerate of the raytracer </summary>
-        public const int TargetFrameRate = 30;
+        public const int TargetFrameRate = 20;
+        /// <summary> The targeted frame time computed from the targeted frame rate </summary>
+        public static TimeSpan TargetFrameTime => new TimeSpan(0, 0, 0, 0, 1000 / TargetFrameRate);
+        /// <summary> Minimum amount of rays to trace in a tick </summary>
+        public const int MinimumRayCount = 10_000;
 
         /// <summary> The 3d scene in which the raytracing takes place </summary>
         public readonly Scene Scene;
         /// <summary> Statistics of the raytracer </summary>
-        public readonly Stats Stats = new Stats();
+        public readonly Statistics Stats = new Statistics();
 
         /// <summary> Whether it is drawing debug information </summary>
         public bool Debug = false;
@@ -37,6 +41,7 @@ namespace WhittedRaytracer {
 
         /// <summary> Process a single frame </summary>
         public void Tick() {
+            Stats.LogFrameTime();
             InputCheck();
             Stats.LogTaskTime(Stats.OpenTKTime);
             DivideRayTracingTasks();
@@ -44,12 +49,6 @@ namespace WhittedRaytracer {
             threadpool.DoTasks(tasks);
             threadpool.WaitTillDone();
             Stats.LogTaskTime(Stats.TracingTime);
-            Stats.LogFrameTime();
-
-            // Console Output
-            Console.WriteLine($"{Stats.OpenTKTime.LastTick.Milliseconds}\t| OpenTK ms");
-            Console.WriteLine($"{Stats.MultithreadingOverhead.LastTick.Milliseconds}\t| Divide Tasks ms");
-            Console.WriteLine($"{Stats.TracingTime.LastTick.Milliseconds}\t| Tracing ms");
 
             // Drawing
             Scene.Camera.ScreenPlane.Screen.Clear(0);
@@ -60,9 +59,15 @@ namespace WhittedRaytracer {
                 Scene.Camera.ScreenPlane.DrawScreenPlane();
                 Scene.Camera.ScreenPlane.DrawCamera();
             }
-            Scene.Camera.ScreenPlane.Screen.Print($"Frametime: {Stats.FrameTime.LastTick.Milliseconds}", 1, 1, 0xffffff);
-            Scene.Camera.ScreenPlane.Screen.Print($"FPS: {1000 / Stats.FrameTime.LastTick.Milliseconds}", 1, 17, 0xffffff);
-            Scene.Camera.ScreenPlane.Screen.Print($"FOV: {Scene.Camera.FOV}", 1, 33, 0xffffff);
+            Scene.Camera.ScreenPlane.Screen.Print($"FPS: {1000 / (int)Stats.FrameTime.LastTick.TotalMilliseconds}", 1, 1, 0xffffff);
+            Scene.Camera.ScreenPlane.Screen.Print($"Rays Traced: {Stats.RaysTracedLastTick}", 1, 17, 0xffffff);
+            Scene.Camera.ScreenPlane.Screen.Print($"Frame Time: {(int)Stats.FrameTime.LastTick.TotalMilliseconds}", 1, 33, 0xffffff);
+            Scene.Camera.ScreenPlane.Screen.Print($"Tracing Time: {(int)Stats.TracingTime.LastTick.TotalMilliseconds}", 1, 49, 0xffffff);
+            Scene.Camera.ScreenPlane.Screen.Print($"Drawing Time: {(int)Stats.DrawingTime.LastTick.TotalMilliseconds}", 1, 65, 0xffffff);
+            Scene.Camera.ScreenPlane.Screen.Print($"OpenTK Time: {(int)Stats.OpenTKTime.LastTick.TotalMilliseconds}", 1, 81, 0xffffff);
+            Scene.Camera.ScreenPlane.Screen.Print($"Multithreading Overhead: {(int)Stats.MultithreadingOverhead.LastTick.TotalMilliseconds}", 1, 97, 0xffffff);
+            Scene.Camera.ScreenPlane.Screen.Print($"FOV: {Scene.Camera.FOV}", 1, 113, 0xffffff);
+            Stats.LogTaskTime(Stats.DrawingTime);
         }
 
         /// <summary> Check if there was any input </summary>
@@ -84,22 +89,22 @@ namespace WhittedRaytracer {
         }
 
         void DivideRayTracingTasks() {
-            int rayCount = 25_000;
+            int rayCount = Stats.RayCountNextTick();
             Stats.LogTickRays(rayCount);
-            CameraRay[] rays = Scene.Camera.GetRandomCameraRays(rayCount);
-            float size = rays.Length / RayTaskAmount;
+            float size = rayCount / RayTaskAmount;
             float[] taskBounds = new float[RayTaskAmount + 1];
             taskBounds[0] = 0;
             for (int n = 0; n < RayTaskAmount; n++) {
                 taskBounds[n + 1] = taskBounds[n] + size;
                 int taskLower = (int)taskBounds[n];
                 int taskUpper = (int)taskBounds[n + 1];
-                tasks[n] = () => TraceRays(taskLower, taskUpper, rays);
+                tasks[n] = () => TraceRays(taskLower, taskUpper);
             }
         }
 
-        void TraceRays(int from, int to, CameraRay[] rays) {
-            for (int i = from; i < to; i++) {
+        void TraceRays(int from, int to) {
+            CameraRay[] rays = Scene.Camera.GetRandomCameraRays(to - from);
+            for (int i = 0; i < rays.Length; i++) {
                 int x = i % Scene.Camera.ScreenPlane.Screen.Width;
                 int y = i / Scene.Camera.ScreenPlane.Screen.Width;
                 bool debugRay = Debug && DebugShowRays && (x % 64 == 0 || x == Scene.Camera.ScreenPlane.Screen.Width) && y == Scene.Camera.ScreenPlane.Screen.Height / 2;

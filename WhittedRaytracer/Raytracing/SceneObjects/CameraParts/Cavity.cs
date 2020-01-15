@@ -8,6 +8,9 @@ namespace WhittedRaytracer.Raytracing.SceneObjects.CameraParts {
         /// <summary> The amount of photons caught by the cavity </summary>
         public int Samples { get; private set; } = 0;
 
+        /// <summary> Get the average light in this cavity </summary>
+        public Vector3 AverageLight => Light == Vector3.Zero ? Vector3.Zero : Light / Samples;
+
         /// <summary> Add a photon to the cavity </summary>
         /// <param name="photon">The photon to add to the cavity</param>
         public void AddPhoton(Vector3 photon) {

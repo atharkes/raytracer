@@ -1,5 +1,6 @@
 ﻿using OpenTK;
 using System;
+using WhittedRaytracer.Utilities;
 
 namespace WhittedRaytracer.Raytracing.SceneObjects {
     /// <summary> A material class for primitives in the scene </summary>

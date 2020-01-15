@@ -26,7 +26,7 @@ namespace WhittedRaytracer.Raytracing.SceneObjects.CameraParts {
         /// <param name="screen">The screen to draw the image to</param>
         public void DrawImage(IScreen screen) {
             for (int i = 0; i < Cavities.Length; i++) {
-                screen.Plot(i, (Cavities[i].Light / Cavities[i].Samples).ToIntColor());
+                screen.Plot(i, Cavities[i].AverageLight.ToIntColor());
             }
         }
 

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using WhittedRaytracer.Raytracing.SceneObjects;
+using WhittedRaytracer.Utilities;
 
 namespace WhittedRaytracer.Raytracing.AccelerationStructure {
     /// <summary> An Axis-Aligned Bounding Box </summary>

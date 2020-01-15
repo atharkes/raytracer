@@ -1,9 +1,17 @@
 ﻿using OpenTK;
 using WhittedRaytracer.Raytracing.SceneObjects.CameraParts;
+using WhittedRaytracer.Utilities;
 
 namespace WhittedRaytracer.Raytracing.SceneObjects {
     /// <summary> The camera object in the 3d scene </summary>
     class Camera : ISceneObject {
+        /// <summary> The input handler of the camera </summary>
+        public readonly InputHandler InputHandler = new InputHandler();
+        /// <summary> The statitics of the camera </summary>
+        public readonly Statistics Statistics = new Statistics();
+        /// <summary> The configuration of the camera </summary>
+        public readonly Config Config = new Config();
+
         /// <summary> The screen plane in front of the camera </summary>
         public readonly ScreenPlane ScreenPlane;
         /// <summary> The position of the camera </summary>

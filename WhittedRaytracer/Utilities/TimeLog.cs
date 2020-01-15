@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace WhittedRaytracer.Statistics {
+namespace WhittedRaytracer.Utilities {
     /// <summary> A log for times </summary>
     class TimeLog {
         /// <summary> The total time spend </summary>

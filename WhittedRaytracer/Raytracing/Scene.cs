@@ -6,6 +6,7 @@ using WhittedRaytracer.Raytracing.AccelerationStructure;
 using WhittedRaytracer.Raytracing.SceneObjects;
 using WhittedRaytracer.Raytracing.SceneObjects.CameraParts;
 using WhittedRaytracer.Raytracing.SceneObjects.Primitives;
+using WhittedRaytracer.Utilities;
 
 namespace WhittedRaytracer.Raytracing {
     /// <summary> The 3d scene in which the ray tracing takes place </summary>

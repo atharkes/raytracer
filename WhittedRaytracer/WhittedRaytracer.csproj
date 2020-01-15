@@ -120,9 +120,11 @@
     <Compile Include="Drawing\Surface.cs" />
     <Compile Include="OpenTKProgram.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Statistics\Stats.cs" />
-    <Compile Include="Statistics\TimeLog.cs" />
-    <Compile Include="Utils.cs" />
+    <Compile Include="Utilities\Config.cs" />
+    <Compile Include="Utilities\InputHandler.cs" />
+    <Compile Include="Utilities\Statistics.cs" />
+    <Compile Include="Utilities\TimeLog.cs" />
+    <Compile Include="Utilities\Utils.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

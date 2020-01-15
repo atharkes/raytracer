@@ -1,8 +1,9 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 
-namespace WhittedRaytracer.Statistics {
+namespace WhittedRaytracer.Utilities {
     /// <summary> Statistics for the raytracer </summary>
-    class Stats {
+    class Statistics {
         /// <summary> Amount of rays traced </summary>
         public int RaysTraced { get; private set; } = 0;
         /// <summary> Amount of rays traced in the previous tick </summary>
@@ -16,6 +17,8 @@ namespace WhittedRaytracer.Statistics {
         public readonly TimeLog MultithreadingOverhead = new TimeLog();
         /// <summary> A log for the time required by tracing rays </summary>
         public readonly TimeLog TracingTime = new TimeLog();
+        /// <summary> A log for the time required by drawing on the screen </summary>
+        public readonly TimeLog DrawingTime = new TimeLog();
 
         readonly Stopwatch frameTimer = Stopwatch.StartNew();
         readonly Stopwatch taskTimer = Stopwatch.StartNew();
@@ -38,6 +41,15 @@ namespace WhittedRaytracer.Statistics {
         public void LogTaskTime(TimeLog taskLog) {
             taskLog.LogTickTime(taskTimer.Elapsed);
             taskTimer.Restart();
+        }
+        
+        /// <summary> Returns how many rays should be traced in the next tick </summary>
+        /// <returns>Amount of rays to trace in the next tick</returns>
+        public int RayCountNextTick() {
+            if (FrameTime.LastTick == default(TimeSpan)) return Main.MinimumRayCount;
+            double frameTimeDifference = Main.TargetFrameTime.TotalMilliseconds - (FrameTime.LastTick.TotalMilliseconds + MultithreadingOverhead.LastTick.TotalMilliseconds);
+            double excessTraceFactor = frameTimeDifference / TracingTime.LastTick.TotalMilliseconds;
+            return Math.Max(Main.MinimumRayCount, (int)(RaysTracedLastTick * (1f + excessTraceFactor)));
         }
     }
 }

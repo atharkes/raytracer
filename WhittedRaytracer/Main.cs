@@ -51,7 +51,7 @@ namespace WhittedRaytracer {
 
             // Drawing
             Scene.Camera.ScreenPlane.Screen.Clear(0);
-            Scene.Camera.ScreenPlane.DrawAccumulatedLight();
+            Scene.Camera.ScreenPlane.DrawAccumulator();
             if (Debug) {
                 foreach (Primitive primitive in Scene.Primitives) if (primitive is Sphere) Scene.Camera.ScreenPlane.DrawSphere(primitive as Sphere);
                 foreach (PointLight light in Scene.Lights) Scene.Camera.ScreenPlane.DrawLight(light);
@@ -73,6 +73,7 @@ namespace WhittedRaytracer {
         void InputCheck() {
             KeyboardState keyboardState = Keyboard.GetState();
             if (keyboardState[Key.F1]) Debug = !Debug;
+            if (keyboardState[Key.F2]) Scene.Camera.ScreenPlane.Accumulator.DrawBVH = !Scene.Camera.ScreenPlane.Accumulator.DrawBVH;
             if (keyboardState[Key.Space]) Scene.Camera.Move(Scene.Camera.Up);
             if (keyboardState[Key.LShift]) Scene.Camera.Move(Scene.Camera.Down);
             if (keyboardState[Key.W]) Scene.Camera.Move(Scene.Camera.Front);
@@ -108,7 +109,7 @@ namespace WhittedRaytracer {
                 int y = i / Scene.Camera.ScreenPlane.Screen.Width;
                 bool debugRay = Debug && DebugShowRays && (x % 64 == 0 || x == Scene.Camera.ScreenPlane.Screen.Width) && y == Scene.Camera.ScreenPlane.Screen.Height / 2;
                 Vector3 pixelColor = Scene.CastRay(rays[i], 0, debugRay);
-                rays[i].Cavity.AddPhoton(pixelColor);
+                rays[i].Cavity.AddPhoton(pixelColor, rays[i].BVHTraversals);
             }
         }
     }

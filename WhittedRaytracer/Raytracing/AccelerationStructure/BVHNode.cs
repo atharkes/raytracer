@@ -41,6 +41,7 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructure {
         /// <param name="ray">The ray to intersect the BVH with</param>
         /// <returns>The intersection in the BVH</returns>
         public Intersection Intersect(Ray ray) {
+            ray.BVHTraversals++;
             if (!AABB.Intersect(ray)) {
                 return null;
             } else if (Leaf) {
@@ -86,7 +87,7 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructure {
         /// <summary> Compute the best split for this BVH node </summary>
         /// <returns>Either a tuple with the best split or null if there is no good split</returns>
         (AABB left, AABB right)? ComputeBestSplit() { 
-            ICollection<(AABB left, AABB right)> splits = BVH.BinAmount < AABB.Primitives.Count ? BinSplits() : AllSplits();
+            ICollection<(AABB left, AABB right)> splits = BVH.Bin && BVH.BinAmount < AABB.Primitives.Count ? BinSplits() : AllSplits();
             float bestCost = AABB.SurfaceAreaHeuristic;
             (AABB left, AABB right)? bestSplit = null;
             foreach ((AABB, AABB) split in splits) {

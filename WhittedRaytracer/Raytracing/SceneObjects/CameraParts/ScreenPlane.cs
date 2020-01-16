@@ -44,7 +44,7 @@ namespace WhittedRaytracer.Raytracing.SceneObjects.CameraParts {
         }
 
         /// <summary> Draw the light that is accumulated by the accumulator </summary>
-        public void DrawAccumulatedLight() {
+        public void DrawAccumulator() {
             Accumulator.DrawImage(Screen);
         }
 

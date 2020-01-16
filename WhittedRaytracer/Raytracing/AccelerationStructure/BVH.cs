@@ -14,6 +14,8 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructure {
         public const float TraversalCost = 1f;
         /// <summary> The estimated cost of intersecting a primitive for the SAH </summary>
         public const float IntersectionCost = 1f;
+        /// <summary> Whether to bin or just find the optimal greedy BVH </summary>
+        public const bool Bin = true;
         /// <summary> The amount of bins used for the binning process </summary>
         public const int BinAmount = 16;
         /// <summary> An epsilon for the binning process </summary>

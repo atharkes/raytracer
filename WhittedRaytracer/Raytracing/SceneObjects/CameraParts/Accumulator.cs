@@ -1,4 +1,5 @@
 ﻿using System;
+using WhittedRaytracer.Utilities;
 
 namespace WhittedRaytracer.Raytracing.SceneObjects.CameraParts {
     /// <summary> An accumulator that accumulates the light of photons </summary>
@@ -40,7 +41,7 @@ namespace WhittedRaytracer.Raytracing.SceneObjects.CameraParts {
 
         void DrawImageRange(IScreen screen, int from, int to) {
             for (int i = from; i < to; i++) {
-                if (DrawBVH) screen.Plot(i, Cavities[i].AverageBVHTraversals);
+                if (DrawBVH) screen.Plot(i, Cavities[i].AverageBVHTraversalColor.ToIntColor());
                 else screen.Plot(i, Cavities[i].AverageLight.ToIntColor());
             }
         }

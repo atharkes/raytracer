@@ -14,6 +14,8 @@ namespace WhittedRaytracer.Raytracing.SceneObjects.CameraParts {
         public Vector3 AverageLight => Light == Vector3.Zero ? Vector3.Zero : Light / Samples;
         /// <summary> Average BVH traversals of photons in the cavity </summary>
         public int AverageBVHTraversals => Samples == 0 ? 0 : BVHTraversals / Samples;
+        /// <summary> The green to red color fade for the BVH traversals </summary>
+        public Vector3 AverageBVHTraversalColor => new Vector3((AverageBVHTraversals - 256f) / 255f, AverageBVHTraversals < 255f ? AverageBVHTraversals / 255f : 2 - AverageBVHTraversals / 255f, 0);
 
         /// <summary> Add a photon to the cavity </summary>
         /// <param name="photon">The photon to add to the cavity</param>

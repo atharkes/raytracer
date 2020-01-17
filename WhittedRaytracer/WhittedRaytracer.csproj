@@ -95,7 +95,7 @@
     <Compile Include="Raytracing\SceneObjects\CameraParts\Accumulator.cs" />
     <Compile Include="Raytracing\SceneObjects\CameraParts\Cavity.cs" />
     <Compile Include="Drawing\Sprite.cs" />
-    <Compile Include="ExtensionMethods.cs" />
+    <Compile Include="Utilities\ExtensionMethods.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Multithreading\CPUaffinity.cs" />
     <Compile Include="Multithreading\Threadpool.cs" />

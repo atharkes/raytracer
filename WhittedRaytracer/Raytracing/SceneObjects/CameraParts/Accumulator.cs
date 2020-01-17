@@ -1,9 +1,11 @@
-﻿using OpenTK;
-using System;
+﻿using System;
+using WhittedRaytracer.Utilities;
 
 namespace WhittedRaytracer.Raytracing.SceneObjects.CameraParts {
     /// <summary> An accumulator that accumulates the light of photons </summary>
     class Accumulator {
+        /// <summary> Whether the draw BVH instead of the Light </summary>
+        public bool DrawBVH { get; set; } = false;
         /// <summary> The cavities in which the light is accumulated </summary>
         public Cavity[] Cavities { get; }
         /// <summary> The width of the accumulator </summary>
@@ -39,7 +41,8 @@ namespace WhittedRaytracer.Raytracing.SceneObjects.CameraParts {
 
         void DrawImageRange(IScreen screen, int from, int to) {
             for (int i = from; i < to; i++) {
-                screen.Plot(i, Cavities[i].AverageLight.ToIntColor());
+                if (DrawBVH) screen.Plot(i, Cavities[i].AverageBVHTraversalColor.ToIntColor());
+                else screen.Plot(i, Cavities[i].AverageLight.ToIntColor());
             }
         }
 
@@ -48,14 +51,6 @@ namespace WhittedRaytracer.Raytracing.SceneObjects.CameraParts {
             foreach (Cavity cavity in Cavities) {
                 cavity.Clear();
             }
-        }
-
-        /// <summary> Add a photon to a cavity in the accumulator </summary>
-        /// <param name="x">The x coordinate of the cavity</param>
-        /// <param name="y">The y coordinate of the cavity</param>
-        /// <param name="photon">The photon to add to a cavity in the accumulator</param>
-        public void AddPhoton(int x, int y, Vector3 photon) {
-            Cavities[x + y * Width].AddPhoton(photon);
         }
     }
 }

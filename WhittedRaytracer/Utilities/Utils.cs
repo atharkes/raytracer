@@ -16,5 +16,14 @@ namespace WhittedRaytracer.Utilities {
         public static Vector3 MaxVector => new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
         /// <summary> Get a vector with random values between 0 and 1 </summary>
         public static Vector3 RandomVector => new Vector3((float)Random.NextDouble(), (float)Random.NextDouble(), (float)Random.NextDouble());
+
+        public static Vector3 ColorScaleBlackGreenYellowRed(float value, float min, float max) {
+            const int transitions = 3;
+            float range = max - min;
+            float transition1 = range / transitions;
+            float green = value < transition1 ? value / transition1 : transitions - value / transition1;
+            float red = (value - transition1) / transition1;
+            return new Vector3(red, green, 0);
+        }
     }
 }

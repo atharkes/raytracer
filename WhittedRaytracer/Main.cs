@@ -34,7 +34,7 @@ namespace WhittedRaytracer {
         readonly Action[] tasks;
 
         public Main(IScreen screen) {
-            Scene = Scene.DefaultWithRandomSpheres(screen, 50_000);
+            Scene = Scene.DefaultWithRandomSpheres(screen, 10_000);
             tasks = new Action[MultithreadingTaskCount];
         }
 

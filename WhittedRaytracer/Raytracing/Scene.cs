@@ -142,6 +142,7 @@ namespace WhittedRaytracer.Raytracing {
             Vector3 radianceOut = Vector3.Zero;
             foreach (Primitive light in Lights) {
                 Ray shadowRay = intersection.GetShadowRay(light);
+                if (Vector3.Dot(intersection.Normal, shadowRay.Direction) < 0) continue;
                 if (AccelerationStructure.IntersectBool(shadowRay)) continue;
                 Vector3 radianceIn = light.Material.EmittingLight * shadowRay.DistanceAttenuation;
                 Vector3 irradiance;

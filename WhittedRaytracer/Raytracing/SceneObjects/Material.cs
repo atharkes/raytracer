@@ -6,11 +6,11 @@ namespace WhittedRaytracer.Raytracing.SceneObjects {
     /// <summary> A material class for primitives in the scene </summary>
     class Material {
         /// <summary> The color of the primitive </summary>
-        public Vector3 Color { get; set; }
+        public Vector3 Color { get; set; } = Vector3.One;
         /// <summary> How specular this primitive is. A specular object reflects light like a mirror. </summary>
-        public float Specularity { get; set; }
+        public float Specularity { get; set; } = 0;
         /// <summary> How dielectric this primitive is. A dielectric object both passes light and reflects it like water or glass. </summary>
-        public float Dielectric { get; set; }
+        public float Dielectric { get; set; } = 0;
         /// <summary> The refraction index of this primitive if it is a dielectric. This is typically a value between 1 and 3.
         /// <para> Vacuum 1 </para>
         /// <para> Gases at 0 °C: Air 1.000293, Helium 1.000036, Hydrogen 1.000132, Carbon dioxide 1.00045 </para>
@@ -18,11 +18,19 @@ namespace WhittedRaytracer.Raytracing.SceneObjects {
         /// <para> Solids: Ice 1.31, Fused silica(quartz) 1.46, Plexiglas 1.49, Window glass 1.52, 
         /// Flint glass 1.62, Sapphire 1.77, Cubic zirconia 2.15, Diamond 2.42, Moissanite 2.65 </para>
         /// </summary>
-        public float RefractionIndex { get; set; }
+        public float RefractionIndex { get; set; } = 1;
         /// <summary> The glossyness of the primitive </summary>
-        public float Glossyness { get; set; }
+        public float Glossyness { get; set; } = 0;
         /// <summary> The gloss specularity of the primitive </summary>
-        public float GlossSpecularity { get; set; }
+        public float GlossSpecularity { get; set; } = 0;
+
+        /// <summary> How much light this material is emitting (in watt/m^2) </summary>
+        public float EmittingStrength { get; set; } = 0;
+
+        /// <summary> The light this material is emitting </summary>
+        public Vector3 EmittingLight => Color * EmittingStrength;
+        /// <summary> Whether this material is emitting light </summary>
+        public bool Emitting => EmittingStrength > 0;
 
         /// <summary> Create a new material </summary>
         /// <param name="color">The color of the material</param>
@@ -40,17 +48,37 @@ namespace WhittedRaytracer.Raytracing.SceneObjects {
             GlossSpecularity = glossSpecularity;
         }
 
+        /// <summary> Create an emitting material </summary>
+        /// <param name="color">The color of the material and the light</param>
+        /// <param name="emittingStrength">The emitting strength of the light</param>
+        public Material(float emittingStrength, Vector3 color) {
+            EmittingStrength = emittingStrength;
+            Color = color;
+        }
+
         /// <summary> Create a random material </summary>
         /// <returns>A random material</returns>
         public static Material Random() {
+            return Utils.Random.NextDouble() < 0.9995f ? RandomNonEmitter() : RandomEmitter();
+        }
+
+        /// <summary> Create a random material that doesn't emit light </summary>
+        /// <returns>A random material that doesn't emit light</returns>
+        public static Material RandomNonEmitter() {
             Random r = Utils.Random;
-            Vector3 color = new Vector3((float)r.NextDouble(), (float)r.NextDouble(), (float)r.NextDouble());
+            Vector3 color = Utils.RandomVector;
             float specularity = r.NextDouble() < 0.3f ? (float)r.NextDouble() : 0;
             float dielectric = r.NextDouble() < 0.1f ? (float)r.NextDouble() : 0;
             float refractionIndex = (float)r.NextDouble() * 2f + 1f;
             float glossyness = r.NextDouble() < 0.5f ? (float)r.NextDouble() : 0;
             float glossSpecularity = (float)r.NextDouble() * 10f;
             return new Material(color, specularity, dielectric, refractionIndex, glossyness, glossSpecularity);
+        }
+
+        /// <summary> Create a random emitting material </summary>
+        /// <returns>A random emitting material</returns>
+        public static Material RandomEmitter() {
+            return new Material(Utils.Random.Next(1, 50), Utils.RandomVector);
         }
 
         /// <summary> Create a diffuse green material </summary>

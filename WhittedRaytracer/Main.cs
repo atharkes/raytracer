@@ -54,7 +54,7 @@ namespace WhittedRaytracer {
             Scene.Camera.ScreenPlane.DrawAccumulator();
             if (Debug) {
                 foreach (Primitive primitive in Scene.Primitives) if (primitive is Sphere) Scene.Camera.ScreenPlane.DrawSphere(primitive as Sphere);
-                foreach (PointLight light in Scene.Lights) Scene.Camera.ScreenPlane.DrawLight(light);
+                foreach (Primitive primitive in Scene.Lights) if (primitive is PointLight) Scene.Camera.ScreenPlane.DrawLight(primitive as PointLight);
                 Scene.Camera.ScreenPlane.DrawScreenPlane();
                 Scene.Camera.ScreenPlane.DrawCamera();
             }

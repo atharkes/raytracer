@@ -1,7 +1,7 @@
 ﻿using OpenTK;
 
 namespace WhittedRaytracer.Raytracing.SceneObjects {
-    /// <summary> A abstract primitive for the 3d scene </summary>
+    /// <summary> An abstract primitive for the 3d scene </summary>
     abstract class Primitive : ISceneObject {
         /// <summary> The position of the primitive </summary>
         public Vector3 Position { get; set; }

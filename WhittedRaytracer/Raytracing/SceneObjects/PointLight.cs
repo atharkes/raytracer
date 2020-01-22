@@ -1,19 +1,39 @@
 ﻿using OpenTK;
 
 namespace WhittedRaytracer.Raytracing.SceneObjects {
-    /// <summary> A lightsource for the 3d scene </summary>
-    class PointLight : ISceneObject {
-        /// <summary> The position of the lightsource </summary>
-        public Vector3 Position { get; set; }
-        /// <summary> The color of the lightsource </summary>
-        public Vector3 Color { get; set; }
+    /// <summary> A point light to illuminate your scene </summary>
+    class PointLight : Primitive {
+        /// <summary> Create a new point light </summary>
+        /// <param name="position">The position of the point light</param>
+        /// <param name="color">The color of the point light</param>
+        /// <param name="intensity">Intensity of the point light</param>
+        public PointLight(Vector3 position, Vector3 color, float intensity) : base(position, new Material(intensity, color)) { }
 
-        /// <summary> Create a new lightsource for the 3d scene </summary>
-        /// <param name="position">The position of the lightsource</param>
-        /// <param name="color">The color of the lightsource</param>
-        public PointLight(Vector3 position, Vector3 color) {
-            Position = position;
-            Color = color;
+        /// <summary> You cannot intersect a point light </summary>
+        /// <param name="ray">The ray that will never intersect the pointlight</param>
+        /// <returns>-1f</returns>
+        public override float Intersect(Ray ray) {
+            return -1f;
+        }
+
+        /// <summary> You cannot intersect a point light </summary>
+        /// <param name="ray">The ray that will never intersect the pointlight</param>
+        /// <returns>False</returns>
+        public override bool IntersectBool(Ray ray) {
+            return false;
+        }
+
+        /// <summary> A point light doesn't really have a normal </summary>
+        /// <param name="intersectionPoint">The intersection point which cannot be on the surface</param>
+        /// <returns>A zero vector</returns>
+        public override Vector3 GetNormal(Vector3 intersectionPoint) {
+            return Vector3.Zero;
+        }
+
+        /// <summary> A point has no bounds </summary>
+        /// <returns>Just twice the position of the point light</returns>
+        public override (Vector3 min, Vector3 max) GetBounds() {
+            return (Position, Position);
         }
     }
 }

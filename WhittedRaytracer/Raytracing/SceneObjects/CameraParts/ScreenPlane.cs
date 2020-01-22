@@ -114,7 +114,7 @@ namespace WhittedRaytracer.Raytracing.SceneObjects.CameraParts {
             int y1 = TZ(light.Position.Z) - 1;
             int x2 = x1 + 2;
             int y2 = y1 + 2;
-            Screen.Box(x1, y1, x2, y2, light.Color.ToIntColor());
+            Screen.Box(x1, y1, x2, y2, light.Material.Color.ToIntColor());
         }
 
         /// <summary> Draw a sphere from topview for debug purposes </summary>

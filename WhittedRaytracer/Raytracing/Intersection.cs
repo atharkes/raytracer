@@ -43,7 +43,7 @@ namespace WhittedRaytracer.Raytracing {
         /// <summary> Get a shadow ray from this intersection to a lightsource </summary>
         /// <param name="lightsource">The lightsource to send the shadow ray to</param>
         /// <returns>A shadow ray from the intersection to the lightsource</returns>
-        public Ray GetShadowRay(PointLight lightsource) {
+        public Ray GetShadowRay(Primitive lightsource) {
             Vector3 direction = lightsource.Position - Position;
             return new Ray(Position + Normal * RaiseEpsilon, direction, direction.Length);
         }

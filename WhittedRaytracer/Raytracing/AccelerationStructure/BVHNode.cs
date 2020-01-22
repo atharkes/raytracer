@@ -41,7 +41,7 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructure {
         /// <param name="ray">The ray to intersect the BVH with</param>
         /// <returns>The intersection in the BVH</returns>
         public Intersection Intersect(Ray ray) {
-            ray.BVHTraversals++;
+            if (ray is CameraRay) (ray as CameraRay).BVHTraversals++;
             if (!AABB.Intersect(ray)) {
                 return null;
             } else if (Leaf) {

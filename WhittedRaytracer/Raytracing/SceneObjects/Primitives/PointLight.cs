@@ -1,6 +1,6 @@
 ﻿using OpenTK;
 
-namespace WhittedRaytracer.Raytracing.SceneObjects {
+namespace WhittedRaytracer.Raytracing.SceneObjects.Primitives {
     /// <summary> A point light to illuminate your scene </summary>
     class PointLight : Primitive {
         /// <summary> Create a new point light </summary>

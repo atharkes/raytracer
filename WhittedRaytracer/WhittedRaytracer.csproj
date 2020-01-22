@@ -111,7 +111,7 @@
     <Compile Include="Raytracing\Intersection.cs" />
     <Compile Include="Raytracing\SceneObjects\Camera.cs" />
     <Compile Include="Main.cs" />
-    <Compile Include="Raytracing\SceneObjects\PointLight.cs" />
+    <Compile Include="Raytracing\SceneObjects\Primitives\PointLight.cs" />
     <Compile Include="Raytracing\SceneObjects\Primitives\Plane.cs" />
     <Compile Include="Raytracing\SceneObjects\Primitive.cs" />
     <Compile Include="Raytracing\SceneObjects\Primitives\Sphere.cs" />

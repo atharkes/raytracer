@@ -35,6 +35,7 @@ Controls:
 - W,A,S,D:      Move Camera
 - Space:        Move Camera Up
 - Shift:        Move Camera Down
-- F1:           Disable/Enable Debug
+- F1:           Disable/Enable Debug drawing
+- F2:           Disable/Enable BVHTraversal color scale
 - Numpad '+':   Increase FOV
 - Numpad '-':   Decrease FOV

@@ -44,11 +44,6 @@ namespace WhittedRaytracer.Raytracing.SceneObjects.CameraParts {
             Update();
         }
 
-        /// <summary> Draw the light that is accumulated by the accumulator </summary>
-        public void DrawAccumulator() {
-            Accumulator.DrawImage(Screen);
-        }
-
         /// <summary> Set the position of the screen plane and move the camera with it </summary>
         /// <param name="newPosition">The new position of the screen plane</param>
         public void SetCenter(Vector3 newPosition) {
@@ -73,6 +68,25 @@ namespace WhittedRaytracer.Raytracing.SceneObjects.CameraParts {
         /// <returns>The position of the pixel in worldspace</returns>
         public Vector3 GetPixelPosition(int x, int y) {
             return TopLeft + (float)x / (Screen.Width - 1) * (TopRight - TopLeft) + (float)y / (Screen.Height - 1) * (BottomLeft - TopLeft);
+        }
+
+        /// <summary> Draw an image to this screen plane </summary>
+        public void Draw() {
+            Screen.Clear();
+            Accumulator.DrawImage(Screen, Camera.Config.DrawBVHTraversal);
+            if (Camera.Config.DebugInfo) DrawDebugInformation();
+        }
+
+        public void DrawDebugInformation() {
+            Screen.Print($"FPS: {1000 / (int)Camera.Statistics.FrameTime.LastTick.TotalMilliseconds}", 1, 1);
+            Screen.Print($"Light: {Camera.ScreenPlane.Accumulator.AverageLight()}", 1, 17);
+            Screen.Print($"Rays Traced: {Camera.Statistics.RaysTracedLastTick}", 1, 33);
+            Screen.Print($"Frame Time (ms): {(int)Camera.Statistics.FrameTime.LastTick.TotalMilliseconds}", 1, 49);
+            Screen.Print($"Tracing Time (ms): {(int)Camera.Statistics.TracingTime.LastTick.TotalMilliseconds}", 1, 65);
+            Screen.Print($"Drawing Time (ms): {(int)Camera.Statistics.DrawingTime.LastTick.TotalMilliseconds}", 1, 81);
+            Screen.Print($"OpenTK Time (ms): {(int)Camera.Statistics.OpenTKTime.LastTick.TotalMilliseconds}", 1, 97);
+            Screen.Print($"Multithreading Overhead (ms): {(int)Camera.Statistics.MultithreadingOverhead.LastTick.TotalMilliseconds}", 1, 113);
+            Screen.Print($"FOV: {Camera.FOV}", 1, 129);
         }
 
         #region Debug Drawing

@@ -1,4 +1,5 @@
 ﻿using OpenTK;
+using System;
 using WhittedRaytracer.Raytracing.SceneObjects.CameraParts;
 using WhittedRaytracer.Utilities;
 
@@ -10,7 +11,7 @@ namespace WhittedRaytracer.Raytracing.SceneObjects {
         /// <summary> The statitics of the camera </summary>
         public readonly Statistics Statistics = new Statistics();
         /// <summary> The configuration of the camera </summary>
-        public readonly Config Config = new Config();
+        public readonly Config Config;
 
         /// <summary> The screen plane in front of the camera </summary>
         public readonly ScreenPlane ScreenPlane;
@@ -50,6 +51,7 @@ namespace WhittedRaytracer.Raytracing.SceneObjects {
             this.position = position ?? new Vector3(0, -1, -1);
             this.viewDirection = viewDirection?.Normalized() ?? new Vector3(0, 0, 1);
             ScreenPlane = new ScreenPlane(this, screen);
+            Config = Config.LoadFromFile();
         }
 
         /// <summary> Move the camera in a direction </summary>
@@ -100,6 +102,15 @@ namespace WhittedRaytracer.Raytracing.SceneObjects {
         /// <returns>The ray from the camera through the screen plane</returns>
         public CameraRay CreateCameraRay(int x, int y) {
             return new CameraRay(Position, ScreenPlane.GetPixelPosition(x, y) - Position, ScreenPlane.Accumulator.Cavities[x + y * ScreenPlane.Screen.Width]);
+        }
+
+        /// <summary> Returns how many rays should be traced in the next tick </summary>
+        /// <returns>Amount of rays to trace in the next tick</returns>
+        public int RayCountNextTick() {
+            if (Statistics.FrameTime.LastTick == default(TimeSpan)) return Config.MinimumRayCount;
+            double frameTimeDifference = Config.TargetFrameTime.TotalMilliseconds - (Statistics.FrameTime.LastTick.TotalMilliseconds + Statistics.MultithreadingOverhead.LastTick.TotalMilliseconds);
+            double excessTraceFactor = frameTimeDifference / Statistics.TracingTime.LastTick.TotalMilliseconds;
+            return Math.Max(Config.MinimumRayCount, (int)(Statistics.RaysTracedLastTick * (1f + excessTraceFactor)));
         }
     }
 }

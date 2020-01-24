@@ -55,7 +55,7 @@ namespace WhittedRaytracer.Raytracing.SceneObjects {
         /// <summary> Turn the view direction of the camera </summary>
         /// <param name="direction">The direction to turn the camera in</param>
         public void Turn(Vector3 direction) {
-            Config.ViewDirection += direction * Config.Sensitivity;
+            Config.ViewDirection += direction * Config.ViewSensitivity;
             Config.ViewDirection.Normalize();
             ScreenPlane.Update();
         }

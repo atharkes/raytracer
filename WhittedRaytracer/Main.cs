@@ -3,77 +3,58 @@ using OpenTK.Input;
 using System;
 using WhittedRaytracer.Multithreading;
 using WhittedRaytracer.Raytracing;
-using WhittedRaytracer.Raytracing.SceneObjects;
 using WhittedRaytracer.Raytracing.SceneObjects.CameraParts;
-using WhittedRaytracer.Raytracing.SceneObjects.Primitives;
-using WhittedRaytracer.Utilities;
 
 namespace WhittedRaytracer {
     /// <summary> Main class of the raytracer </summary>
     class Main {
+        /// <summary> The threadpool of this application </summary>
         public static readonly Threadpool Threadpool = new Threadpool();
-        /// <summary> The amount of tasks created for the threadpool </summary>
-        public const int MultithreadingTaskCount = 720;
-        /// <summary> The targeted framerate of the raytracer </summary>
-        public const int TargetFrameRate = 20;
-        /// <summary> The targeted frame time computed from the targeted frame rate </summary>
-        public static TimeSpan TargetFrameTime => new TimeSpan(0, 0, 0, 0, 1000 / TargetFrameRate);
-        /// <summary> Minimum amount of rays to trace in a tick </summary>
-        public const int MinimumRayCount = 10_000;
-
         /// <summary> The 3d scene in which the raytracing takes place </summary>
         public readonly Scene Scene;
-        /// <summary> Statistics of the raytracer </summary>
-        public readonly Statistics Stats = new Statistics();
 
-        /// <summary> Whether it is drawing debug information </summary>
-        public bool Debug = false;
-        /// <summary> Whether to draw rays in debug </summary>
-        public bool DebugShowRays = true;
-        
-        readonly Action[] tasks;
-
+        /// <summary> Create a raytracing application </summary>
+        /// <param name="screen">The screen to draw the raytracing to</param>
         public Main(IScreen screen) {
             Scene = Scene.DefaultWithRandomSpheres(screen, 10_000);
-            tasks = new Action[MultithreadingTaskCount];
         }
 
         /// <summary> Process a single frame </summary>
         public void Tick() {
-            Stats.LogFrameTime();
+            Scene.Camera.Statistics.LogFrameTime();
             InputCheck();
-            Stats.LogTaskTime(Stats.OpenTKTime);
-            DivideRayTracingTasks();
-            Stats.LogTaskTime(Stats.MultithreadingOverhead);
+            Scene.Camera.Statistics.LogTaskTime(Scene.Camera.Statistics.OpenTKTime);
+            int rayCount = Scene.Camera.RayCountNextTick();
+            Scene.Camera.Statistics.LogTickRays(rayCount);
+            Action[] tasks = new Action[Threadpool.MultithreadingTaskCount];
+            float size = rayCount / Threadpool.MultithreadingTaskCount;
+            for (int i = 0; i < Threadpool.MultithreadingTaskCount; i++) {
+                int lowerbound = (int)(i * size);
+                int higherbound = (int)((i + 1) * size);
+                tasks[i] = () => TraceRays(lowerbound, higherbound);
+            }
+            Scene.Camera.Statistics.LogTaskTime(Scene.Camera.Statistics.MultithreadingOverhead);
             Threadpool.DoTasks(tasks);
             Threadpool.WaitTillDone();
-            Stats.LogTaskTime(Stats.TracingTime);
-
-            // Drawing
-            Scene.Camera.ScreenPlane.Screen.Clear(0);
-            Scene.Camera.ScreenPlane.DrawAccumulator();
-            if (Debug) {
-                foreach (Primitive primitive in Scene.Primitives) if (primitive is Sphere) Scene.Camera.ScreenPlane.DrawSphere(primitive as Sphere);
-                foreach (PointLight light in Scene.Lights) Scene.Camera.ScreenPlane.DrawLight(light);
-                Scene.Camera.ScreenPlane.DrawScreenPlane();
-                Scene.Camera.ScreenPlane.DrawCamera();
-            }
-            Scene.Camera.ScreenPlane.Screen.Print($"FPS: {1000 / (int)Stats.FrameTime.LastTick.TotalMilliseconds}", 1, 1, 0xffffff);
-            Scene.Camera.ScreenPlane.Screen.Print($"Rays Traced: {Stats.RaysTracedLastTick}", 1, 17, 0xffffff);
-            Scene.Camera.ScreenPlane.Screen.Print($"Frame Time (ms): {(int)Stats.FrameTime.LastTick.TotalMilliseconds}", 1, 33, 0xffffff);
-            Scene.Camera.ScreenPlane.Screen.Print($"Tracing Time (ms): {(int)Stats.TracingTime.LastTick.TotalMilliseconds}", 1, 49, 0xffffff);
-            Scene.Camera.ScreenPlane.Screen.Print($"Drawing Time (ms): {(int)Stats.DrawingTime.LastTick.TotalMilliseconds}", 1, 65, 0xffffff);
-            Scene.Camera.ScreenPlane.Screen.Print($"OpenTK Time (ms): {(int)Stats.OpenTKTime.LastTick.TotalMilliseconds}", 1, 81, 0xffffff);
-            Scene.Camera.ScreenPlane.Screen.Print($"Multithreading Overhead (ms): {(int)Stats.MultithreadingOverhead.LastTick.TotalMilliseconds}", 1, 97, 0xffffff);
-            Scene.Camera.ScreenPlane.Screen.Print($"FOV: {Scene.Camera.FOV}", 1, 113, 0xffffff);
-            Stats.LogTaskTime(Stats.DrawingTime);
+            Scene.Camera.Statistics.LogTaskTime(Scene.Camera.Statistics.TracingTime);
+            Scene.Camera.ScreenPlane.Draw();
+            Scene.Camera.Statistics.LogTaskTime(Scene.Camera.Statistics.DrawingTime);
         }
 
-        /// <summary> Check if there was any input </summary>
+        void TraceRays(int from, int to) {
+            CameraRay[] rays = Scene.Camera.GetRandomCameraRays(to - from);
+            for (int i = 0; i < rays.Length; i++) {
+                int x = i % Scene.Camera.ScreenPlane.Screen.Width;
+                int y = i / Scene.Camera.ScreenPlane.Screen.Width;
+                Vector3 pixelColor = Scene.CastRay(rays[i], 0);
+                rays[i].Cavity.AddPhoton(pixelColor, rays[i].BVHTraversals);
+            }
+        }
+
         void InputCheck() {
             KeyboardState keyboardState = Keyboard.GetState();
-            if (keyboardState[Key.F1]) Debug = !Debug;
-            if (keyboardState[Key.F2]) Scene.Camera.ScreenPlane.Accumulator.DrawBVH = !Scene.Camera.ScreenPlane.Accumulator.DrawBVH;
+            if (keyboardState[Key.F1]) Scene.Camera.Config.DebugInfo = !Scene.Camera.Config.DebugInfo;
+            if (keyboardState[Key.F2]) Scene.Camera.Config.DrawBVHTraversal = !Scene.Camera.Config.DrawBVHTraversal;
             if (keyboardState[Key.Space]) Scene.Camera.Move(Scene.Camera.Up);
             if (keyboardState[Key.LShift]) Scene.Camera.Move(Scene.Camera.Down);
             if (keyboardState[Key.W]) Scene.Camera.Move(Scene.Camera.Front);
@@ -86,31 +67,6 @@ namespace WhittedRaytracer {
             if (keyboardState[Key.Right]) Scene.Camera.Turn(Scene.Camera.Right);
             if (keyboardState[Key.Up]) Scene.Camera.Turn(Scene.Camera.Up);
             if (keyboardState[Key.Down]) Scene.Camera.Turn(Scene.Camera.Down);
-        }
-
-        void DivideRayTracingTasks() {
-            int rayCount = Stats.RayCountNextTick();
-            Stats.LogTickRays(rayCount);
-            float size = rayCount / MultithreadingTaskCount;
-            float[] taskBounds = new float[MultithreadingTaskCount + 1];
-            taskBounds[0] = 0;
-            for (int n = 0; n < MultithreadingTaskCount; n++) {
-                taskBounds[n + 1] = taskBounds[n] + size;
-                int taskLower = (int)taskBounds[n];
-                int taskUpper = (int)taskBounds[n + 1];
-                tasks[n] = () => TraceRays(taskLower, taskUpper);
-            }
-        }
-
-        void TraceRays(int from, int to) {
-            CameraRay[] rays = Scene.Camera.GetRandomCameraRays(to - from);
-            for (int i = 0; i < rays.Length; i++) {
-                int x = i % Scene.Camera.ScreenPlane.Screen.Width;
-                int y = i / Scene.Camera.ScreenPlane.Screen.Width;
-                bool debugRay = Debug && DebugShowRays && (x % 64 == 0 || x == Scene.Camera.ScreenPlane.Screen.Width) && y == Scene.Camera.ScreenPlane.Screen.Height / 2;
-                Vector3 pixelColor = Scene.CastRay(rays[i], 0, debugRay);
-                rays[i].Cavity.AddPhoton(pixelColor, rays[i].BVHTraversals);
-            }
         }
     }
 }

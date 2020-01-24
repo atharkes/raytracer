@@ -1,11 +1,10 @@
-﻿using System;
+﻿using OpenTK;
+using System;
 using WhittedRaytracer.Utilities;
 
 namespace WhittedRaytracer.Raytracing.SceneObjects.CameraParts {
     /// <summary> An accumulator that accumulates the light of photons </summary>
     class Accumulator {
-        /// <summary> Whether the draw BVH instead of the Light </summary>
-        public bool DrawBVH { get; set; } = false;
         /// <summary> The cavities in which the light is accumulated </summary>
         public Cavity[] Cavities { get; }
         /// <summary> The width of the accumulator </summary>
@@ -27,23 +26,35 @@ namespace WhittedRaytracer.Raytracing.SceneObjects.CameraParts {
 
         /// <summary> Draws an image from the photons in the accumulator to a screen </summary>
         /// <param name="screen">The screen to draw the image to</param>
-        public void DrawImage(IScreen screen) {
-            Action[] tasks = new Action[Main.MultithreadingTaskCount];
+        public void DrawImage(IScreen screen, bool drawBVH) {
+            Action[] tasks = new Action[Main.Threadpool.MultithreadingTaskCount];
             float size = Cavities.Length / tasks.Length;
             for (int i = 0; i < tasks.Length; i++) {
                 int lowerbound = (int)(i * size);
                 int higherbound = (int)((i + 1) * size);
-                tasks[i] = () => DrawImageRange(screen, lowerbound, higherbound);
+                if (drawBVH) tasks[i] = () => DrawBVHRange(screen, lowerbound, higherbound);
+                else tasks[i] = () => DrawImageRange(screen, lowerbound, higherbound);
             }
             Main.Threadpool.DoTasks(tasks);
             Main.Threadpool.WaitTillDone();
         }
 
         void DrawImageRange(IScreen screen, int from, int to) {
-            for (int i = from; i < to; i++) {
-                if (DrawBVH) screen.Plot(i, Cavities[i].AverageBVHTraversalColor.ToIntColor());
-                else screen.Plot(i, Cavities[i].AverageLight.ToIntColor());
+            for (int i = from; i < to; i++) screen.Plot(i, Cavities[i].AverageLight.ToIntColor());
+        }
+
+        void DrawBVHRange(IScreen screen, int from, int to) {
+            for (int i = from; i < to; i++) screen.Plot(i, Cavities[i].AverageBVHTraversalColor.ToIntColor());
+        }
+
+        /// <summary> Get the total average light in the accumulator </summary>
+        /// <returns>The total average light in the accumulator</returns>
+        public Vector3 AverageLight() {
+            Vector3 averageLight = Vector3.Zero;
+            foreach (Cavity cavity in Cavities) {
+                averageLight += cavity.AverageLight;
             }
+            return averageLight;
         }
 
         /// <summary> Clear the light in the accumulator </summary>

@@ -17,11 +17,6 @@ Features:
 - Scene showing off all primitives and materials
 - Debug drawing
 
-Extra:
-- BVH using SAH and Binning
-- BVH construction with 4-Binning on 100k triangles in under 1 second on intel i7 6700K
-	(although performance is dependent on the random triangles that are generated)
-
 References:
 - Course Slides (Graphics & Advanced Graphics)
 - OpenTK: https://github.com/opentk/opentk
@@ -35,6 +30,10 @@ Controls:
 - W,A,S,D:      Move Camera
 - Space:        Move Camera Up
 - Shift:        Move Camera Down
-- F1:           Disable/Enable Debug
+- F1:           Toggle Debug Drawing
+- F2:           Toggle BVHTraversal Color Scale
 - Numpad '+':   Increase FOV
 - Numpad '-':   Decrease FOV
+
+Notes to self:
+- No area lights with deterministic/whitted raytracing

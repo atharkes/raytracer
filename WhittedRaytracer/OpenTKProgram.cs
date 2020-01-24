@@ -13,7 +13,6 @@ namespace WhittedRaytracer {
         public static Surface GameWindow { get; private set; }
 
         static Main main;
-        static readonly bool terminated = false;
 
         /// <summary> Called upon app init </summary>
         /// <param name="e">Arguments given</param>
@@ -32,9 +31,10 @@ namespace WhittedRaytracer {
         /// <summary> Called upon app close </summary>
         /// <param name="e">Arguments given</param>
         protected override void OnUnload(EventArgs e) {
+            main.Scene.Camera.Config.SaveToFile();
             int texture = GameWindowID;
             GL.DeleteTextures(1, ref texture);
-            Environment.Exit(0); // bypass wait for key on CTRL-F5
+            Environment.Exit(0);
         }
 
         /// <summary> Called upon window resize </summary>
@@ -57,10 +57,6 @@ namespace WhittedRaytracer {
         /// <param name="e">Arguments given</param>
         protected override void OnRenderFrame(FrameEventArgs e) {
             main.Tick();
-            if (terminated) {
-                Exit();
-                return;
-            }
             // Convert Game.screen to OpenGL texture
             GL.BindTexture(TextureTarget.Texture2D, GameWindowID);
             GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba,

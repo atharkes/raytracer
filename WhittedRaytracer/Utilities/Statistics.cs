@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 
 namespace WhittedRaytracer.Utilities {
     /// <summary> Statistics for the raytracer </summary>
@@ -41,15 +40,6 @@ namespace WhittedRaytracer.Utilities {
         public void LogTaskTime(TimeLog taskLog) {
             taskLog.LogTickTime(taskTimer.Elapsed);
             taskTimer.Restart();
-        }
-        
-        /// <summary> Returns how many rays should be traced in the next tick </summary>
-        /// <returns>Amount of rays to trace in the next tick</returns>
-        public int RayCountNextTick() {
-            if (FrameTime.LastTick == default(TimeSpan)) return Main.MinimumRayCount;
-            double frameTimeDifference = Main.TargetFrameTime.TotalMilliseconds - (FrameTime.LastTick.TotalMilliseconds + MultithreadingOverhead.LastTick.TotalMilliseconds);
-            double excessTraceFactor = frameTimeDifference / TracingTime.LastTick.TotalMilliseconds;
-            return Math.Max(Main.MinimumRayCount, (int)(RaysTracedLastTick * (1f + excessTraceFactor)));
         }
     }
 }

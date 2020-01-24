@@ -20,8 +20,6 @@ namespace WhittedRaytracer.Raytracing {
 
         /// <summary> The length that the ray is travelling </summary>
         public float Length { get; set; }
-        /// <summary> How many times a BVH node is intersected </summary>
-        public int BVHTraversals { get; set; } = 0;
         /// <summary> The distance attenuation of a point light when this is a shadow ray </summary>
         public float DistanceAttenuation => 1f / (Length * Length);
 

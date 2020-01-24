@@ -18,16 +18,15 @@ namespace WhittedRaytracer.Raytracing {
         /// <summary> The primitives in the scene </summary>
         public readonly ICollection<Primitive> Primitives;
         /// <summary> The lightsources in the scene </summary>
-        public readonly ICollection<PointLight> Lights;
+        public readonly ICollection<Primitive> Lights;
 
         /// <summary> Create a new scene with some default objects </summary>
         /// <param name="screen">The screen to draw the raytracing to</param>
         /// <param name="primitives">The primitives in the scene</param>
-        /// <param name="lights">The lights in the scene</param>
-        public Scene(IScreen screen, List<Primitive> primitives, ICollection<PointLight> lights) { 
+        public Scene(IScreen screen, List<Primitive> primitives) { 
             Camera = new Camera(screen);
             Primitives = primitives;
-            Lights = lights;
+            Lights = primitives.FindAll(p => p.Material.Emitting);
             Stopwatch timer = Stopwatch.StartNew();
             AccelerationStructure = new BVH(primitives);
             Console.WriteLine(timer.ElapsedMilliseconds + "\t| BVH Building ms");
@@ -37,14 +36,14 @@ namespace WhittedRaytracer.Raytracing {
         /// <param name="screen">The screen to draw the raytracing</param>
         /// <returns>An empty scene</returns>
         public static Scene Empty(IScreen screen) {
-            return new Scene(screen, new List<Primitive>(), new List<PointLight>());
+            return new Scene(screen, new List<Primitive>());
         }
         
         /// <summary> Create the default scene </summary>
         /// <param name="screen">The screen to draw the raytracing to</param>
         /// <returns>A default scene</returns>
         public static Scene Default(IScreen screen) {
-            return new Scene(screen, DefaultPrimitives, DefaultLights);
+            return new Scene(screen, DefaultPrimitives);
         }
 
         /// <summary> Create the default scene with random spheres </summary>
@@ -61,7 +60,7 @@ namespace WhittedRaytracer.Raytracing {
                 float radius = (float)Utils.Random.NextDouble();
                 primitives.Add(new Sphere(pos, radius));
             }
-            return new Scene(screen, primitives, DefaultLights);
+            return new Scene(screen, primitives);
         }
 
         /// <summary> Create the default scene with random spheres </summary>
@@ -79,11 +78,8 @@ namespace WhittedRaytracer.Raytracing {
                 Vector3 p3 = p1 - Utils.RandomVector;
                 primitives.Add(new Triangle(p1, p2, p3));
             }
-            return new Scene(screen, primitives, DefaultLights);
+            return new Scene(screen, primitives);
         }
-
-        /// <summary> The lights in the default scene </summary>
-        public static List<PointLight> DefaultLights => new List<PointLight>() { new PointLight(new Vector3(0, -8, 3), new Vector3(200, 200, 150)) };
 
         /// <summary> The primitives in the default scene </summary>
         public static List<Primitive> DefaultPrimitives => new List<Primitive>() {
@@ -91,9 +87,10 @@ namespace WhittedRaytracer.Raytracing {
             new Sphere(new Vector3(3, -1, 5), 1, Material.GlossyRed),
             new Sphere(new Vector3(0, -1, 5), 1, Material.Mirror),
             new Sphere(new Vector3(-1, -1, 2), 0.5f, Material.Glass),
-            //new Plane(new Vector3(0, -1, 0), -1, Material.DiffuseYellow),
             new Triangle(new Vector3(-5, 0, 0), new Vector3(5, 0, 0), new Vector3(5, 0, 10), null, Material.GlossyPurpleMirror),
-            new Triangle(new Vector3(-5, 0, 0), new Vector3(5, 0, 10), new Vector3(-5, 0, 10), null, Material.GlossyGreen)
+            new Triangle(new Vector3(-5, 0, 0), new Vector3(5, 0, 10), new Vector3(-5, 0, 10), null, Material.GlossyGreen),
+            new PointLight(new Vector3(0, -8, 3), new Vector3(1, 1, 0.75f), 200),
+            //new Sphere(new Vector3(0, -8, 3), 0.5f, new Material(200, new Vector3(1, 1, 0.75f)))
         };
 
         /// <summary> Intersect the scene with a ray and calculate the color found by the ray </summary>
@@ -126,6 +123,10 @@ namespace WhittedRaytracer.Raytracing {
                 radianceOut = directIllumination;
             }
 
+            if (intersection.Primitive.Material.Emitting) {
+                radianceOut += intersection.Primitive.Material.EmittingLight / ray.DistanceAttenuation;
+            }
+
             // Debug: Primary Rays
             if (debugRay) {
                 Camera.ScreenPlane.DrawRay(ray);
@@ -139,10 +140,11 @@ namespace WhittedRaytracer.Raytracing {
         /// <returns>The color at the intersection</returns>
         public Vector3 CastShadowRays(Intersection intersection, bool debugRay = false) {
             Vector3 radianceOut = Vector3.Zero;
-            foreach (PointLight light in Lights) {
+            foreach (Primitive light in Lights) {
                 Ray shadowRay = intersection.GetShadowRay(light);
+                if (Vector3.Dot(intersection.Normal, shadowRay.Direction) < 0) continue;
                 if (AccelerationStructure.IntersectBool(shadowRay)) continue;
-                Vector3 radianceIn = light.Color * shadowRay.DistanceAttenuation;
+                Vector3 radianceIn = light.Material.EmittingLight * shadowRay.DistanceAttenuation;
                 Vector3 irradiance;
                 // N dot L
                 float NdotL = Vector3.Dot(intersection.Normal, shadowRay.Direction);
@@ -163,7 +165,7 @@ namespace WhittedRaytracer.Raytracing {
                 // Absorption
                 radianceOut += irradiance * intersection.Primitive.Material.Color;
                 if (debugRay) {
-                    Camera.ScreenPlane.DrawRay(shadowRay, light.Color.ToIntColor());
+                    Camera.ScreenPlane.DrawRay(shadowRay, light.Material.Color.ToIntColor());
                 }
 
             }

@@ -6,6 +6,8 @@ namespace WhittedRaytracer.Raytracing {
     class CameraRay : Ray {
         /// <summary> The cavity from which this ray originates </summary>
         public readonly Cavity Cavity;
+        /// <summary> How many times a BVH node is intersected </summary>
+        public int BVHTraversals { get; set; } = 0;
 
         /// <summary> Create a new camera ray </summary>
         /// <param name="origin">The origin of the ray</param>

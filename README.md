@@ -10,12 +10,12 @@ Features:
 - Raytracing architecture
 - Camera: Position, Orientation, FOV, Aspect ratio
 - Input handling: see controls
+- Debug information
 - Primitives: Planes, Spheres, Triangles
+- Lights: Pointlights
 - Materials: Diffuse, Specular, Dielectric (Snell & Fresnel), Glossy (Phong Shading)
-- Acceleration Structure: Bounding Volume Hierachy (SAH & Binning)
+- Acceleration Structure: Bounding Volume Hierachy (SAH & Binning & Split-Ordered-Traversal & BVH rendering)
 - Multithreading: Threadpool with worker threads
-- Scene showing off all primitives and materials
-- Debug drawing
 
 References:
 - Course Slides (Graphics & Advanced Graphics)
@@ -30,7 +30,7 @@ Controls:
 - W,A,S,D:      Move Camera
 - Space:        Move Camera Up
 - Shift:        Move Camera Down
-- F1:           Toggle Debug Drawing
+- F1:           Toggle Debug Information
 - F2:           Toggle BVHTraversal Color Scale
 - Numpad '+':   Increase FOV
 - Numpad '-':   Decrease FOV

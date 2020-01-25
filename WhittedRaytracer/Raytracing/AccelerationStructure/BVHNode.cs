@@ -15,6 +15,8 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructure {
         public BVHNode Right { get; private set; }
         /// <summary> Whether this node is a leaf or not </summary>
         public bool Leaf { get; private set; } = true;
+        /// <summary> On which axis the node is split </summary>
+        public Vector3 SplitDirection { get; private set; }
 
         /// <summary> Create a bounding volume hierarchy tree, splitting into smaller nodes if needed </summary>
         /// <param name="primitives">The primitives in the tree</param>
@@ -36,6 +38,7 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructure {
             if (split is null) return;
             Left = new BVHNode(split.Left);
             Right = new BVHNode(split.Right);
+            SplitDirection = split.Direction;
             Leaf = false;
         }
 
@@ -57,16 +60,19 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructure {
         /// <param name="ray">The ray to intersect the children with</param>
         /// <returns>The intersection in the children if there is any</returns>
         Intersection IntersectChildren(Ray ray) {
-            Intersection intersectionLeft = Left.Intersect(ray);
-            Intersection intersectionRight = Right.Intersect(ray);
-            if (intersectionLeft == null) {
-                return intersectionRight;
-            } else if (intersectionRight == null) {
-                return intersectionLeft;
-            } else if (intersectionLeft.Distance < intersectionRight.Distance) {
-                return intersectionLeft;
+            Intersection firstIntersection;
+            Intersection secondIntersection;
+            if (Vector3.Dot(SplitDirection, ray.Direction) < 0) {
+                firstIntersection = Left.Intersect(ray);
+                secondIntersection = Right.Intersect(ray);
             } else {
-                return intersectionRight;
+                firstIntersection = Right.Intersect(ray);
+                secondIntersection = Left.Intersect(ray);
+            }
+            if (secondIntersection == null) {
+                return firstIntersection;
+            } else {
+                return secondIntersection;
             }
         }
 
@@ -89,7 +95,7 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructure {
         /// <summary> Compute the best split for this BVH node </summary>
         /// <returns>Either a tuple with the best split or null if there is no good split</returns>
         Split ComputeBestSplit() { 
-            List<Split> splits = BVH.Bin && BVH.BinAmount < AABB.Primitives.Count ? BinSplits() : AllSplits();
+            List<Split> splits = BVH.Bin && BVH.BinAmount < AABB.Primitives.Count ? BinSplits() : CheckAllSplits();
             float bestCost = AABB.SurfaceAreaHeuristic;
             Split bestSplit = null;
             foreach (Split split in splits) {
@@ -102,22 +108,22 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructure {
             return bestSplit;
         }
 
-        /// <summary> Get the best split for every axis </summary>
+        /// <summary> Check all possible splits </summary>
         /// <returns>The best split for every axis</returns>
-        List<Split> AllSplits() {
+        List<Split> CheckAllSplits() {
             return new List<Split> {
-                BestLinearSplitAfterSort(p => p.GetCenter().X),
-                BestLinearSplitAfterSort(p => p.GetCenter().Y),
-                BestLinearSplitAfterSort(p => p.GetCenter().Z)
+                BestLinearSplitAfterSort(Vector3.UnitX, p => p.GetCenter().X),
+                BestLinearSplitAfterSort(Vector3.UnitY, p => p.GetCenter().Y),
+                BestLinearSplitAfterSort(Vector3.UnitZ, p => p.GetCenter().Z)
             };
         }
 
         /// <summary> Split linearly over primitives after using a sorting function </summary>
         /// <param name="sortingFunc">The sorting function to sort the primitives with before finding splits</param>
         /// <returns>The best split using the sorting funciton</returns>
-        Split BestLinearSplitAfterSort(Func<Primitive, float> sortingFunc) {
+        Split BestLinearSplitAfterSort(Vector3 sortDirection, Func<Primitive, float> sortingFunc) {
             List<Primitive> orderedPrimitives = AABB.Primitives.OrderBy(sortingFunc).ToList();
-            Split split = new Split(new AABB(), new AABB(orderedPrimitives));
+            Split split = new Split(sortDirection, new AABB(), new AABB(orderedPrimitives));
             Primitive bestSplitPrimitive = orderedPrimitives.FirstOrDefault();
             float bestSplitCost = float.MaxValue;
             foreach (Primitive primitive in orderedPrimitives) {
@@ -132,11 +138,12 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructure {
             int bestSplitPrimitiveIndex = orderedPrimitives.IndexOf(bestSplitPrimitive);
             List<Primitive> primitivesLeft = orderedPrimitives.GetRange(0, bestSplitPrimitiveIndex);
             List<Primitive> primitivesRight = orderedPrimitives.GetRange(bestSplitPrimitiveIndex, orderedPrimitives.Count - bestSplitPrimitiveIndex);
-            return new Split(primitivesLeft, primitivesRight);
+            return new Split(sortDirection, primitivesLeft, primitivesRight);
         }
 
         List<Split> BinSplits() {
             Vector3 size = AABB.Size;
+            Vector3 binDirection = size.X > size.Y && size.X > size.Z ? Vector3.UnitX : (size.Y > size.Z ? Vector3.UnitY : Vector3.UnitZ);
             AABB[] bins = size.X > size.Y && size.X > size.Z ? BinX() : (size.Y > size.Z ? BinY() : BinZ());
             List<Split> splits = new List<Split>(bins.Length - 1);
             for (int i = 1; i < bins.Length; i++) {
@@ -144,7 +151,7 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructure {
                 for (int bin = 0; bin < i; bin++) left.AddRange(bins[bin].Primitives);
                 AABB right = new AABB();
                 for (int bin = i; bin < bins.Length; bin++) right.AddRange(bins[bin].Primitives);
-                splits.Add(new Split(left, right));
+                splits.Add(new Split(binDirection, left, right));
             }
             return splits;
         }

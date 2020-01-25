@@ -1,6 +1,7 @@
 ﻿using OpenTK;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using WhittedRaytracer.Raytracing.SceneObjects;
 using WhittedRaytracer.Utilities;
 
@@ -32,8 +33,8 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructure {
 
         /// <summary> Create a new AABB with primitives </summary>
         /// <param name="primitives">The primitive to add to the AABB</param>
-        public AABB(List<Primitive> primitives) {
-            this.primitives = primitives;
+        public AABB(IEnumerable<Primitive> primitives) {
+            this.primitives = primitives?.ToList() ?? new List<Primitive>();
             foreach (Primitive primitive in primitives) {
                 (Vector3 primitiveMin, Vector3 primitiveMax) = primitive.GetBounds();
                 MinBound = Vector3.ComponentMin(primitiveMin, MinBound);
@@ -69,6 +70,13 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructure {
                 MinBound = Vector3.ComponentMin(MinBound, min);
                 MaxBound = Vector3.ComponentMax(MaxBound, max);
             }
+        }
+
+        /// <summary> Remove a primitive from the AABB </summary>
+        /// <param name="primitive">The primitive to be removed</param>
+        public void Remove(Primitive primitive) {
+            primitives.Remove(primitive);
+            (MinBound, MaxBound) = CalculateBounds(primitives);
         }
 
         /// <summary> Intersect the AABB (Amy Williams's An Efficient and Robust Ray–Box Intersection Algorithm) </summary>

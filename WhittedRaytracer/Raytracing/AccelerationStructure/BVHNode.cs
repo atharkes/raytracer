@@ -1,6 +1,8 @@
 ﻿using OpenTK;
+using System.Linq;
 using System.Collections.Generic;
 using WhittedRaytracer.Raytracing.SceneObjects;
+using System;
 
 namespace WhittedRaytracer.Raytracing.AccelerationStructure {
     /// <summary> A node of a bounding volume hierarchy tree </summary>
@@ -30,10 +32,10 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructure {
 
         /// <summary> Try split the BVH Node into 2 smaller Nodes </summary>
         void TrySplit() {
-            (AABB left, AABB right)? split = ComputeBestSplit();
-            if (!split.HasValue) return;
-            Left = new BVHNode(split.Value.left);
-            Right = new BVHNode(split.Value.right);
+            Split split = ComputeBestSplit();
+            if (split is null) return;
+            Left = new BVHNode(split.Left);
+            Right = new BVHNode(split.Right);
             Leaf = false;
         }
 
@@ -86,12 +88,12 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructure {
 
         /// <summary> Compute the best split for this BVH node </summary>
         /// <returns>Either a tuple with the best split or null if there is no good split</returns>
-        (AABB left, AABB right)? ComputeBestSplit() { 
-            ICollection<(AABB left, AABB right)> splits = BVH.Bin && BVH.BinAmount < AABB.Primitives.Count ? BinSplits() : AllSplits();
+        Split ComputeBestSplit() { 
+            List<Split> splits = BVH.Bin && BVH.BinAmount < AABB.Primitives.Count ? BinSplits() : AllSplits();
             float bestCost = AABB.SurfaceAreaHeuristic;
-            (AABB left, AABB right)? bestSplit = null;
-            foreach ((AABB, AABB) split in splits) {
-                float splitCost = SplitSurfaceAreaHeuristic(split);
+            Split bestSplit = null;
+            foreach (Split split in splits) {
+                float splitCost = split.SurfaceAreaHeuristic;
                 if (splitCost < bestCost) {
                     bestSplit = split;
                     bestCost = splitCost;
@@ -100,33 +102,49 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructure {
             return bestSplit;
         }
 
-        /// <summary> Calculate the cost of a split. Uses the Surface Area Heuristic </summary>
-        /// <param name="split">The split to calculate the cost for</param>
-        /// <returns>The cost of the split</returns>
-        float SplitSurfaceAreaHeuristic((AABB left, AABB right) split) {
-            return BVH.TraversalCost * AABB.SurfaceArea + split.left.SurfaceAreaHeuristic + split.right.SurfaceAreaHeuristic;
+        /// <summary> Get the best split for every axis </summary>
+        /// <returns>The best split for every axis</returns>
+        List<Split> AllSplits() {
+            return new List<Split> {
+                BestLinearSplitAfterSort(p => p.GetCenter().X),
+                BestLinearSplitAfterSort(p => p.GetCenter().Y),
+                BestLinearSplitAfterSort(p => p.GetCenter().Z)
+            };
         }
 
-        ICollection<(AABB left, AABB right)> AllSplits() {
-            List<(AABB left, AABB right)> splits = new List<(AABB, AABB)>();
-            foreach (Primitive primitive in AABB.Primitives) {
-                splits.Add(SplitX(primitive));
-                splits.Add(SplitY(primitive));
-                splits.Add(SplitZ(primitive));
+        /// <summary> Split linearly over primitives after using a sorting function </summary>
+        /// <param name="sortingFunc">The sorting function to sort the primitives with before finding splits</param>
+        /// <returns>The best split using the sorting funciton</returns>
+        Split BestLinearSplitAfterSort(Func<Primitive, float> sortingFunc) {
+            List<Primitive> orderedPrimitives = AABB.Primitives.OrderBy(sortingFunc).ToList();
+            Split split = new Split(new AABB(), new AABB(orderedPrimitives));
+            Primitive bestSplitPrimitive = orderedPrimitives.FirstOrDefault();
+            float bestSplitCost = float.MaxValue;
+            foreach (Primitive primitive in orderedPrimitives) {
+                split.Left.Add(primitive);
+                split.Right.Remove(primitive);
+                float splitCost = split.SurfaceAreaHeuristic;
+                if (splitCost < bestSplitCost) {
+                    bestSplitCost = splitCost;
+                    bestSplitPrimitive = primitive;
+                }
             }
-            return splits;
+            int bestSplitPrimitiveIndex = orderedPrimitives.IndexOf(bestSplitPrimitive);
+            List<Primitive> primitivesLeft = orderedPrimitives.GetRange(0, bestSplitPrimitiveIndex);
+            List<Primitive> primitivesRight = orderedPrimitives.GetRange(bestSplitPrimitiveIndex, orderedPrimitives.Count - bestSplitPrimitiveIndex);
+            return new Split(primitivesLeft, primitivesRight);
         }
 
-        ICollection<(AABB left, AABB right)> BinSplits() {
+        List<Split> BinSplits() {
             Vector3 size = AABB.Size;
             AABB[] bins = size.X > size.Y && size.X > size.Z ? BinX() : (size.Y > size.Z ? BinY() : BinZ());
-            List<(AABB, AABB)> splits = new List<(AABB, AABB)>(bins.Length - 1);
+            List<Split> splits = new List<Split>(bins.Length - 1);
             for (int i = 1; i < bins.Length; i++) {
                 AABB left = new AABB();
                 for (int bin = 0; bin < i; bin++) left.AddRange(bins[bin].Primitives);
                 AABB right = new AABB();
                 for (int bin = i; bin < bins.Length; bin++) right.AddRange(bins[bin].Primitives);
-                splits.Add((left, right));
+                splits.Add(new Split(left, right));
             }
             return splits;
         }
@@ -162,48 +180,6 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructure {
                 bins[binID].Add(primitive);
             }
             return bins;
-        }
-
-        /// <summary> Split on X-axis </summary>
-        /// <param name="splitPrimitive">The primitive to split on</param>
-        /// <returns>A pair with primitives on both sides</returns>
-        (AABB left, AABB right) SplitX(Primitive splitPrimitive) {
-            float split = splitPrimitive.GetCenter().X;
-            AABB left = new AABB();
-            AABB right = new AABB();
-            foreach (Primitive primitive in AABB.Primitives) {
-                if (primitive.GetCenter().X <= split) left.Add(primitive);
-                else right.Add(primitive);
-            }
-            return (left, right);
-        }
-
-        /// <summary> Split on Y-axis </summary>
-        /// <param name="splitPrimitive">The primitive to split on</param>
-        /// <returns>A pair with primitives on both sides</returns>
-        (AABB left, AABB right) SplitY(Primitive splitPrimitive) {
-            float split = splitPrimitive.GetCenter().Y;
-            AABB left = new AABB();
-            AABB right = new AABB();
-            foreach (Primitive primitive in AABB.Primitives) {
-                if (primitive.GetCenter().Y <= split) left.Add(primitive);
-                else right.Add(primitive);
-            }
-            return (left, right);
-        }
-
-        /// <summary> Split on Z-axis </summary>
-        /// <param name="splitPrimitive">The primitive to split on</param>
-        /// <returns>A pair with primitives on both sides</returns>
-        (AABB left, AABB right) SplitZ(Primitive splitPrimitive) {
-            float split = splitPrimitive.GetCenter().Z;
-            AABB left = new AABB();
-            AABB right = new AABB();
-            foreach (Primitive primitive in AABB.Primitives) {
-                if (primitive.GetCenter().Z <= split) left.Add(primitive);
-                else right.Add(primitive);
-            }
-            return (left, right);
         }
     }
 }

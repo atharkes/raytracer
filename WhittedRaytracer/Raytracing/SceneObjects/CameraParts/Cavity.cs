@@ -3,7 +3,7 @@ using WhittedRaytracer.Utilities;
 
 namespace WhittedRaytracer.Raytracing.SceneObjects.CameraParts {
     /// <summary> A cavity of the accumulator that catches light </summary>
-    class Cavity {
+    public class Cavity {
         /// <summary> The amount of light in the cavity </summary>
         public Vector3 Light { get; private set; } = Vector3.Zero;
         /// <summary> Amount of times the bvh is traversed by photons in the cavity </summary>

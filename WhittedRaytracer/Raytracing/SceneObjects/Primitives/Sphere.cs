@@ -1,14 +1,16 @@
 ﻿using OpenTK;
 using System;
+using WhittedRaytracer.Utilities;
 
 namespace WhittedRaytracer.Raytracing.SceneObjects.Primitives {
     /// <summary> A sphere primitive for the 3d scene </summary>
-    class Sphere : Primitive {
+    public class Sphere : Primitive {
         /// <summary> The radius of the sphere </summary>
         public float Radius { get; set; }
-
         /// <summary> Get the AABB bounds of the sphere </summary>
         public override (Vector3 Min, Vector3 Max) AABBBounds => (Position - Vector3.One * Radius, Position + Vector3.One * Radius);
+        /// <summary> Create a random Sphere </summary>
+        public static new Sphere Random => new Sphere(Utils.RandomVector * 100f, Utils.Random.Next(0, 100));
 
         /// <summary> Create a new sphere object for the 3d scene </summary>
         /// <param name="position">The position of the sphere</param>

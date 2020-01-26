@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace WhittedRaytracer.Utilities {
-    class InputHandler {
+    /// <summary> A class that handles input for a camera </summary>
+    public class InputHandler {
     }
 }

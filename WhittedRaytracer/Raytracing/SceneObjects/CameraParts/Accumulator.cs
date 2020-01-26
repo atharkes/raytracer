@@ -4,7 +4,7 @@ using WhittedRaytracer.Utilities;
 
 namespace WhittedRaytracer.Raytracing.SceneObjects.CameraParts {
     /// <summary> An accumulator that accumulates the light of photons </summary>
-    class Accumulator {
+    public class Accumulator {
         /// <summary> The cavities in which the light is accumulated </summary>
         public Cavity[] Cavities { get; }
         /// <summary> The width of the accumulator </summary>

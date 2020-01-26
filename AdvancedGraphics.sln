@@ -5,7 +5,10 @@ VisualStudioVersion = 15.0.28307.902
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WhittedRaytracer", "WhittedRaytracer\WhittedRaytracer.csproj", "{9354EB6E-D674-4763-A589-3631FABE7654}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestProject", "UnitTestProject\UnitTestProject.csproj", "{19140D30-B74F-403E-A35C-F68DF7D97C81}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests", "UnitTestProject\UnitTests.csproj", "{19140D30-B74F-403E-A35C-F68DF7D97C81}"
+	ProjectSection(ProjectDependencies) = postProject
+		{9354EB6E-D674-4763-A589-3631FABE7654} = {9354EB6E-D674-4763-A589-3631FABE7654}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

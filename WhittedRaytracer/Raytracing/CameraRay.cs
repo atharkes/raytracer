@@ -3,7 +3,7 @@ using WhittedRaytracer.Raytracing.SceneObjects.CameraParts;
 
 namespace WhittedRaytracer.Raytracing {
     /// <summary> A ray sent from the camera into the scene </summary>
-    class CameraRay : Ray {
+    public class CameraRay : Ray {
         /// <summary> The cavity from which this ray originates </summary>
         public readonly Cavity Cavity;
         /// <summary> How many times a BVH node is intersected </summary>

@@ -2,7 +2,7 @@
 
 namespace WhittedRaytracer.Utilities {
     /// <summary> A log for times </summary>
-    class TimeLog {
+    public class TimeLog {
         /// <summary> The total time spend </summary>
         public TimeSpan Total { get; private set; }
         /// <summary> Amount of time spend in the last frame </summary>

@@ -1,8 +1,9 @@
 ﻿using OpenTK;
+using WhittedRaytracer.Utilities;
 
 namespace WhittedRaytracer.Raytracing.SceneObjects.Primitives {
     /// <summary> A triangle primitive for the 3d scene </summary>
-    class Triangle : Primitive {
+    public class Triangle : Primitive {
         /// <summary> Epsilon used for the Möller–Trumbore triangle intersection </summary>
         public const float IntersectionEpsilon = 0.0000001f;
 
@@ -14,7 +15,6 @@ namespace WhittedRaytracer.Raytracing.SceneObjects.Primitives {
         public Vector3 P3 { get; }
         /// <summary> The normal of the triangle </summary>
         public Vector3 Normal { get; }
-
         /// <summary> Get the AABB bounds of the triangle </summary>
         public override (Vector3 Min, Vector3 Max) AABBBounds {
             get {
@@ -23,6 +23,8 @@ namespace WhittedRaytracer.Raytracing.SceneObjects.Primitives {
                 return (min, max);
             }
         }
+        /// <summary> Create a random Triangle </summary>
+        public static new Triangle Random => new Triangle(Utils.RandomVector * 100f, Utils.RandomVector * 100f, Utils.RandomVector * 100f);
 
         /// <summary> Create a new triangle object for the 3d scene </summary>
         /// <param name="p1">The first point of the triangle</param>
@@ -83,6 +85,53 @@ namespace WhittedRaytracer.Raytracing.SceneObjects.Primitives {
         /// <returns>The normal of the triangle at the intersection point</returns>
         public override Vector3 GetNormal(Vector3 intersectionPoint) {
             return Normal;
+        }
+
+        /// <summary> Clip this triangle by a plane </summary>
+        /// <param name="planeNormal">The normal of the clipping plane, assumed to go through the origin</param>
+        /// <returns>The points that are left after clipping the triangle</returns>
+        public Vector3[] ClipByPlane(Vector3 planeNormal, Vector3 planePosition) {
+            Vector3 v0 = P1 - planePosition, v1 = P2 - planePosition, v2 = P3 - planePosition, v3;
+            const float clipEpsilon = 0.00001f, clipEpsilon2 = 0.01f;
+            // Distances to the plane (this is an array parallel to v[], stored as a vec3)
+            Vector3 dist = new Vector3(Vector3.Dot(v0, planeNormal), Vector3.Dot(v1, planeNormal), Vector3.Dot(v2, planeNormal));
+            if (dist.X < clipEpsilon2 && dist.Y < clipEpsilon2 && dist.Z < clipEpsilon2) {
+                // Case 1 (all clipped)
+                return new Vector3[0];
+            }
+            if (dist.X > -clipEpsilon && dist.Y > -clipEpsilon && dist.Z > -clipEpsilon) {
+                // Case 2 (none clipped)
+                return new Vector3[] { v0, v1, v2 };
+            }
+            // There are either 1 or 2 vertices above the clipping plane
+            bool above0 = dist.X >= 0;
+            bool above1 = dist.Y >= 0;
+            bool above2 = dist.Z >= 0;
+            bool nextIsAbove;
+            // Find the CCW - most vertex above the plane
+            if (above1 && !above0) {
+                // Cycle once CCW. Use v3 as a temp
+                nextIsAbove = above2;
+                v3 = v0; v0 = v1; v1 = v2; v2 = v3;
+                dist = new Vector3(dist.Y, dist.Z, dist.X);
+            } else if (above2 && !above1) {
+                // Cycle once CW. Use v3 as a temp
+                nextIsAbove = above0;
+                v3 = v2; v2 = v1; v1 = v0; v0 = v3;
+                dist = new Vector3(dist.Z, dist.X, dist.Y);
+            } else nextIsAbove = above1;
+            // We always need to clip v2 - v0
+            v3 = Vector3.Lerp(v0, v2, dist[0] / (dist[0] - dist[2]));
+            if (nextIsAbove) {
+                // Case 3 (quadrilateral)
+                v2 = Vector3.Lerp(v1, v2, dist[1] / (dist[1] - dist[2]));
+                return new Vector3[] { v0, v1, v2, v3 };
+            } else {
+                // Case 4 (triangle)
+                v1 = Vector3.Lerp(v0, v1, dist[0] / (dist[0] - dist[1]));
+                v2 = v3; v3 = v0;
+                return new Vector3[] { v0, v1, v2 };
+            }
         }
     }
 }

@@ -7,7 +7,7 @@ using WhittedRaytracer.Utilities;
 
 namespace WhittedRaytracer.Raytracing.AccelerationStructure {
     /// <summary> An Axis-Aligned Bounding Box </summary>
-    class AABB : IAABB {
+    public class AABB : IAABB {
         /// <summary> The primitives in the AABB </summary>
         public ICollection<IAABB> Primitives => primitives;
         /// <summary> The bounds of the AABB </summary>
@@ -45,7 +45,6 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructure {
             this.primitives = primitives?.ToList() ?? new List<IAABB>();
             (MinBound, MaxBound) = CalculateBounds(this.primitives);
         }
-
 
         /// <summary> Add (the primitives of) another AABB to this AABB </summary>
         /// <param name="other">THe other AABB to add to this one</param>
@@ -146,7 +145,5 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructure {
             }
             return (boundMin, boundMax);
         }
-
-        
     }
 }

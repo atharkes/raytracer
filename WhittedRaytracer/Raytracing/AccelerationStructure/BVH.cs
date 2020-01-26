@@ -7,7 +7,7 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructure {
     /// - Refitting (enable animation/movement, adding and removing primitives)
     /// - Top-level BHV's for static and non-static parts
     /// </summary>
-    class BVH : IAccelerationStructure {
+    public class BVH : IAccelerationStructure {
         /// <summary> The estimated cost of traversing the BVH for the SAH </summary>
         public const float TraversalCost = 1f;
         /// <summary> The estimated cost of intersecting a primitive for the SAH </summary>
@@ -20,26 +20,26 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructure {
         public const float BinningEpsilon = 0.99999f;
 
         /// <summary> The root node of the BVH </summary>
-        readonly BVHNode root;
+        public BVHNode Root { get; }
 
         /// <summary> Create a bounding volume hierarchy tree, splitting into smaller nodes if needed </summary>
         /// <param name="primitives">The primitives in the tree</param>
         public BVH(List<Primitive> primitives) {
-            root = new BVHNode(primitives);
+            Root = new BVHNode(primitives);
         }
 
         /// <summary> Intersect the BVH with a ray </summary>
         /// <param name="ray">The ray to intersect the BVH with</param>
         /// <returns>The intersection in the BVH</returns>
         public Intersection Intersect(Ray ray) {
-            return root.Intersect(ray);
+            return Root.Intersect(ray);
         }
 
         /// <summary> Intersect the BVH with a ray </summary>
         /// <param name="ray">The ray to intersect the BVH with</param>
         /// <returns>Whether there is an intersection in the BVH</returns>
         public bool IntersectBool(Ray ray) {
-            return root.IntersectBool(ray);
+            return Root.IntersectBool(ray);
         }
     }
 }

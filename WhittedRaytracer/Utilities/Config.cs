@@ -5,7 +5,7 @@ using System.IO;
 
 namespace WhittedRaytracer.Utilities {
     /// <summary> A file that holds the configuration of the camera </summary>
-    class Config {
+    public class Config {
         /// <summary> Whether it is drawing debug information </summary>
         public bool DebugInfo { get; set; } = false;
         /// <summary> Whether to draw the amount of BVH traversals instead of normal light </summary>

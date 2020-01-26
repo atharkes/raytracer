@@ -24,6 +24,8 @@ References:
 - Sphere Intersection: https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-sphere-intersection
 - AABB Intersection: https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-box-intersection
 - Binning: http://www.sci.utah.edu/~wald/Publications/2007/ParallelBVHBuild/fastbuild.pdf
+- Triangle Clipping: Efficient Triangle and Quadrilateral Clipping within Shaders - M. McGuire
+- SBVH: Spatial Splits in Bounding Volume Hierarchies - M. Stich, H. Friedrich, A. Dietrich
 
 Controls:
 - Arrow keys:   Rotate Camera
@@ -35,5 +37,16 @@ Controls:
 - Numpad '+':   Increase FOV
 - Numpad '-':   Decrease FOV
 
-Notes to self:
-- No area lights with deterministic/whitted raytracing
+Notes to Self:
+Monte Carlo integration required for:
+- Area Lights (Random point on area of light)
+- Indirect Illumination (Random bounce over hemisphere)
+- Depth of Field (Introducing a lense somewhere)
+- Anti-Aliasing (Random point on screenplane pixels)
+- Motion Blur (Random point in time)
+Monte Carlo integration preferred for:
+- Multiple lightsources
+- Dielectric refraction or reflection
+Other interesting notes:
+- Where there is Monte Carlo integration there can be Russian Roulette, Multiple Importance Sampling, Machine Learning
+- Light is actually a spectrum

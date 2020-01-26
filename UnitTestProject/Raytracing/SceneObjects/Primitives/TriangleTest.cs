@@ -1,7 +1,7 @@
-using Xunit;
-using WhittedRaytracer.Raytracing.SceneObjects.Primitives;
 using OpenTK;
+using WhittedRaytracer.Raytracing.SceneObjects.Primitives;
 using WhittedRaytracer.Utilities;
+using Xunit;
 
 namespace UnitTests.Raytracing.SceneObjects.Primitives {
     public class TriangleTest {

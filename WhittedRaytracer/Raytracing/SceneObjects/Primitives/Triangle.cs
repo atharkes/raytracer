@@ -87,19 +87,19 @@ namespace WhittedRaytracer.Raytracing.SceneObjects.Primitives {
 
         /// <summary> Clip this triangle by a plane </summary>
         /// <param name="planeNormal">The normal of the clipping plane, assumed to go through the origin</param>
-        /// <returns>The amount of points that are above the clipping plane </returns>
-        public int ClipByPlane(Vector3 planeNormal) {
-            Vector3 v0 = P1, v1 = P2, v2 = P3, v3;
+        /// <returns>The points that are left after clipping the triangle</returns>
+        public Vector3[] ClipByPlane(Vector3 planeNormal, Vector3 planePosition) {
+            Vector3 v0 = P1 - planePosition, v1 = P2 - planePosition, v2 = P3 - planePosition, v3;
             const float clipEpsilon = 0.00001f, clipEpsilon2 = 0.01f;
             // Distances to the plane (this is an array parallel to v[], stored as a vec3)
             Vector3 dist = new Vector3(Vector3.Dot(v0, planeNormal), Vector3.Dot(v1, planeNormal), Vector3.Dot(v2, planeNormal));
             if (dist.X < clipEpsilon2 && dist.Y < clipEpsilon2 && dist.Z < clipEpsilon2) {
                 // Case 1 (all clipped)
-                return 0;
+                return new Vector3[0];
             }
             if (dist.X > -clipEpsilon && dist.Y > -clipEpsilon && dist.Z > -clipEpsilon) {
                 // Case 2 (none clipped)
-                return 3;
+                return new Vector3[] { v0, v1, v2 };
             }
             // There are either 1 or 2 vertices above the clipping plane
             bool above0 = dist.X >= 0;
@@ -123,12 +123,12 @@ namespace WhittedRaytracer.Raytracing.SceneObjects.Primitives {
             if (nextIsAbove) {
                 // Case 3 (quadrilateral)
                 v2 = Vector3.Lerp(v1, v2, dist[1] / (dist[1] - dist[2]));
-                return 4;
+                return new Vector3[] { v0, v1, v2, v3 };
             } else {
                 // Case 4 (triangle)
                 v1 = Vector3.Lerp(v0, v1, dist[0] / (dist[0] - dist[1]));
                 v2 = v3; v3 = v0;
-                return 3;
+                return new Vector3[] { v0, v1, v2 };
             }
         }
     }

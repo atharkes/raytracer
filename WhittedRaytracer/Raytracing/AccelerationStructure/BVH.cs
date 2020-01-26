@@ -6,7 +6,6 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructure {
     /// Possible Additions:
     /// - Refitting (enable animation/movement, adding and removing primitives)
     /// - Top-level BHV's for static and non-static parts
-    /// - Use two arrays for primitives and BHV nodes, and using only a Left index and Count (decrease storage and increase performance)
     /// </summary>
     class BVH : IAccelerationStructure {
         /// <summary> The estimated cost of traversing the BVH for the SAH </summary>

@@ -2,7 +2,7 @@
 
 namespace WhittedRaytracer.Raytracing {
     /// <summary> A datastructure to store a ray </summary>
-    class Ray {
+    public class Ray {
         /// <summary> Constant that defines the maximum recursion for secondary rays </summary>
         public const int MaxRecursionDepth = 3;
 

@@ -4,7 +4,7 @@ using WhittedRaytracer.Raytracing.SceneObjects;
 
 namespace WhittedRaytracer.Raytracing {
     /// <summary> A data structure to store an intersection between a ray and a primitive </summary>
-    class Intersection {
+    public class Intersection {
         /// <summary> The ray that intersects the primitive </summary>
         public readonly Ray Ray;
         /// <summary> The primitive that is intersected by the ray </summary>

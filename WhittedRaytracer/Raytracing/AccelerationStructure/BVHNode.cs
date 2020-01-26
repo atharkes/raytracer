@@ -6,7 +6,7 @@ using System;
 
 namespace WhittedRaytracer.Raytracing.AccelerationStructure {
     /// <summary> A node of a bounding volume hierarchy tree </summary>
-    class BVHNode {
+    public class BVHNode {
         /// <summary> The AABB of this BVH node </summary>
         public AABB AABB { get; private set; }
         /// <summary> The left child node if it has one </summary>

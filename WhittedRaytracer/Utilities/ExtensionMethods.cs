@@ -2,7 +2,7 @@
 
 namespace WhittedRaytracer.Utilities {
     /// <summary> Extension methods for classes in OpenTK </summary>
-    static class ExtensionMethods {
+    public static class ExtensionMethods {
         /// <summary> Get the integer color from a vector3 color </summary>
         /// <param name="color">The vector3 color to get the integer color for</param>
         /// <returns>The integer color</returns>

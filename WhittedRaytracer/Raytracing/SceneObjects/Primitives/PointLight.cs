@@ -2,7 +2,7 @@
 
 namespace WhittedRaytracer.Raytracing.SceneObjects.Primitives {
     /// <summary> A point light to illuminate your scene </summary>
-    class PointLight : Primitive {
+    public class PointLight : Primitive {
         /// <summary> The AABB of the pointlight is just the point </summary>
         public override (Vector3 Min, Vector3 Max) AABBBounds => (Position, Position);
 

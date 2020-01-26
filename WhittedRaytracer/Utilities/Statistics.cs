@@ -2,7 +2,7 @@
 
 namespace WhittedRaytracer.Utilities {
     /// <summary> Statistics for the raytracer </summary>
-    class Statistics {
+    public class Statistics {
         /// <summary> Amount of rays traced </summary>
         public int RaysTraced { get; private set; } = 0;
         /// <summary> Amount of rays traced in the previous tick </summary>

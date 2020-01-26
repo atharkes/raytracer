@@ -1,10 +1,9 @@
 ﻿using OpenTK;
 using System.Collections.Generic;
-using WhittedRaytracer.Raytracing.SceneObjects;
 
 namespace WhittedRaytracer.Raytracing.AccelerationStructure {
     /// <summary> A split for a BVHNode </summary>
-    class Split {
+    public class Split {
         /// <summary> Along which direction the split is </summary>
         public Vector3 Direction { get; }
         /// <summary> The left AABB of the split </summary>

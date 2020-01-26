@@ -3,7 +3,7 @@ using System;
 
 namespace WhittedRaytracer.Raytracing.SceneObjects.Primitives {
     /// <summary> A sphere primitive for the 3d scene </summary>
-    class Sphere : Primitive {
+    public class Sphere : Primitive {
         /// <summary> The radius of the sphere </summary>
         public float Radius { get; set; }
 

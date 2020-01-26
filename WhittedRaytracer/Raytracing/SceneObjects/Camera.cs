@@ -5,7 +5,7 @@ using WhittedRaytracer.Utilities;
 
 namespace WhittedRaytracer.Raytracing.SceneObjects {
     /// <summary> The camera object in the 3d scene </summary>
-    class Camera : ISceneObject {
+    public class Camera : ISceneObject {
         /// <summary> The input handler of the camera </summary>
         public readonly InputHandler InputHandler = new InputHandler();
         /// <summary> The statitics of the camera </summary>

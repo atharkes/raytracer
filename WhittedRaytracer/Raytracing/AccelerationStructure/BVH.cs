@@ -7,7 +7,7 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructure {
     /// - Refitting (enable animation/movement, adding and removing primitives)
     /// - Top-level BHV's for static and non-static parts
     /// </summary>
-    class BVH : IAccelerationStructure {
+    public class BVH : IAccelerationStructure {
         /// <summary> The estimated cost of traversing the BVH for the SAH </summary>
         public const float TraversalCost = 1f;
         /// <summary> The estimated cost of intersecting a primitive for the SAH </summary>

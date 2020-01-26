@@ -16,7 +16,7 @@ namespace WhittedRaytracer {
         /// <summary> Create a raytracing application </summary>
         /// <param name="screen">The screen to draw the raytracing to</param>
         public Main(IScreen screen) {
-            Scene = Scene.DefaultWithRandomSpheres(screen, 10_000);
+            Scene = Scene.DefaultWithRandomTriangles(screen, 10_000);
         }
 
         /// <summary> Process a single frame </summary>

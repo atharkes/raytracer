@@ -3,7 +3,7 @@ using WhittedRaytracer.Raytracing.AccelerationStructure;
 
 namespace WhittedRaytracer.Raytracing.SceneObjects {
     /// <summary> An abstract primitive for the 3d scene </summary>
-    abstract class Primitive : ISceneObject, IAABB {
+    public abstract class Primitive : ISceneObject, IAABB {
         /// <summary> The position of the primitive </summary>
         public Vector3 Position { get; set; }
         /// <summary> The material of the primitive </summary>
@@ -20,6 +20,12 @@ namespace WhittedRaytracer.Raytracing.SceneObjects {
         protected Primitive(Vector3? position = null, Material material = null) {
             Position = position ?? Vector3.Zero;
             Material = material ?? Material.Random();
+        }
+
+        /// <summary> Create a random primitive </summary>
+        /// <returns>A random primitive</returns>
+        public static Primitive Random() {
+
         }
 
         /// <summary> Intersect this primitive with a ray </summary>

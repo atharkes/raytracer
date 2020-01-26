@@ -4,7 +4,7 @@ using WhittedRaytracer.Utilities;
 
 namespace WhittedRaytracer.Raytracing.SceneObjects {
     /// <summary> A material class for primitives in the scene </summary>
-    class Material {
+    public class Material {
         /// <summary> The color of the primitive </summary>
         public Vector3 Color { get; set; } = Vector3.One;
         /// <summary> How specular this primitive is. A specular object reflects light like a mirror. </summary>

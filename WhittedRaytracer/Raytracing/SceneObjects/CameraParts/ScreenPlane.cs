@@ -5,7 +5,7 @@ using WhittedRaytracer.Utilities;
 
 namespace WhittedRaytracer.Raytracing.SceneObjects.CameraParts {
     /// <summary> The screen plane object in the 3d scene </summary>
-    class ScreenPlane : ISceneObject {
+    public class ScreenPlane : ISceneObject {
         /// <summary> The camera the screen plane is linked to </summary>
         public readonly Camera Camera;
         /// <summary> The 2d window the screen plane is linked to </summary>

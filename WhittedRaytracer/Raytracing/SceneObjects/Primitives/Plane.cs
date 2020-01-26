@@ -10,14 +10,10 @@ namespace WhittedRaytracer.Raytracing.SceneObjects.Primitives {
         public Vector3 Normal { get; set; }
         /// <summary> Distance of the plane from the origin </summary>
         public float Distance { get; set; }
-
+        /// <summary> An orthogonal vector of the plane </summary>
+        public Vector3 Orthogonal => (Vector3.One - Normal).Normalized();
         /// <summary> Returns the AABB bounds of the plane bounded by the size constant </summary>
-        public override (Vector3 Min, Vector3 Max) AABBBounds {
-            get {
-                Vector3 orthogonal = Vector3.One - Normal;
-                return (AABBCenter - orthogonal * Size, AABBCenter + orthogonal * Size);
-            }
-        }
+        public override (Vector3 Min, Vector3 Max) AABBBounds => (AABBCenter - Orthogonal * Size, AABBCenter + Orthogonal * Size);
 
         /// <summary> Create a new plane using a normal and a distance </summary>
         /// <param name="normal">The normal of the plane</param>

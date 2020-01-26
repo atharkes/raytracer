@@ -74,8 +74,8 @@ namespace WhittedRaytracer.Raytracing {
                 Vector3 trianglesCenter = new Vector3(0f, -30f, 0f);
                 Vector3 trianglesBox = new Vector3(60f, 30f, 60f);
                 Vector3 p1 = Utils.DetRandomVector * trianglesBox - 0.5f * trianglesBox + trianglesCenter;
-                Vector3 p2 = p1 + Utils.DetRandomVector;
-                Vector3 p3 = p1 - Utils.DetRandomVector;
+                Vector3 p2 = p1 + Utils.DetRandomVector * 2;
+                Vector3 p3 = p1 - Utils.DetRandomVector * 2;
                 primitives.Add(new Triangle(p1, p2, p3));
             }
             return new Scene(screen, primitives);

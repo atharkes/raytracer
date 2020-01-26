@@ -7,6 +7,9 @@ namespace WhittedRaytracer.Raytracing.SceneObjects.Primitives {
         /// <summary> The radius of the sphere </summary>
         public float Radius { get; set; }
 
+        /// <summary> Get the AABB bounds of the sphere </summary>
+        public override (Vector3 Min, Vector3 Max) AABBBounds => (Position - Vector3.One * Radius, Position + Vector3.One * Radius);
+
         /// <summary> Create a new sphere object for the 3d scene </summary>
         /// <param name="position">The position of the sphere</param>
         /// <param name="radius">The radius of the sphere</param>
@@ -43,18 +46,6 @@ namespace WhittedRaytracer.Raytracing.SceneObjects.Primitives {
         /// <returns>The normal at the point of intersection</returns>
         public override Vector3 GetNormal(Vector3 intersectionPoint) {
             return (intersectionPoint - Position).Normalized();
-        }
-
-        /// <summary> Get the center of the sphere </summary>
-        /// <returns>The center of the sphere</returns>
-        public override Vector3 GetCenter() {
-            return Position;
-        }
-
-        /// <summary> Get the bounds of the sphere </summary>
-        /// <returns>The bounds of the sphere</returns>
-        public override (Vector3 min, Vector3 max) GetBounds() {
-            return (Position - Vector3.One * Radius, Position + Vector3.One * Radius);
         }
     }
 }

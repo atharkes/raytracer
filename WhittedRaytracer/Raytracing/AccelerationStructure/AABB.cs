@@ -7,40 +7,45 @@ using WhittedRaytracer.Utilities;
 
 namespace WhittedRaytracer.Raytracing.AccelerationStructure {
     /// <summary> An Axis-Aligned Bounding Box </summary>
-    class AABB {
+    class AABB : IAABB {
         /// <summary> The primitives in the AABB </summary>
-        public ICollection<Primitive> Primitives => primitives;
+        public ICollection<IAABB> Primitives => primitives;
         /// <summary> The bounds of the AABB </summary>
-        public readonly Vector3[] Bounds = new Vector3[] { Utils.MaxVector, Utils.MinVector };
-
+        public Vector3[] Bounds { get; } = new Vector3[] { Utils.MaxVector, Utils.MinVector };
+        /// <summary> Get the bounds of the AABB </summary>
+        public (Vector3 Min, Vector3 Max) AABBBounds => (Bounds[0], Bounds[1]);
         /// <summary> The minimum bound of the AABB </summary>
         public Vector3 MinBound { get => Bounds[0]; private set => Bounds[0] = value; }
         /// <summary> The maximum bound of the AABB </summary>
         public Vector3 MaxBound { get => Bounds[1]; private set => Bounds[1] = value; }
         /// <summary> The size of the AABB </summary>
         public Vector3 Size => MaxBound - MinBound;
+        /// <summary> The center of the AABB </summary>
+        public Vector3 AABBCenter => MinBound + 0.5f * Size;
         /// <summary> The surface area of the AABB </summary>
         public float SurfaceArea => 2 * (Size.X * Size.Y + Size.Y * Size.Z + Size.X * Size.Z);
         /// <summary> The cost of having this AABB as a BVHNode </summary>
         public float SurfaceAreaHeuristic => BVH.TraversalCost + BVH.IntersectionCost * primitives.Count * SurfaceArea;
 
-        readonly List<Primitive> primitives;
+        readonly List<IAABB> primitives;
 
         /// <summary> Create a new AABB with no primitives </summary>
         public AABB() {
-            primitives = new List<Primitive>();
+            primitives = new List<IAABB>();
+        }
+
+        public AABB(IAABB left, IAABB right) {
+            primitives = new List<IAABB>() { left, right };
+            (MinBound, MaxBound) = CalculateBounds(primitives);
         }
 
         /// <summary> Create a new AABB with primitives </summary>
-        /// <param name="primitives">The primitive to add to the AABB</param>
-        public AABB(IEnumerable<Primitive> primitives) {
-            this.primitives = primitives?.ToList() ?? new List<Primitive>();
-            foreach (Primitive primitive in primitives) {
-                (Vector3 primitiveMin, Vector3 primitiveMax) = primitive.GetBounds();
-                MinBound = Vector3.ComponentMin(primitiveMin, MinBound);
-                MaxBound = Vector3.ComponentMax(primitiveMax, MaxBound);
-            }
+        /// <param name="primitives">The primitives to add to the AABB</param>
+        public AABB(IEnumerable<IAABB> primitives) {
+            this.primitives = primitives?.ToList() ?? new List<IAABB>();
+            (MinBound, MaxBound) = CalculateBounds(this.primitives);
         }
+
 
         /// <summary> Add (the primitives of) another AABB to this AABB </summary>
         /// <param name="other">THe other AABB to add to this one</param>
@@ -54,19 +59,19 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructure {
 
         /// <summary> Add a primitive to the AABB </summary>
         /// <param name="primitive">The primitive to add to the AABB</param>
-        public void Add(Primitive primitive) {
+        public void Add(IAABB primitive) {
             Primitives.Add(primitive);
-            (Vector3 min, Vector3 max) = primitive.GetBounds();
+            (Vector3 min, Vector3 max) = primitive.AABBBounds;
             MinBound = Vector3.ComponentMin(MinBound, min);
             MaxBound = Vector3.ComponentMax(MaxBound, max);
         }
 
         /// <summary> Add a list of primitives to the AABB </summary>
         /// <param name="primitives">The primitives to add to the AABB</param>
-        public void AddRange(IEnumerable<Primitive> primitives) {
+        public void AddRange(IEnumerable<IAABB> primitives) {
             this.primitives.AddRange(primitives);
             foreach (Primitive primitive in primitives) {
-                (Vector3 min, Vector3 max) = primitive.GetBounds();
+                (Vector3 min, Vector3 max) = primitive.AABBBounds;
                 MinBound = Vector3.ComponentMin(MinBound, min);
                 MaxBound = Vector3.ComponentMax(MaxBound, max);
             }
@@ -74,7 +79,7 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructure {
 
         /// <summary> Remove a primitive from the AABB </summary>
         /// <param name="primitive">The primitive to be removed</param>
-        public void Remove(Primitive primitive) {
+        public void Remove(IAABB primitive) {
             primitives.Remove(primitive);
             (MinBound, MaxBound) = CalculateBounds(primitives);
         }
@@ -131,15 +136,17 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructure {
         /// <summary> Calculate the bounds of a List of Primitives </summary>
         /// <param name="primitives">The primitives the calculate the bounds for</param>
         /// <returns>The bounds of the primitives</returns>
-        public static (Vector3 boundMin, Vector3 boundMax) CalculateBounds(ICollection<Primitive> primitives) {
+        public static (Vector3 boundMin, Vector3 boundMax) CalculateBounds(ICollection<IAABB> primitives) {
             Vector3 boundMin = Utils.MaxVector;
             Vector3 boundMax = Utils.MinVector;
-            foreach (Primitive primitive in primitives) {
-                (Vector3 primitiveMin, Vector3 primitiveMax) = primitive.GetBounds();
+            foreach (IAABB primitive in primitives) {
+                (Vector3 primitiveMin, Vector3 primitiveMax) = primitive.AABBBounds;
                 boundMin = Vector3.ComponentMin(primitiveMin, boundMin);
                 boundMax = Vector3.ComponentMax(primitiveMax, boundMax);
             }
             return (boundMin, boundMax);
         }
+
+        
     }
 }

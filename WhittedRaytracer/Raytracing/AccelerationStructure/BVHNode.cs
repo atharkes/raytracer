@@ -1,8 +1,8 @@
 ﻿using OpenTK;
-using System.Linq;
-using System.Collections.Generic;
-using WhittedRaytracer.Raytracing.SceneObjects;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using WhittedRaytracer.Raytracing.SceneObjects;
 
 namespace WhittedRaytracer.Raytracing.AccelerationStructure {
     /// <summary> A node of a bounding volume hierarchy tree </summary>

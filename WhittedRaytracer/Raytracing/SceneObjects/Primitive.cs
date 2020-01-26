@@ -22,12 +22,6 @@ namespace WhittedRaytracer.Raytracing.SceneObjects {
             Material = material ?? Material.Random();
         }
 
-        /// <summary> Create a random primitive </summary>
-        /// <returns>A random primitive</returns>
-        public static Primitive Random() {
-
-        }
-
         /// <summary> Intersect this primitive with a ray </summary>
         /// <param name="ray">The ray to intersect the primitive with</param>
         /// <returns>The distance the ray travels untill the intersection with this primitive</returns>

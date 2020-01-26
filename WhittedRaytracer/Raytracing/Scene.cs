@@ -74,8 +74,8 @@ namespace WhittedRaytracer.Raytracing {
                 Vector3 trianglesCenter = new Vector3(0f, -30f, 0f);
                 Vector3 trianglesBox = new Vector3(60f, 30f, 60f);
                 Vector3 p1 = Utils.DetRandomVector * trianglesBox - 0.5f * trianglesBox + trianglesCenter;
-                Vector3 p2 = p1 + Utils.DetRandomVector * 2;
-                Vector3 p3 = p1 - Utils.DetRandomVector * 2;
+                Vector3 p2 = p1 + Utils.DetRandomVector * 4;
+                Vector3 p3 = p1 - Utils.DetRandomVector * 4;
                 primitives.Add(new Triangle(p1, p2, p3));
             }
             return new Scene(screen, primitives);
@@ -96,18 +96,17 @@ namespace WhittedRaytracer.Raytracing {
         /// <summary> Intersect the scene with a ray and calculate the color found by the ray </summary>
         /// <param name="ray">The ray to intersect the scene with</param>
         /// <param name="recursionDepth">The recursion depth if this is a secondary ray</param>
-        /// <param name="debugRay">Whether to draw this ray in debug</param>
         /// <returns>The color at the origin of the ray</returns>
-        public Vector3 CastRay(Ray ray, int recursionDepth = 0, bool debugRay = false) {
+        public Vector3 CastRay(Ray ray, int recursionDepth = 0) {
             // Intersect with Scene
             Intersection intersection = AccelerationStructure.Intersect(ray);
             if (intersection == null) return Vector3.Zero;
-            Vector3 directIllumination = intersection.Primitive.Material.Specularity < 1 ? CastShadowRays(intersection, debugRay) : Vector3.Zero;
+            Vector3 directIllumination = intersection.Primitive.Material.Specularity < 1 ? CastShadowRays(intersection) : Vector3.Zero;
             Vector3 radianceOut;
             
             if (intersection.Primitive.Material.Specularity > 0 && recursionDepth < Ray.MaxRecursionDepth) {
                 // Specular
-                Vector3 reflectedIn = CastRay(intersection.GetReflectedRay(), recursionDepth + 1, debugRay);
+                Vector3 reflectedIn = CastRay(intersection.GetReflectedRay(), recursionDepth + 1);
                 Vector3 reflectedOut = reflectedIn * intersection.Primitive.Material.Color;
                 radianceOut = directIllumination * (1 - intersection.Primitive.Material.Specularity) + reflectedOut * intersection.Primitive.Material.Specularity;
             } else if (intersection.Primitive.Material.Dielectric > 0 && recursionDepth < Ray.MaxRecursionDepth) {
@@ -115,8 +114,8 @@ namespace WhittedRaytracer.Raytracing {
                 float reflected = intersection.GetReflectivity();
                 float refracted = 1 - reflected;
                 Ray refractedRay = intersection.GetRefractedRay();
-                Vector3 incRefractedLight = refractedRay != null ? CastRay(refractedRay, recursionDepth + 1, debugRay) : Vector3.Zero;
-                Vector3 incReflectedLight = CastRay(intersection.GetReflectedRay(), recursionDepth + 1, debugRay);
+                Vector3 incRefractedLight = refractedRay != null ? CastRay(refractedRay, recursionDepth + 1) : Vector3.Zero;
+                Vector3 incReflectedLight = CastRay(intersection.GetReflectedRay(), recursionDepth + 1);
                 radianceOut = directIllumination * (1f - intersection.Primitive.Material.Dielectric) + (incRefractedLight * refracted + incReflectedLight * reflected) * intersection.Primitive.Material.Dielectric * intersection.Primitive.Material.Color;
             } else {
                 // Diffuse
@@ -126,19 +125,13 @@ namespace WhittedRaytracer.Raytracing {
             if (intersection.Primitive.Material.Emitting) {
                 radianceOut += intersection.Primitive.Material.EmittingLight / ray.DistanceAttenuation;
             }
-
-            // Debug: Primary Rays
-            if (debugRay) {
-                Camera.ScreenPlane.DrawRay(ray);
-            }
             return radianceOut;
         }
 
         /// <summary> Cast shadow rays from an intersection to every light and calculate the color </summary>
         /// <param name="intersection">The intersection to cast the shadow rays from</param>
-        /// <param name="debugRay">Whether to draw this ray in debug</param>
         /// <returns>The color at the intersection</returns>
-        public Vector3 CastShadowRays(Intersection intersection, bool debugRay = false) {
+        public Vector3 CastShadowRays(Intersection intersection) {
             Vector3 radianceOut = Vector3.Zero;
             foreach (Primitive light in Lights) {
                 Ray shadowRay = intersection.GetShadowRay(light);
@@ -164,17 +157,7 @@ namespace WhittedRaytracer.Raytracing {
                 }
                 // Absorption
                 radianceOut += irradiance * intersection.Primitive.Material.Color;
-                if (debugRay) {
-                    Camera.ScreenPlane.DrawRay(shadowRay, light.Material.Color.ToIntColor());
-                }
-
             }
-            // Triangle Texture
-            if (intersection.Primitive is Triangle) {
-                if (Math.Abs(intersection.Position.X % 2) < 1) radianceOut = radianceOut * 0.5f;
-                if (Math.Abs(intersection.Position.Z % 2) > 1) radianceOut = radianceOut * 0.5f;
-            }
-
             return radianceOut;
         }
     }

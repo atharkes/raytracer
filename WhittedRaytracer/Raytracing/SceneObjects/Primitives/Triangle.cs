@@ -3,13 +3,26 @@
 namespace WhittedRaytracer.Raytracing.SceneObjects.Primitives {
     /// <summary> A triangle primitive for the 3d scene </summary>
     class Triangle : Primitive {
-        /// <summary> A point of the triangle </summary>
-        public Vector3 P1, P2, P3;
-        /// <summary> The normal of the triangle </summary>
-        public Vector3 Normal;
-
         /// <summary> Epsilon used for the Möller–Trumbore triangle intersection </summary>
         public const float IntersectionEpsilon = 0.0000001f;
+
+        /// <summary> The first point of the triangle </summary>
+        public Vector3 P1 { get; }
+        /// <summary> The second point of the triangle </summary>
+        public Vector3 P2 { get; }
+        /// <summary> The third point of the triangle </summary>
+        public Vector3 P3 { get; }
+        /// <summary> The normal of the triangle </summary>
+        public Vector3 Normal { get; }
+
+        /// <summary> Get the AABB bounds of the triangle </summary>
+        public override (Vector3 Min, Vector3 Max) AABBBounds {
+            get {
+                Vector3 min = Vector3.ComponentMin(P1, Vector3.ComponentMin(P2, P3));
+                Vector3 max = Vector3.ComponentMax(P1, Vector3.ComponentMax(P2, P3));
+                return (min, max);
+            }
+        }
 
         /// <summary> Create a new triangle object for the 3d scene </summary>
         /// <param name="p1">The first point of the triangle</param>
@@ -62,11 +75,7 @@ namespace WhittedRaytracer.Raytracing.SceneObjects.Primitives {
         /// <returns>Whether the ray intersects the triangle</returns>
         public override bool IntersectBool(Ray ray) {
             float intersectDistance = Intersect(ray);
-            if (intersectDistance > 0 && intersectDistance < ray.Length) {
-                return true;
-            } else {
-                return false;
-            }
+            return intersectDistance > 0 && intersectDistance < ray.Length;
         }
 
         /// <summary> Get the normal of the triangle </summary>
@@ -74,20 +83,6 @@ namespace WhittedRaytracer.Raytracing.SceneObjects.Primitives {
         /// <returns>The normal of the triangle at the intersection point</returns>
         public override Vector3 GetNormal(Vector3 intersectionPoint) {
             return Normal;
-        }
-
-        /// <summary> Get the center of the triangle </summary>
-        /// <returns>The center of the triangle</returns>
-        public override Vector3 GetCenter() {
-            return Position;
-        }
-
-        /// <summary> Get the bounds of the triangle </summary>
-        /// <returns>The bounds of the triangle</returns>
-        public override (Vector3 min, Vector3 max) GetBounds() {
-            Vector3 min = Vector3.ComponentMin(P1, Vector3.ComponentMin(P2, P3));
-            Vector3 max = Vector3.ComponentMax(P1, Vector3.ComponentMax(P2, P3));
-            return (min, max);
         }
     }
 }

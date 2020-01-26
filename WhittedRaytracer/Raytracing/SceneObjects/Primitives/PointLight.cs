@@ -3,6 +3,9 @@
 namespace WhittedRaytracer.Raytracing.SceneObjects.Primitives {
     /// <summary> A point light to illuminate your scene </summary>
     class PointLight : Primitive {
+        /// <summary> The AABB of the pointlight is just the point </summary>
+        public override (Vector3 Min, Vector3 Max) AABBBounds => (Position, Position);
+
         /// <summary> Create a new point light </summary>
         /// <param name="position">The position of the point light</param>
         /// <param name="color">The color of the point light</param>
@@ -28,12 +31,6 @@ namespace WhittedRaytracer.Raytracing.SceneObjects.Primitives {
         /// <returns>A zero vector</returns>
         public override Vector3 GetNormal(Vector3 intersectionPoint) {
             return Vector3.Zero;
-        }
-
-        /// <summary> A point has no bounds </summary>
-        /// <returns>Just twice the position of the point light</returns>
-        public override (Vector3 min, Vector3 max) GetBounds() {
-            return (Position, Position);
         }
     }
 }

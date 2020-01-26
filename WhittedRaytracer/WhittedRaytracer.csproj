@@ -94,6 +94,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Raytracing\AccelerationStructure\IAABB.cs" />
     <Compile Include="Raytracing\AccelerationStructure\Split.cs" />
     <Compile Include="Raytracing\CameraRay.cs" />
     <Compile Include="Raytracing\SceneObjects\CameraParts\Accumulator.cs" />

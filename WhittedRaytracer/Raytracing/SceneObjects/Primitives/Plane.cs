@@ -3,12 +3,21 @@
 namespace WhittedRaytracer.Raytracing.SceneObjects.Primitives {
     /// <summary> A plane for the 3d scene </summary>
     class Plane : Primitive {
+        /// <summary> The size of plane objects. Required to fit in an AABB for the BVh </summary>
+        public const float Size = 1000;
+
         /// <summary> Normal vector of the plane </summary>
         public Vector3 Normal { get; set; }
         /// <summary> Distance of the plane from the origin </summary>
         public float Distance { get; set; }
-        /// <summary> The size of the plane. Required for bvh </summary>
-        public const float Size = 1000;
+
+        /// <summary> Returns the AABB bounds of the plane bounded by the size constant </summary>
+        public override (Vector3 Min, Vector3 Max) AABBBounds {
+            get {
+                Vector3 orthogonal = Vector3.One - Normal;
+                return (AABBCenter - orthogonal * Size, AABBCenter + orthogonal * Size);
+            }
+        }
 
         /// <summary> Create a new plane using a normal and a distance </summary>
         /// <param name="normal">The normal of the plane</param>
@@ -17,6 +26,7 @@ namespace WhittedRaytracer.Raytracing.SceneObjects.Primitives {
         public Plane(Vector3 normal, float distance, Material material = null) : base(null, material) {
             Normal = normal.Normalized();
             Distance = distance;
+            Position = Normal * Distance;
         }
 
         /// <summary> Returns the distance of the intersection </summary>
@@ -43,20 +53,6 @@ namespace WhittedRaytracer.Raytracing.SceneObjects.Primitives {
         /// <returns>The normal of the plane</returns>
         public override Vector3 GetNormal(Vector3 intersectionPoint) {
             return Normal;
-        }
-
-        /// <summary> The center of the plane, which is the point closest to the origin </summary>
-        /// <returns>The point closest to the origin</returns>
-        public override Vector3 GetCenter() {
-            return Normal * Distance;
-        }
-
-        /// <summary> Returns some arbitrary bounds of the plane </summary>
-        /// <returns>The bounds of the plane</returns>
-        public override (Vector3 min, Vector3 max) GetBounds() {
-            Vector3 center = GetCenter();
-            Vector3 orthogonal = Vector3.One - Normal;
-            return (center - orthogonal * Size, center + orthogonal * Size);
         }
     }
 }

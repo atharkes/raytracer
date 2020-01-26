@@ -1,12 +1,18 @@
 ﻿using OpenTK;
+using WhittedRaytracer.Raytracing.AccelerationStructure;
 
 namespace WhittedRaytracer.Raytracing.SceneObjects {
     /// <summary> An abstract primitive for the 3d scene </summary>
-    abstract class Primitive : ISceneObject {
+    abstract class Primitive : ISceneObject, IAABB {
         /// <summary> The position of the primitive </summary>
         public Vector3 Position { get; set; }
         /// <summary> The material of the primitive </summary>
         public Material Material { get; set; }
+
+        /// <summary> The center of the AABB of the primitive equals the position </summary>
+        public Vector3 AABBCenter => Position;
+        /// <summary> Get the AABB bounds of this primitive </summary>
+        public abstract (Vector3 Min, Vector3 Max) AABBBounds { get; }
 
         /// <summary> Create a new primitive for the 3d scene </summary>
         /// <param name="position">The position of the primitive</param>
@@ -30,13 +36,5 @@ namespace WhittedRaytracer.Raytracing.SceneObjects {
         /// <param name="intersectionPoint">The point of the intersection</param>
         /// <returns>The normal at the point of intersection on this primitive</returns>
         public abstract Vector3 GetNormal(Vector3 intersectionPoint);
-
-        /// <summary> Get the center of this primitive </summary>
-        /// <returns>The center of this primitive</returns>
-        public virtual Vector3 GetCenter() { return Position; }
-
-        /// <summary> Get the axis-alinged bounding box bounds of this primitive </summary>
-        /// <returns>The axis-alinged bounds of this primitive</returns>
-        public abstract (Vector3 min, Vector3 max) GetBounds();
     }
 }

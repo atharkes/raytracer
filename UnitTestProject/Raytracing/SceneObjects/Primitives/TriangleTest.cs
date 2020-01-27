@@ -5,13 +5,11 @@ using Xunit;
 
 namespace UnitTests.Raytracing.SceneObjects.Primitives {
     public class TriangleTest {
-        Triangle RandomTriangle => new Triangle(Utils.RandomVector, Utils.RandomVector, Utils.RandomVector);
-
         [Fact]
         public void Constructor() {
-            Vector3 P1 = Utils.RandomVector;
-            Vector3 P2 = Utils.RandomVector;
-            Vector3 P3 = Utils.RandomVector;
+            Vector3 P1 = Utils.Random.Vector3();
+            Vector3 P2 = Utils.Random.Vector3();
+            Vector3 P3 = Utils.Random.Vector3();
             Triangle triangle = new Triangle(P1, P2, P3);
             Assert.Equal(P1, triangle.P1);
             Assert.Equal(P2, triangle.P2);
@@ -23,7 +21,7 @@ namespace UnitTests.Raytracing.SceneObjects.Primitives {
             Vector3 planeNormal = new Vector3(0, 0, 1);
             Vector3 planePosition = Vector3.Zero;
             for (int i = 0; i < 100; i++) {
-                Triangle triangle = RandomTriangle;
+                Triangle triangle = Utils.Random.Triangle(0f, 1f);
                 Vector3[] points = triangle.ClipByPlane(planeNormal, planePosition);
                 Assert.Equal(3, points.Length);
                 Assert.Equal(triangle.P1, points[0]);
@@ -75,7 +73,7 @@ namespace UnitTests.Raytracing.SceneObjects.Primitives {
             Vector3 planeNormal = new Vector3(0, 0, -1);
             Vector3 planePosition = Vector3.Zero;
             for (int i = 0; i < 100; i++) {
-                Triangle triangle = RandomTriangle;
+                Triangle triangle = Utils.Random.Triangle(0f, 1f);
                 Vector3[] points = triangle.ClipByPlane(planeNormal, planePosition);
                 Assert.Empty(points);
             }

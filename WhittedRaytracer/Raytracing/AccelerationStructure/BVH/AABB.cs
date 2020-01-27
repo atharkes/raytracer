@@ -5,7 +5,7 @@ using System.Linq;
 using WhittedRaytracer.Raytracing.SceneObjects;
 using WhittedRaytracer.Utilities;
 
-namespace WhittedRaytracer.Raytracing.AccelerationStructure {
+namespace WhittedRaytracer.Raytracing.AccelerationStructure.BVH {
     /// <summary> An Axis-Aligned Bounding Box </summary>
     public class AABB : IAABB {
         /// <summary> The primitives in the AABB </summary>
@@ -25,7 +25,7 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructure {
         /// <summary> The surface area of the AABB </summary>
         public float SurfaceArea => 2 * (Size.X * Size.Y + Size.Y * Size.Z + Size.X * Size.Z);
         /// <summary> The cost of having this AABB as a BVHNode </summary>
-        public float SurfaceAreaHeuristic => BVH.TraversalCost + BVH.IntersectionCost * primitives.Count * SurfaceArea;
+        public float SurfaceAreaHeuristic => BVHTree.TraversalCost + BVHTree.IntersectionCost * primitives.Count * SurfaceArea;
 
         readonly List<IAABB> primitives;
 
@@ -50,7 +50,7 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructure {
         /// <param name="other">THe other AABB to add to this one</param>
         /// <returns>This AABB with the added primitives</returns>
         public AABB Add(AABB other) {
-            foreach (Primitive primitive in other.Primitives) {
+            foreach (IAABB primitive in other.Primitives) {
                 Add(primitive);
             }
             return this;

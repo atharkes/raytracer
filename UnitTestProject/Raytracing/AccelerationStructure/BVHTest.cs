@@ -12,12 +12,12 @@ namespace UnitTests.Raytracing.AccelerationStructure {
             this.output = output;
         }
 
-        static BVH RandomBVH(int primitiveAmount) {
+        static BVHTree RandomBVH(int primitiveAmount) {
             List<Primitive> primitives = new List<Primitive>(primitiveAmount);
             for (int i = 0; i < primitiveAmount; i++) {
                 primitives.Add(Primitive.Random);
             }
-            return new BVH(primitives);
+            return new BVHTree(primitives);
         }
 
         [Fact]
@@ -29,7 +29,7 @@ namespace UnitTests.Raytracing.AccelerationStructure {
         public void NodeCount() {
             const int primitiveCount = 10_000;
             for (int i = 0; i < 10; i++) {
-                BVH bvh = RandomBVH(primitiveCount);
+                BVHTree bvh = RandomBVH(primitiveCount);
                 int nodeCount = CountNodes(bvh.Root);
                 output.WriteLine($"Node count in percentage of primitives: {(float)primitiveCount / nodeCount}");
                 Assert.True(nodeCount <= primitiveCount * 2);

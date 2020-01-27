@@ -66,7 +66,7 @@ namespace WhittedRaytracer.Raytracing.SceneObjects {
         /// <returns>A random material that doesn't emit light</returns>
         public static Material RandomNonEmitter() {
             Random r = Utils.DetRandom;
-            Vector3 color = Utils.DetRandomVector;
+            Vector3 color = Utils.DetRandom.Vector3();
             float specularity = r.NextDouble() < 0.3f ? (float)r.NextDouble() : 0;
             float dielectric = r.NextDouble() < 0.1f ? (float)r.NextDouble() : 0;
             float refractionIndex = (float)r.NextDouble() * 2f + 1f;
@@ -78,7 +78,7 @@ namespace WhittedRaytracer.Raytracing.SceneObjects {
         /// <summary> Create a random emitting material </summary>
         /// <returns>A random emitting material</returns>
         public static Material RandomEmitter() {
-            return new Material(Utils.DetRandom.Next(1, 50), Utils.DetRandomVector);
+            return new Material(Utils.DetRandom.Next(1, 50), Utils.DetRandom.Vector3());
         }
 
         /// <summary> Create a diffuse green material </summary>

@@ -1,7 +1,5 @@
 ﻿using OpenTK;
-using WhittedRaytracer.Raytracing.AccelerationStructure;
-using WhittedRaytracer.Raytracing.SceneObjects.Primitives;
-using WhittedRaytracer.Utilities;
+using WhittedRaytracer.Raytracing.AccelerationStructure.BVH;
 
 namespace WhittedRaytracer.Raytracing.SceneObjects {
     /// <summary> An abstract primitive for the 3d scene </summary>
@@ -14,8 +12,6 @@ namespace WhittedRaytracer.Raytracing.SceneObjects {
         public Vector3 AABBCenter => Position;
         /// <summary> Get the AABB bounds of this primitive </summary>
         public abstract (Vector3 Min, Vector3 Max) AABBBounds { get; }
-        /// <summary> Create a random primitive </summary>
-        public static Primitive Random => Utils.Random.NextDouble() < 0.5f ? Sphere.Random as Primitive : Triangle.Random as Primitive;
 
         /// <summary> Create a new primitive for the 3d scene </summary>
         /// <param name="position">The position of the primitive</param>

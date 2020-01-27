@@ -4,35 +4,38 @@ using System.Collections.Generic;
 using System.Linq;
 using WhittedRaytracer.Raytracing.SceneObjects;
 
-namespace WhittedRaytracer.Raytracing.AccelerationStructure {
+namespace WhittedRaytracer.Raytracing.AccelerationStructure.BVH {
     /// <summary> A node of a bounding volume hierarchy tree </summary>
-    public class BVHNode {
+    public class BVHNode : IBVHNode {
         /// <summary> The AABB of this BVH node </summary>
-        public AABB AABB { get; private set; }
+        public AABB AABB { get; protected set; }
         /// <summary> The left child node if it has one </summary>
-        public BVHNode Left { get; private set; }
+        public IBVHNode Left { get; protected set; }
         /// <summary> The right child node if it has one </summary>
-        public BVHNode Right { get; private set; }
+        public IBVHNode Right { get; protected set; }
         /// <summary> Whether this node is a leaf or not </summary>
-        public bool Leaf { get; private set; } = true;
+        public bool Leaf { get; protected set; } = true;
         /// <summary> On which axis the node is split </summary>
-        public Vector3 SplitDirection { get; private set; }
+        public Vector3 SplitDirection { get; protected set; }
 
-        /// <summary> Create a bounding volume hierarchy tree, splitting into smaller nodes if needed </summary>
-        /// <param name="primitives">The primitives in the tree</param>
+        /// <summary> Create an empty BVH node </summary>
+        public BVHNode() { }
+
+        /// <summary> Create a BVH node, splitting into smaller nodes if benificial </summary>
+        /// <param name="primitives">The primitives in the node</param>
         public BVHNode(List<Primitive> primitives) {
             AABB = new AABB(primitives);
             TrySplit();
         }
 
-        /// <summary> Create a bounding volume hierarchy tree, splitting into smaller nodes if needed </summary>
-        /// <param name="aabb">The aabb to create the tree from</param>
+        /// <summary> Create a BVH node, splitting into smaller nodes if beneficial </summary>
+        /// <param name="aabb">The aabb for the node</param>
         public BVHNode(AABB aabb) {
             AABB = aabb;
             TrySplit();
         }
 
-        /// <summary> Try split the BVH Node into 2 smaller Nodes </summary>
+        /// <summary> Try split node into 2 smaller Nodes </summary>
         void TrySplit() {
             Split split = ComputeBestSplit();
             if (split is null) return;
@@ -43,9 +46,9 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructure {
             AABB = new AABB(Left.AABB, Right.AABB);
         }
 
-        /// <summary> Intersect and traverse the BVH with a ray </summary>
-        /// <param name="ray">The ray to intersect the BVH with</param>
-        /// <returns>The intersection in the BVH</returns>
+        /// <summary> Intersect and traverse the node with a ray </summary>
+        /// <param name="ray">The ray to intersect the node with</param>
+        /// <returns>The intersection in the node or any of its children</returns>
         public Intersection Intersect(Ray ray) {
             if (ray is CameraRay) (ray as CameraRay).BVHTraversals++;
             if (!AABB.Intersect(ray)) {
@@ -57,7 +60,7 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructure {
             }
         }
 
-        /// <summary> Intersect the children of this BHV node </summary>
+        /// <summary> Intersect the children of this node </summary>
         /// <param name="ray">The ray to intersect the children with</param>
         /// <returns>The intersection in the children if there is any</returns>
         Intersection IntersectChildren(Ray ray) {
@@ -77,9 +80,9 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructure {
             }
         }
 
-        /// <summary> Intersect and traverse the BVH with a ray </summary>
-        /// <param name="ray">The ray to intersect the BVH with</param>
-        /// <returns>Whether there is an intersection with the BVH and the ray</returns>
+        /// <summary> Intersect and traverse the node with a ray </summary>
+        /// <param name="ray">The ray to intersect the node with</param>
+        /// <returns>Whether there is an intersection in this node or any of its children</returns>
         public bool IntersectBool(Ray ray) {
             if (!AABB.Intersect(ray)) {
                 return false;
@@ -93,10 +96,10 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructure {
             }
         }
 
-        /// <summary> Compute the best split for this BVH node </summary>
-        /// <returns>Either a tuple with the best split or null if there is no good split</returns>
+        /// <summary> Compute the best split for this node </summary>
+        /// <returns>Either a tuple with the best split or null if there is no beneficial split</returns>
         Split ComputeBestSplit() { 
-            List<Split> splits = BVH.Bin && BVH.BinAmount < AABB.Primitives.Count ? BinSplits() : CheckAllSplits();
+            List<Split> splits = BVHTree.Bin && BVHTree.BinAmount < AABB.Primitives.Count ? BinSplits() : CheckAllSplits();
             float bestCost = AABB.SurfaceAreaHeuristic;
             Split bestSplit = null;
             foreach (Split split in splits) {
@@ -127,7 +130,7 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructure {
             Split split = new Split(sortDirection, new AABB(), new AABB(orderedPrimitives));
             IAABB bestSplitPrimitive = orderedPrimitives.FirstOrDefault();
             float bestSplitCost = float.MaxValue;
-            foreach (Primitive primitive in orderedPrimitives) {
+            foreach (IAABB primitive in orderedPrimitives) {
                 split.Left.Add(primitive);
                 split.Right.Remove(primitive);
                 float splitCost = split.SurfaceAreaHeuristic;
@@ -158,10 +161,10 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructure {
         }
 
         AABB[] BinX() {
-            AABB[] bins = new AABB[BVH.BinAmount];
-            for (int i = 0; i < BVH.BinAmount; i++) bins[i] = new AABB();
-            float k1 = BVH.BinAmount * BVH.BinningEpsilon / (AABB.MaxBound.X - AABB.MinBound.X);
-            foreach (Primitive primitive in AABB.Primitives) {
+            AABB[] bins = new AABB[BVHTree.BinAmount];
+            for (int i = 0; i < BVHTree.BinAmount; i++) bins[i] = new AABB();
+            float k1 = BVHTree.BinAmount * BVHTree.BinningEpsilon / (AABB.MaxBound.X - AABB.MinBound.X);
+            foreach (IAABB primitive in AABB.Primitives) {
                 int binID = (int)(k1 * (primitive.AABBCenter.X - AABB.MinBound.X));
                 bins[binID].Add(primitive);
             }
@@ -169,10 +172,10 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructure {
         }
 
         AABB[] BinY() {
-            AABB[] bins = new AABB[BVH.BinAmount];
-            for (int i = 0; i < BVH.BinAmount; i++) bins[i] = new AABB();
-            float k1 = BVH.BinAmount * BVH.BinningEpsilon / (AABB.MaxBound.Y - AABB.MinBound.Y);
-            foreach (Primitive primitive in AABB.Primitives) {
+            AABB[] bins = new AABB[BVHTree.BinAmount];
+            for (int i = 0; i < BVHTree.BinAmount; i++) bins[i] = new AABB();
+            float k1 = BVHTree.BinAmount * BVHTree.BinningEpsilon / (AABB.MaxBound.Y - AABB.MinBound.Y);
+            foreach (IAABB primitive in AABB.Primitives) {
                 int binID = (int)(k1 * (primitive.AABBCenter.Y - AABB.MinBound.Y));
                 bins[binID].Add(primitive);
             }
@@ -180,10 +183,10 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructure {
         }
 
         AABB[] BinZ() {
-            AABB[] bins = new AABB[BVH.BinAmount];
-            for (int i = 0; i < BVH.BinAmount; i++) bins[i] = new AABB();
-            float k1 = BVH.BinAmount * BVH.BinningEpsilon / (AABB.MaxBound.Z - AABB.MinBound.Z);
-            foreach (Primitive primitive in AABB.Primitives) {
+            AABB[] bins = new AABB[BVHTree.BinAmount];
+            for (int i = 0; i < BVHTree.BinAmount; i++) bins[i] = new AABB();
+            float k1 = BVHTree.BinAmount * BVHTree.BinningEpsilon / (AABB.MaxBound.Z - AABB.MinBound.Z);
+            foreach (IAABB primitive in AABB.Primitives) {
                 int binID = (int)(k1 * (primitive.AABBCenter.Z - AABB.MinBound.Z));
                 bins[binID].Add(primitive);
             }

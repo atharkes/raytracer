@@ -1,8 +1,8 @@
 ﻿using OpenTK;
 using System.Collections.Generic;
 
-namespace WhittedRaytracer.Raytracing.AccelerationStructure {
-    /// <summary> A split for a BVHNode </summary>
+namespace WhittedRaytracer.Raytracing.AccelerationStructure.BVH {
+    /// <summary> A possible split for a BVHNode </summary>
     public class Split {
         /// <summary> Along which direction the split is </summary>
         public Vector3 Direction { get; }

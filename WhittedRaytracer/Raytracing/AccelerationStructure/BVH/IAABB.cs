@@ -1,7 +1,7 @@
 ﻿using OpenTK;
 
-namespace WhittedRaytracer.Raytracing.AccelerationStructure {
-    /// <summary> An interface for a class that has an AABB </summary>
+namespace WhittedRaytracer.Raytracing.AccelerationStructure.BVH {
+    /// <summary> An interface for a class that supports an AABB </summary>
     public interface IAABB {
         /// <summary> The center of the AABB </summary>
         Vector3 AABBCenter { get; }

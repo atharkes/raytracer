@@ -1,5 +1,4 @@
 ﻿using OpenTK;
-using WhittedRaytracer.Utilities;
 
 namespace WhittedRaytracer.Raytracing.SceneObjects.Primitives {
     /// <summary> A triangle primitive for the 3d scene </summary>
@@ -23,8 +22,6 @@ namespace WhittedRaytracer.Raytracing.SceneObjects.Primitives {
                 return (min, max);
             }
         }
-        /// <summary> Create a random Triangle </summary>
-        public static new Triangle Random => new Triangle(Utils.RandomVector * 100f, Utils.RandomVector * 100f, Utils.RandomVector * 100f);
 
         /// <summary> Create a new triangle object for the 3d scene </summary>
         /// <param name="p1">The first point of the triangle</param>

@@ -19,9 +19,11 @@ Features:
 - Multithreading: Threadpool with worker threads
 
 Added For Final Assignment:
-- SBVH (Split Bounding Volume Hierarchy)
+- SBVH (Split Bounding Volume Hierarchy): I didn't find time to add scene importing (yet) so it is hard to demonstrate the usefulness of the SBVH.
+    I added pictures to show that it is actually doing something different which must result in a lower overall SAH for the entire tree. 
 - Unit tests for BVH/SBVH (node count)
 - Randomized pixel sampling to increase FPS
+- Check BVHTraversals with F2
 - Save Camera Configuration on exit with ESC
 - Raytracing architecture: I tried to setup my code from the rendered scene point of view. So theoretically this framework can easily duplicate the camera and support multiple gamewindows.
     This framework is by no means an efficient ray tracer, but I did try to make the code part of the features and therefore is hopefully easily digestible.

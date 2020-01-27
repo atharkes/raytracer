@@ -96,6 +96,9 @@
   <ItemGroup>
     <Compile Include="Raytracing\AccelerationStructure\BVH\IAABB.cs" />
     <Compile Include="Raytracing\AccelerationStructure\BVH\Split.cs" />
+    <Compile Include="Raytracing\AccelerationStructure\BVH\IBVHNode.cs" />
+    <Compile Include="Raytracing\AccelerationStructure\SBVH\SBVHNode.cs" />
+    <Compile Include="Raytracing\AccelerationStructure\SBVH\SBVHTree.cs" />
     <Compile Include="Raytracing\CameraRay.cs" />
     <Compile Include="Raytracing\SceneObjects\CameraParts\Accumulator.cs" />
     <Compile Include="Raytracing\SceneObjects\CameraParts\Cavity.cs" />
@@ -148,9 +151,7 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Raytracing\AccelerationStructure\SBVH\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

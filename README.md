@@ -19,8 +19,12 @@ Features:
 - Multithreading: Threadpool with worker threads
 
 Added For Final Assignment:
-- Split-BVH
+- SBVH (Split Bounding Volume Hierarchy)
 - Unit tests for BVH/SBVH (node count)
+- Randomized pixel sampling to increase FPS
+- Save Camera Configuration on exit with ESC
+- Raytracing architecture: I tried to setup my code from the rendered scene point of view. So theoretically this framework can easily duplicate the camera and support multiple gamewindows.
+    This framework is by no means an efficient ray tracer, but I did try to make the code part of the features and therefore is hopefully easily digestible.
 
 Controls:
 - Arrow keys:   Rotate Camera
@@ -31,6 +35,7 @@ Controls:
 - F2:           Toggle BVHTraversal Color Scale
 - Numpad '+':   Increase FOV
 - Numpad '-':   Decrease FOV
+- ESC           Exit the renderer and save the Camera Configuration
 
 References:
 - Course Slides (Graphics & Advanced Graphics)
@@ -40,7 +45,7 @@ References:
 - AABB Intersection: https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-box-intersection
 - Binning: http://www.sci.utah.edu/~wald/Publications/2007/ParallelBVHBuild/fastbuild.pdf
 - Triangle Clipping: Efficient Triangle and Quadrilateral Clipping within Shaders - M. McGuire
-- SBVH: Spatial Splits in Bounding Volume Hierarchies - M. Stich, H. Friedrich, A. Dietrich
+- SBVH Idea: Spatial Splits in Bounding Volume Hierarchies - M. Stich, H. Friedrich, A. Dietrich
 - SBVH Implementation: Parallel Spatial Splits in Bounding Volume Hierarchies - V. Fuetterling, C. Lojewski, F.-J Pfreundt and A. Ebert
 
 

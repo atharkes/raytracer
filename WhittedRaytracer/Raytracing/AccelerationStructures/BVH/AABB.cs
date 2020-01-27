@@ -9,44 +9,41 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructures.BVH {
     /// <summary> An Axis-Aligned Bounding Box </summary>
     public class AABB : IAABB {
         /// <summary> The primitives in the AABB </summary>
-        public ICollection<IAABB> Primitives => primitives;
+        public List<IAABB> Primitives { get; protected set; } = new List<IAABB>();
         /// <summary> The bounds of the AABB </summary>
         public Vector3[] Bounds { get; } = new Vector3[] { Utils.MaxVector, Utils.MinVector };
-        /// <summary> Get the bounds of the AABB </summary>
-        public (Vector3 Min, Vector3 Max) AABBBounds => (Bounds[0], Bounds[1]);
         /// <summary> The minimum bound of the AABB </summary>
-        public Vector3 MinBound { get => Bounds[0]; private set => Bounds[0] = value; }
+        public Vector3 MinBound { get => Bounds[0]; protected set => Bounds[0] = value; }
         /// <summary> The maximum bound of the AABB </summary>
-        public Vector3 MaxBound { get => Bounds[1]; private set => Bounds[1] = value; }
+        public Vector3 MaxBound { get => Bounds[1]; protected set => Bounds[1] = value; }
         /// <summary> The size of the AABB </summary>
         public Vector3 Size => MaxBound - MinBound;
         /// <summary> The center of the AABB </summary>
-        public Vector3 AABBCenter => MinBound + 0.5f * Size;
+        public Vector3 Center => MinBound + 0.5f * Size;
         /// <summary> The surface area of the AABB </summary>
         public float SurfaceArea => 2 * (Size.X * Size.Y + Size.Y * Size.Z + Size.X * Size.Z);
         /// <summary> The cost of having this AABB as a BVHNode </summary>
-        public float SurfaceAreaHeuristic => BVHTree.TraversalCost + BVHTree.IntersectionCost * primitives.Count * SurfaceArea;
-
-        readonly List<IAABB> primitives;
+        public float SurfaceAreaHeuristic => BVHTree.TraversalCost + BVHTree.IntersectionCost * Primitives.Count * SurfaceArea;
 
         /// <summary> Create a new AABB with no primitives </summary>
-        public AABB() {
-            primitives = new List<IAABB>();
-        }
+        public AABB() { }
 
+        /// <summary> Create a new AABB from two boundable objects </summary>
+        /// <param name="left">The left object</param>
+        /// <param name="right">The right object</param>
         public AABB(IAABB left, IAABB right) {
-            primitives = new List<IAABB>() { left, right };
-            (MinBound, MaxBound) = CalculateBounds(primitives);
+            Primitives = new List<IAABB>() { left, right };
+            (MinBound, MaxBound) = CalculateBounds(Primitives);
         }
 
         /// <summary> Create a new AABB with primitives </summary>
         /// <param name="primitives">The primitives to add to the AABB</param>
         public AABB(IEnumerable<IAABB> primitives) {
-            this.primitives = primitives?.ToList() ?? new List<IAABB>();
-            (MinBound, MaxBound) = CalculateBounds(this.primitives);
+            Primitives = primitives?.ToList() ?? new List<IAABB>();
+            (MinBound, MaxBound) = CalculateBounds(Primitives);
         }
 
-        /// <summary> Add (the primitives of) another AABB to this AABB </summary>
+        /// <summary> Add the primitives of another AABB to this AABB </summary>
         /// <param name="other">THe other AABB to add to this one</param>
         /// <returns>This AABB with the added primitives</returns>
         public AABB Add(AABB other) {
@@ -60,33 +57,33 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructures.BVH {
         /// <param name="primitive">The primitive to add to the AABB</param>
         public void Add(IAABB primitive) {
             Primitives.Add(primitive);
-            (Vector3 min, Vector3 max) = primitive.AABBBounds;
-            MinBound = Vector3.ComponentMin(MinBound, min);
-            MaxBound = Vector3.ComponentMax(MaxBound, max);
+            Vector3[] bounds = primitive.Bounds;
+            MinBound = Vector3.ComponentMin(MinBound, bounds[0]);
+            MaxBound = Vector3.ComponentMax(MaxBound, bounds[1]);
         }
 
         /// <summary> Add a list of primitives to the AABB </summary>
         /// <param name="primitives">The primitives to add to the AABB</param>
         public void AddRange(IEnumerable<IAABB> primitives) {
-            this.primitives.AddRange(primitives);
+            Primitives.AddRange(primitives);
             foreach (Primitive primitive in primitives) {
-                (Vector3 min, Vector3 max) = primitive.AABBBounds;
-                MinBound = Vector3.ComponentMin(MinBound, min);
-                MaxBound = Vector3.ComponentMax(MaxBound, max);
+                Vector3[] bounds = primitive.Bounds;
+                MinBound = Vector3.ComponentMin(MinBound, bounds[0]);
+                MaxBound = Vector3.ComponentMax(MaxBound, bounds[1]);
             }
         }
 
         /// <summary> Remove a primitive from the AABB </summary>
         /// <param name="primitive">The primitive to be removed</param>
         public void Remove(IAABB primitive) {
-            primitives.Remove(primitive);
-            (MinBound, MaxBound) = CalculateBounds(primitives);
+            Primitives.Remove(primitive);
+            (MinBound, MaxBound) = CalculateBounds(Primitives);
         }
 
         /// <summary> Intersect the AABB (Amy Williams's An Efficient and Robust Ray–Box Intersection Algorithm) </summary>
         /// <param name="ray">The ray to calculate intersection for</param>
         /// <returns>Whether the ray intersects the AABB</returns>
-        public bool Intersect(Ray ray) {
+        public bool IntersectBool(Ray ray) {
             float tmin = (Bounds[ray.Sign[0]].X - ray.Origin.X) * ray.DirectionInverted.X;
             float tmax = (Bounds[1 - ray.Sign[0]].X - ray.Origin.X) * ray.DirectionInverted.X;
 
@@ -110,16 +107,15 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructures.BVH {
         /// <returns>The intersection with the primitive if there is any</returns>
         public Intersection IntersectPrimitives(Ray ray) {
             float intersectionDistance = ray.Length;
-            Primitive intersectionPrimitive = null;
+            Intersection closestIntersection = null;
             foreach (Primitive primitive in Primitives) {
-                float distance = primitive.Intersect(ray);
-                if (0 < distance && distance < intersectionDistance) {
-                    intersectionPrimitive = primitive;
-                    intersectionDistance = distance;
+                Intersection intersection = primitive.Intersect(ray);
+                if (intersection != null && 0 < intersection.Distance && intersection.Distance < intersectionDistance) {
+                    closestIntersection = intersection;
+                    intersectionDistance = intersection.Distance;
                 }
             }
-            if (intersectionPrimitive == null) return null;
-            else return new Intersection(ray, intersectionPrimitive, intersectionDistance);
+            return closestIntersection;
         }
 
         /// <summary> Get the distance from a point to the AABB </summary>
@@ -139,9 +135,9 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructures.BVH {
             Vector3 boundMin = Utils.MaxVector;
             Vector3 boundMax = Utils.MinVector;
             foreach (IAABB primitive in primitives) {
-                (Vector3 primitiveMin, Vector3 primitiveMax) = primitive.AABBBounds;
-                boundMin = Vector3.ComponentMin(primitiveMin, boundMin);
-                boundMax = Vector3.ComponentMax(primitiveMax, boundMax);
+                Vector3[] bounds = primitive.Bounds;
+                boundMin = Vector3.ComponentMin(bounds[0], boundMin);
+                boundMax = Vector3.ComponentMax(bounds[1], boundMax);
             }
             return (boundMin, boundMax);
         }

@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using WhittedRaytracer.Raytracing.AccelerationStructures;
-using WhittedRaytracer.Raytracing.AccelerationStructures.BVH;
 using WhittedRaytracer.Raytracing.SceneObjects;
 using WhittedRaytracer.Raytracing.SceneObjects.CameraParts;
 using WhittedRaytracer.Raytracing.SceneObjects.Primitives;
@@ -29,8 +28,8 @@ namespace WhittedRaytracer.Raytracing {
             Primitives = primitives;
             Lights = primitives.FindAll(p => p.Material.Emitting);
             Stopwatch timer = Stopwatch.StartNew();
-            AccelerationStructure = new BVHTree(primitives);
-            Console.WriteLine(timer.ElapsedMilliseconds + "\t| BVH Building ms");
+            AccelerationStructure = new SBVHTree(primitives);
+            Console.WriteLine(timer.ElapsedMilliseconds + "\t| (S)BVH Building ms");
         }
 
         /// <summary> Create an empty scene </summary>
@@ -57,7 +56,7 @@ namespace WhittedRaytracer.Raytracing {
             for (int i = 0; i < randomSpheres; i++) {
                 Vector3 spheresCenter = new Vector3(0f, -30f, 0f);
                 Vector3 spheresBox = new Vector3(60f, 30f, 60f);
-                Vector3 pos = Utils.DetRandom.Vector3() * spheresBox - 0.5f * spheresBox + spheresCenter;
+                Vector3 pos = Utils.DetRandom.Vector() * spheresBox - 0.5f * spheresBox + spheresCenter;
                 float radius = (float)Utils.DetRandom.NextDouble();
                 primitives.Add(new Sphere(pos, radius));
             }
@@ -74,9 +73,9 @@ namespace WhittedRaytracer.Raytracing {
             for (int i = 0; i < randomTriangles; i++) {
                 Vector3 trianglesCenter = new Vector3(0f, -30f, 0f);
                 Vector3 trianglesBox = new Vector3(60f, 30f, 60f);
-                Vector3 p1 = Utils.DetRandom.Vector3() * trianglesBox - 0.5f * trianglesBox + trianglesCenter;
-                Vector3 p2 = p1 + Utils.DetRandom.Vector3(4f);
-                Vector3 p3 = p1 - Utils.DetRandom.Vector3(4f);
+                Vector3 p1 = Utils.DetRandom.Vector() * trianglesBox - 0.5f * trianglesBox + trianglesCenter;
+                Vector3 p2 = p1 + Utils.DetRandom.Vector(4f);
+                Vector3 p3 = p1 - Utils.DetRandom.Vector(4f);
                 primitives.Add(new Triangle(p1, p2, p3));
             }
             return new Scene(screen, primitives);

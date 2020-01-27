@@ -1,4 +1,6 @@
 ﻿using OpenTK;
+using WhittedRaytracer.Raytracing.AccelerationStructures.SBVH;
+using WhittedRaytracer.Utilities;
 
 namespace WhittedRaytracer.Raytracing.SceneObjects.Primitives {
     /// <summary> A triangle primitive for the 3d scene </summary>
@@ -15,11 +17,11 @@ namespace WhittedRaytracer.Raytracing.SceneObjects.Primitives {
         /// <summary> The normal of the triangle </summary>
         public Vector3 Normal { get; }
         /// <summary> Get the AABB bounds of the triangle </summary>
-        public override (Vector3 Min, Vector3 Max) AABBBounds {
+        public override Vector3[] Bounds {
             get {
                 Vector3 min = Vector3.ComponentMin(P1, Vector3.ComponentMin(P2, P3));
                 Vector3 max = Vector3.ComponentMax(P1, Vector3.ComponentMax(P2, P3));
-                return (min, max);
+                return new Vector3[] { min, max };
             }
         }
 
@@ -38,8 +40,8 @@ namespace WhittedRaytracer.Raytracing.SceneObjects.Primitives {
 
         /// <summary> Intersect the triangle with a ray (Möller–Trumbore triangle intersection) </summary>
         /// <param name="ray">The ray to intersect the triangle with</param>
-        /// <returns>The distance at which the ray intersects the triangle</returns>
-        public override float Intersect(Ray ray) {
+        /// <returns>The intersection with the triangle if there is any</returns>
+        public override Intersection Intersect(Ray ray) {
             // Get vectors for two edges sharing V1
             Vector3 e1 = P2 - P1;
             Vector3 e2 = P3 - P1;
@@ -48,33 +50,32 @@ namespace WhittedRaytracer.Raytracing.SceneObjects.Primitives {
             Vector3 P = Vector3.Cross(ray.Direction, e2);
             // If determinant is near zero, ray lies in plane of triangle
             float determinant = Vector3.Dot(e1, P);
-            if (determinant > -IntersectionEpsilon && determinant < IntersectionEpsilon) return -1f;
+            if (determinant > -IntersectionEpsilon && determinant < IntersectionEpsilon) return null;
             float determinantInverted = 1f / determinant;
 
             // Calculate distance from V1 to ray origin
             Vector3 T = ray.Origin - P1;
             // Calculate u parameter and test bound
             float u = Vector3.Dot(T, P) * determinantInverted;
-            if (u < 0f || u > 1f)  return -1f;
+            if (u < 0f || u > 1f)  return null;
 
             // Prepare to test v parameter
             Vector3 Q = Vector3.Cross(T, e1);
             // Calculate V parameter and test bound
             float v = Vector3.Dot(ray.Direction, Q) * determinantInverted;
-            if (v < 0f || u + v > 1f)  return -1f;
+            if (v < 0f || u + v > 1f)  return null;
 
             float t = Vector3.Dot(e2, Q) * determinantInverted;
-            if (t > IntersectionEpsilon) return t;
+            if (t > IntersectionEpsilon && 0 < t && t < ray.Length) return new Intersection(ray, this, t);
 
-            return -1f;
+            return null;
         }
 
         /// <summary> Intersect the triangle with a ray </summary>
         /// <param name="ray">The ray to intersect the triangle with</param>
         /// <returns>Whether the ray intersects the triangle</returns>
         public override bool IntersectBool(Ray ray) {
-            float intersectDistance = Intersect(ray);
-            return intersectDistance > 0 && intersectDistance < ray.Length;
+            return Intersect(ray) != null;
         }
 
         /// <summary> Get the normal of the triangle </summary>
@@ -85,13 +86,13 @@ namespace WhittedRaytracer.Raytracing.SceneObjects.Primitives {
         }
 
         /// <summary> Clip this triangle by a plane </summary>
-        /// <param name="planeNormal">The normal of the clipping plane, assumed to go through the origin</param>
+        /// <param name="plane">The clipping plane to clip the triangle with</param>
         /// <returns>The points that are left after clipping the triangle</returns>
-        public Vector3[] ClipByPlane(Vector3 planeNormal, Vector3 planePosition) {
-            Vector3 v0 = P1 - planePosition, v1 = P2 - planePosition, v2 = P3 - planePosition, v3;
+        public Vector3[] GetClippedPoints(SplitPlane plane) {
+            Vector3 v0 = P1 - plane.Position, v1 = P2 - plane.Position, v2 = P3 - plane.Position, v3;
             const float clipEpsilon = 0.00001f, clipEpsilon2 = 0.01f;
             // Distances to the plane (this is an array parallel to v[], stored as a vec3)
-            Vector3 dist = new Vector3(Vector3.Dot(v0, planeNormal), Vector3.Dot(v1, planeNormal), Vector3.Dot(v2, planeNormal));
+            Vector3 dist = new Vector3(Vector3.Dot(v0, plane.Normal), Vector3.Dot(v1, plane.Normal), Vector3.Dot(v2, plane.Normal));
             if (dist.X < clipEpsilon2 && dist.Y < clipEpsilon2 && dist.Z < clipEpsilon2) {
                 // Case 1 (all clipped)
                 return new Vector3[0];

@@ -4,7 +4,7 @@ namespace WhittedRaytracer.Raytracing.SceneObjects.Primitives {
     /// <summary> A point light to illuminate your scene </summary>
     public class PointLight : Primitive {
         /// <summary> The AABB of the pointlight is just the point </summary>
-        public override (Vector3 Min, Vector3 Max) AABBBounds => (Position, Position);
+        public override Vector3[] Bounds => new Vector3[] { Position, Position };
 
         /// <summary> Create a new point light </summary>
         /// <param name="position">The position of the point light</param>
@@ -14,14 +14,14 @@ namespace WhittedRaytracer.Raytracing.SceneObjects.Primitives {
 
         /// <summary> You cannot intersect a point light </summary>
         /// <param name="ray">The ray that will never intersect the pointlight</param>
-        /// <returns>-1f</returns>
-        public override float Intersect(Ray ray) {
-            return -1f;
+        /// <returns>null</returns>
+        public override Intersection Intersect(Ray ray) {
+            return null;
         }
 
         /// <summary> You cannot intersect a point light </summary>
         /// <param name="ray">The ray that will never intersect the pointlight</param>
-        /// <returns>False</returns>
+        /// <returns>false</returns>
         public override bool IntersectBool(Ray ray) {
             return false;
         }

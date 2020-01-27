@@ -24,6 +24,7 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructures.BVH {
         /// <summary> Create a BVH node, splitting into smaller nodes if benificial </summary>
         /// <param name="primitives">The primitives in the node</param>
         public BVHNode(List<Primitive> primitives) {
+            if (primitives.Count == 0) throw new ArgumentException("Don't make an empty BVHNode");
             AABB = new AABB(primitives);
             TrySplit();
         }
@@ -35,10 +36,16 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructures.BVH {
             TrySplit();
         }
 
-        /// <summary> Try split node into 2 smaller Nodes </summary>
+        /// <summary> Try split node into two smaller nodes </summary>
         void TrySplit() {
-            Split split = ComputeBestSplit();
+            Split split = GetSplit();
             if (split is null) return;
+            else Split(split);
+        }
+
+        /// <summary> Split this node </summary>
+        /// <param name="split">The split to split this node with</param>
+        protected virtual void Split(Split split) {
             Left = new BVHNode(split.Left);
             Right = new BVHNode(split.Right);
             SplitDirection = split.Direction;
@@ -46,12 +53,89 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructures.BVH {
             AABB = new AABB(Left.AABB, Right.AABB);
         }
 
+        /// <summary> Get the best split for this node </summary>
+        /// <returns>The best split for this BVH node</returns>
+        protected virtual Split GetSplit() {
+            if (BVHTree.Bin && AABB.Primitives.Count > BVHTree.BinAmount) {
+                Vector3 size = AABB.Size;
+                if (size.X > size.Y && size.X > size.Z) return BestBinSplit(Vector3.UnitX, v => v.X);
+                else if (size.Y > size.Z) return BestBinSplit(Vector3.UnitY, v => v.Y);
+                else return BestBinSplit(Vector3.UnitZ, v => v.Z);
+            } else {
+                return BestSweepSplit();
+            }
+        }
+
+        /// <summary> Check all possible splits </summary>
+        /// <returns>The best split for every axis</returns>
+        Split BestSweepSplit() {
+            List<Split> splits = new List<Split> {
+                BestLinearSplitAfterSort(Vector3.UnitX, p => p.Center.X),
+                BestLinearSplitAfterSort(Vector3.UnitY, p => p.Center.Y),
+                BestLinearSplitAfterSort(Vector3.UnitZ, p => p.Center.Z)
+            };
+            splits.RemoveAll(s => s == null);
+            return splits.OrderBy(s => s?.SurfaceAreaHeuristic).FirstOrDefault();
+        }
+
+        /// <summary> Split linearly over primitives after using a sorting function </summary>
+        /// <param name="axisSortingFunc">The sorting function to sort the primitives with before finding splits</param>
+        /// <returns>The best split using the sorting funciton</returns>
+        Split BestLinearSplitAfterSort(Vector3 sortDirection, Func<IAABB, float> axisSortingFunc) {
+            List<IAABB> orderedPrimitives = AABB.Primitives.OrderBy(axisSortingFunc).ToList();
+            Split split = new Split(sortDirection, new AABB(), new AABB(orderedPrimitives));
+            IAABB bestSplitPrimitive = null;
+            float bestSplitCost = AABB.SurfaceAreaHeuristic;
+            foreach (IAABB primitive in orderedPrimitives) {
+                split.Left.Add(primitive);
+                split.Right.Remove(primitive);
+                float splitCost = split.SurfaceAreaHeuristic;
+                if (splitCost < bestSplitCost) {
+                    bestSplitCost = splitCost;
+                    bestSplitPrimitive = primitive;
+                }
+            }
+            if (bestSplitPrimitive == null) return null;
+            int bestSplitPrimitiveIndex = orderedPrimitives.IndexOf(bestSplitPrimitive) + 1;
+            List<IAABB> primitivesLeft = orderedPrimitives.GetRange(0, bestSplitPrimitiveIndex);
+            List<IAABB> primitivesRight = orderedPrimitives.GetRange(bestSplitPrimitiveIndex, orderedPrimitives.Count - bestSplitPrimitiveIndex);
+            return new Split(sortDirection, primitivesLeft, primitivesRight);
+        }
+
+        /// <summary> Get the best binning split for a certain axis </summary>
+        /// <param name="binningDirection">The direction the binning proces is going</param>
+        /// <param name="axis">The axis selector</param>
+        /// <returns>The best binning split in the specified direction</returns>
+        Split BestBinSplit(Vector3 binningDirection, Func<Vector3, float> axis) {
+            float k1 = BVHTree.BinAmount * BVHTree.BinningEpsilon / axis(AABB.Size);
+            float bestSplitCost = AABB.SurfaceAreaHeuristic;
+            Split bestSplit = null;
+            for (int i = 1; i < BVHTree.BinAmount; i++) {
+                AABB left = new AABB();
+                AABB right = new AABB();
+                // Populate Split
+                foreach (IAABB primitive in AABB.Primitives) {
+                    int binID = (int)(k1 * (axis(primitive.Center) - axis(AABB.MinBound)));
+                    if (binID < i) left.Add(primitive);
+                    else right.Add(primitive);
+                }
+                // Evaluate Split
+                Split split = new Split(binningDirection, left, right);
+                float splitCost = split.SurfaceAreaHeuristic;
+                if (splitCost < bestSplitCost) {
+                    bestSplitCost = splitCost;
+                    bestSplit = split;
+                }
+            }
+            return bestSplit;
+        }
+
         /// <summary> Intersect and traverse the node with a ray </summary>
         /// <param name="ray">The ray to intersect the node with</param>
         /// <returns>The intersection in the node or any of its children</returns>
         public Intersection Intersect(Ray ray) {
             if (ray is CameraRay) (ray as CameraRay).BVHTraversals++;
-            if (!AABB.Intersect(ray)) {
+            if (!AABB.IntersectBool(ray)) {
                 return null;
             } else if (Leaf) {
                 return AABB.IntersectPrimitives(ray);
@@ -84,7 +168,7 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructures.BVH {
         /// <param name="ray">The ray to intersect the node with</param>
         /// <returns>Whether there is an intersection in this node or any of its children</returns>
         public bool IntersectBool(Ray ray) {
-            if (!AABB.Intersect(ray)) {
+            if (!AABB.IntersectBool(ray)) {
                 return false;
             } else if (Leaf) {
                 foreach (Primitive primitive in AABB.Primitives) {
@@ -94,103 +178,6 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructures.BVH {
             } else {
                 return Left.IntersectBool(ray) || Right.IntersectBool(ray);
             }
-        }
-
-        /// <summary> Compute the best split for this node </summary>
-        /// <returns>Either a tuple with the best split or null if there is no beneficial split</returns>
-        Split ComputeBestSplit() { 
-            List<Split> splits = BVHTree.Bin && BVHTree.BinAmount < AABB.Primitives.Count ? BinSplits() : CheckAllSplits();
-            float bestCost = AABB.SurfaceAreaHeuristic;
-            Split bestSplit = null;
-            foreach (Split split in splits) {
-                float splitCost = split.SurfaceAreaHeuristic;
-                if (splitCost < bestCost) {
-                    bestSplit = split;
-                    bestCost = splitCost;
-                }
-            }
-            return bestSplit;
-        }
-
-        /// <summary> Check all possible splits </summary>
-        /// <returns>The best split for every axis</returns>
-        List<Split> CheckAllSplits() {
-            return new List<Split> {
-                BestLinearSplitAfterSort(Vector3.UnitX, p => p.AABBCenter.X),
-                BestLinearSplitAfterSort(Vector3.UnitY, p => p.AABBCenter.Y),
-                BestLinearSplitAfterSort(Vector3.UnitZ, p => p.AABBCenter.Z)
-            };
-        }
-
-        /// <summary> Split linearly over primitives after using a sorting function </summary>
-        /// <param name="sortingFunc">The sorting function to sort the primitives with before finding splits</param>
-        /// <returns>The best split using the sorting funciton</returns>
-        Split BestLinearSplitAfterSort(Vector3 sortDirection, Func<IAABB, float> sortingFunc) {
-            List<IAABB> orderedPrimitives = AABB.Primitives.OrderBy(sortingFunc).ToList();
-            Split split = new Split(sortDirection, new AABB(), new AABB(orderedPrimitives));
-            IAABB bestSplitPrimitive = orderedPrimitives.FirstOrDefault();
-            float bestSplitCost = float.MaxValue;
-            foreach (IAABB primitive in orderedPrimitives) {
-                split.Left.Add(primitive);
-                split.Right.Remove(primitive);
-                float splitCost = split.SurfaceAreaHeuristic;
-                if (splitCost < bestSplitCost) {
-                    bestSplitCost = splitCost;
-                    bestSplitPrimitive = primitive;
-                }
-            }
-            int bestSplitPrimitiveIndex = orderedPrimitives.IndexOf(bestSplitPrimitive);
-            List<IAABB> primitivesLeft = orderedPrimitives.GetRange(0, bestSplitPrimitiveIndex);
-            List<IAABB> primitivesRight = orderedPrimitives.GetRange(bestSplitPrimitiveIndex, orderedPrimitives.Count - bestSplitPrimitiveIndex);
-            return new Split(sortDirection, primitivesLeft, primitivesRight);
-        }
-
-        List<Split> BinSplits() {
-            Vector3 size = AABB.Size;
-            Vector3 binDirection = size.X > size.Y && size.X > size.Z ? Vector3.UnitX : (size.Y > size.Z ? Vector3.UnitY : Vector3.UnitZ);
-            AABB[] bins = size.X > size.Y && size.X > size.Z ? BinX() : (size.Y > size.Z ? BinY() : BinZ());
-            List<Split> splits = new List<Split>(bins.Length - 1);
-            for (int i = 1; i < bins.Length; i++) {
-                AABB left = new AABB();
-                for (int bin = 0; bin < i; bin++) left.AddRange(bins[bin].Primitives);
-                AABB right = new AABB();
-                for (int bin = i; bin < bins.Length; bin++) right.AddRange(bins[bin].Primitives);
-                splits.Add(new Split(binDirection, left, right));
-            }
-            return splits;
-        }
-
-        AABB[] BinX() {
-            AABB[] bins = new AABB[BVHTree.BinAmount];
-            for (int i = 0; i < BVHTree.BinAmount; i++) bins[i] = new AABB();
-            float k1 = BVHTree.BinAmount * BVHTree.BinningEpsilon / (AABB.MaxBound.X - AABB.MinBound.X);
-            foreach (IAABB primitive in AABB.Primitives) {
-                int binID = (int)(k1 * (primitive.AABBCenter.X - AABB.MinBound.X));
-                bins[binID].Add(primitive);
-            }
-            return bins;
-        }
-
-        AABB[] BinY() {
-            AABB[] bins = new AABB[BVHTree.BinAmount];
-            for (int i = 0; i < BVHTree.BinAmount; i++) bins[i] = new AABB();
-            float k1 = BVHTree.BinAmount * BVHTree.BinningEpsilon / (AABB.MaxBound.Y - AABB.MinBound.Y);
-            foreach (IAABB primitive in AABB.Primitives) {
-                int binID = (int)(k1 * (primitive.AABBCenter.Y - AABB.MinBound.Y));
-                bins[binID].Add(primitive);
-            }
-            return bins;
-        }
-
-        AABB[] BinZ() {
-            AABB[] bins = new AABB[BVHTree.BinAmount];
-            for (int i = 0; i < BVHTree.BinAmount; i++) bins[i] = new AABB();
-            float k1 = BVHTree.BinAmount * BVHTree.BinningEpsilon / (AABB.MaxBound.Z - AABB.MinBound.Z);
-            foreach (IAABB primitive in AABB.Primitives) {
-                int binID = (int)(k1 * (primitive.AABBCenter.Z - AABB.MinBound.Z));
-                bins[binID].Add(primitive);
-            }
-            return bins;
         }
     }
 }

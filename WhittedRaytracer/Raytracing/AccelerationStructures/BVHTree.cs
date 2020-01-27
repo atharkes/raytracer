@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
+using WhittedRaytracer.Raytracing.AccelerationStructures.BVH;
 using WhittedRaytracer.Raytracing.SceneObjects;
 
-namespace WhittedRaytracer.Raytracing.AccelerationStructures.BVH {
+namespace WhittedRaytracer.Raytracing.AccelerationStructures {
     /// <summary> A Bounding Volume Hierarchy tree used as acceleration structure for ray intersections in world space
     /// Possible Additions:
     /// - Refitting (enable animation/movement, adding and removing primitives)

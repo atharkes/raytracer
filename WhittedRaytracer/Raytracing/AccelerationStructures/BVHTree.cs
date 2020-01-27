@@ -1,13 +1,14 @@
 ﻿using System.Collections.Generic;
+using WhittedRaytracer.Raytracing.AccelerationStructures.BVH;
 using WhittedRaytracer.Raytracing.SceneObjects;
 
-namespace WhittedRaytracer.Raytracing.AccelerationStructure {
+namespace WhittedRaytracer.Raytracing.AccelerationStructures {
     /// <summary> A Bounding Volume Hierarchy tree used as acceleration structure for ray intersections in world space
     /// Possible Additions:
     /// - Refitting (enable animation/movement, adding and removing primitives)
     /// - Top-level BHV's for static and non-static parts
     /// </summary>
-    public class BVH : IAccelerationStructure {
+    public class BVHTree : IAccelerationStructure {
         /// <summary> The estimated cost of traversing the BVH for the SAH </summary>
         public const float TraversalCost = 1f;
         /// <summary> The estimated cost of intersecting a primitive for the SAH </summary>
@@ -20,11 +21,14 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructure {
         public const float BinningEpsilon = 0.99999f;
 
         /// <summary> The root node of the BVH </summary>
-        public BVHNode Root { get; }
+        public IBVHNode Root { get; protected set; }
 
-        /// <summary> Create a bounding volume hierarchy tree, splitting into smaller nodes if needed </summary>
-        /// <param name="primitives">The primitives in the tree</param>
-        public BVH(List<Primitive> primitives) {
+        /// <summary> Create an empty bounding volume hierarchy tree </summary>
+        public BVHTree() { }
+
+        /// <summary> Create a bounding volume hierarchy tree, splitting into smaller nodes if beneficial </summary>
+        /// <param name="primitives">The primitives to build the tree with</param>
+        public BVHTree(List<Primitive> primitives) {
             Root = new BVHNode(primitives);
         }
 

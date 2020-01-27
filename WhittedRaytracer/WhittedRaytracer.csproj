@@ -94,8 +94,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Raytracing\AccelerationStructure\IAABB.cs" />
-    <Compile Include="Raytracing\AccelerationStructure\Split.cs" />
+    <Compile Include="Raytracing\AccelerationStructures\BVH\IAABB.cs" />
+    <Compile Include="Raytracing\AccelerationStructures\BVH\Split.cs" />
+    <Compile Include="Raytracing\AccelerationStructures\BVH\IBVHNode.cs" />
+    <Compile Include="Raytracing\AccelerationStructures\SBVH\Fragment.cs" />
+    <Compile Include="Raytracing\AccelerationStructures\SBVH\SBVHNode.cs" />
+    <Compile Include="Raytracing\AccelerationStructures\SBVHTree.cs" />
+    <Compile Include="Raytracing\AccelerationStructures\SBVH\SpatialBin.cs" />
+    <Compile Include="Raytracing\AccelerationStructures\SBVH\SplitPlane.cs" />
     <Compile Include="Raytracing\CameraRay.cs" />
     <Compile Include="Raytracing\SceneObjects\CameraParts\Accumulator.cs" />
     <Compile Include="Raytracing\SceneObjects\CameraParts\Cavity.cs" />
@@ -104,10 +110,10 @@
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Multithreading\CPUaffinity.cs" />
     <Compile Include="Multithreading\Threadpool.cs" />
-    <Compile Include="Raytracing\AccelerationStructure\AABB.cs" />
-    <Compile Include="Raytracing\AccelerationStructure\BVH.cs" />
-    <Compile Include="Raytracing\AccelerationStructure\BVHNode.cs" />
-    <Compile Include="Raytracing\IAccelerationStructure.cs" />
+    <Compile Include="Raytracing\AccelerationStructures\BVH\AABB.cs" />
+    <Compile Include="Raytracing\AccelerationStructures\BVHTree.cs" />
+    <Compile Include="Raytracing\AccelerationStructures\BVH\BVHNode.cs" />
+    <Compile Include="Raytracing\AccelerationStructures\IAccelerationStructure.cs" />
     <Compile Include="Raytracing\ISceneObject.cs" />
     <Compile Include="Raytracing\SceneObjects\CameraParts\IScreen.cs" />
     <Compile Include="Raytracing\SceneObjects\Material.cs" />

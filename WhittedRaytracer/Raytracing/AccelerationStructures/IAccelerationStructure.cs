@@ -1,4 +1,4 @@
-﻿namespace WhittedRaytracer.Raytracing {
+﻿namespace WhittedRaytracer.Raytracing.AccelerationStructures {
     /// <summary> An interface for an acceleration structure </summary>
     public interface IAccelerationStructure {
         /// <summary> Intersect the acceleration structure with a ray </summary>

@@ -2,7 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using WhittedRaytracer.Raytracing.AccelerationStructure.BVH;
+using WhittedRaytracer.Raytracing.AccelerationStructures;
+using WhittedRaytracer.Raytracing.AccelerationStructures.BVH;
 using WhittedRaytracer.Raytracing.SceneObjects;
 using WhittedRaytracer.Raytracing.SceneObjects.CameraParts;
 using WhittedRaytracer.Raytracing.SceneObjects.Primitives;

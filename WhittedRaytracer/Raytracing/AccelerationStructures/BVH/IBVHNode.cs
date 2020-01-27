@@ -1,4 +1,4 @@
-﻿namespace WhittedRaytracer.Raytracing.AccelerationStructure.BVH {
+﻿namespace WhittedRaytracer.Raytracing.AccelerationStructures.BVH {
     /// <summary> An interface for a node in a BVH </summary>
     public interface IBVHNode : IAccelerationStructure {
         /// <summary> The AABB of this BVH node </summary>

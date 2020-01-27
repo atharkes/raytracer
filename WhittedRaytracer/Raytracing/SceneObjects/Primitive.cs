@@ -1,5 +1,5 @@
 ﻿using OpenTK;
-using WhittedRaytracer.Raytracing.AccelerationStructure.BVH;
+using WhittedRaytracer.Raytracing.AccelerationStructures.BVH;
 
 namespace WhittedRaytracer.Raytracing.SceneObjects {
     /// <summary> An abstract primitive for the 3d scene </summary>

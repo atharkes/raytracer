@@ -110,7 +110,7 @@
     <Compile Include="Raytracing\AccelerationStructure\BVH\AABB.cs" />
     <Compile Include="Raytracing\AccelerationStructure\BVH\BVHTree.cs" />
     <Compile Include="Raytracing\AccelerationStructure\BVH\BVHNode.cs" />
-    <Compile Include="Raytracing\IAccelerationStructure.cs" />
+    <Compile Include="Raytracing\AccelerationStructure\IAccelerationStructure.cs" />
     <Compile Include="Raytracing\ISceneObject.cs" />
     <Compile Include="Raytracing\SceneObjects\CameraParts\IScreen.cs" />
     <Compile Include="Raytracing\SceneObjects\Material.cs" />

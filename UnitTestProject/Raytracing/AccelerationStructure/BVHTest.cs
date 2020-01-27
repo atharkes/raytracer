@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
-using WhittedRaytracer.Raytracing.AccelerationStructure;
+using WhittedRaytracer.Raytracing.AccelerationStructures.BVH;
 using WhittedRaytracer.Raytracing.SceneObjects;
+using WhittedRaytracer.Utilities;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -15,7 +16,7 @@ namespace UnitTests.Raytracing.AccelerationStructure {
         static BVHTree RandomBVH(int primitiveAmount) {
             List<Primitive> primitives = new List<Primitive>(primitiveAmount);
             for (int i = 0; i < primitiveAmount; i++) {
-                primitives.Add(Primitive.Random);
+                primitives.Add(Utils.Random.Primitive(100f, 100f));
             }
             return new BVHTree(primitives);
         }
@@ -35,7 +36,7 @@ namespace UnitTests.Raytracing.AccelerationStructure {
                 Assert.True(nodeCount <= primitiveCount * 2);
             }
 
-            int CountNodes(BVHNode node) {
+            int CountNodes(IBVHNode node) {
                 if (node.Leaf) return 1;
                 else return CountNodes(node.Left) + 1 + CountNodes(node.Right);
             }

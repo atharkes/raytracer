@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using WhittedRaytracer.Raytracing.AccelerationStructure.BVH;
+using WhittedRaytracer.Raytracing.AccelerationStructures.BVH;
 using WhittedRaytracer.Raytracing.SceneObjects;
 
-namespace WhittedRaytracer.Raytracing.AccelerationStructure.SBVH {
+namespace WhittedRaytracer.Raytracing.AccelerationStructures.SBVH {
     /// <summary> A node of a spatial BVH </summary>
     public class SBVHNode : BVHNode {
         /// <summary> Create a SBVH node, splitting into smaller nodes if benificial </summary>

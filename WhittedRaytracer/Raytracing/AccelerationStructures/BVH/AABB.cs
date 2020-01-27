@@ -5,7 +5,7 @@ using System.Linq;
 using WhittedRaytracer.Raytracing.SceneObjects;
 using WhittedRaytracer.Utilities;
 
-namespace WhittedRaytracer.Raytracing.AccelerationStructure.BVH {
+namespace WhittedRaytracer.Raytracing.AccelerationStructures.BVH {
     /// <summary> An Axis-Aligned Bounding Box </summary>
     public class AABB : IAABB {
         /// <summary> The primitives in the AABB </summary>

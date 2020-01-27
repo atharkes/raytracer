@@ -7,6 +7,7 @@ namespace WhittedRaytracer.Raytracing.AccelerationStructures {
     /// Possible Additions:
     /// - Check for each fragments if it is better to move to either side of the split
     /// - Enable Triangle and/or Polygon clipping to decrease AABB sizes
+    /// - Add an alpha to promote spatial splits closer to the root
     /// </summary>
     public class SBVHTree : BVHTree, IAccelerationStructure {
         /// <summary> The amount of bins used for spatial binning </summary>

@@ -40,18 +40,29 @@ Controls:
 - ESC           Exit the renderer and save the Camera Configuration
 
 References:
-- Course Slides (Graphics & Advanced Graphics)
+- Many Parts: Course Slides of Graphics & Advanced Graphics at the UU
 - OpenTK: https://github.com/opentk/opentk
 - Triangle Intersection: https://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm
 - Sphere Intersection: https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-sphere-intersection
 - AABB Intersection: https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-box-intersection
-- Binning: http://www.sci.utah.edu/~wald/Publications/2007/ParallelBVHBuild/fastbuild.pdf
+- Binning: On fast Construction of SAH-based Bounding Volume Hierarchies - I. Wald
 - Triangle Clipping: Efficient Triangle and Quadrilateral Clipping within Shaders - M. McGuire
 - SBVH Idea: Spatial Splits in Bounding Volume Hierarchies - M. Stich, H. Friedrich, A. Dietrich
 - SBVH Implementation: Parallel Spatial Splits in Bounding Volume Hierarchies - V. Fuetterling, C. Lojewski, F.-J Pfreundt and A. Ebert
 
 
 Notes to Self
+
+Worthwile Additions:
+- Loading of meshes and scenes
+- Adaptive Sampling
+- Rendering equation for Path Tracing
+- Path Guiding
+- Self intersection Epsilon: A Fast and Robust Method for Avoiding Self-Intersection - C. Wächter and N. Binder
+
+Crazy Ideas:
+- Switch from .NET Framework with OpenTK to .NET Core with MonoGame 
+- Take hemisphere of a point on a primitive as camera position and view frustum
 
 Monte Carlo integration required for:
 - Area Lights (Random point on area of light)

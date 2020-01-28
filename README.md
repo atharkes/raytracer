@@ -1,13 +1,12 @@
-Whitted Raytracer for the course Advanced Graphics in 2019-2020 at Utrecht University
+# Whitted Raytracer
+*Made during the course Advanced Graphics in 2019-2020 at Utrecht University by:*
+**Theo Harkes (5672120)**
 
-Created by:
-Theo Harkes (5672120)
-
-Required:
+#### Required:
 - .Net Framework 4.7.2 (Raytracer)
 - .Net Core 2.1 (UnitTests)
 
-Features:
+#### Features:
 - Raytracing architecture
 - Camera: Position, Orientation, FOV, Aspect ratio
 - Input handling: see controls
@@ -18,7 +17,7 @@ Features:
 - Acceleration Structure: SBVH, BVH (SAH, Binning, Split-Ordered-Traversal & BVH rendering)
 - Multithreading: Threadpool with worker threads
 
-Added For Final Assignment:
+#### Added For Final Assignment:
 - SBVH (Split Bounding Volume Hierarchy): I didn't find time to add scene importing (yet) so it is hard to demonstrate the usefulness of the SBVH.
     I added pictures to show that it is actually doing something different which must result in a lower overall SAH for the entire tree. 
 - Unit tests for BVH/SBVH (node count)
@@ -28,7 +27,7 @@ Added For Final Assignment:
 - Raytracing architecture: I tried to setup my code from the rendered scene point of view. So theoretically this framework can easily duplicate the camera and support multiple gamewindows.
     This framework is by no means an efficient ray tracer, but I did try to make the code part of the features and therefore is hopefully easily digestible.
 
-Controls:
+#### Controls:
 - Arrow keys:   Rotate Camera
 - W,A,S,D:      Move Camera
 - Space:        Move Camera Up
@@ -39,7 +38,7 @@ Controls:
 - Numpad '-':   Decrease FOV
 - ESC           Exit the renderer and save the Camera Configuration
 
-References:
+#### References:
 - Many Parts: Course Slides of Graphics & Advanced Graphics at the UU
 - OpenTK: https://github.com/opentk/opentk
 - Triangle Intersection: https://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm
@@ -50,31 +49,29 @@ References:
 - SBVH Idea: Spatial Splits in Bounding Volume Hierarchies - M. Stich, H. Friedrich, A. Dietrich
 - SBVH Implementation: Parallel Spatial Splits in Bounding Volume Hierarchies - V. Fuetterling, C. Lojewski, F.-J Pfreundt and A. Ebert
 
-
-Notes to Self
-
-Worthwile Additions:
+## Notes to Self
+#### Worthwile Additions:
 - Loading of meshes and scenes
 - Adaptive Sampling
+- Self intersection Epsilon: A Fast and Robust Method for Avoiding Self-Intersection - C. Wächter and N. Binder
 - Rendering equation for Path Tracing
 - Path Guiding
-- Self intersection Epsilon: A Fast and Robust Method for Avoiding Self-Intersection - C. Wächter and N. Binder
 
-Crazy Ideas:
+#### Crazy Ideas:
 - Switch from .NET Framework with OpenTK to .NET Core with MonoGame 
 - Take hemisphere of a point on a primitive as camera position and view frustum
 
-Monte Carlo integration required for:
+#### Monte Carlo integration required for:
 - Area Lights (Random point on area of light)
 - Indirect Illumination (Random bounce over hemisphere)
 - Depth of Field (Introducing a lense somewhere)
 - Anti-Aliasing (Random point on screenplane pixels)
 - Motion Blur (Random point in time)
 
-Monte Carlo integration preferred for:
+#### Monte Carlo integration preferred for:
 - Multiple lightsources
 - Dielectric refraction or reflection
 
-Other interesting notes:
+#### Other interesting notes:
 - Where there is Monte Carlo integration there can be Russian Roulette, Multiple Importance Sampling, Machine Learning
 - Light is actually a spectrum

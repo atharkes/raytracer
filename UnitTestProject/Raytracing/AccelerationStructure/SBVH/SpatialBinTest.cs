@@ -1,6 +1,6 @@
 ﻿using OpenTK;
-using WhittedRaytracer.Raytracing.AccelerationStructures.SBVH;
-using WhittedRaytracer.Utilities;
+using PathTracer.Raytracing.AccelerationStructures.SBVH;
+using PathTracer.Utilities;
 using Xunit;
 
 namespace UnitTests.Raytracing.AccelerationStructure.SBVH {

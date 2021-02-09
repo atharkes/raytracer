@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using WhittedRaytracer.Raytracing.AccelerationStructures;
-using WhittedRaytracer.Raytracing.AccelerationStructures.BVH;
-using WhittedRaytracer.Raytracing.SceneObjects;
-using WhittedRaytracer.Utilities;
+using PathTracer.Raytracing.AccelerationStructures;
+using PathTracer.Raytracing.AccelerationStructures.BVH;
+using PathTracer.Raytracing.SceneObjects;
+using PathTracer.Utilities;
 using Xunit;
 using Xunit.Abstractions;
 

@@ -1,7 +1,7 @@
 using OpenTK;
-using WhittedRaytracer.Raytracing.AccelerationStructures.SBVH;
-using WhittedRaytracer.Raytracing.SceneObjects.Primitives;
-using WhittedRaytracer.Utilities;
+using PathTracer.Raytracing.AccelerationStructures.SBVH;
+using PathTracer.Raytracing.SceneObjects.Primitives;
+using PathTracer.Utilities;
 using Xunit;
 
 namespace UnitTests.Raytracing.SceneObjects.Primitives {

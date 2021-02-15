@@ -43,7 +43,7 @@ namespace PathTracer.Raytracing.SceneObjects {
         /// <summary> Clip the AABB of the primitive with an axis-aligned plane </summary>
         /// <param name="plane">The plane to clip the AABB with</param>
         /// <returns>The bounds of the clipped AABB</returns>
-        public virtual Fragment Clip(SplitPlane plane) {
+        public virtual PrimitiveFragment Clip(AxisAlignedPlane plane) {
             Vector3[] bounds = Bounds;
             Vector3 min = bounds[0];
             Vector3 max = bounds[1];
@@ -61,7 +61,7 @@ namespace PathTracer.Raytracing.SceneObjects {
                 max.Z = Math.Min(max.Z, plane.Position.Z);
             } else throw new ArgumentException("Can't clip if plane is not axis-aligned");
             if (max.X < min.X || max.Y < min.Y || max.Z < min.Z) return null;
-            else return new Fragment(this, new Vector3[] { min, max });
+            else return new PrimitiveFragment(this, new Vector3[] { min, max });
         }
     }
 }

@@ -1,19 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PathTracer.Raytracing.AccelerationStructures;
 using PathTracer.Raytracing.AccelerationStructures.BVH;
 using PathTracer.Raytracing.SceneObjects;
 using PathTracer.Utilities;
-using Xunit;
-using Xunit.Abstractions;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace UnitTests.Raytracing.AccelerationStructure.SBVH {
+    [TestClass]
     public class SBVHTreeTest {
-        readonly ITestOutputHelper output;
-
-        public SBVHTreeTest(ITestOutputHelper output) {
-            this.output = output;
-        }
-
         static SBVHTree RandomSBVH(int primitiveAmount) {
             List<Primitive> primitives = new List<Primitive>(primitiveAmount);
             for (int i = 0; i < primitiveAmount; i++) {
@@ -22,22 +17,22 @@ namespace UnitTests.Raytracing.AccelerationStructure.SBVH {
             return new SBVHTree(primitives);
         }
 
-        [Fact]
+        [TestMethod]
         public void Constructor() {
             RandomSBVH(1_000);
         }
 
-        [Fact]
+        [TestMethod]
         public void NodeCount() {
             const int primitiveCount = 1_000;
             for (int i = 0; i < 10; i++) {
                 SBVHTree bvh = RandomSBVH(primitiveCount);
                 int nodeCount = CountNodes(bvh.Root);
-                output.WriteLine($"Node count in percentage of primitives: {(float)nodeCount / primitiveCount}");
-                Assert.True(nodeCount <= primitiveCount * 4);
+                Debug.WriteLine($"Node count in percentage of primitives: {(float)nodeCount / primitiveCount}");
+                Assert.IsTrue(nodeCount <= primitiveCount * 4);
             }
 
-            int CountNodes(IBVHNode node) {
+            static int CountNodes(IBVHNode node) {
                 if (node.Leaf) return 1;
                 else return CountNodes(node.Left) + 1 + CountNodes(node.Right);
             }

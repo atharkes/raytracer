@@ -29,7 +29,7 @@ namespace PathTracer.Raytracing.AccelerationStructures.BVH {
             TrySplit();
         }
 
-        /// <summary> Create a BVH node, splitting into smaller nodes if beneficial </summary>
+        /// <summary> Create a BVH node, splitting into smaller nodes if bene ficial </summary>
         /// <param name="aabb">The aabb for the node</param>
         public BVHNode(AABB aabb) {
             AABB = aabb;

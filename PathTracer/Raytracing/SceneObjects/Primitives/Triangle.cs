@@ -1,5 +1,7 @@
 ﻿using OpenTK.Mathematics;
+using PathTracer.Raytracing.AccelerationStructures.BVH;
 using PathTracer.Raytracing.AccelerationStructures.SBVH;
+using System;
 
 namespace PathTracer.Raytracing.SceneObjects.Primitives {
     /// <summary> A triangle primitive for the 3d scene </summary>
@@ -87,14 +89,14 @@ namespace PathTracer.Raytracing.SceneObjects.Primitives {
         /// <summary> Clip this triangle by a plane </summary>
         /// <param name="plane">The clipping plane to clip the triangle with</param>
         /// <returns>The points that are left after clipping the triangle</returns>
-        public Vector3[] GetClippedPoints(SplitPlane plane) {
+        public Vector3[] GetClippedPoints(AxisAlignedPlane plane) {
             Vector3 v0 = P1 - plane.Position, v1 = P2 - plane.Position, v2 = P3 - plane.Position, v3;
             const float clipEpsilon = 0.00001f, clipEpsilon2 = 0.01f;
             // Distances to the plane (this is an array parallel to v[], stored as a vec3)
             Vector3 dist = new Vector3(Vector3.Dot(v0, plane.Normal), Vector3.Dot(v1, plane.Normal), Vector3.Dot(v2, plane.Normal));
             if (dist.X < clipEpsilon2 && dist.Y < clipEpsilon2 && dist.Z < clipEpsilon2) {
                 // Case 1 (all clipped)
-                return new Vector3[0];
+                return Array.Empty<Vector3>();
             }
             if (dist.X > -clipEpsilon && dist.Y > -clipEpsilon && dist.Z > -clipEpsilon) {
                 // Case 2 (none clipped)
@@ -126,7 +128,7 @@ namespace PathTracer.Raytracing.SceneObjects.Primitives {
             } else {
                 // Case 4 (triangle)
                 v1 = Vector3.Lerp(v0, v1, dist[0] / (dist[0] - dist[1]));
-                v2 = v3; v3 = v0;
+                v2 = v3;
                 return new Vector3[] { v0, v1, v2 };
             }
         }

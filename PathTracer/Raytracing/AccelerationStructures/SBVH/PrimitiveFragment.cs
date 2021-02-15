@@ -3,7 +3,7 @@ using PathTracer.Raytracing.SceneObjects;
 
 namespace PathTracer.Raytracing.AccelerationStructures.SBVH {
     /// <summary> A fragment of a primitive for the SBVH construction </summary>
-    public class Fragment : Primitive {
+    public class PrimitiveFragment : Primitive {
         /// <summary> The original primitive of the fragment </summary>
         public Primitive Original { get; }
         /// <summary> The bounds of the fragment </summary>
@@ -12,7 +12,7 @@ namespace PathTracer.Raytracing.AccelerationStructures.SBVH {
         /// <summary> Create a new fragment of a primitive </summary>
         /// <param name="original">The original primitive</param>
         /// <param name="bounds">The bounds of the fragment</param>
-        public Fragment(Primitive original, Vector3[] bounds) {
+        public PrimitiveFragment(Primitive original, Vector3[] bounds) {
             Original = original;
             Bounds = bounds;
             Position = bounds[0] + 0.5f * bounds[1] - bounds[0];
@@ -42,10 +42,10 @@ namespace PathTracer.Raytracing.AccelerationStructures.SBVH {
         /// <summary> Clipping a fragment doesn't create a fragment of a fragment </summary>
         /// <param name="plane">The plane to clip the fragment with</param>
         /// <returns>Creates a smaller fragment of the original primitive</returns>
-        public override Fragment Clip(SplitPlane plane) {
-            Fragment doubleFragment = base.Clip(plane);
+        public override PrimitiveFragment Clip(AxisAlignedPlane plane) {
+            PrimitiveFragment doubleFragment = base.Clip(plane);
             if (doubleFragment == null) return null;
-             else return new Fragment((doubleFragment.Original as Fragment).Original, doubleFragment.Bounds);
+             else return new PrimitiveFragment((doubleFragment.Original as PrimitiveFragment).Original, doubleFragment.Bounds);
         }
     }
 }

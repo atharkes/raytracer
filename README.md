@@ -58,7 +58,6 @@
 - Path Guiding
 
 #### Crazy Ideas:
-- Switch from .NET Framework with OpenTK to .NET Core with MonoGame 
 - Take hemisphere of a point on a primitive as camera position and view frustum
 
 #### Monte Carlo integration required for:

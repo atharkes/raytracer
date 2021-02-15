@@ -24,7 +24,7 @@ namespace PathTracer.Raytracing.AccelerationStructures.BVH {
         /// <summary> Create a new split with AABB's </summary>
         /// <param name="left">The left AABB</param>
         /// <param name="right">The right AABB</param>
-        public Split(Vector3 direction, AABB left, AABB right = null) {
+        public Split(Vector3 direction, AABB left = null, AABB right = null) {
             Direction = direction;
             Left = left ?? new AABB();
             Right = right ?? new AABB();

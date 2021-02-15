@@ -19,6 +19,7 @@ namespace PathTracer.Raytracing.AccelerationStructures.SBVH {
         /// <returns>A better or equal split than the normal BVH would</returns>
         protected override Split GetSplit() {
             Split bvhSplit = base.GetSplit();
+            // TODO: Introduce Alpha to just use regular split
             Split sbvhSplit;
             Vector3 size = AABB.Size;
             if (size.X > size.Y && size.X > size.Z) {
@@ -28,7 +29,6 @@ namespace PathTracer.Raytracing.AccelerationStructures.SBVH {
             } else {
                 sbvhSplit = BestSpatialBinSplit(Vector3.UnitZ, v => v.Z);
             }
-
             if (bvhSplit == null) return sbvhSplit;
             if (sbvhSplit == null) return bvhSplit;
             float bvhSplitSAH = bvhSplit.SurfaceAreaHeuristic;
@@ -79,6 +79,7 @@ namespace PathTracer.Raytracing.AccelerationStructures.SBVH {
                     bestSplit = split;
                 }
             }
+            // TODO: Reference Unsplitting on best Split
             return bestSplit;
         }
     }

@@ -3,7 +3,7 @@ using System;
 using System.IO;
 using System.Text;
 
-namespace PathTracer {
+namespace PathTracer.Drawing {
     public class Shader : IDisposable {
         public readonly int Handle;
         bool disposedValue = false;

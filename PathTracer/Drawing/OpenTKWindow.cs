@@ -3,11 +3,10 @@ using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
-using PathTracer.Drawing;
 using System;
 using System.Drawing;
 
-namespace PathTracer {
+namespace PathTracer.Drawing {
     /// <summary> The main class derived from an OpenTK gamewindow </summary>
     public class OpenTKWindow : GameWindow {
         /// <summary> The identifier of the gamewindow </summary>
@@ -15,7 +14,6 @@ namespace PathTracer {
         /// <summary> The gamewindow </summary>
         public Surface GameWindow { get; }
 
-        readonly Main main;
         readonly Shader shader;
         int vertexBufferObject;
         int vertexArrayObject;
@@ -37,8 +35,7 @@ namespace PathTracer {
         public OpenTKWindow(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings) : base(gameWindowSettings, nativeWindowSettings) {
             GameWindow = new Surface();
             GameWindowID = GameWindow.GenTexture();
-            main = new Main(GameWindow);
-            shader = new Shader("shader.vert", "shader.frag");
+            shader = new Shader("Drawing\\shader.vert", "Drawing\\shader.frag");
             Location = new Vector2i(50, 80);
         }
 
@@ -46,7 +43,6 @@ namespace PathTracer {
         /// <param name="e">Arguments given</param>
         protected override void OnLoad() {
             GL.ClearColor(Color.Black);
-            
             vertexBufferObject = GL.GenBuffer();
             elementBufferObject = GL.GenBuffer();
             vertexArrayObject = GL.GenVertexArray();
@@ -75,7 +71,6 @@ namespace PathTracer {
         /// <summary> Called upon app close </summary>
         /// <param name="e">Arguments given</param>
         protected override void OnUnload() {
-            main.Scene.Camera.Config.SaveToFile();
             shader.Dispose();
             int texture = GameWindowID;
             GL.DeleteTextures(1, ref texture);
@@ -103,27 +98,11 @@ namespace PathTracer {
 
         void HandleInput() {
             if (KeyboardState.IsKeyDown(Keys.Escape)) Close();
-            var scene = main.Scene;
-            if (KeyboardState.IsKeyDown(Keys.F1)) scene.Camera.Config.DebugInfo = !scene.Camera.Config.DebugInfo;
-            if (KeyboardState.IsKeyDown(Keys.F2)) scene.Camera.Config.DrawBVHTraversal = !scene.Camera.Config.DrawBVHTraversal;
-            if (KeyboardState.IsKeyDown(Keys.Space)) scene.Camera.Move(scene.Camera.Up);
-            if (KeyboardState.IsKeyDown(Keys.LeftShift)) scene.Camera.Move(scene.Camera.Down);
-            if (KeyboardState.IsKeyDown(Keys.W)) scene.Camera.Move(scene.Camera.Front);
-            if (KeyboardState.IsKeyDown(Keys.S)) scene.Camera.Move(scene.Camera.Back);
-            if (KeyboardState.IsKeyDown(Keys.A)) scene.Camera.Move(scene.Camera.Left);
-            if (KeyboardState.IsKeyDown(Keys.D)) scene.Camera.Move(scene.Camera.Right);
-            if (KeyboardState.IsKeyDown(Keys.KeyPadAdd)) scene.Camera.FOV *= 1.1f;
-            if (KeyboardState.IsKeyDown(Keys.KeyPadSubtract)) scene.Camera.FOV *= 0.9f;
-            if (KeyboardState.IsKeyDown(Keys.Left)) scene.Camera.Turn(scene.Camera.Left);
-            if (KeyboardState.IsKeyDown(Keys.Right)) scene.Camera.Turn(scene.Camera.Right);
-            if (KeyboardState.IsKeyDown(Keys.Up)) scene.Camera.Turn(scene.Camera.Up);
-            if (KeyboardState.IsKeyDown(Keys.Down)) scene.Camera.Turn(scene.Camera.Down);
         }
 
         /// <summary> Called once per frame; render </summary>
         /// <param name="e">Arguments given</param>
         protected override void OnRenderFrame(FrameEventArgs e) {
-            main.Tick();
             /// Clear Screen
             GL.Clear(ClearBufferMask.ColorBufferBit);
             /// Bind Texture

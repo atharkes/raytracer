@@ -1,5 +1,4 @@
 ﻿using OpenTK.Mathematics;
-using OpenTK.Windowing.GraphicsLibraryFramework;
 using PathTracer.Multithreading;
 using PathTracer.Raytracing;
 using PathTracer.Raytracing.SceneObjects.CameraParts;
@@ -7,7 +6,7 @@ using System;
 
 namespace PathTracer {
     /// <summary> Main class of the raytracer </summary>
-    class Main {
+    class Renderer {
         /// <summary> The threadpool of this application </summary>
         public static readonly Threadpool Threadpool = new Threadpool();
         /// <summary> The 3d scene in which the raytracing takes place </summary>
@@ -15,7 +14,7 @@ namespace PathTracer {
 
         /// <summary> Create a raytracing application </summary>
         /// <param name="screen">The screen to draw the raytracing to</param>
-        public Main(IScreen screen) {
+        public Renderer(IScreen screen) {
             Scene = Scene.Default(screen);
         }
 

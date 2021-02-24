@@ -14,10 +14,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="shader.frag">
+    <None Update="Drawing\shader.frag">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="shader.vert">
+    <None Update="Drawing\shader.vert">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

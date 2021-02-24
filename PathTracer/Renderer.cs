@@ -1,5 +1,4 @@
 ﻿using OpenTK.Mathematics;
-using PathTracer.Multithreading;
 using PathTracer.Raytracing;
 using PathTracer.Raytracing.SceneObjects.CameraParts;
 using System;
@@ -7,8 +6,6 @@ using System;
 namespace PathTracer {
     /// <summary> Main class of the raytracer </summary>
     class Renderer {
-        /// <summary> The threadpool of this application </summary>
-        public static readonly Threadpool Threadpool = new Threadpool();
         /// <summary> The 3d scene in which the raytracing takes place </summary>
         public readonly Scene Scene;
 
@@ -24,16 +21,16 @@ namespace PathTracer {
             Scene.Camera.Statistics.LogTaskTime(Scene.Camera.Statistics.OpenTKTime);
             int rayCount = Scene.Camera.RayCountNextTick();
             Scene.Camera.Statistics.LogTickRays(rayCount);
-            Action[] tasks = new Action[Threadpool.MultithreadingTaskCount];
-            float size = rayCount / Threadpool.MultithreadingTaskCount;
-            for (int i = 0; i < Threadpool.MultithreadingTaskCount; i++) {
+            Action[] tasks = new Action[Program.Threadpool.MultithreadingTaskCount];
+            float size = rayCount / Program.Threadpool.MultithreadingTaskCount;
+            for (int i = 0; i < Program.Threadpool.MultithreadingTaskCount; i++) {
                 int lowerbound = (int)(i * size);
                 int higherbound = (int)((i + 1) * size);
                 tasks[i] = () => TraceRays(lowerbound, higherbound);
             }
             Scene.Camera.Statistics.LogTaskTime(Scene.Camera.Statistics.MultithreadingOverhead);
-            Threadpool.DoTasks(tasks);
-            Threadpool.WaitTillDone();
+            Program.Threadpool.DoTasks(tasks);
+            Program.Threadpool.WaitTillDone();
             Scene.Camera.Statistics.LogTaskTime(Scene.Camera.Statistics.TracingTime);
             Scene.Camera.ScreenPlane.Draw();
             Scene.Camera.Statistics.LogTaskTime(Scene.Camera.Statistics.DrawingTime);

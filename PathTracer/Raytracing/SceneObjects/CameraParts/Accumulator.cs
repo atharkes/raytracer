@@ -27,7 +27,7 @@ namespace PathTracer.Raytracing.SceneObjects.CameraParts {
         /// <summary> Draws an image from the photons in the accumulator to a screen </summary>
         /// <param name="screen">The screen to draw the image to</param>
         public void DrawImage(IScreen screen, bool drawBVH) {
-            Action[] tasks = new Action[Renderer.Threadpool.MultithreadingTaskCount];
+            Action[] tasks = new Action[Program.Threadpool.MultithreadingTaskCount];
             float size = Cavities.Length / tasks.Length;
             for (int i = 0; i < tasks.Length; i++) {
                 int lowerbound = (int)(i * size);
@@ -35,8 +35,8 @@ namespace PathTracer.Raytracing.SceneObjects.CameraParts {
                 if (drawBVH) tasks[i] = () => DrawBVHRange(screen, lowerbound, higherbound);
                 else tasks[i] = () => DrawImageRange(screen, lowerbound, higherbound);
             }
-            Renderer.Threadpool.DoTasks(tasks);
-            Renderer.Threadpool.WaitTillDone();
+            Program.Threadpool.DoTasks(tasks);
+            Program.Threadpool.WaitTillDone();
         }
 
         void DrawImageRange(IScreen screen, int from, int to) {

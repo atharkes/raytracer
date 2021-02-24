@@ -4,7 +4,7 @@ using System.Threading;
 
 namespace PathTracer.Multithreading {
     /// <summary> A threadpool for dividing work between threads </summary>
-    class Threadpool {
+    public class Threadpool {
         /// <summary> The amount of tasks created for the threadpool </summary>
         public readonly int MultithreadingTaskCount = 720;
         /// <summary> Amount of threads used for the threadpool </summary>

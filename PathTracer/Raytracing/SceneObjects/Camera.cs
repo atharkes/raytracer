@@ -6,14 +6,14 @@ using System;
 namespace PathTracer.Raytracing.SceneObjects {
     /// <summary> The camera object in the 3d scene </summary>
     public class Camera : ISceneObject {
+        /// <summary> The screen plane in front of the camera </summary>
+        public readonly ScreenPlane ScreenPlane;
         /// <summary> The input handler of the camera </summary>
-        public readonly InputHandler InputHandler = new InputHandler();
+        public readonly InputHandler InputHandler;
         /// <summary> The statitics of the camera </summary>
         public readonly Statistics Statistics = new Statistics();
         /// <summary> The configuration of the camera </summary>
         public readonly Config Config = Config.LoadFromFile();
-        /// <summary> The screen plane in front of the camera </summary>
-        public readonly ScreenPlane ScreenPlane;
 
         /// <summary> The position of the camera </summary>
         public Vector3 Position { get => Config.Position; set => Move(value - Position); }
@@ -42,6 +42,7 @@ namespace PathTracer.Raytracing.SceneObjects {
             if (position.HasValue) Config.Position = position.Value;
             if (viewDirection.HasValue) Config.ViewDirection = viewDirection.Value;
             ScreenPlane = new ScreenPlane(this, screen);
+            InputHandler = new InputHandler(this);
         }
 
         /// <summary> Move the camera in a direction </summary>

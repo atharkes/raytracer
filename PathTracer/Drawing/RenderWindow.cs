@@ -8,7 +8,7 @@ using System.Drawing;
 
 namespace PathTracer.Drawing {
     /// <summary> The main class derived from an OpenTK gamewindow </summary>
-    public class OpenTKWindow : GameWindow {
+    public class RenderWindow : GameWindow {
         /// <summary> The identifier of the gamewindow </summary>
         public int GameWindowID { get; }
         /// <summary> The gamewindow </summary>
@@ -32,7 +32,7 @@ namespace PathTracer.Drawing {
             1, 2, 3
         };
 
-        public OpenTKWindow(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings) : base(gameWindowSettings, nativeWindowSettings) {
+        public RenderWindow(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings) : base(gameWindowSettings, nativeWindowSettings) {
             GameWindow = new Surface();
             GameWindowID = GameWindow.GenTexture();
             shader = new Shader("Drawing\\shader.vert", "Drawing\\shader.frag");

@@ -5,25 +5,24 @@ using System;
 namespace PathTracer.Raytracing {
     /// <summary> A data structure to store an intersection between a ray and a primitive </summary>
     public class Intersection {
-        /// <summary> The ray that intersects the primitive </summary>
-        public readonly Ray Ray;
-        /// <summary> The primitive that is intersected by the ray </summary>
-        public readonly Primitive Primitive;
-        /// <summary> The distance from the origin of the ray to the intersection </summary>
-        public readonly float Distance;
-        /// <summary> Whether the ray is entering the primitive or exiting it </summary>
-        public readonly bool IntoPrimitive;
-
-        /// <summary> The position of the intersection </summary>
-        public readonly Vector3 Position;
-        /// <summary> The normal of the primitive at the intersection </summary>
-        public readonly Vector3 Normal;
-
         /// <summary>
         /// Epsilon used to raise the intersection away from the primitive.
         /// Used to avoid the intersection falling behind the primitive by rounding errors.
         /// </summary>
         public const float RaiseEpsilon = 0.001f;
+
+        /// <summary> The ray that intersects the primitive </summary>
+        public Ray Ray { get; }
+        /// <summary> The primitive that is intersected by the ray </summary>
+        public Primitive Primitive { get; }
+        /// <summary> The distance from the origin of the ray to the intersection </summary>
+        public float Distance { get; }
+        /// <summary> Whether the ray is entering the primitive or exiting it </summary>
+        public bool IntoPrimitive { get; }
+        /// <summary> The position of the intersection </summary>
+        public Vector3 Position { get; }
+        /// <summary> The normal of the primitive at the intersection </summary>
+        public Vector3 Normal { get; }
 
         /// <summary> Create a new intersection between a ray and a primitive </summary>
         /// <param name="ray">The ray that intersects the primitive</param>

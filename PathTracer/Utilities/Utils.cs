@@ -8,9 +8,10 @@ namespace PathTracer.Utilities {
     /// <summary> Just some usefull static methods </summary>
     public static class Utils {
         /// <summary> A deterministic random to generate random scenes which are always the same </summary>
-        public static readonly Random DetRandom = new Random(0);
+        public static Random DetRandom { get; } = new Random(0);
         /// <summary> Random to generate random values </summary>
         public static Random Random => random ??= new Random(Thread.CurrentThread.ManagedThreadId * (int)DateTime.Today.TimeOfDay.Ticks);
+        
         [ThreadStatic] static Random? random;
 
         /// <summary> Create a random Vector </summary>

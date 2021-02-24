@@ -36,7 +36,6 @@ namespace PathTracer.Drawing {
             GameWindow = new Surface();
             GameWindowID = GameWindow.GenTexture();
             shader = new Shader("Drawing\\shader.vert", "Drawing\\shader.frag");
-            Location = new Vector2i(50, 80);
         }
 
         /// <summary> Called upon app init </summary>

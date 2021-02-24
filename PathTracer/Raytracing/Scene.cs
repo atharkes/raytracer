@@ -10,15 +10,15 @@ using System.Diagnostics;
 
 namespace PathTracer.Raytracing {
     /// <summary> The 3d scene in which the ray tracing takes place </summary>
-    class Scene {
+    public class Scene {
         /// <summary> The camera in the scene </summary>
-        public readonly Camera Camera;
+        public Camera Camera { get; }
         /// <summary> The acceleration structure used to find intersections </summary>
-        public readonly IAccelerationStructure AccelerationStructure;
+        public IAccelerationStructure AccelerationStructure { get; }
         /// <summary> The primitives in the scene </summary>
-        public readonly ICollection<Primitive> Primitives;
+        public ICollection<Primitive> Primitives { get; }
         /// <summary> The lightsources in the scene </summary>
-        public readonly ICollection<Primitive> Lights;
+        public ICollection<Primitive> Lights { get; }
 
         /// <summary> Create a new scene with some default objects </summary>
         /// <param name="screen">The screen to draw the raytracing to</param>

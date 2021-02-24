@@ -86,17 +86,17 @@ namespace PathTracer.Raytracing.AccelerationStructures.BVH {
         /// <param name="ray">The ray to calculate intersection for</param>
         /// <returns>Whether the ray intersects the AABB</returns>
         public bool IntersectBool(Ray ray) {
-            float tmin = (Bounds[ray.Sign[0]].X - ray.Origin.X) * ray.DirectionInverted.X;
-            float tmax = (Bounds[1 - ray.Sign[0]].X - ray.Origin.X) * ray.DirectionInverted.X;
+            float tmin = (Bounds[ray.Sign.X].X - ray.Origin.X) * ray.DirectionInverted.X;
+            float tmax = (Bounds[1 - ray.Sign.X].X - ray.Origin.X) * ray.DirectionInverted.X;
 
-            float tymin = (Bounds[ray.Sign[1]].Y - ray.Origin.Y) * ray.DirectionInverted.Y;
-            float tymax = (Bounds[1 - ray.Sign[1]].Y - ray.Origin.Y) * ray.DirectionInverted.Y;
+            float tymin = (Bounds[ray.Sign.Y].Y - ray.Origin.Y) * ray.DirectionInverted.Y;
+            float tymax = (Bounds[1 - ray.Sign.Y].Y - ray.Origin.Y) * ray.DirectionInverted.Y;
             if ((tmin > tymax) || (tmax < tymin)) return false;
             tmin = Math.Max(tmin, tymin);
             tmax = Math.Min(tmax, tymax);
 
-            float tzmin = (Bounds[ray.Sign[2]].Z - ray.Origin.Z) * ray.DirectionInverted.Z;
-            float tzmax = (Bounds[1 - ray.Sign[2]].Z - ray.Origin.Z) * ray.DirectionInverted.Z;
+            float tzmin = (Bounds[ray.Sign.Z].Z - ray.Origin.Z) * ray.DirectionInverted.Z;
+            float tzmax = (Bounds[1 - ray.Sign.Z].Z - ray.Origin.Z) * ray.DirectionInverted.Z;
             if ((tmin > tzmax) || (tmax < tzmin)) return false;
             tmin = Math.Max(tmin, tzmin);
             tmax = Math.Min(tmax, tzmax);

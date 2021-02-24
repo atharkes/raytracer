@@ -5,9 +5,9 @@ using System;
 
 namespace PathTracer {
     /// <summary> Main class of the raytracer </summary>
-    class Renderer {
+    public class Renderer {
         /// <summary> The 3d scene in which the raytracing takes place </summary>
-        public readonly Scene Scene;
+        public Scene Scene { get; }
 
         /// <summary> Create a raytracing application </summary>
         /// <param name="screen">The screen to draw the raytracing to</param>

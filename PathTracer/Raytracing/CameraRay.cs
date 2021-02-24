@@ -5,7 +5,7 @@ namespace PathTracer.Raytracing {
     /// <summary> A ray sent from the camera into the scene </summary>
     public class CameraRay : Ray {
         /// <summary> The cavity from which this ray originates </summary>
-        public readonly Cavity Cavity;
+        public Cavity Cavity { get; }
         /// <summary> How many times a BVH node is intersected </summary>
         public int BVHTraversals { get; set; } = 0;
 

@@ -7,16 +7,16 @@ namespace PathTracer.Raytracing {
         public const int MaxRecursionDepth = 3;
 
         /// <summary> The origin of the ray </summary>
-        public readonly Vector3 Origin;
+        public Vector3 Origin { get; }
         /// <summary> The direction of the ray. This should always be normalized </summary>
-        public readonly Vector3 Direction;
+        public Vector3 Direction { get; }
         /// <summary> How many bounces this ray made so far </summary>
-        public readonly int RecursionDepth;
+        public int RecursionDepth { get; }
 
         /// <summary> The inverted direction. Used for quick AABB intersection </summary>
-        public readonly Vector3 DirectionInverted;
+        public Vector3 DirectionInverted { get; }
         /// <summary> Whether the individual components of the inverted direction of the ray is negative </summary>
-        public readonly int[] Sign;
+        public Vector3i Sign { get; }
 
         /// <summary> The length that the ray is travelling </summary>
         public float Length { get; set; }
@@ -31,14 +31,10 @@ namespace PathTracer.Raytracing {
         public Ray(Vector3 origin, Vector3 direction, float length = float.MaxValue, int recursionDepth = 0) {
             Origin = origin;
             Direction = direction.Normalized();
+            Length = length;
             RecursionDepth = recursionDepth;
             DirectionInverted = new Vector3(1 / direction.X, 1 / direction.Y, 1 / direction.Z);
-            Length = length;
-            Sign = new int[] {
-                DirectionInverted.X < 0 ? 1 : 0,
-                DirectionInverted.Y < 0 ? 1 : 0,
-                DirectionInverted.Z < 0 ? 1 : 0
-            };
+            Sign = new Vector3i(DirectionInverted.X < 0 ? 1 : 0, DirectionInverted.Y < 0 ? 1 : 0, DirectionInverted.Z < 0 ? 1 : 0);
         }
     }
 }

@@ -11,7 +11,7 @@ namespace PathTracer.Raytracing.SceneObjects {
         /// <summary> The statitics of the camera </summary>
         public readonly Statistics Statistics = new Statistics();
         /// <summary> The configuration of the camera </summary>
-        public readonly Config Config;
+        public readonly Config Config = Config.LoadFromFile();
         /// <summary> The screen plane in front of the camera </summary>
         public readonly ScreenPlane ScreenPlane;
 
@@ -39,7 +39,6 @@ namespace PathTracer.Raytracing.SceneObjects {
         /// <param name="position">The position of the camera</param>
         /// <param name="viewDirection">The direction the camera is facing</param>
         public Camera(IScreen screen, Vector3? position = null, Vector3? viewDirection = null) {
-            Config = Config.LoadFromFile();
             if (position.HasValue) Config.Position = position.Value;
             if (viewDirection.HasValue) Config.ViewDirection = viewDirection.Value;
             ScreenPlane = new ScreenPlane(this, screen);
@@ -98,7 +97,7 @@ namespace PathTracer.Raytracing.SceneObjects {
         /// <summary> Returns how many rays should be traced in the next tick </summary>
         /// <returns>Amount of rays to trace in the next tick</returns>
         public int RayCountNextTick() {
-            if (Statistics.FrameTime.LastTick == default(TimeSpan)) return Config.MinimumRayCount;
+            if (Statistics.FrameTime.LastTick == default) return Config.MinimumRayCount;
             double frameTimeDifference = Config.TargetFrameTime.TotalMilliseconds - (Statistics.FrameTime.LastTick.TotalMilliseconds + Statistics.MultithreadingOverhead.LastTick.TotalMilliseconds);
             double excessTraceFactor = frameTimeDifference / Statistics.TracingTime.LastTick.TotalMilliseconds;
             return Math.Max(Config.MinimumRayCount, (int)(Statistics.RaysTracedLastTick * (1f + excessTraceFactor)));

@@ -13,14 +13,14 @@ namespace PathTracer.Raytracing.SceneObjects.Primitives {
         /// <param name="position">The position of the sphere</param>
         /// <param name="radius">The radius of the sphere</param>
         /// <param name="material">The material of the sphere</param>
-        public Sphere(Vector3 position, float radius = 1, Material material = null) : base(position, material) {
+        public Sphere(Vector3 position, float radius = 1, Material? material = null) : base(position, material) {
             Radius = radius;
         }
 
         /// <summary> Intersect the sphere with a ray </summary>
         /// <param name="ray">The ray to intersect the sphere with</param>
         /// <returns>The intersection with the sphere if there is any</returns>
-        public override Intersection Intersect(Ray ray) {
+        public override Intersection? Intersect(Ray ray) {
             Vector3 sphereFromRayOrigin = Position - ray.Origin;
             float sphereInDirectionOfRay = Vector3.Dot(sphereFromRayOrigin, ray.Direction);
             float rayNormalDistance = Vector3.Dot(sphereFromRayOrigin, sphereFromRayOrigin) - sphereInDirectionOfRay * sphereInDirectionOfRay;

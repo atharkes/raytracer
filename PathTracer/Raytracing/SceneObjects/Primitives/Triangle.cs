@@ -31,7 +31,7 @@ namespace PathTracer.Raytracing.SceneObjects.Primitives {
         /// <param name="p2">The second point of the triangle</param>
         /// <param name="p3">The third point of the triangle</param>
         /// <param name="material">The material of the triangle</param>
-        public Triangle(Vector3 p1, Vector3 p2, Vector3 p3, Vector3? normal = null, Material material = null) : base(null, material) {
+        public Triangle(Vector3 p1, Vector3 p2, Vector3 p3, Vector3? normal = null, Material? material = null) : base(null, material) {
             P1 = p1;
             P2 = p2;
             P3 = p3;
@@ -42,7 +42,7 @@ namespace PathTracer.Raytracing.SceneObjects.Primitives {
         /// <summary> Intersect the triangle with a ray (Möller–Trumbore triangle intersection) </summary>
         /// <param name="ray">The ray to intersect the triangle with</param>
         /// <returns>The intersection with the triangle if there is any</returns>
-        public override Intersection Intersect(Ray ray) {
+        public override Intersection? Intersect(Ray ray) {
             // Get vectors for two edges sharing V1
             Vector3 e1 = P2 - P1;
             Vector3 e2 = P3 - P1;

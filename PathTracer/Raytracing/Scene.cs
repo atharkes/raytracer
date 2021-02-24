@@ -99,7 +99,7 @@ namespace PathTracer.Raytracing {
         /// <returns>The color at the origin of the ray</returns>
         public Vector3 CastRay(Ray ray, int recursionDepth = 0) {
             // Intersect with Scene
-            Intersection intersection = AccelerationStructure.Intersect(ray);
+            Intersection? intersection = AccelerationStructure.Intersect(ray);
             if (intersection == null) return Vector3.Zero;
             Vector3 directIllumination = intersection.Primitive.Material.Specularity < 1 ? CastShadowRays(intersection) : Vector3.Zero;
             Vector3 radianceOut;
@@ -113,7 +113,7 @@ namespace PathTracer.Raytracing {
                 // Dielectric
                 float reflected = intersection.GetReflectivity();
                 float refracted = 1 - reflected;
-                Ray refractedRay = intersection.GetRefractedRay();
+                Ray? refractedRay = intersection.GetRefractedRay();
                 Vector3 incRefractedLight = refractedRay != null ? CastRay(refractedRay, recursionDepth + 1) : Vector3.Zero;
                 Vector3 incReflectedLight = CastRay(intersection.GetReflectedRay(), recursionDepth + 1);
                 radianceOut = directIllumination * (1f - intersection.Primitive.Material.Dielectric) + (incRefractedLight * refracted + incReflectedLight * reflected) * intersection.Primitive.Material.Dielectric * intersection.Primitive.Material.Color;

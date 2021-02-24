@@ -32,8 +32,9 @@ namespace UnitTests.Raytracing.AccelerationStructure.BVH {
                 Assert.IsTrue(nodeCount <= primitiveCount * 2);
             }
 
-            static int CountNodes(IBVHNode node) {
-                if (node.Leaf) return 1;
+            static int CountNodes(IBVHNode? node) {
+                if (node == null) return 0;
+                else if (node.Leaf) return 1;
                 else return CountNodes(node.Left) + 1 + CountNodes(node.Right);
             }
         }

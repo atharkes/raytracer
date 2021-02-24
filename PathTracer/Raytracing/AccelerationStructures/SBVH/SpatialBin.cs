@@ -27,7 +27,7 @@ namespace PathTracer.Raytracing.AccelerationStructures.SBVH {
         /// <summary> Add a primitive to the spatial bin and clip it </summary>
         /// <param name="primitive">The primitive to add to the bin</param>
         public void ClipAndAdd(Primitive primitive) {
-            PrimitiveFragment fragment = primitive.Clip(SplitPlaneLeft)?.Clip(SplitPlaneRight);
+            PrimitiveFragment? fragment = primitive.Clip(SplitPlaneLeft)?.Clip(SplitPlaneRight);
             if (fragment == null) return;
             Fragments.Add(fragment);
             AABB.Add(fragment);

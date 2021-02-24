@@ -17,10 +17,10 @@ namespace PathTracer.Raytracing.AccelerationStructures.SBVH {
 
         /// <summary> The SBVH thinks it can get a better split </summary>
         /// <returns>A better or equal split than the normal BVH would</returns>
-        protected override Split GetSplit() {
-            Split bvhSplit = base.GetSplit();
+        protected override Split? GetSplit() {
+            Split? bvhSplit = base.GetSplit();
             // TODO: Introduce Alpha to just use regular split
-            Split sbvhSplit;
+            Split? sbvhSplit;
             Vector3 size = AABB.Size;
             if (size.X > size.Y && size.X > size.Z) {
                 sbvhSplit = BestSpatialBinSplit(Vector3.UnitX, v => v.X);
@@ -42,7 +42,6 @@ namespace PathTracer.Raytracing.AccelerationStructures.SBVH {
             Left = new SBVHNode(split.Left);
             Right = new SBVHNode(split.Right);
             SplitDirection = split.Direction;
-            Leaf = false;
             AABB = new AABB(Left.AABB, Right.AABB);
         }
 
@@ -50,13 +49,13 @@ namespace PathTracer.Raytracing.AccelerationStructures.SBVH {
         /// <param name="binningDirection">The direction the binning proces is going</param>
         /// <param name="axis">The axis selector</param>
         /// <returns>The best spatial binning split in the specified direction</returns>
-        Split BestSpatialBinSplit(Vector3 binningDirection, Func<Vector3, float> axis) {
+        Split? BestSpatialBinSplit(Vector3 binningDirection, Func<Vector3, float> axis) {
             float binStart = axis(AABB.MinBound);
             float binEnd = axis(AABB.MaxBound);
             float binSize = axis(AABB.Size) / SBVHTree.SpatialBinAmount;
             float k1 = SBVHTree.SpatialBinAmount * BVHTree.BinningEpsilon / axis(AABB.Size);
             float bestSplitCost = AABB.SurfaceAreaHeuristic;
-            Split bestSplit = null;
+            Split? bestSplit = null;
             for (int i = 1; i < SBVHTree.SpatialBinAmount; i++) {
                 SpatialBin left = new SpatialBin(binningDirection, binStart, binSize * i);
                 SpatialBin right = new SpatialBin(binningDirection, binSize * i, binEnd);

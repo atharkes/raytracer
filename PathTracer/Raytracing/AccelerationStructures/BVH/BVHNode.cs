@@ -10,16 +10,18 @@ namespace PathTracer.Raytracing.AccelerationStructures.BVH {
         /// <summary> The AABB of this BVH node </summary>
         public AABB AABB { get; protected set; }
         /// <summary> The left child node if it has one </summary>
-        public IBVHNode Left { get; protected set; }
+        public IBVHNode? Left { get; protected set; }
         /// <summary> The right child node if it has one </summary>
-        public IBVHNode Right { get; protected set; }
+        public IBVHNode? Right { get; protected set; }
         /// <summary> Whether this node is a leaf or not </summary>
-        public bool Leaf { get; protected set; } = true;
+        public bool Leaf => Left == null || Right == null;
         /// <summary> On which axis the node is split </summary>
         public Vector3 SplitDirection { get; protected set; }
 
         /// <summary> Create an empty BVH node </summary>
-        public BVHNode() { }
+        public BVHNode() {
+            AABB = new AABB();
+        }
 
         /// <summary> Create a BVH node, splitting into smaller nodes if benificial </summary>
         /// <param name="primitives">The primitives in the node</param>
@@ -38,7 +40,7 @@ namespace PathTracer.Raytracing.AccelerationStructures.BVH {
 
         /// <summary> Try split node into two smaller nodes </summary>
         void TrySplit() {
-            Split split = GetSplit();
+            Split? split = GetSplit();
             if (split is null) return;
             else Split(split);
         }
@@ -49,13 +51,12 @@ namespace PathTracer.Raytracing.AccelerationStructures.BVH {
             Left = new BVHNode(split.Left);
             Right = new BVHNode(split.Right);
             SplitDirection = split.Direction;
-            Leaf = false;
             AABB = new AABB(Left.AABB, Right.AABB);
         }
 
         /// <summary> Get the best split for this node </summary>
         /// <returns>The best split for this BVH node</returns>
-        protected virtual Split GetSplit() {
+        protected virtual Split? GetSplit() {
             if (BVHTree.Bin && AABB.Primitives.Count > BVHTree.BinAmount) {
                 Vector3 size = AABB.Size;
                 if (size.X > size.Y && size.X > size.Z) return BestBinSplit(Vector3.UnitX, v => v.X);
@@ -68,8 +69,8 @@ namespace PathTracer.Raytracing.AccelerationStructures.BVH {
 
         /// <summary> Check all possible splits </summary>
         /// <returns>The best split for every axis</returns>
-        Split BestSweepSplit() {
-            List<Split> splits = new List<Split> {
+        Split? BestSweepSplit() {
+            List<Split?> splits = new List<Split?> {
                 BestLinearSplitAfterSort(Vector3.UnitX, p => p.Center.X),
                 BestLinearSplitAfterSort(Vector3.UnitY, p => p.Center.Y),
                 BestLinearSplitAfterSort(Vector3.UnitZ, p => p.Center.Z)
@@ -81,10 +82,10 @@ namespace PathTracer.Raytracing.AccelerationStructures.BVH {
         /// <summary> Split linearly over primitives after using a sorting function </summary>
         /// <param name="axisSortingFunc">The sorting function to sort the primitives with before finding splits</param>
         /// <returns>The best split using the sorting funciton</returns>
-        Split BestLinearSplitAfterSort(Vector3 sortDirection, Func<IAABB, float> axisSortingFunc) {
+        Split? BestLinearSplitAfterSort(Vector3 sortDirection, Func<IAABB, float> axisSortingFunc) {
             List<IAABB> orderedPrimitives = AABB.Primitives.OrderBy(axisSortingFunc).ToList();
-            Split split = new Split(sortDirection, new AABB(), new AABB(orderedPrimitives));
-            IAABB bestSplitPrimitive = null;
+            Split? split = new Split(sortDirection, new AABB(), new AABB(orderedPrimitives));
+            IAABB? bestSplitPrimitive = null;
             float bestSplitCost = AABB.SurfaceAreaHeuristic;
             foreach (IAABB primitive in orderedPrimitives) {
                 split.Left.Add(primitive);
@@ -106,10 +107,10 @@ namespace PathTracer.Raytracing.AccelerationStructures.BVH {
         /// <param name="binningDirection">The direction the binning proces is going</param>
         /// <param name="axis">The axis selector</param>
         /// <returns>The best binning split in the specified direction</returns>
-        Split BestBinSplit(Vector3 binningDirection, Func<Vector3, float> axis) {
+        Split? BestBinSplit(Vector3 binningDirection, Func<Vector3, float> axis) {
             float k1 = BVHTree.BinAmount * BVHTree.BinningEpsilon / axis(AABB.Size);
             float bestSplitCost = AABB.SurfaceAreaHeuristic;
-            Split bestSplit = null;
+            Split? bestSplit = null;
             for (int i = 1; i < BVHTree.BinAmount; i++) {
                 AABB left = new AABB();
                 AABB right = new AABB();
@@ -133,8 +134,8 @@ namespace PathTracer.Raytracing.AccelerationStructures.BVH {
         /// <summary> Intersect and traverse the node with a ray </summary>
         /// <param name="ray">The ray to intersect the node with</param>
         /// <returns>The intersection in the node or any of its children</returns>
-        public Intersection Intersect(Ray ray) {
-            if (ray is CameraRay) (ray as CameraRay).BVHTraversals++;
+        public Intersection? Intersect(Ray ray) {
+            if (ray is CameraRay cameraRay) cameraRay.BVHTraversals++;
             if (!AABB.IntersectBool(ray)) {
                 return null;
             } else if (Leaf) {
@@ -147,15 +148,15 @@ namespace PathTracer.Raytracing.AccelerationStructures.BVH {
         /// <summary> Intersect the children of this node </summary>
         /// <param name="ray">The ray to intersect the children with</param>
         /// <returns>The intersection in the children if there is any</returns>
-        Intersection IntersectChildren(Ray ray) {
-            Intersection firstIntersection;
-            Intersection secondIntersection;
+        Intersection? IntersectChildren(Ray ray) {
+            Intersection? firstIntersection;
+            Intersection? secondIntersection;
             if (Vector3.Dot(SplitDirection, ray.Direction) < 0) {
-                firstIntersection = Left.Intersect(ray);
-                secondIntersection = Right.Intersect(ray);
+                firstIntersection = Left?.Intersect(ray);
+                secondIntersection = Right?.Intersect(ray);
             } else {
-                firstIntersection = Right.Intersect(ray);
-                secondIntersection = Left.Intersect(ray);
+                firstIntersection = Right?.Intersect(ray);
+                secondIntersection = Left?.Intersect(ray);
             }
             if (secondIntersection == null) {
                 return firstIntersection;
@@ -176,7 +177,7 @@ namespace PathTracer.Raytracing.AccelerationStructures.BVH {
                 }
                 return false;
             } else {
-                return Left.IntersectBool(ray) || Right.IntersectBool(ray);
+                return (Left?.IntersectBool(ray) ?? false) || (Right?.IntersectBool(ray) ?? false);
             }
         }
     }

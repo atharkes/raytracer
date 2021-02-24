@@ -13,23 +13,21 @@ namespace PathTracer.Utilities {
         /// <summary> Minimum amount of rays to trace in a tick </summary>
         public int MinimumRayCount { get; set; } = 10_000;
         /// <summary> The targeted framerate of the raytracer </summary>
-        public int TargetFrameRate { get; set; } = 20;
+        public int TargetFrameRate { get; set; } = 30;
         /// <summary> The targeted frame time computed from the targeted frame rate </summary>
         public TimeSpan TargetFrameTime => new TimeSpan(0, 0, 0, 0, 1000 / TargetFrameRate);
 
-        [JsonIgnore]
         /// <summary> The position of the camera. This value should be modified in the camera </summary>
-        public Vector3 Position { get; set; } = new Vector3(0, -1, -1);
+        [JsonIgnore] public Vector3 Position { get; set; } = new Vector3(0, -1, -1);
         /// <summary> The x position of the camera. This value should be modified in the camera </summary>
         public float PositionX { get => Position.X; set => Position = new Vector3(value, Position.Y, Position.Z); }
         /// <summary> The y position of the camera. This value should be modified in the camera </summary>
         public float PositionY { get => Position.Y; set => Position = new Vector3(Position.X, value, Position.Z); }
         /// <summary> The z position of the camera. This value should be modified in the camera </summary>
         public float PositionZ { get => Position.Z; set => Position = new Vector3(Position.X, Position.Y, value); }
-        
-        [JsonIgnore]
+
         /// <summary> The direction the camera is facing. This value should be modified in the camera </summary>
-        public Vector3 ViewDirection { get; set; } = new Vector3(0, 0, 1);
+        [JsonIgnore] public Vector3 ViewDirection { get; set; } = new Vector3(0, 0, 1);
         /// <summary> The x direction the camera is facing. This value should be modified in the camera </summary>
         public float ViewDirectionX { get => ViewDirection.X; set => ViewDirection = new Vector3(value, ViewDirection.Y, ViewDirection.Z); }
         /// <summary> The y direction the camera is facing. This value should be modified in the camera </summary>

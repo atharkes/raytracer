@@ -9,7 +9,7 @@ namespace PathTracer.Raytracing.AccelerationStructures.BVH {
     /// <summary> An Axis-Aligned Bounding Box </summary>
     public class AABB : IAABB {
         /// <summary> The primitives in the AABB </summary>
-        public List<IAABB> Primitives { get; protected set; } = new List<IAABB>();
+        public List<IAABB> Primitives { get; protected set; }
         /// <summary> The bounds of the AABB </summary>
         public Vector3[] Bounds { get; } = new Vector3[] { Utils.MaxVector, Utils.MinVector };
         /// <summary> The minimum bound of the AABB </summary>
@@ -26,7 +26,9 @@ namespace PathTracer.Raytracing.AccelerationStructures.BVH {
         public float SurfaceAreaHeuristic => BVHTree.TraversalCost + BVHTree.IntersectionCost * Primitives.Count * SurfaceArea;
 
         /// <summary> Create a new AABB with no primitives </summary>
-        public AABB() { }
+        public AABB() {
+            Primitives = new List<IAABB>();
+        }
 
         /// <summary> Create a new AABB from two boundable objects </summary>
         /// <param name="left">The left object</param>
@@ -39,7 +41,7 @@ namespace PathTracer.Raytracing.AccelerationStructures.BVH {
         /// <summary> Create a new AABB with primitives </summary>
         /// <param name="primitives">The primitives to add to the AABB</param>
         public AABB(IEnumerable<IAABB> primitives) {
-            Primitives = primitives?.ToList() ?? new List<IAABB>();
+            Primitives = primitives.ToList();
             (MinBound, MaxBound) = CalculateBounds(Primitives);
         }
 
@@ -105,11 +107,11 @@ namespace PathTracer.Raytracing.AccelerationStructures.BVH {
         /// <summary> Intersect the primitives of this AABB </summary>
         /// <param name="ray">The ray to intersect the primitives with</param>
         /// <returns>The intersection with the primitive if there is any</returns>
-        public Intersection IntersectPrimitives(Ray ray) {
+        public Intersection? IntersectPrimitives(Ray ray) {
             float intersectionDistance = ray.Length;
-            Intersection closestIntersection = null;
+            Intersection? closestIntersection = null;
             foreach (Primitive primitive in Primitives) {
-                Intersection intersection = primitive.Intersect(ray);
+                Intersection? intersection = primitive.Intersect(ray);
                 if (intersection != null && 0 < intersection.Distance && intersection.Distance < intersectionDistance) {
                     closestIntersection = intersection;
                     intersectionDistance = intersection.Distance;

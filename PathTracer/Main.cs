@@ -16,7 +16,7 @@ namespace PathTracer {
         /// <summary> Create a raytracing application </summary>
         /// <param name="screen">The screen to draw the raytracing to</param>
         public Main(IScreen screen) {
-            Scene = Scene.DefaultWithRandomTriangles(screen, 1_000);
+            Scene = Scene.Default(screen);
         }
 
         /// <summary> Process a single frame </summary>

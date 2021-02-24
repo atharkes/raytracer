@@ -14,9 +14,18 @@ namespace PathTracer.Drawing {
         /// <summary> The pixels of the surface </summary>
         public readonly int[] Pixels;
 
-        static bool fontReady = false;
-        static Surface font;
-        static int[] fontRedir;
+        public static Surface Font { get; } = new Surface("../../../assets/font.png");
+        static int[] fontRedir = FontRedir();
+        static int[] FontRedir() {
+            string ch = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_-+={}[];:<>,.?/\\ ";
+            fontRedir = new int[256];
+            for (int i = 0; i < 256; i++) fontRedir[i] = 0;
+            for (int i = 0; i < ch.Length; i++) {
+                int l = ch[i];
+                fontRedir[l & 255] = i;
+            }
+            return fontRedir;
+        }
 
         /// <summary> Create a new empty surface </summary>
         /// <param name="width">The width of the surface</param>
@@ -148,24 +157,13 @@ namespace PathTracer.Drawing {
         }
 
         public void Print(string t, int x, int y, int c) {
-            if (!fontReady) {
-                font = new Surface("../../../assets/font.png");
-                string ch = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_-+={}[];:<>,.?/\\ ";
-                fontRedir = new int[256];
-                for (int i = 0; i < 256; i++) fontRedir[i] = 0;
-                for (int i = 0; i < ch.Length; i++) {
-                    int l = ch[i];
-                    fontRedir[l & 255] = i;
-                }
-                fontReady = true;
-            }
             for (int i = 0; i < t.Length; i++) {
                 int f = fontRedir[t[i] & 255];
                 int dest = x + i * 12 + y * Width;
                 int src = f * 12;
-                for (int v = 0; v < font.Height; v++, src += font.Width, dest += Width) {
+                for (int v = 0; v < Font.Height; v++, src += Font.Width, dest += Width) {
                     for (int u = 0; u < 12; u++) {
-                        if ((font.Pixels[src + u] & 0xffffff) != 0) Pixels[dest + u] = c;
+                        if ((Font.Pixels[src + u] & 0xffffff) != 0) Pixels[dest + u] = c;
                     }
                 }
             }

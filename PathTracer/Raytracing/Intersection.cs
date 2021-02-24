@@ -57,7 +57,7 @@ namespace PathTracer.Raytracing {
 
         /// <summary> Get a refracted ray of the incoming ray at this intersection </summary>
         /// <returns>The refracted ray</returns>
-        public Ray GetRefractedRay() {
+        public Ray? GetRefractedRay() {
             float n1 = IntoPrimitive ? 1 : Primitive.Material.RefractionIndex;
             float n2 = IntoPrimitive ? Primitive.Material.RefractionIndex : 1;
             float refraction = n1 / n2;

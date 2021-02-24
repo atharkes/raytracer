@@ -11,13 +11,12 @@ namespace PathTracer {
     /// <summary> The main class derived from an OpenTK gamewindow </summary>
     public class OpenTKWindow : GameWindow {
         /// <summary> The identifier of the gamewindow </summary>
-        public static int GameWindowID { get; private set; }
+        public int GameWindowID { get; }
         /// <summary> The gamewindow </summary>
-        public static Surface GameWindow { get; private set; }
+        public Surface GameWindow { get; }
 
-        Main main;
-
-        Shader shader;
+        readonly Main main;
+        readonly Shader shader;
         int vertexBufferObject;
         int vertexArrayObject;
         int elementBufferObject;
@@ -35,13 +34,19 @@ namespace PathTracer {
             1, 2, 3
         };
 
-        public OpenTKWindow(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings) : base(gameWindowSettings, nativeWindowSettings) { }
+        public OpenTKWindow(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings) : base(gameWindowSettings, nativeWindowSettings) {
+            GameWindow = new Surface();
+            GameWindowID = GameWindow.GenTexture();
+            main = new Main(GameWindow);
+            shader = new Shader("shader.vert", "shader.frag");
+            Location = new Vector2i(50, 80);
+        }
 
         /// <summary> Called upon app init </summary>
         /// <param name="e">Arguments given</param>
         protected override void OnLoad() {
             GL.ClearColor(Color.Black);
-            shader = new Shader("shader.vert", "shader.frag");
+            
             vertexBufferObject = GL.GenBuffer();
             elementBufferObject = GL.GenBuffer();
             vertexArrayObject = GL.GenVertexArray();
@@ -64,11 +69,6 @@ namespace PathTracer {
             GL.Enable(EnableCap.Texture2D);
             GL.Disable(EnableCap.DepthTest);
             GL.Hint(HintTarget.PerspectiveCorrectionHint, HintMode.Nicest);
-            GameWindow = new Surface();
-            GameWindowID = GameWindow.GenTexture();
-            //ClientSize = new Size(GameWindow.Width, GameWindow.Height);
-            Location = new Vector2i(50, 80);
-            main = new Main(GameWindow);
             base.OnLoad();
         }
 
@@ -106,7 +106,7 @@ namespace PathTracer {
             var scene = main.Scene;
             if (KeyboardState.IsKeyDown(Keys.F1)) scene.Camera.Config.DebugInfo = !scene.Camera.Config.DebugInfo;
             if (KeyboardState.IsKeyDown(Keys.F2)) scene.Camera.Config.DrawBVHTraversal = !scene.Camera.Config.DrawBVHTraversal;
-            if (KeyboardState.IsKeyDown(Keys.Space)) scene.Camera.Move(main.Scene.Camera.Up);
+            if (KeyboardState.IsKeyDown(Keys.Space)) scene.Camera.Move(scene.Camera.Up);
             if (KeyboardState.IsKeyDown(Keys.LeftShift)) scene.Camera.Move(scene.Camera.Down);
             if (KeyboardState.IsKeyDown(Keys.W)) scene.Camera.Move(scene.Camera.Front);
             if (KeyboardState.IsKeyDown(Keys.S)) scene.Camera.Move(scene.Camera.Back);

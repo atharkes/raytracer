@@ -19,7 +19,7 @@ namespace PathTracer.Raytracing.SceneObjects.Primitives {
         /// <param name="normal">The normal of the plane</param>
         /// <param name="distance">The distance of the plane from the origin</param>
         /// <param name="material">The material of the plane</param>
-        public Plane(Vector3 normal, float distance, Material material = null) : base(null, material) {
+        public Plane(Vector3 normal, float distance, Material? material = null) : base(null, material) {
             Normal = normal.Normalized();
             Distance = distance;
             Position = Normal * Distance;
@@ -28,7 +28,7 @@ namespace PathTracer.Raytracing.SceneObjects.Primitives {
         /// <summary> Returns the distance of the intersection </summary>
         /// <param name="ray">The ray to intersect this plane with</param>
         /// <returns>The distance of the intersection</returns>
-        public override Intersection Intersect(Ray ray) {
+        public override Intersection? Intersect(Ray ray) {
             float dist =  -((Vector3.Dot(ray.Origin, Normal) - Distance) / Vector3.Dot(ray.Direction, Normal));
             if (0 < dist && dist < ray.Length) return new Intersection(ray, this, dist);
             else return null;

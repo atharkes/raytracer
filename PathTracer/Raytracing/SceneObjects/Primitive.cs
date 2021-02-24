@@ -20,7 +20,7 @@ namespace PathTracer.Raytracing.SceneObjects {
         /// <summary> Create a new primitive for the 3d scene </summary>
         /// <param name="position">The position of the primitive</param>
         /// <param name="material">The material of the primitive</param>
-        protected Primitive(Vector3? position = null, Material material = null) {
+        protected Primitive(Vector3? position = null, Material? material = null) {
             Position = position ?? Vector3.Zero;
             Material = material ?? Material.Random();
         }
@@ -28,7 +28,7 @@ namespace PathTracer.Raytracing.SceneObjects {
         /// <summary> Intersect this primitive with a ray </summary>
         /// <param name="ray">The ray to intersect the primitive with</param>
         /// <returns>An intersection if the primitive is hit</returns>
-        public abstract Intersection Intersect(Ray ray);
+        public abstract Intersection? Intersect(Ray ray);
 
         /// <summary> Intersect this primitive with a ray </summary>
         /// <param name="ray">The ray to intersect the primitive with</param>
@@ -43,7 +43,7 @@ namespace PathTracer.Raytracing.SceneObjects {
         /// <summary> Clip the AABB of the primitive with an axis-aligned plane </summary>
         /// <param name="plane">The plane to clip the AABB with</param>
         /// <returns>The bounds of the clipped AABB</returns>
-        public virtual PrimitiveFragment Clip(AxisAlignedPlane plane) {
+        public virtual PrimitiveFragment? Clip(AxisAlignedPlane plane) {
             Vector3[] bounds = Bounds;
             Vector3 min = bounds[0];
             Vector3 max = bounds[1];

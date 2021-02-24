@@ -10,9 +10,8 @@ namespace PathTracer.Utilities {
         /// <summary> A deterministic random to generate random scenes which are always the same </summary>
         public static readonly Random DetRandom = new Random(0);
         /// <summary> Random to generate random values </summary>
-        public static Random Random => random ?? (random = new Random(Thread.CurrentThread.ManagedThreadId * (int)DateTime.Today.TimeOfDay.Ticks));
-        [ThreadStatic]
-        static Random random;
+        public static Random Random => random ??= new Random(Thread.CurrentThread.ManagedThreadId * (int)DateTime.Today.TimeOfDay.Ticks);
+        [ThreadStatic] static Random? random;
 
         /// <summary> Create a random Vector </summary>
         /// <param name="r">The random to create the vector with</param>
@@ -36,7 +35,7 @@ namespace PathTracer.Utilities {
         /// <param name="scale">The possible scale of the random primitive</param>
         /// <returns>A random primitive</returns>
         public static Primitive Primitive(this Random r, float posRange = 1f, float scale = 1f) {
-            return r.NextDouble() < 0.5f ? r.Sphere(posRange, scale) as Primitive : r.Triangle(posRange, scale) as Primitive;
+            return r.NextDouble() < 0.5f ? r.Sphere(posRange, scale) : r.Triangle(posRange, scale) as Primitive;
         }
 
         /// <summary> Create a random Triangle </summary>

@@ -24,7 +24,9 @@ namespace PathTracer.Raytracing.AccelerationStructures {
         public IBVHNode Root { get; protected set; }
 
         /// <summary> Create an empty bounding volume hierarchy tree </summary>
-        public BVHTree() { }
+        public BVHTree() {
+            Root = new BVHNode();
+        }
 
         /// <summary> Create a bounding volume hierarchy tree, splitting into smaller nodes if beneficial </summary>
         /// <param name="primitives">The primitives to build the tree with</param>
@@ -35,7 +37,7 @@ namespace PathTracer.Raytracing.AccelerationStructures {
         /// <summary> Intersect the BVH with a ray </summary>
         /// <param name="ray">The ray to intersect the BVH with</param>
         /// <returns>The intersection in the BVH</returns>
-        public Intersection Intersect(Ray ray) {
+        public Intersection? Intersect(Ray ray) {
             return Root.Intersect(ray);
         }
 

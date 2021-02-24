@@ -18,7 +18,7 @@ namespace PathTracer.Multithreading {
         readonly EventWaitHandle[] doneHandle;
         readonly bool[] done;
         int remaining;
-        Action[] tasks;
+        Action[]? tasks;
 
         /// <summary> Create a new threadpool </summary>
         /// <param name="threadCount">Amount of threads used for the threadpool</param>
@@ -76,7 +76,7 @@ namespace PathTracer.Multithreading {
                 while (remaining > 0) {
                     int task = Interlocked.Decrement(ref remaining);
                     if (task >= 0) {
-                        tasks[task].Invoke();
+                        tasks?[task].Invoke();
                     }
                 }
                 // Signal Done

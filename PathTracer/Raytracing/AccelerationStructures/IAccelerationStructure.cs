@@ -4,7 +4,7 @@
         /// <summary> Intersect the acceleration structure with a ray </summary>
         /// <param name="ray">The ray to intersect the acceleration structure with</param>
         /// <returns>An intersection with a primitive if there is any</returns>
-        Intersection Intersect(Ray ray);
+        Intersection? Intersect(Ray ray);
 
         /// <summary> Intersect the acceleration structure with a ray </summary>
         /// <param name="ray">The ray to intersect the acceleration structure with</param>

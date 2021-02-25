@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using PathTracer.Raytracing.AccelerationStructures;
-using PathTracer.Raytracing.AccelerationStructures.BVH;
-using PathTracer.Raytracing.SceneObjects;
+using PathTracer.Pathtracing.AccelerationStructures;
+using PathTracer.Pathtracing.AccelerationStructures.BVH;
+using PathTracer.Pathtracing.SceneObjects;
 using PathTracer.Utilities;
 using System.Collections.Generic;
 using System.Diagnostics;

@@ -1,5 +1,5 @@
 ﻿using OpenTK.Graphics.OpenGL;
-using PathTracer.Raytracing.SceneObjects.CameraParts;
+using PathTracer.Pathtracing.SceneObjects.CameraParts;
 using System;
 using System.Drawing;
 using System.Drawing.Imaging;

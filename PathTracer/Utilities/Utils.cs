@@ -1,6 +1,6 @@
 ﻿using OpenTK.Mathematics;
-using PathTracer.Raytracing.SceneObjects;
-using PathTracer.Raytracing.SceneObjects.Primitives;
+using PathTracer.Pathtracing.SceneObjects;
+using PathTracer.Pathtracing.SceneObjects.Primitives;
 using System;
 using System.Threading;
 

@@ -1,7 +1,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenTK.Mathematics;
-using PathTracer.Raytracing.AccelerationStructures.SBVH;
-using PathTracer.Raytracing.SceneObjects.Primitives;
+using PathTracer.Pathtracing.AccelerationStructures.SBVH;
+using PathTracer.Pathtracing.SceneObjects.Primitives;
 using PathTracer.Utilities;
 using System.Collections.Generic;
 

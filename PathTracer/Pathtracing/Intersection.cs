@@ -17,17 +17,20 @@ namespace PathTracer.Pathtracing {
         public Primitive Primitive { get; }
         /// <summary> The distance from the origin of the ray to the intersection </summary>
         public float Distance { get; }
-        /// <summary> Whether the ray is entering the primitive or exiting it </summary>
-        public bool IntoPrimitive { get; }
         /// <summary> The position of the intersection </summary>
         public Vector3 Position { get; }
+
+        /// <summary> Whether the ray is entering the primitive or exiting it </summary>
+        public bool IntoPrimitive { get; }
         /// <summary> The normal of the primitive at the intersection </summary>
         public Vector3 Normal { get; }
+        /// <summary> The conversion from irradiance to radiance </summary>
+        public float NdotL { get; }
 
         /// <summary> Create a new intersection between a ray and a primitive </summary>
         /// <param name="ray">The ray that intersects the primitive</param>
         /// <param name="primitive">The primitive that is intersected by the ray</param>
-        /// <param name="position">The position of the intersection</param>
+        /// <param name="distance">The distance travelled along the ray</param>
         public Intersection(Ray ray, Primitive primitive, float distance) {
             Ray = ray;
             Ray.Length = distance;
@@ -37,21 +40,15 @@ namespace PathTracer.Pathtracing {
             Vector3 normal = primitive.GetNormal(Position);
             IntoPrimitive = Vector3.Dot(Ray.Direction, normal) < 0;
             Normal = IntoPrimitive ? normal : -normal;
-        }
-
-        /// <summary> Get a shadow ray from this intersection to a lightsource </summary>
-        /// <param name="lightsource">The lightsource to send the shadow ray to</param>
-        /// <returns>A shadow ray from the intersection to the lightsource</returns>
-        public Ray GetShadowRay(Primitive lightsource) {
-            Vector3 direction = lightsource.Position - Position;
-            return new Ray(Position + Normal * RaiseEpsilon, direction, direction.Length);
+            Position = Ray.Origin + Ray.Direction * distance + Normal * RaiseEpsilon;
+            NdotL = Vector3.Dot(Ray.Direction, -Normal);
         }
 
         /// <summary> Get a reflection of the incoming ray at this intersection </summary>
         /// <returns>The reflected ray</returns>
         public Ray GetReflectedRay() {
             Vector3 reflectedDirection = Ray.Direction - 2 * Vector3.Dot(Ray.Direction, Normal) * Normal;
-            return new Ray(Position + Normal * RaiseEpsilon, reflectedDirection, float.MaxValue, Ray.RecursionDepth + 1);
+            return new Ray(Position, reflectedDirection, float.MaxValue, Ray.RecursionDepth + 1);
         }
 
         /// <summary> Get a refracted ray of the incoming ray at this intersection </summary>
@@ -64,7 +61,7 @@ namespace PathTracer.Pathtracing {
             float k = 1 - refraction * refraction * (1 - cosThetaInc * cosThetaInc);
             if (k < 0) return null;
             Vector3 refractedDirection = refraction * Ray.Direction + Normal * (refraction * cosThetaInc - (float)Math.Sqrt(k));
-            return new Ray(Position - Normal * RaiseEpsilon, refractedDirection, float.MaxValue, Ray.RecursionDepth + 1);
+            return new Ray(Position, refractedDirection, float.MaxValue, Ray.RecursionDepth + 1);
         }
 
         /// <summary> Get the reflectivity of the surface of the dielectric </summary>

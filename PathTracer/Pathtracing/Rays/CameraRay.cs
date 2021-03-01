@@ -1,7 +1,7 @@
 ﻿using OpenTK.Mathematics;
 using PathTracer.Pathtracing.SceneObjects.CameraParts;
 
-namespace PathTracer.Pathtracing {
+namespace PathTracer.Pathtracing.Rays {
     /// <summary> A ray sent from the camera into the scene </summary>
     public class CameraRay : Ray {
         /// <summary> The cavity from which this ray originates </summary>

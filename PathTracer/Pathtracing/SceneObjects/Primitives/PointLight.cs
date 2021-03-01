@@ -1,4 +1,5 @@
 ﻿using OpenTK.Mathematics;
+using PathTracer.Pathtracing.Rays;
 
 namespace PathTracer.Pathtracing.SceneObjects.Primitives {
     /// <summary> A point light to illuminate your scene </summary>
@@ -16,21 +17,41 @@ namespace PathTracer.Pathtracing.SceneObjects.Primitives {
         /// <param name="ray">The ray that will never intersect the pointlight</param>
         /// <returns>null</returns>
         public override Intersection? Intersect(Ray ray) {
-            return null;
+            if (ray is LightRay lightRay && lightRay.Light == this) {
+                return new Intersection(lightRay, this, lightRay.Length);
+            } else {
+                return null;
+            }
         }
 
         /// <summary> You cannot intersect a point light </summary>
         /// <param name="ray">The ray that will never intersect the pointlight</param>
         /// <returns>false</returns>
         public override bool IntersectBool(Ray ray) {
-            return false;
+            if (ray is LightRay lightRay && lightRay.Light == this) {
+                return true;
+            } else {
+                return false;
+            }
         }
 
         /// <summary> A point light doesn't really have a normal </summary>
-        /// <param name="intersectionPoint">The intersection point which cannot be on the surface</param>
+        /// <param name="intersectionLocation">The intersection point which cannot be on the surface</param>
         /// <returns>A zero vector</returns>
-        public override Vector3 GetNormal(Vector3 intersectionPoint) {
+        public override Vector3 GetNormal(Vector3 intersectionLocation) {
             return Vector3.Zero;
+        }
+
+        /// <summary> Get the emittance of the pointlight </summary>
+        /// <param name="intersection">The intersection at this pointlight</param>
+        /// <returns>The emittance of the pointlight at the intersection</returns>
+        public override Vector3 GetEmmitance(Intersection intersection) {
+            return Material.EmittingLight * DistanceAttenuation(intersection.Distance);
+        }
+
+        /// <summary> The distance attenuation of a point light when this is a shadow ray </summary>
+        public float DistanceAttenuation(float length) {
+            return 1f / (length * length);
         }
     }
 }

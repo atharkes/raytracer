@@ -79,9 +79,9 @@ namespace PathTracer.Pathtracing.SceneObjects.Primitives {
         }
 
         /// <summary> Get the normal of the triangle </summary>
-        /// <param name="intersectionPoint">The intersection point to get the normal at</param>
+        /// <param name="intersectionLocation">The intersection point to get the normal at</param>
         /// <returns>The normal of the triangle at the intersection point</returns>
-        public override Vector3 GetNormal(Vector3 intersectionPoint) {
+        public override Vector3 GetNormal(Vector3 intersectionLocation) {
             return Normal;
         }
 

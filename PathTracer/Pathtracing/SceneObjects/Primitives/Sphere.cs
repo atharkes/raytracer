@@ -41,10 +41,10 @@ namespace PathTracer.Pathtracing.SceneObjects.Primitives {
         }
 
         /// <summary> Get the normal of the sphere at a point of intersection </summary>
-        /// <param name="intersectionPoint">The intersection point to get the normal at</param>
+        /// <param name="intersectionLocation">The intersection point to get the normal at</param>
         /// <returns>The normal at the point of intersection</returns>
-        public override Vector3 GetNormal(Vector3 intersectionPoint) {
-            return (intersectionPoint - Position).Normalized();
+        public override Vector3 GetNormal(Vector3 intersectionLocation) {
+            return (intersectionLocation - Position).Normalized();
         }
     }
 }

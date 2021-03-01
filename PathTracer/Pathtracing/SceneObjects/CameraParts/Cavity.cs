@@ -18,10 +18,10 @@ namespace PathTracer.Pathtracing.SceneObjects.CameraParts {
         /// <summary> The green to red color fade for the BVH traversals </summary>
         public Vector3 AverageBVHTraversalColor => Utils.ColorScaleBlackGreenYellowRed(AverageBVHTraversals, 0, 255);
 
-        /// <summary> Add a photon to the cavity </summary>
-        /// <param name="photon">The photon to add to the cavity</param>
-        public void AddPhoton(Vector3 photon, int bvhTraversals) {
-            Light += photon;
+        /// <summary> Add a sample to the cavity </summary>
+        /// <param name="light">The light to add to the cavity</param>
+        public void AddSample(Vector3 light, int bvhTraversals) {
+            Light += light;
             BVHTraversals += bvhTraversals;
             Samples++;
         }

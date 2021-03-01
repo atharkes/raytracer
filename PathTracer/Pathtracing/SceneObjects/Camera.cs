@@ -1,4 +1,5 @@
 ﻿using OpenTK.Mathematics;
+using PathTracer.Pathtracing.Rays;
 using PathTracer.Pathtracing.SceneObjects.CameraParts;
 using PathTracer.Utilities;
 using System;
@@ -77,11 +78,11 @@ namespace PathTracer.Pathtracing.SceneObjects {
         /// <summary> Get a random amount of camera rays </summary>
         /// <param name="amount">The amount of random rays to get</param>
         /// <returns>An array with random camera rays</returns>
-        public CameraRay[] GetRandomCameraRays(int amount) {
+        public CameraRay[] GetCameraRays(int amount, Random random) {
             CameraRay[] rays = new CameraRay[amount];
             for (int i = 0; i < amount; i++) {
-                int x = Utils.Random.Next(0, ScreenPlane.Screen.Width);
-                int y = Utils.Random.Next(0, ScreenPlane.Screen.Height);
+                int x = random.Next(0, ScreenPlane.Screen.Width);
+                int y = random.Next(0, ScreenPlane.Screen.Height);
                 rays[i] = CreateCameraRay(x, y);
             }
             return rays;

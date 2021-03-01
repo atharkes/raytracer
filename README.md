@@ -59,6 +59,7 @@
 
 #### Crazy Ideas:
 - Take hemisphere of a point on a primitive as camera position and view frustum
+- Fix float/double imprecision (Relative epsilon; ULPs; Arbitrary-precision type like BigDecimal)
 
 #### Monte Carlo integration required for:
 - Area Lights (Random point on area of light)

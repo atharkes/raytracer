@@ -33,10 +33,10 @@ namespace PathTracer.Pathtracing.AccelerationStructures.SBVH {
         }
 
         /// <summary> Get the normal of the fragment at an intersect location using the original primitive </summary>
-        /// <param name="intersectionPoint">The intersection point to get the normal at</param>
+        /// <param name="intersectionLocation">The intersection point to get the normal at</param>
         /// <returns>The normal of the original primitive at the intersection point</returns>
-        public override Vector3 GetNormal(Vector3 intersectionPoint) {
-            return Original.GetNormal(intersectionPoint);
+        public override Vector3 GetNormal(Vector3 intersectionLocation) {
+            return Original.GetNormal(intersectionLocation);
         }
 
         /// <summary> Clipping a fragment doesn't create a fragment of a fragment </summary>

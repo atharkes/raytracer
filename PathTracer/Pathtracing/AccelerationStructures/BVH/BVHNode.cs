@@ -1,4 +1,5 @@
 ﻿using OpenTK.Mathematics;
+using PathTracer.Pathtracing.Rays;
 using PathTracer.Pathtracing.SceneObjects;
 using System;
 using System.Collections.Generic;

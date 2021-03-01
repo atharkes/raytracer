@@ -36,9 +36,16 @@ namespace PathTracer.Pathtracing.SceneObjects {
         public abstract bool IntersectBool(Ray ray);
 
         /// <summary> Get the normal at an intersection on this primitive </summary>
-        /// <param name="intersectionPoint">The point of the intersection</param>
+        /// <param name="intersectionLocation">The point of the intersection</param>
         /// <returns>The normal at the point of intersection on this primitive</returns>
-        public abstract Vector3 GetNormal(Vector3 intersectionPoint);
+        public abstract Vector3 GetNormal(Vector3 intersectionLocation);
+
+        /// <summary> Get the emittance of this primitive </summary>
+        /// <param name="intersection">The intersection at this primitive</param>
+        /// <returns>The emittance of the primitive at the intersection</returns>
+        public virtual Vector3 GetEmmitance(Intersection intersection) {
+            return Material.EmittingLight * intersection.NdotL;
+        }
 
         /// <summary> Clip the AABB of the primitive with an axis-aligned plane </summary>
         /// <param name="plane">The plane to clip the AABB with</param>

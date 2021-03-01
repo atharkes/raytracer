@@ -1,10 +1,11 @@
 ﻿using OpenTK.Mathematics;
+using System;
 
 namespace PathTracer.Pathtracing {
     /// <summary> A datastructure to store a ray </summary>
     public class Ray {
         /// <summary> Constant that defines the maximum recursion for secondary rays </summary>
-        public const int MaxRecursionDepth = 3;
+        public const int MaxRecursionDepth = 8;
 
         /// <summary> The origin of the ray </summary>
         public Vector3 Origin { get; }
@@ -20,8 +21,6 @@ namespace PathTracer.Pathtracing {
 
         /// <summary> The length that the ray is travelling </summary>
         public float Length { get; set; }
-        /// <summary> The distance attenuation of a point light when this is a shadow ray </summary>
-        public float DistanceAttenuation => 1f / (Length * Length);
 
         /// <summary> Create a new ray using an origin and a direction </summary>
         /// <param name="origin">The origin of the ray</param>

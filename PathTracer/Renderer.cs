@@ -64,7 +64,7 @@ namespace PathTracer {
                 return Vector3.Zero;
             }
             // Intersect with Scene
-            Intersection? intersection = Scene.Intersect(ray);
+            Intersection? intersection = ray.Trace(Scene);
             if (intersection == null) return Vector3.Zero;
             Vector3 directIllumination = intersection.Primitive.Material.Specularity < 1 ? NextEventEstimation(intersection) : Vector3.Zero;
             Vector3 indirectIllumination = Vector3.Zero;
@@ -102,29 +102,27 @@ namespace PathTracer {
         /// <returns>The color at the intersection</returns>
         public Vector3 NextEventEstimation(Intersection intersection) {
             Vector3 radianceOut = Vector3.Zero;
-            foreach (LightRay ray in Guider.NextEventEstimation(intersection, Utils.Random)) {
-                if (Vector3.Dot(intersection.Normal, ray.Direction) < 0) continue;
-                if (Scene.IntersectBool(ray)) continue;
-                Intersection? lightIntersection = ray.Light.Intersect(ray);
-                if (lightIntersection == null) throw new InvalidOperationException("Next-Event Estimation didn't hit the lightsource it was supposed to");
-                Vector3 radianceIn = ray.Light.GetEmmitance(lightIntersection);
+            foreach (ShadowRay shadowRay in Guider.NextEventEstimation(intersection, Utils.Random)) {
+                float NdotL = Vector3.Dot(intersection.Normal, shadowRay.Direction);
+                if (NdotL < 0) continue;
+                Intersection? lightIntersection = shadowRay.Trace(Scene);
+                if (lightIntersection == null) continue;
+                Vector3 radianceIn = shadowRay.Light.GetEmmitance(lightIntersection);
                 Vector3 irradiance;
-                // N dot L
-                float NdotL = Vector3.Dot(intersection.Normal, ray.Direction);
-                if (intersection.Primitive.Material.Glossyness > 0) {
-                    // Glossy Object: Phong-Shading
-                    Vector3 glossyDirection = -ray.Direction - 2 * Vector3.Dot(-ray.Direction, intersection.Normal) * intersection.Normal;
-                    float dot = Vector3.Dot(glossyDirection, -intersection.Ray.Direction);
-                    if (dot > 0) {
-                        float glossyness = (float)Math.Pow(dot, intersection.Primitive.Material.GlossSpecularity);
-                        irradiance = radianceIn * ((1 - intersection.Primitive.Material.Glossyness) * NdotL + intersection.Primitive.Material.Glossyness * glossyness);
-                    } else {
-                        irradiance = radianceIn * (1 - intersection.Primitive.Material.Glossyness) * NdotL;
-                    }
-                } else {
-                    //Diffuse
+                //if (intersection.Primitive.Material.Glossyness > 0) {
+                //    // Glossy Object: Phong-Shading
+                //    Vector3 glossyDirection = -shadowRay.Direction - 2 * Vector3.Dot(-shadowRay.Direction, intersection.Normal) * intersection.Normal;
+                //    float dot = Vector3.Dot(glossyDirection, -intersection.Ray.Direction);
+                //    if (dot > 0) {
+                //        float glossyness = (float)Math.Pow(dot, intersection.Primitive.Material.GlossSpecularity);
+                //        irradiance = radianceIn * ((1 - intersection.Primitive.Material.Glossyness) * NdotL + intersection.Primitive.Material.Glossyness * glossyness);
+                //    } else {
+                //        irradiance = radianceIn * (1 - intersection.Primitive.Material.Glossyness) * NdotL;
+                //    }
+                //} else {
+                //    //Diffuse
                     irradiance = radianceIn * NdotL;
-                }
+                //}
                 // Absorption
                 radianceOut += irradiance * intersection.Primitive.Material.Color;
             }

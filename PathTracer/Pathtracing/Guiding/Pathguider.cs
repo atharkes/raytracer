@@ -30,12 +30,10 @@ namespace PathTracer.Pathtracing.Guiding {
             return rays;
         }
 
-        public ICollection<LightRay> NextEventEstimation(Intersection intersection, Random random) {
-            List<LightRay> rays = new List<LightRay>();
+        public ICollection<ShadowRay> NextEventEstimation(Intersection intersection, Random random) {
+            List<ShadowRay> rays = new List<ShadowRay>();
             foreach (Primitive lightsource in Scene.Lights) {
-                Vector3 direction = lightsource.Position - intersection.Position;
-                LightRay shadowRay =  new LightRay(intersection.Position, direction, lightsource, direction.Length);
-                rays.Add(shadowRay);
+                rays.Add(new ShadowRay(intersection.Position, lightsource.Position - intersection.Position, lightsource, intersection.Ray.RecursionDepth + 1));
             }
             return rays;
         }

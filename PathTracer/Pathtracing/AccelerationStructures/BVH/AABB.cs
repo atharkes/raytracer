@@ -101,7 +101,7 @@ namespace PathTracer.Pathtracing.AccelerationStructures.BVH {
             tmin = Math.Max(tmin, tzmin);
             tmax = Math.Min(tmax, tzmax);
 
-            return tmin > 0 || tmax > 0;
+            return tmin < ray.Length && tmax > 0;
         }
 
         /// <summary> Intersect the primitives of this AABB </summary>

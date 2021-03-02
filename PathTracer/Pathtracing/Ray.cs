@@ -1,5 +1,4 @@
 ﻿using OpenTK.Mathematics;
-using System;
 
 namespace PathTracer.Pathtracing {
     /// <summary> A datastructure to store a ray </summary>
@@ -11,6 +10,8 @@ namespace PathTracer.Pathtracing {
         public Vector3 Origin { get; }
         /// <summary> The direction of the ray. This should always be normalized </summary>
         public Vector3 Direction { get; }
+        /// <summary> The length that the ray is travelling </summary>
+        public float Length { get; set; }
         /// <summary> How many bounces this ray made so far </summary>
         public int RecursionDepth { get; }
 
@@ -18,9 +19,6 @@ namespace PathTracer.Pathtracing {
         public Vector3 DirectionInverted { get; }
         /// <summary> Whether the individual components of the inverted direction of the ray is negative </summary>
         public Vector3i Sign { get; }
-
-        /// <summary> The length that the ray is travelling </summary>
-        public float Length { get; set; }
 
         /// <summary> Create a new ray using an origin and a direction </summary>
         /// <param name="origin">The origin of the ray</param>
@@ -34,6 +32,17 @@ namespace PathTracer.Pathtracing {
             RecursionDepth = recursionDepth;
             DirectionInverted = new Vector3(1 / direction.X, 1 / direction.Y, 1 / direction.Z);
             Sign = new Vector3i(DirectionInverted.X < 0 ? 1 : 0, DirectionInverted.Y < 0 ? 1 : 0, DirectionInverted.Z < 0 ? 1 : 0);
+        }
+
+        /// <summary> Trace the <see cref="Ray"/> through a <paramref name="scene"/> </summary>
+        /// <param name="scene">The <see cref="Scene"/> to trace through</param>
+        /// <returns>An <see cref="Intersection"/> if there is one</returns>
+        public virtual Intersection? Trace(Scene scene) {
+            Intersection? intersection = scene.Intersect(this);
+            if (intersection != null) {
+                Length = intersection.Distance;
+            }
+            return intersection;
         }
     }
 }

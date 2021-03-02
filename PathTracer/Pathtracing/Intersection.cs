@@ -33,7 +33,6 @@ namespace PathTracer.Pathtracing {
         /// <param name="distance">The distance travelled along the ray</param>
         public Intersection(Ray ray, Primitive primitive, float distance) {
             Ray = ray;
-            Ray.Length = distance;
             Primitive = primitive;
             Distance = distance;
             Position = Ray.Origin + Ray.Direction * distance;

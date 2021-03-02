@@ -11,7 +11,11 @@ namespace PathTracer.Pathtracing.Rays {
         /// <param name="origin">The origin of the ray</param>
         /// <param name="direction">The direction of the ray</param>
         /// <param name="light">The light connected to this ray</param>
-        public LightRay(Vector3 origin, Vector3 direction, Primitive light, float length) : base(origin, direction, length, 0) {
+        public LightRay(Vector3 origin, Vector3 direction, Primitive light, float length = float.MaxValue) : base(origin, direction, length, 0) {
+            Light = light;
+        }
+
+        protected LightRay(Vector3 origin, Vector3 direction, Primitive light, int recursionDepth) : base(origin, direction, direction.Length, recursionDepth) {
             Light = light;
         }
     }

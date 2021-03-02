@@ -4,7 +4,7 @@ namespace PathTracer.Pathtracing {
     /// <summary> A datastructure to store a ray </summary>
     public class Ray {
         /// <summary> Constant that defines the maximum recursion for secondary rays </summary>
-        public const int MaxRecursionDepth = 8;
+        public const int MaxRecursionDepth = 0;
 
         /// <summary> The origin of the ray </summary>
         public Vector3 Origin { get; }

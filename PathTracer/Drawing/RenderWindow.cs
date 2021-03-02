@@ -76,7 +76,6 @@ namespace PathTracer.Drawing {
             GL.DeleteBuffer(vertexBufferObject);
             GL.DeleteBuffer(elementBufferObject);
             GL.DeleteVertexArray(vertexArrayObject);
-            Environment.Exit(0);
             base.OnUnload();
         }
 

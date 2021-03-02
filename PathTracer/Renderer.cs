@@ -104,11 +104,15 @@ namespace PathTracer {
             Vector3 radianceOut = Vector3.Zero;
             foreach (ShadowRay shadowRay in Guider.NextEventEstimation(intersection, Utils.Random)) {
                 float NdotL = Vector3.Dot(intersection.Normal, shadowRay.Direction);
-                if (NdotL < 0) continue;
+                if (NdotL < 0) {
+                    continue;
+                }
                 Intersection? lightIntersection = shadowRay.Trace(Scene);
-                if (lightIntersection == null) continue;
+                if (lightIntersection == null) {
+                    continue;
+                }
                 Vector3 radianceIn = shadowRay.Light.GetEmmitance(lightIntersection);
-                Vector3 irradiance;
+                Vector3 irradiance = radianceIn * NdotL;
                 //if (intersection.Primitive.Material.Glossyness > 0) {
                 //    // Glossy Object: Phong-Shading
                 //    Vector3 glossyDirection = -shadowRay.Direction - 2 * Vector3.Dot(-shadowRay.Direction, intersection.Normal) * intersection.Normal;

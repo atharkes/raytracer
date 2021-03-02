@@ -25,7 +25,6 @@ namespace PathTracer {
         public static void Main() {
             Window.UpdateFrame += HandleInput;
             Window.RenderFrame += UpdateRenderer;
-            Window.Closed += Renderer.Scene.Camera.Config.SaveToFile;
             Window.Run();
             Renderer.Scene.Camera.Config.SaveToFile();
         }

@@ -18,7 +18,7 @@ namespace PathTracer.Utilities {
         public TimeSpan TargetFrameTime => new TimeSpan(0, 0, 0, 0, 1000 / TargetFrameRate);
 
         /// <summary> The position of the camera. This value should be modified in the camera </summary>
-        [JsonIgnore] public Vector3 Position { get; set; } = new Vector3(0, -1, -1);
+        [JsonIgnore] public Vector3 Position { get; set; } = new Vector3(0, 1, 0);
         /// <summary> The x position of the camera. This value should be modified in the camera </summary>
         public float PositionX { get => Position.X; set => Position = new Vector3(value, Position.Y, Position.Z); }
         /// <summary> The y position of the camera. This value should be modified in the camera </summary>

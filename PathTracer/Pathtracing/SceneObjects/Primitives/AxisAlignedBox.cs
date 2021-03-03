@@ -52,10 +52,12 @@ namespace PathTracer.Pathtracing.SceneObjects.Primitives {
             tmin = Math.Max(tmin, tzmin);
             tmax = Math.Min(tmax, tzmax);
 
-            if (tmin > ray.Length || tmax < 0) {
-                return null;
+            if (ray.WithinBounds(tmin)) {
+                return new Intersection(ray, tmin, this);
+            } else if (ray.WithinBounds(tmax)) {
+                return new Intersection(ray, tmax, this);
             } else {
-                return new Intersection(ray, tmin > 0 ? tmin : tmax, this);
+                return null;
             }
         }
     }

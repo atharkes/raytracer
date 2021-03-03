@@ -84,13 +84,13 @@ namespace PathTracer.Pathtracing {
         /// <summary> The primitives in the default scene </summary>
         public static List<Primitive> DefaultPrimitives => new() {
             //new AxisAlignedBox(new Vector3(-20), new Vector3(20)),
-            new Sphere(new Vector3(-3, -1, 5), 1, Material.DiffuseGreen),
-            new Sphere(new Vector3(3, -1, 5), 1, Material.GlossyRed),
-            new Sphere(new Vector3(0, -1, 5), 1, Material.Mirror),
-            new Sphere(new Vector3(-1, -1, 2), 0.5f, Material.Glass),
+            new Sphere(new Vector3(-3, 1, 5), 1, Material.DiffuseGreen),
+            new Sphere(new Vector3(3, 1, 5), 1, Material.GlossyRed),
+            new Sphere(new Vector3(0, 1, 5), 1, Material.Mirror),
+            new Sphere(new Vector3(-1, 1, 2), 0.5f, Material.Glass),
             new Triangle(new Vector3(-5, 0, 0), new Vector3(5, 0, 0), new Vector3(5, 0, 10), null, Material.GlossyPurpleMirror),
             new Triangle(new Vector3(-5, 0, 0), new Vector3(5, 0, 10), new Vector3(-5, 0, 10), null, Material.GlossyGreen),
-            new PointLight(new Vector3(0, -8, 3), new Vector3(1, 1, 0.75f), 200),
+            new PointLight(new Vector3(0, 8, 3), new Vector3(1, 1, 0.75f), 200),
             //new Sphere(new Vector3(0, -8, 3), 0.5f, new Material(50, new Vector3(1, 1, 0.75f)))
         };
 

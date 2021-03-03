@@ -23,7 +23,7 @@ namespace PathTracer.Pathtracing.SceneObjects {
         /// <summary> The field of view of the camera. It determines the distance to the screen plane </summary>
         public float FOV { get => Config.FOV; set => SetFOV(value); }
         /// <summary> Vector going up from the view direction of the camera </summary>
-        public Vector3 Up => Vector3.Cross(ViewDirection, Left).Normalized();
+        public Vector3 Up => Vector3.Cross(Left, ViewDirection).Normalized();
         /// <summary> Vector going down from the view direction of the camera </summary>
         public Vector3 Down => -Up;
         /// <summary> Vector going left from the view direction of the camera </summary>

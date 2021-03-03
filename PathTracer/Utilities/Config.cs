@@ -15,7 +15,7 @@ namespace PathTracer.Utilities {
         /// <summary> The targeted framerate of the raytracer </summary>
         public int TargetFrameRate { get; set; } = 30;
         /// <summary> The targeted frame time computed from the targeted frame rate </summary>
-        public TimeSpan TargetFrameTime => new TimeSpan(0, 0, 0, 0, 1000 / TargetFrameRate);
+        public TimeSpan TargetFrameTime => new(0, 0, 0, 0, 1000 / TargetFrameRate);
 
         /// <summary> The position of the camera. This value should be modified in the camera </summary>
         [JsonIgnore] public Vector3 Position { get; set; } = new Vector3(0, 1, 0);

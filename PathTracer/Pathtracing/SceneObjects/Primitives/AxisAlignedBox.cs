@@ -36,6 +36,9 @@ namespace PathTracer.Pathtracing.SceneObjects.Primitives {
             return Intersect(ray) != null;
         }
 
+        /// <summary> Intersect the AABB (Amy Williams's An Efficient and Robust Ray–Box Intersection Algorithm) </summary>
+        /// <param name="ray">The ray to calculate intersection for</param>
+        /// <returns>Whether the ray intersects the AABB</returns>
         public override Intersection? Intersect(Ray ray) {
             float tmin = (Bounds[ray.Sign.X].X - ray.Origin.X) * ray.DirectionInverted.X;
             float tmax = (Bounds[1 - ray.Sign.X].X - ray.Origin.X) * ray.DirectionInverted.X;

@@ -83,7 +83,7 @@ namespace PathTracer.Pathtracing {
 
         /// <summary> The primitives in the default scene </summary>
         public static List<Primitive> DefaultPrimitives => new() {
-            //new AxisAlignedBox(new Vector3(-20), new Vector3(20)),
+            new AxisAlignedBox(new Vector3(-10, -5, -10), new Vector3(10, -1, 10)),
             new Sphere(new Vector3(-3, 1, 5), 1, Material.DiffuseGreen),
             new Sphere(new Vector3(3, 1, 5), 1, Material.GlossyRed),
             new Sphere(new Vector3(0, 1, 5), 1, Material.Mirror),

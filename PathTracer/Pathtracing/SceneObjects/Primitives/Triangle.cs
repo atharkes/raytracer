@@ -1,5 +1,4 @@
 ﻿using OpenTK.Mathematics;
-using PathTracer.Pathtracing.AccelerationStructures.SBVH;
 using System;
 
 namespace PathTracer.Pathtracing.SceneObjects.Primitives {
@@ -29,60 +28,77 @@ namespace PathTracer.Pathtracing.SceneObjects.Primitives {
         /// <param name="p1">The first point of the triangle</param>
         /// <param name="p2">The second point of the triangle</param>
         /// <param name="p3">The third point of the triangle</param>
+        /// <param name="normal">The optional normal value; default is clockwise</param>
         /// <param name="material">The material of the triangle</param>
-        public Triangle(Vector3 p1, Vector3 p2, Vector3 p3, Vector3? normal = null, Material? material = null) : base(null, material) {
+        public Triangle(Vector3 p1, Vector3 p2, Vector3 p3, Vector3? normal = null, Material? material = null) : base((p1 + p2 + p3) / 3f, material) {
             P1 = p1;
             P2 = p2;
             P3 = p3;
             Normal = normal ?? Vector3.Cross(p2 - p1, p3 - p1).Normalized();
-            Position = (p1 + p2 + p3) / 3f;
+        }
+
+        /// <summary> Create a <paramref name="random"/> point on the surface of the <see cref="Triangle"/> </summary>
+        /// <param name="random">The <see cref="Random"/> to determine the location of the point</param>
+        /// <returns>A <paramref name="random"/> point on the surface of the <see cref="Triangle"/></returns>
+        public override Vector3 GetSurfacePoint(Random random) {
+            Vector3 P1toP2 = P2 - P1;
+            Vector3 P1toP3 = P3 - P1;
+            float r1 = (float)random.NextDouble();
+            float r2 = (float)random.NextDouble();
+            if (r1 + r2 > 1) {
+                r1 = 1 - r1;
+                r2 = 1 - r2;
+            }
+            return P1 + P1toP2 * r1 + P1toP3 * r2;
+        }
+
+        /// <summary> Get the normal of the triangle </summary>
+        /// <param name="surfacePoint">The intersection point to get the normal at</param>
+        /// <returns>The normal of the triangle at the intersection point</returns>
+        public override Vector3 GetNormal(Vector3 surfacePoint) {
+            return Normal;
+        }
+
+        /// <summary> Intersect the <see cref="Triangle"/> with a <paramref name="ray"/> </summary>
+        /// <param name="ray">The <see cref="Ray"/> to intersect the <see cref="Triangle"/> with</param>
+        /// <returns>Whether the <paramref name="ray"/> intersects the <see cref="Triangle"/></returns>
+        public override bool IntersectBool(Ray ray) {
+            return Intersect(ray).HasValue;
         }
 
         /// <summary> Intersect the triangle with a ray (Möller–Trumbore triangle intersection) </summary>
         /// <param name="ray">The ray to intersect the triangle with</param>
         /// <returns>The intersection with the triangle if there is any</returns>
-        public override Intersection? Intersect(Ray ray) {
+        public override float? Intersect(Ray ray) {
             // Get vectors for two edges sharing V1
-            Vector3 e1 = P2 - P1;
-            Vector3 e2 = P3 - P1;
+            Vector3 P1toP2 = P2 - P1;
+            Vector3 P1toP3 = P3 - P1;
 
             // Begin calculating determinant - also used to calculate u parameter
-            Vector3 P = Vector3.Cross(ray.Direction, e2);
+            Vector3 P = Vector3.Cross(ray.Direction, P1toP3);
             // If determinant is near zero, ray lies in plane of triangle
-            float determinant = Vector3.Dot(e1, P);
+            float determinant = Vector3.Dot(P1toP2, P);
             if (determinant > -IntersectionEpsilon && determinant < IntersectionEpsilon) return null;
             float determinantInverted = 1f / determinant;
 
             // Calculate distance from V1 to ray origin
             Vector3 T = ray.Origin - P1;
+
             // Calculate u parameter and test bound
             float u = Vector3.Dot(T, P) * determinantInverted;
             if (u < 0f || u > 1f)  return null;
 
-            // Prepare to test v parameter
-            Vector3 Q = Vector3.Cross(T, e1);
-            // Calculate V parameter and test bound
+            // Calculate v and test bound
+            Vector3 Q = Vector3.Cross(T, P1toP2);
             float v = Vector3.Dot(ray.Direction, Q) * determinantInverted;
             if (v < 0f || u + v > 1f)  return null;
 
-            float t = Vector3.Dot(e2, Q) * determinantInverted;
-            if (t > IntersectionEpsilon && 0 < t && t < ray.Length) return new Intersection(ray, this, t);
-
-            return null;
-        }
-
-        /// <summary> Intersect the triangle with a ray </summary>
-        /// <param name="ray">The ray to intersect the triangle with</param>
-        /// <returns>Whether the ray intersects the triangle</returns>
-        public override bool IntersectBool(Ray ray) {
-            return Intersect(ray) != null;
-        }
-
-        /// <summary> Get the normal of the triangle </summary>
-        /// <param name="intersectionLocation">The intersection point to get the normal at</param>
-        /// <returns>The normal of the triangle at the intersection point</returns>
-        public override Vector3 GetNormal(Vector3 intersectionLocation) {
-            return Normal;
+            float t = Vector3.Dot(P1toP3, Q) * determinantInverted;
+            if (t < IntersectionEpsilon || t > ray.Length) {
+                return null;
+            } else {
+                return t;
+            }
         }
 
         /// <summary> Clip this triangle by a plane </summary>
@@ -131,5 +147,7 @@ namespace PathTracer.Pathtracing.SceneObjects.Primitives {
                 return new Vector3[] { v0, v1, v2 };
             }
         }
+
+        
     }
 }

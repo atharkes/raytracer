@@ -7,7 +7,7 @@ namespace PathTracer.Pathtracing.Rays {
         /// <summary> The light connected to this ray </summary>
         public Primitive Light { get; }
 
-        /// <summary> Create a new light ray </summary>
+        /// <summary> Create a ray from a light </summary>
         /// <param name="origin">The origin of the ray</param>
         /// <param name="direction">The direction of the ray</param>
         /// <param name="light">The light connected to this ray</param>
@@ -15,7 +15,7 @@ namespace PathTracer.Pathtracing.Rays {
             Light = light;
         }
 
-        protected LightRay(Vector3 origin, Vector3 direction, Primitive light, int recursionDepth) : base(origin, direction, direction.Length, recursionDepth) {
+        protected LightRay(Vector3 origin, Vector3 destination, Primitive light, int recursionDepth) : base(origin, destination, recursionDepth) {
             Light = light;
         }
     }

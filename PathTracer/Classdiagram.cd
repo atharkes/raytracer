@@ -1,0 +1,152 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="PathTracer.Renderer">
+    <Position X="363.75" Y="335.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAIAgAAAAABAAAAAAAAAAAAAAQAAQAA=</HashCode>
+      <FileName>Renderer.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Guider" />
+      <Property Name="Scene" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="PathTracer.Program">
+    <Position X="363.75" Y="333.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAAACAAAAAAAAAAAAAAAAAAAAAAAAAAACADAAAAIA=</HashCode>
+      <FileName>Program.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="Renderer" />
+      <Field Name="Window" />
+      <Field Name="Threadpool" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="PathTracer.Drawing.RenderWindow" Collapsed="true">
+    <Position X="361.25" Y="333.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAARQACAAgAAAAAAQAAAAAACAAAQACgAAAAAIEAQQAA=</HashCode>
+      <FileName>Drawing\RenderWindow.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="shader" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="PathTracer.Multithreading.Threadpool" Collapsed="true">
+    <Position X="366.25" Y="333.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAQAAAQAEAAhAAAAAQAAAgAAACAAwCAAABAIAAAAA=</HashCode>
+      <FileName>Multithreading\Threadpool.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PathTracer.Drawing.Shader" Collapsed="true">
+    <Position X="359" Y="333.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAACAAACAAAAAAAAAAAAAAAAAEAAIAAAAAAgAAAAA=</HashCode>
+      <FileName>Drawing\Shader.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="PathTracer.Pathtracing.Guiding.Pathguider">
+    <Position X="366.25" Y="334.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAgAAAAAgAAAAAAAAgAAAAAQAAAAA=</HashCode>
+      <FileName>Pathtracing\Guiding\Pathguider.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PathTracer.Pathtracing.Scene">
+    <Position X="366.25" Y="336.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAABBAAEIAIEIgAAAAAAAAAAAAAAAAAAJAA=</HashCode>
+      <FileName>Pathtracing\Scene.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Camera" />
+      <Property Name="AccelerationStructure" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="OpenTK.Windowing.Desktop.GameWindow" Collapsed="true">
+    <Position X="361.25" Y="332.25" Width="1.5" />
+    <TypeIdentifier />
+  </Class>
+  <Class Name="PathTracer.Pathtracing.SceneObjects.Camera">
+    <Position X="369.5" Y="338" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAEAIAIoAAAAAsAAACgAAAAAAQAQAACQCAAAABAAY=</HashCode>
+      <FileName>Pathtracing\SceneObjects\Camera.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="Config" />
+      <Field Name="InputHandler" />
+      <Field Name="ScreenPlane" />
+      <Field Name="Statistics" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="PathTracer.Utilities.Config">
+    <Position X="367.75" Y="343" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAwAAggIAgEABAgQAAAAAABAAACIEAAoQBAAABAEAA=</HashCode>
+      <FileName>Utilities\Config.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PathTracer.Utilities.InputHandler">
+    <Position X="366" Y="343" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA=</HashCode>
+      <FileName>Utilities\InputHandler.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PathTracer.Pathtracing.SceneObjects.CameraParts.ScreenPlane">
+    <Position X="372" Y="338" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgwCAEAIAUAAAhAhBgATAAIAAAAAAAAAAAAAABEIAGA=</HashCode>
+      <FileName>Pathtracing\SceneObjects\CameraParts\ScreenPlane.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="Screen" />
+      <Field Name="Accumulator" />
+    </ShowAsAssociation>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="PathTracer.Utilities.Statistics">
+    <Position X="369.5" Y="343" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAIgEAAAAAAAAAAAAAAAgAgAAMAAEiAAAAAAEAAAg=</HashCode>
+      <FileName>Utilities\Statistics.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PathTracer.Pathtracing.SceneObjects.CameraParts.Accumulator">
+    <Position X="374.75" Y="338" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABABAAAADAIAAAAAAAAAAEQAAAAAAAAAAAAAAABAAAA=</HashCode>
+      <FileName>Pathtracing\SceneObjects\CameraParts\Accumulator.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsCollectionAssociation>
+      <Property Name="Cavities" />
+    </ShowAsCollectionAssociation>
+  </Class>
+  <Class Name="PathTracer.Pathtracing.SceneObjects.CameraParts.Cavity">
+    <Position X="377.25" Y="338" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAABAAAIgQCAAAAAAAgAAAAAARAAAA=</HashCode>
+      <FileName>Pathtracing\SceneObjects\CameraParts\Cavity.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="PathTracer.Pathtracing.AccelerationStructures.IAccelerationStructure">
+    <Position X="369.5" Y="336.25" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAIAA=</HashCode>
+      <FileName>Pathtracing\AccelerationStructures\IAccelerationStructure.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="PathTracer.Pathtracing.SceneObjects.CameraParts.IScreen">
+    <Position X="374.75" Y="341" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAABAAAAAAAAAAAAEAAAAIAAAAAAAAEAABFAAA=</HashCode>
+      <FileName>Pathtracing\SceneObjects\CameraParts\IScreen.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

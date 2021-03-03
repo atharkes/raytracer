@@ -113,8 +113,8 @@ namespace PathTracer.Pathtracing.AccelerationStructures.BVH {
             float bestSplitCost = AABB.SurfaceAreaHeuristic;
             Split? bestSplit = null;
             for (int i = 1; i < BVHTree.BinAmount; i++) {
-                AABB left = new AABB();
-                AABB right = new AABB();
+                AABB left = new();
+                AABB right = new();
                 // Populate Split
                 foreach (IAABB primitive in AABB.Primitives) {
                     int binID = (int)(k1 * (axis(primitive.Center) - axis(AABB.MinBound)));
@@ -122,7 +122,7 @@ namespace PathTracer.Pathtracing.AccelerationStructures.BVH {
                     else right.Add(primitive);
                 }
                 // Evaluate Split
-                Split split = new Split(binningDirection, left, right);
+                Split split = new(binningDirection, left, right);
                 float splitCost = split.SurfaceAreaHeuristic;
                 if (splitCost < bestSplitCost) {
                     bestSplitCost = splitCost;
@@ -135,7 +135,7 @@ namespace PathTracer.Pathtracing.AccelerationStructures.BVH {
         /// <summary> Intersect and traverse the node with a ray </summary>
         /// <param name="ray">The ray to intersect the node with</param>
         /// <returns>The intersection in the node or any of its children</returns>
-        public Intersection? Intersect(Ray ray) {
+        public (float distance, Primitive primitive)? Intersect(Ray ray) {
             if (ray is CameraRay cameraRay) cameraRay.BVHTraversals++;
             if (!AABB.IntersectBool(ray)) {
                 return null;
@@ -149,9 +149,9 @@ namespace PathTracer.Pathtracing.AccelerationStructures.BVH {
         /// <summary> Intersect the children of this node </summary>
         /// <param name="ray">The ray to intersect the children with</param>
         /// <returns>The intersection in the children if there is any</returns>
-        Intersection? IntersectChildren(Ray ray) {
-            Intersection? firstIntersection;
-            Intersection? secondIntersection;
+        (float distance, Primitive primitive)? IntersectChildren(Ray ray) {
+            (float distance, Primitive primitive)? firstIntersection;
+            (float distance, Primitive primitive)? secondIntersection;
             if (Vector3.Dot(SplitDirection, ray.Direction) < 0) {
                 firstIntersection = Left?.Intersect(ray);
                 secondIntersection = Right?.Intersect(ray);
@@ -159,7 +159,9 @@ namespace PathTracer.Pathtracing.AccelerationStructures.BVH {
                 firstIntersection = Right?.Intersect(ray);
                 secondIntersection = Left?.Intersect(ray);
             }
-            if (secondIntersection == null) {
+            if (firstIntersection == null && secondIntersection == null) {
+                return null;
+            } else if (secondIntersection == null || firstIntersection?.distance < secondIntersection?.distance) {
                 return firstIntersection;
             } else {
                 return secondIntersection;

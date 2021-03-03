@@ -3,6 +3,7 @@ using PathTracer.Pathtracing.SceneObjects;
 using PathTracer.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace PathTracer.Pathtracing.AccelerationStructures.BVH {
@@ -107,17 +108,22 @@ namespace PathTracer.Pathtracing.AccelerationStructures.BVH {
         /// <summary> Intersect the primitives of this AABB </summary>
         /// <param name="ray">The ray to intersect the primitives with</param>
         /// <returns>The intersection with the primitive if there is any</returns>
-        public Intersection? IntersectPrimitives(Ray ray) {
-            float intersectionDistance = ray.Length;
-            Intersection? closestIntersection = null;
+        public (float distance, Primitive primitive)? IntersectPrimitives(Ray ray) {
+            float closestDistance = ray.Length;
+            Primitive? closestPrimitive = null;
             foreach (Primitive primitive in Primitives) {
-                Intersection? intersection = primitive.Intersect(ray);
-                if (intersection != null && 0 < intersection.Distance && intersection.Distance < intersectionDistance) {
-                    closestIntersection = intersection;
-                    intersectionDistance = intersection.Distance;
+                float? distance = primitive.Intersect(ray);
+                if (distance.HasValue && distance.Value < closestDistance) {
+                    Debug.Assert(0 < distance.Value && distance.Value < ray.Length);
+                    closestDistance = distance.Value;
+                    closestPrimitive = primitive;
                 }
             }
-            return closestIntersection;
+            if (closestPrimitive == null) {
+                return null;
+            } else {
+                return (closestDistance, closestPrimitive);
+            }
         }
 
         /// <summary> Get the distance from a point to the AABB </summary>

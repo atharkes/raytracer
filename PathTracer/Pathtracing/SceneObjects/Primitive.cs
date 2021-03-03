@@ -2,6 +2,7 @@
 using PathTracer.Pathtracing.AccelerationStructures.BVH;
 using PathTracer.Pathtracing.AccelerationStructures.SBVH;
 using System;
+using System.Diagnostics;
 
 namespace PathTracer.Pathtracing.SceneObjects {
     /// <summary> An abstract primitive for the 3d scene </summary>
@@ -17,39 +18,37 @@ namespace PathTracer.Pathtracing.SceneObjects {
         /// <summary> The center of the AABB of the primitive equals the position </summary>
         public Vector3 Center => Position;
 
-        /// <summary> Create a new primitive for the 3d scene </summary>
-        /// <param name="position">The position of the primitive</param>
-        /// <param name="material">The material of the primitive</param>
+        /// <summary> Create a new <see cref="Primitive"/> </summary>
+        /// <param name="position">The <see cref="Position"/> of the <see cref="Primitive"/></param>
+        /// <param name="material">The <see cref="Material"/> of the <see cref="Primitive"/></param>
         protected Primitive(Vector3? position = null, Material? material = null) {
             Position = position ?? Vector3.Zero;
             Material = material ?? Material.Random();
         }
 
-        /// <summary> Intersect this primitive with a ray </summary>
-        /// <param name="ray">The ray to intersect the primitive with</param>
-        /// <returns>An intersection if the primitive is hit</returns>
-        public abstract Intersection? Intersect(Ray ray);
+        /// <summary> Get a <paramref name="random"/> point on the surface of the <see cref="Primitive"/> </summary>
+        /// <param name="random">The <see cref="Random"/> to decide the location of the point </param>
+        /// <returns>A <paramref name="random"/> point on the surface of the <see cref="Primitive"/></returns>
+        public abstract Vector3 GetSurfacePoint(Random random);
 
-        /// <summary> Intersect this primitive with a ray </summary>
-        /// <param name="ray">The ray to intersect the primitive with</param>
-        /// <returns>Whether the ray intersects this primitive</returns>
+        /// <summary> Get the normal at a <paramref name="surfacePoint"/> on this <see cref="Primitive"/> </summary>
+        /// <param name="surfacePoint">The surface point to get the normal at</param>
+        /// <returns>The normal at the specified <paramref name="surfacePoint"/> on the <see cref="Primitive"/></returns>
+        public abstract Vector3 GetNormal(Vector3 surfacePoint);
+
+        /// <summary> Intersect the <see cref="Primitive"/> with a <paramref name="ray"/> </summary>
+        /// <param name="ray">The <see cref="Ray"/> to intersect the <see cref="Primitive"/> with</param>
+        /// <returns>Whether the <paramref name="ray"/> intersects the <see cref="Primitive"/></returns>
         public abstract bool IntersectBool(Ray ray);
 
-        /// <summary> Get the normal at an intersection on this primitive </summary>
-        /// <param name="intersectionLocation">The point of the intersection</param>
-        /// <returns>The normal at the point of intersection on this primitive</returns>
-        public abstract Vector3 GetNormal(Vector3 intersectionLocation);
+        /// <summary> Intersect this <see cref="Primitive"/> with a <paramref name="ray"/> </summary>
+        /// <param name="ray">The <see cref="Ray"/> to intersect the <see cref="Primitive"/> with</param>
+        /// <returns>The distance if the <see cref="Primitive"/> is hit by the <paramref name="ray"/></returns>
+        public abstract float? Intersect(Ray ray);
 
-        /// <summary> Get the emittance of this primitive </summary>
-        /// <param name="intersection">The intersection at this primitive</param>
-        /// <returns>The emittance of the primitive at the intersection</returns>
-        public virtual Vector3 GetEmmitance(Intersection intersection) {
-            return Material.EmittingLight * intersection.NdotL;
-        }
-
-        /// <summary> Clip the AABB of the primitive with an axis-aligned plane </summary>
-        /// <param name="plane">The plane to clip the AABB with</param>
-        /// <returns>The bounds of the clipped AABB</returns>
+        /// <summary> Clip the <see cref="Bounds"/> of the <see cref="Primitive"/> using a <paramref name="plane"/> </summary>
+        /// <param name="plane">The <see cref="AxisAlignedPlane"/> to clip the <see cref="Bounds"/> with</param>
+        /// <returns>The <see cref="PrimitiveFragment"/> with the clipped <see cref="Bounds"/> </returns>
         public virtual PrimitiveFragment? Clip(AxisAlignedPlane plane) {
             Vector3[] bounds = Bounds;
             Vector3 min = bounds[0];
@@ -69,6 +68,10 @@ namespace PathTracer.Pathtracing.SceneObjects {
             } else throw new ArgumentException("Can't clip if plane is not axis-aligned");
             if (max.X < min.X || max.Y < min.Y || max.Z < min.Z) return null;
             else return new PrimitiveFragment(this, new Vector3[] { min, max });
+        }
+
+        public virtual Vector3 GetEmmitance(Ray ray) {
+            return Material.EmittingLight * Vector3.Dot(GetNormal(ray.Destination), ray.Direction);
         }
     }
 }

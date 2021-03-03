@@ -1,5 +1,6 @@
 ﻿using OpenTK.Mathematics;
 using PathTracer.Pathtracing.SceneObjects;
+using System;
 
 namespace PathTracer.Pathtracing.AccelerationStructures.SBVH {
     /// <summary> A fragment of a primitive for the SBVH construction </summary>
@@ -21,22 +22,29 @@ namespace PathTracer.Pathtracing.AccelerationStructures.SBVH {
         /// <summary> Intersect the fragment with a ray by intersecting its original primitive </summary>
         /// <param name="ray">The ray to intersect the fragment with</param>
         /// <returns>The intersection with the original primitive if there is any</returns>
-        public override Intersection? Intersect(Ray ray) {
+        public override float? Intersect(Ray ray) {
             return Original.Intersect(ray);
         }
 
         /// <summary> Intersect the fragment with a ray by intersecting its original primitive </summary>
-        /// <param name="ray">The ray to intersect the fragment with</param>
-        /// <returns>Whether the ray intersects the original primitive</returns>
+        /// <param name="ray">The <see cref="Ray"/> to intersect the <see cref="Primitive"/> with</param>
+        /// <returns>Whether the <paramref name="ray"/> intersects the original primitive</returns>
         public override bool IntersectBool(Ray ray) {
             return Original.IntersectBool(ray);
         }
 
+        /// <summary> Get a <paramref name="random"/> surface point on the <see cref="PrimitiveFragment"/> </summary>
+        /// <param name="random">The <see cref="Random"/> to determine the location of the surface point</param>
+        /// <returns>A <paramref name="random"/> surface point on the <see cref="Original"/></returns>
+        public override Vector3 GetSurfacePoint(Random random) {
+            return Original.GetSurfacePoint(random);
+        }
+
         /// <summary> Get the normal of the fragment at an intersect location using the original primitive </summary>
-        /// <param name="intersectionLocation">The intersection point to get the normal at</param>
+        /// <param name="surfacePoint">The intersection point to get the normal at</param>
         /// <returns>The normal of the original primitive at the intersection point</returns>
-        public override Vector3 GetNormal(Vector3 intersectionLocation) {
-            return Original.GetNormal(intersectionLocation);
+        public override Vector3 GetNormal(Vector3 surfacePoint) {
+            return Original.GetNormal(surfacePoint);
         }
 
         /// <summary> Clipping a fragment doesn't create a fragment of a fragment </summary>

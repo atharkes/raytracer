@@ -82,18 +82,18 @@ namespace PathTracer.Pathtracing.SceneObjects {
         }
 
         /// <summary> Create a diffuse green material </summary>
-        public static Material DiffuseGreen => new Material(new Vector3(0.1f, 0.4f, 0.1f));
+        public static Material DiffuseGreen => new(new Vector3(0.1f, 0.4f, 0.1f));
         /// <summary> Create a diffuse yellow material </summary>
-        public static Material DiffuseYellow => new Material(new Vector3(0.4f, 0.4f, 0.1f));
+        public static Material DiffuseYellow => new(new Vector3(0.4f, 0.4f, 0.1f));
         /// <summary> Create a glossy red material </summary>
-        public static Material GlossyRed => new Material(new Vector3(0.4f, 0.1f, 0.1f), 0, 0, 1, 0.5f, 15f);
+        public static Material GlossyRed => new(new Vector3(0.4f, 0.1f, 0.1f), 0, 0, 1, 0.5f, 15f);
         /// <summary> Create a glossy green material </summary>
-        public static Material GlossyGreen => new Material(new Vector3(1, 1, 0.8f), 0, 0, 1, 0.7f, 50f);
+        public static Material GlossyGreen => new(new Vector3(1, 1, 0.8f), 0, 0, 1, 0.7f, 50f);
         /// <summary> Create a glossy mirror with a purple hue </summary>
-        public static Material GlossyPurpleMirror => new Material(new Vector3(1, 0.8f, 1), 0.4f, 0, 1, 0.7f, 50f);
+        public static Material GlossyPurpleMirror => new(new Vector3(1, 0.8f, 1), 0.4f, 0, 1, 0.7f, 50f);
         /// <summary> Create a mirror material </summary>
-        public static Material Mirror => new Material(new Vector3(0.9f, 0.9f, 0.9f), 0.97f);
+        public static Material Mirror => new(new Vector3(0.9f, 0.9f, 0.9f), 0.97f);
         /// <summary> Create a glass material </summary>
-        public static Material Glass => new Material(new Vector3(0.4f, 0.4f, 0.9f), 0, 0.97f, 1.62f);
+        public static Material Glass => new(new Vector3(0.4f, 0.4f, 0.9f), 0, 0.97f, 1.62f);
     }
 }

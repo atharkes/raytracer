@@ -69,10 +69,10 @@ namespace PathTracer.Pathtracing {
         /// <returns>A default scene with random spheres</returns>
         public static Scene DefaultWithRandomTriangles(IScreen screen, int randomTriangles) {
             List<Primitive> defaultPrimitives = DefaultPrimitives;
-            List<Primitive> primitives = new List<Primitive>(defaultPrimitives);
+            List<Primitive> primitives = new(defaultPrimitives);
             for (int i = 0; i < randomTriangles; i++) {
-                Vector3 trianglesCenter = new Vector3(0f, -30f, 0f);
-                Vector3 trianglesBox = new Vector3(60f, 30f, 60f);
+                Vector3 trianglesCenter = new(0f, -30f, 0f);
+                Vector3 trianglesBox = new(60f, 30f, 60f);
                 Vector3 p1 = Utils.DetRandom.Vector() * trianglesBox - 0.5f * trianglesBox + trianglesCenter;
                 Vector3 p2 = p1 + Utils.DetRandom.Vector(4f);
                 Vector3 p3 = p1 - Utils.DetRandom.Vector(4f);
@@ -82,7 +82,8 @@ namespace PathTracer.Pathtracing {
         }
 
         /// <summary> The primitives in the default scene </summary>
-        public static List<Primitive> DefaultPrimitives => new List<Primitive>() {
+        public static List<Primitive> DefaultPrimitives => new() {
+            //new AxisAlignedBox(new Vector3(-20), new Vector3(20)),
             new Sphere(new Vector3(-3, -1, 5), 1, Material.DiffuseGreen),
             new Sphere(new Vector3(3, -1, 5), 1, Material.GlossyRed),
             new Sphere(new Vector3(0, -1, 5), 1, Material.Mirror),
@@ -95,8 +96,8 @@ namespace PathTracer.Pathtracing {
 
         /// <summary> Intersect the <see cref="Scene"/> with a <paramref name="ray"/> </summary>
         /// <param name="ray">The <see cref="Ray"/> to intersect the <see cref="Scene"/> with</param>
-        /// <returns>The <see cref="Intersection"/> if there is any</returns>
-        public Intersection? Intersect(Ray ray) {
+        /// <returns>The <see cref="Interaction"/> if there is any</returns>
+        public (float distance, Primitive primitive)? Intersect(Ray ray) {
             return AccelerationStructure.Intersect(ray);
         }
 

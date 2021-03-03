@@ -32,13 +32,13 @@ namespace PathTracer.Pathtracing.SceneObjects.Primitives {
         /// <param name="ray">The ray to intersect the sphere with</param>
         /// <returns>Whether the ray intersects the sphere</returns>
         public override bool IntersectBool(Ray ray) {
-            return Intersect(ray).HasValue;
+            return Intersect(ray) != null;
         }
 
         /// <summary> Intersect the sphere with a ray </summary>
         /// <param name="ray">The ray to intersect the sphere with</param>
         /// <returns>The intersection with the sphere if there is any</returns>
-        public override float? Intersect(Ray ray) {
+        public override Intersection? Intersect(Ray ray) {
             Vector3 sphereFromRayOrigin = Position - ray.Origin;
             float sphereInDirectionOfRay = Vector3.Dot(sphereFromRayOrigin, ray.Direction);
             float rayNormalDistance = Vector3.Dot(sphereFromRayOrigin, sphereFromRayOrigin) - sphereInDirectionOfRay * sphereInDirectionOfRay;
@@ -49,9 +49,9 @@ namespace PathTracer.Pathtracing.SceneObjects.Primitives {
             float intersection1 = sphereInDirectionOfRay - raySphereDist;
             float intersection2 = sphereInDirectionOfRay + raySphereDist;
             if (ray.WithinBounds(intersection1)) {
-                return intersection1;
+                return new Intersection(ray, intersection1, this);
             } else if (ray.WithinBounds(intersection2)) {
-                return intersection2;
+                return new Intersection(ray, intersection2, this);
             } else {
                 return null;
             }

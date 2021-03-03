@@ -37,14 +37,14 @@ namespace PathTracer.Pathtracing.AccelerationStructures {
         /// <summary> Intersect the BVH with a ray </summary>
         /// <param name="ray">The ray to intersect the BVH with</param>
         /// <returns>The intersection in the BVH</returns>
-        public (float distance, Primitive primitive)? Intersect(Ray ray) {
+        public virtual Intersection? Intersect(Ray ray) {
             return Root.Intersect(ray);
         }
 
         /// <summary> Intersect the BVH with a ray </summary>
         /// <param name="ray">The ray to intersect the BVH with</param>
         /// <returns>Whether there is an intersection in the BVH</returns>
-        public bool IntersectBool(Ray ray) {
+        public virtual bool IntersectBool(Ray ray) {
             return Root.IntersectBool(ray);
         }
     }

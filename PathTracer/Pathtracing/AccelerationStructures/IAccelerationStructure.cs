@@ -1,12 +1,10 @@
-﻿using PathTracer.Pathtracing.SceneObjects;
-
-namespace PathTracer.Pathtracing.AccelerationStructures {
+﻿namespace PathTracer.Pathtracing.AccelerationStructures {
     /// <summary> An interface for an acceleration structure </summary>
     public interface IAccelerationStructure {
         /// <summary> Intersect the acceleration structure with a ray </summary>
         /// <param name="ray">The ray to intersect the acceleration structure with</param>
         /// <returns>An intersection with a primitive if there is any</returns>
-        (float distance, Primitive primitive)? Intersect(Ray ray);
+        Intersection? Intersect(Ray ray);
 
         /// <summary> Intersect the acceleration structure with a ray </summary>
         /// <param name="ray">The ray to intersect the acceleration structure with</param>

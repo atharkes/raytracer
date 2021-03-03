@@ -34,7 +34,7 @@ namespace PathTracer.Pathtracing.SceneObjects.Primitives {
         /// <summary> You cannot intersect a point light </summary>
         /// <param name="ray">The ray that will never intersect the pointlight</param>
         /// <returns></returns>
-        public override float? Intersect(Ray ray) {
+        public override Intersection? Intersect(Ray ray) {
             return null;
         }
 

@@ -16,7 +16,6 @@ namespace PathTracer.Pathtracing.AccelerationStructures {
         /// <summary> The amount of bins considered during spatial splitting </summary>
         public const int SpatialBinAmount = 256;
         
-
         /// <summary> Create a spatial BVH </summary>
         /// <param name="primitives">The primitives to build the SBVH with</param>
         public SBVHTree(List<Primitive> primitives) {

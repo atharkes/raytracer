@@ -33,10 +33,10 @@ namespace PathTracer.Pathtracing.SceneObjects.Primitives {
         }
 
         public override bool IntersectBool(Ray ray) {
-            return Intersect(ray).HasValue;
+            return Intersect(ray) != null;
         }
 
-        public override float? Intersect(Ray ray) {
+        public override Intersection? Intersect(Ray ray) {
             float tmin = (Bounds[ray.Sign.X].X - ray.Origin.X) * ray.DirectionInverted.X;
             float tmax = (Bounds[1 - ray.Sign.X].X - ray.Origin.X) * ray.DirectionInverted.X;
 
@@ -55,7 +55,7 @@ namespace PathTracer.Pathtracing.SceneObjects.Primitives {
             if (tmin > ray.Length || tmax < 0) {
                 return null;
             } else {
-                return tmin > 0 ? tmin : tmax;
+                return new Intersection(ray, tmin > 0 ? tmin : tmax, this);
             }
         }
     }

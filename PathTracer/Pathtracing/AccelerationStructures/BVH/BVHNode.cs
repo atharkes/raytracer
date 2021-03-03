@@ -135,7 +135,7 @@ namespace PathTracer.Pathtracing.AccelerationStructures.BVH {
         /// <summary> Intersect and traverse the node with a ray </summary>
         /// <param name="ray">The ray to intersect the node with</param>
         /// <returns>The intersection in the node or any of its children</returns>
-        public (float distance, Primitive primitive)? Intersect(Ray ray) {
+        public Intersection? Intersect(Ray ray) {
             if (ray is CameraRay cameraRay) cameraRay.BVHTraversals++;
             if (!AABB.IntersectBool(ray)) {
                 return null;
@@ -149,9 +149,9 @@ namespace PathTracer.Pathtracing.AccelerationStructures.BVH {
         /// <summary> Intersect the children of this node </summary>
         /// <param name="ray">The ray to intersect the children with</param>
         /// <returns>The intersection in the children if there is any</returns>
-        (float distance, Primitive primitive)? IntersectChildren(Ray ray) {
-            (float distance, Primitive primitive)? firstIntersection;
-            (float distance, Primitive primitive)? secondIntersection;
+        Intersection? IntersectChildren(Ray ray) {
+            Intersection? firstIntersection;
+            Intersection? secondIntersection;
             if (Vector3.Dot(SplitDirection, ray.Direction) < 0) {
                 firstIntersection = Left?.Intersect(ray);
                 secondIntersection = Right?.Intersect(ray);
@@ -161,7 +161,7 @@ namespace PathTracer.Pathtracing.AccelerationStructures.BVH {
             }
             if (firstIntersection == null && secondIntersection == null) {
                 return null;
-            } else if (secondIntersection == null || firstIntersection?.distance < secondIntersection?.distance) {
+            } else if (secondIntersection == null || firstIntersection?.Distance < secondIntersection?.Distance) {
                 return firstIntersection;
             } else {
                 return secondIntersection;

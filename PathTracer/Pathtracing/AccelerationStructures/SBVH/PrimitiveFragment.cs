@@ -22,7 +22,7 @@ namespace PathTracer.Pathtracing.AccelerationStructures.SBVH {
         /// <summary> Intersect the fragment with a ray by intersecting its original primitive </summary>
         /// <param name="ray">The ray to intersect the fragment with</param>
         /// <returns>The intersection with the original primitive if there is any</returns>
-        public override float? Intersect(Ray ray) {
+        public override Intersection? Intersect(Ray ray) {
             return Original.Intersect(ray);
         }
 

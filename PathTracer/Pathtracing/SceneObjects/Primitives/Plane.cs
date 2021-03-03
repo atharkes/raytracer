@@ -37,16 +37,16 @@ namespace PathTracer.Pathtracing.SceneObjects.Primitives {
         /// <param name="ray">The ray to intersect the plane with</param>
         /// <returns>Whether the ray intersects the plane</returns>
         public override bool IntersectBool(Ray ray) {
-            return Intersect(ray).HasValue;
+            return Intersect(ray) != null;
         }
 
         /// <summary> Returns the distance of the intersection </summary>
         /// <param name="ray">The ray to intersect this plane with</param>
         /// <returns>The distance of the intersection</returns>
-        public override float? Intersect(Ray ray) {
+        public override Intersection? Intersect(Ray ray) {
             float dist = -((Vector3.Dot(ray.Origin, Normal) - Distance) / Vector3.Dot(ray.Direction, Normal));
             if (ray.WithinBounds(dist)) {
-                return dist;
+                return new Intersection(ray, dist, this);
             } else {
                 return null;
             }

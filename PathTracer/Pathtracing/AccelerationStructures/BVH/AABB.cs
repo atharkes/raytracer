@@ -108,21 +108,21 @@ namespace PathTracer.Pathtracing.AccelerationStructures.BVH {
         /// <summary> Intersect the primitives of this AABB </summary>
         /// <param name="ray">The ray to intersect the primitives with</param>
         /// <returns>The intersection with the primitive if there is any</returns>
-        public (float distance, Primitive primitive)? IntersectPrimitives(Ray ray) {
+        public Intersection? IntersectPrimitives(Ray ray) {
             float closestDistance = ray.Length;
-            Primitive? closestPrimitive = null;
+            Intersection? closestIntersection = null;
             foreach (Primitive primitive in Primitives) {
-                float? distance = primitive.Intersect(ray);
-                if (distance.HasValue && distance.Value < closestDistance) {
-                    Debug.Assert(0 < distance.Value && distance.Value < ray.Length);
-                    closestDistance = distance.Value;
-                    closestPrimitive = primitive;
+                Intersection? intersection = primitive.Intersect(ray);
+                if (intersection != null && intersection.Distance < closestDistance) {
+                    Debug.Assert(0 < intersection.Distance && intersection.Distance < ray.Length);
+                    closestDistance = intersection.Distance;
+                    closestIntersection = intersection;
                 }
             }
-            if (closestPrimitive == null) {
+            if (closestIntersection == null) {
                 return null;
             } else {
-                return (closestDistance, closestPrimitive);
+                return closestIntersection;
             }
         }
 

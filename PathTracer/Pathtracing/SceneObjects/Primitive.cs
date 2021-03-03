@@ -2,7 +2,6 @@
 using PathTracer.Pathtracing.AccelerationStructures.BVH;
 using PathTracer.Pathtracing.AccelerationStructures.SBVH;
 using System;
-using System.Diagnostics;
 
 namespace PathTracer.Pathtracing.SceneObjects {
     /// <summary> An abstract primitive for the 3d scene </summary>
@@ -44,7 +43,7 @@ namespace PathTracer.Pathtracing.SceneObjects {
         /// <summary> Intersect this <see cref="Primitive"/> with a <paramref name="ray"/> </summary>
         /// <param name="ray">The <see cref="Ray"/> to intersect the <see cref="Primitive"/> with</param>
         /// <returns>The distance if the <see cref="Primitive"/> is hit by the <paramref name="ray"/></returns>
-        public abstract float? Intersect(Ray ray);
+        public abstract Intersection? Intersect(Ray ray);
 
         /// <summary> Clip the <see cref="Bounds"/> of the <see cref="Primitive"/> using a <paramref name="plane"/> </summary>
         /// <param name="plane">The <see cref="AxisAlignedPlane"/> to clip the <see cref="Bounds"/> with</param>

@@ -63,13 +63,13 @@ namespace PathTracer.Pathtracing.SceneObjects.Primitives {
         /// <param name="ray">The <see cref="Ray"/> to intersect the <see cref="Triangle"/> with</param>
         /// <returns>Whether the <paramref name="ray"/> intersects the <see cref="Triangle"/></returns>
         public override bool IntersectBool(Ray ray) {
-            return Intersect(ray).HasValue;
+            return Intersect(ray) != null;
         }
 
         /// <summary> Intersect the triangle with a ray (Möller–Trumbore triangle intersection) </summary>
         /// <param name="ray">The ray to intersect the triangle with</param>
         /// <returns>The intersection with the triangle if there is any</returns>
-        public override float? Intersect(Ray ray) {
+        public override Intersection? Intersect(Ray ray) {
             // Get vectors for two edges sharing V1
             Vector3 P1toP2 = P2 - P1;
             Vector3 P1toP3 = P3 - P1;
@@ -97,7 +97,7 @@ namespace PathTracer.Pathtracing.SceneObjects.Primitives {
             if (t < IntersectionEpsilon || t > ray.Length) {
                 return null;
             } else {
-                return t;
+                return new Intersection(ray, t, this);
             }
         }
 

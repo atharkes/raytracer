@@ -96,8 +96,8 @@ namespace PathTracer.Pathtracing {
 
         /// <summary> Intersect the <see cref="Scene"/> with a <paramref name="ray"/> </summary>
         /// <param name="ray">The <see cref="Ray"/> to intersect the <see cref="Scene"/> with</param>
-        /// <returns>The <see cref="Interaction"/> if there is any</returns>
-        public (float distance, Primitive primitive)? Intersect(Ray ray) {
+        /// <returns>The <see cref="Intersection"/> if there is any</returns>
+        public Intersection? Intersect(Ray ray) {
             return AccelerationStructure.Intersect(ray);
         }
 

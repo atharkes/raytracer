@@ -1,5 +1,4 @@
 ﻿using OpenTK.Mathematics;
-using PathTracer.Pathtracing.SceneObjects;
 
 namespace PathTracer.Pathtracing {
     /// <summary> A datastructure to store a ray </summary>
@@ -49,12 +48,12 @@ namespace PathTracer.Pathtracing {
 
         /// <summary> Trace the <see cref="Ray"/> through a <paramref name="scene"/> </summary>
         /// <param name="scene">The <see cref="Scene"/> to trace through</param>
-        /// <returns>An <see cref="Interaction"/> if there is one</returns>
-        public virtual Interaction? Trace(Scene scene) {
-            (float distance, Primitive primitive)? intersection = scene.Intersect(this);
-            if (intersection.HasValue) {
-                Length = intersection.Value.distance;
-                return new Interaction(this, intersection.Value.distance, intersection.Value.primitive);
+        /// <returns>An <see cref="Intersection"/> if there is one</returns>
+        public virtual Intersection? Trace(Scene scene) {
+            Intersection? intersection = scene.Intersect(this);
+            if (intersection != null) {
+                Length = intersection.Distance;
+                return new Intersection(this, intersection.Distance, intersection.Primitive);
             } else {
                 return null;
             }

@@ -4,7 +4,7 @@ using System;
 
 namespace PathTracer.Pathtracing {
     /// <summary> An interaction between a <see cref="Pathtracing.Ray"/> and a <see cref="SceneObjects.Primitive"/> </summary>
-    public class Interaction {
+    public class Intersection {
         /// <summary>
         /// Epsilon used to raise the intersection away from the primitive.
         /// Used to avoid the intersection falling behind the primitive by rounding errors.
@@ -31,7 +31,7 @@ namespace PathTracer.Pathtracing {
         /// <param name="ray">The ray that intersects the primitive</param>
         /// <param name="primitive">The primitive that is intersected by the ray</param>
         /// <param name="distance">The distance travelled along the ray</param>
-        public Interaction(Ray ray, float distance, Primitive primitive) {
+        public Intersection(Ray ray, float distance, Primitive primitive) {
             Ray = ray;
             Primitive = primitive;
             Distance = distance;
@@ -41,10 +41,6 @@ namespace PathTracer.Pathtracing {
             Normal = IntoPrimitive ? normal : -normal;
             Position = Ray.Origin + Ray.Direction * distance + Normal * RaiseEpsilon;
             NdotL = Vector3.Dot(Ray.Direction, -Normal);
-        }
-
-        public Interaction(Vector3 position, Primitive primitive) {
-
         }
 
         /// <summary> Get a reflection of the incoming ray at this intersection </summary>

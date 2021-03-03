@@ -19,7 +19,7 @@ namespace PathTracer.Pathtracing.Guiding {
             return Scene.Camera.GetCameraRays(amount, random);
         }
 
-        public ICollection<Ray> IndirectIllumination(Interaction intersection, Random random) {
+        public ICollection<Ray> IndirectIllumination(Intersection intersection, Random random) {
             List<Ray> rays = new List<Ray>();
             float r1 = (float)random.NextDouble();
             float r2 = (float)random.NextDouble();
@@ -30,7 +30,7 @@ namespace PathTracer.Pathtracing.Guiding {
             return rays;
         }
 
-        public ICollection<ShadowRay> NextEventEstimation(Interaction intersection, Random random) {
+        public ICollection<ShadowRay> NextEventEstimation(Intersection intersection, Random random) {
             List<ShadowRay> rays = new();
             foreach (Primitive lightsource in Scene.Lights) {
                 Vector3 destination = lightsource.GetSurfacePoint(random);

@@ -64,7 +64,7 @@ namespace PathTracer {
                 return Vector3.Zero;
             }
             // Intersect with Scene
-            Interaction? intersection = ray.Trace(Scene);
+            Intersection? intersection = ray.Trace(Scene);
             if (intersection == null) return Vector3.Zero;
             Vector3 directIllumination = intersection.Primitive.Material.Specularity < 1 ? NextEventEstimation(intersection) : Vector3.Zero;
             Vector3 indirectIllumination = Vector3.Zero;
@@ -100,14 +100,14 @@ namespace PathTracer {
         /// <summary> Cast shadow rays from an intersection to every light and calculate the color </summary>
         /// <param name="intersection">The intersection to cast the shadow rays from</param>
         /// <returns>The color at the intersection</returns>
-        public Vector3 NextEventEstimation(Interaction intersection) {
+        public Vector3 NextEventEstimation(Intersection intersection) {
             Vector3 radianceOut = Vector3.Zero;
             foreach (ShadowRay shadowRay in Guider.NextEventEstimation(intersection, Utils.Random)) {
                 float NdotL = Vector3.Dot(intersection.Normal, shadowRay.Direction);
                 if (NdotL < 0) {
                     continue;
                 }
-                Interaction? lightIntersection = shadowRay.Trace(Scene);
+                Intersection? lightIntersection = shadowRay.Trace(Scene);
                 if (lightIntersection == null) {
                     continue;
                 }

@@ -27,7 +27,7 @@ namespace PathTracer.Pathtracing.SceneObjects.Primitives {
             throw new NotImplementedException();
         }
 
-        public override float? Intersect(Ray ray) {
+        public override Intersection? Intersect(Ray ray) {
             throw new NotImplementedException();
         }
     }

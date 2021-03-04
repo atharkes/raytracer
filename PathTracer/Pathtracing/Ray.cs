@@ -4,7 +4,7 @@ namespace PathTracer.Pathtracing {
     /// <summary> A <see cref="Ray"/> used for tracing through the <see cref="Scene"/> </summary>
     public class Ray {
         /// <summary> The maximum recursion depth of traced paths </summary>
-        public static int MaxRecursionDepth { get; set; } = 8;
+        public static int MaxRecursionDepth { get; set; } = 3;
 
         /// <summary> The origin of the <see cref="Ray"/> </summary>
         public Vector3 Origin { get; }
@@ -32,7 +32,7 @@ namespace PathTracer.Pathtracing {
             Direction = direction.Normalized();
             Length = length;
             RecursionDepth = recursionDepth;
-            DirectionInverted = new Vector3(1 / direction.X, 1 / direction.Y, 1 / direction.Z);
+            DirectionInverted = new Vector3(1 / Direction.X, 1 / Direction.Y, 1 / Direction.Z);
             Sign = new Vector3i(DirectionInverted.X < 0 ? 1 : 0, DirectionInverted.Y < 0 ? 1 : 0, DirectionInverted.Z < 0 ? 1 : 0);
         }
 

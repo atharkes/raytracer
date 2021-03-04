@@ -27,7 +27,7 @@ namespace PathTracer.Pathtracing {
         /// <param name="direction">The direction of the <see cref="Ray"/></param>
         /// <param name="length">The length of the <see cref="Ray"/></param>
         /// <param name="recursionDepth">The recursion depth of the path so farr</param>
-        public Ray(Vector3 origin, Vector3 direction, float length = float.MaxValue, int recursionDepth = 0) {
+        public Ray(Vector3 origin, Vector3 direction, float length = float.PositiveInfinity, int recursionDepth = 0) {
             Origin = origin;
             Direction = direction.Normalized();
             Length = length;

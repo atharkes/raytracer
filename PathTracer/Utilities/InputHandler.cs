@@ -16,7 +16,7 @@ namespace PathTracer.Utilities {
         /// <param name="keyboard">The <see cref="KeyboardState"/> to read the input from</param>
         public void HandleKeyboardInput(KeyboardState keyboard) {
             if (keyboard.IsKeyPressed(Keys.F1)) Camera.Config.DebugInfo = !Camera.Config.DebugInfo;
-            if (keyboard.IsKeyPressed(Keys.F2)) Camera.Config.DrawBVHTraversal = !Camera.Config.DrawBVHTraversal;
+            if (keyboard.IsKeyPressed(Keys.F2)) Camera.Config.DrawingMode = Camera.Config.DrawingMode.Next();
             if (keyboard.IsKeyDown(Keys.Space)) Camera.Move(Camera.Up);
             if (keyboard.IsKeyDown(Keys.LeftShift)) Camera.Move(Camera.Down);
             if (keyboard.IsKeyDown(Keys.W)) Camera.Move(Camera.Front);

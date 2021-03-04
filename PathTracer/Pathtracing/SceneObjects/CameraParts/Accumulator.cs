@@ -3,6 +3,13 @@ using PathTracer.Utilities;
 using System;
 
 namespace PathTracer.Pathtracing.SceneObjects.CameraParts {
+    /// <summary> The drawing mode of the accumulator </summary>
+    public enum DrawingMode {
+        Light,
+        BVHNodeTraversals,
+        Intersections,
+    }
+
     /// <summary> An accumulator that accumulates the light of photons </summary>
     public class Accumulator {
         /// <summary> The cavities in which the light is accumulated </summary>
@@ -26,25 +33,26 @@ namespace PathTracer.Pathtracing.SceneObjects.CameraParts {
 
         /// <summary> Draws an image from the photons in the accumulator to a screen </summary>
         /// <param name="screen">The screen to draw the image to</param>
-        public void DrawImage(IScreen screen, bool drawBVH) {
+        public void DrawImage(IScreen screen, DrawingMode drawingMode) {
             Action[] tasks = new Action[Program.Threadpool.MultithreadingTaskCount];
             float size = Cavities.Length / tasks.Length;
             for (int i = 0; i < tasks.Length; i++) {
                 int lowerbound = (int)(i * size);
                 int higherbound = (int)((i + 1) * size);
-                if (drawBVH) tasks[i] = () => DrawBVHRange(screen, lowerbound, higherbound);
-                else tasks[i] = () => DrawImageRange(screen, lowerbound, higherbound);
+                switch (drawingMode) {
+                    case DrawingMode.Light:
+                        tasks[i] = () => { for (int i = lowerbound; i < higherbound; i++) screen.Plot(i, Cavities[i].AverageLight.ToIntColor()); };
+                        break;
+                    case DrawingMode.BVHNodeTraversals:
+                        tasks[i] = () => { for (int i = lowerbound; i < higherbound; i++) screen.Plot(i, Cavities[i].AverageBVHTraversalColor.ToIntColor()); };
+                        break;
+                    case DrawingMode.Intersections:
+                        tasks[i] = () => { for (int i = lowerbound; i < higherbound; i++) screen.Plot(i, Cavities[i].IntersectionChanceColor.ToIntColor()); };
+                        break;
+                }
             }
             Program.Threadpool.DoTasks(tasks);
             Program.Threadpool.WaitTillDone();
-        }
-
-        void DrawImageRange(IScreen screen, int from, int to) {
-            for (int i = from; i < to; i++) screen.Plot(i, Cavities[i].AverageLight.ToIntColor());
-        }
-
-        void DrawBVHRange(IScreen screen, int from, int to) {
-            for (int i = from; i < to; i++) screen.Plot(i, Cavities[i].AverageBVHTraversalColor.ToIntColor());
         }
 
         /// <summary> Get the total average light in the accumulator </summary>

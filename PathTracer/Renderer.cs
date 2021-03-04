@@ -2,9 +2,7 @@
 using PathTracer.Pathtracing;
 using PathTracer.Pathtracing.Guiding;
 using PathTracer.Pathtracing.Rays;
-using PathTracer.Pathtracing.SceneObjects;
 using PathTracer.Pathtracing.SceneObjects.CameraParts;
-using PathTracer.Pathtracing.SceneObjects.Primitives;
 using PathTracer.Utilities;
 using System;
 using System.Collections.Generic;
@@ -12,6 +10,9 @@ using System.Collections.Generic;
 namespace PathTracer {
     /// <summary> Main class of the raytracer </summary>
     public class Renderer {
+        /// <summary> Whether next event estimation is used </summary>
+        public bool NextEvenEstimation { get; set; } = true;
+
         /// <summary> The 3d scene in which the raytracing takes place </summary>
         public Scene Scene { get; }
         /// <summary> The path guiding method used to guide random decisions </summary>
@@ -50,7 +51,7 @@ namespace PathTracer {
             foreach(Ray ray in rays) {
                 Vector3 pixelColor = Sample(ray, 0);
                 if (ray is CameraRay cameraRay) {
-                    cameraRay.Cavity.AddSample(pixelColor, cameraRay.BVHTraversals);
+                    cameraRay.Cavity.AddSample(pixelColor, cameraRay.BVHTraversals, cameraRay.Intersection);
                 }
             }
         }
@@ -66,7 +67,11 @@ namespace PathTracer {
             // Intersect with Scene
             Intersection? intersection = ray.Trace(Scene);
             if (intersection == null) return Vector3.Zero;
-            Vector3 directIllumination = intersection.Primitive.Material.Specularity < 1 ? NextEventEstimation(intersection) : Vector3.Zero;
+            Vector3 directIllumination = Vector3.Zero;
+            if (NextEvenEstimation) {
+                directIllumination = NextEventEstimation(intersection);
+            }
+            
             Vector3 indirectIllumination = Vector3.Zero;
             ICollection<Ray> samples = Guider.IndirectIllumination(intersection, Utils.Random);
             foreach (Ray sample in samples) {
@@ -93,7 +98,9 @@ namespace PathTracer {
                 // Diffuse
                 radianceOut = incomingLight;
             }
-            radianceOut += intersection.Primitive.GetEmmitance(ray);
+            if (!NextEvenEstimation) {
+                radianceOut += intersection.Primitive.GetEmmitance(ray);
+            }
             return radianceOut;
         }
 

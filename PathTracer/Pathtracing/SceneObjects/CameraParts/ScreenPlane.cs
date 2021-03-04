@@ -73,7 +73,7 @@ namespace PathTracer.Pathtracing.SceneObjects.CameraParts {
         /// <summary> Draw an image to this screen plane </summary>
         public void Draw() {
             Screen.Clear();
-            Accumulator.DrawImage(Screen, Camera.Config.DrawBVHTraversal);
+            Accumulator.DrawImage(Screen, Camera.Config.DrawingMode);
             if (Camera.Config.DebugInfo) DrawDebugInformation();
         }
 

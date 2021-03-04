@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using OpenTK.Mathematics;
+using PathTracer.Pathtracing.SceneObjects.CameraParts;
 using System;
 using System.IO;
 
@@ -9,7 +10,7 @@ namespace PathTracer.Utilities {
         /// <summary> Whether it is drawing debug information </summary>
         public bool DebugInfo { get; set; } = false;
         /// <summary> Whether to draw the amount of BVH traversals instead of normal light </summary>
-        public bool DrawBVHTraversal { get; set; } = false;
+        public DrawingMode DrawingMode { get; set; } = DrawingMode.Light;
         /// <summary> Minimum amount of rays to trace in a tick </summary>
         public int MinimumRayCount { get; set; } = 10_000;
         /// <summary> The targeted framerate of the raytracer </summary>

@@ -3,8 +3,9 @@
 **Theo Harkes (5672120)**
 
 #### Required:
-- .Net Framework 4.7.2 (Raytracer)
-- .Net Core 2.1 (UnitTests)
+Visual Studio 2019 with:
+- .Net 5
+- Class Designer (to view the class diagram)
 
 #### Features:
 - Raytracing architecture
@@ -32,14 +33,14 @@
 - W,A,S,D:      Move Camera
 - Space:        Move Camera Up
 - Shift:        Move Camera Down
-- F1:           Toggle Debug Information
-- F2:           Toggle BVHTraversal Color Scale
+- F1:           Toggle debug information
+- F2:           Cycle through viewing mode
 - Numpad '+':   Increase FOV
 - Numpad '-':   Decrease FOV
-- ESC           Exit the renderer and save the Camera Configuration
+- ESC           Exit the application
 
 #### References:
-- Many Parts: Course Slides of Graphics & Advanced Graphics at the UU
+- Many Parts: Course Slides of Graphics & Advanced Graphics at the Utrecht University
 - OpenTK: https://github.com/opentk/opentk
 - Triangle Intersection: https://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm
 - Sphere Intersection: https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-sphere-intersection
@@ -50,17 +51,6 @@
 - SBVH Implementation: Parallel Spatial Splits in Bounding Volume Hierarchies - V. Fuetterling, C. Lojewski, F.-J Pfreundt and A. Ebert
 
 ## Notes to Self
-#### Worthwile Additions:
-- Loading of meshes and scenes
-- Adaptive Sampling
-- Self intersection Epsilon: A Fast and Robust Method for Avoiding Self-Intersection - C. Wächter and N. Binder
-- Rendering equation for Path Tracing
-- Path Guiding
-
-#### Crazy Ideas:
-- Take hemisphere of a point on a primitive as camera position and view frustum
-- Fix float/double imprecision (Relative epsilon; ULPs; Arbitrary-precision type like BigDecimal)
-
 #### Monte Carlo integration required for:
 - Area Lights (Random point on area of light)
 - Indirect Illumination (Random bounce over hemisphere)

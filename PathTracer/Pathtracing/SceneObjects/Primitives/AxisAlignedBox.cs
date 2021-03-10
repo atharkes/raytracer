@@ -22,7 +22,7 @@ namespace PathTracer.Pathtracing.SceneObjects.Primitives {
         }
 
         public override Vector3 GetNormal(Vector3 surfacePosition) {
-            Vector3 direction = surfacePosition - Center;
+            Vector3 direction = Vector3.Divide(surfacePosition - Center, Size);
             if (direction.X > direction.Y && direction.X > direction.Z) {
                 return Vector3.UnitX;
             } else if (direction.Y > direction.Z) {

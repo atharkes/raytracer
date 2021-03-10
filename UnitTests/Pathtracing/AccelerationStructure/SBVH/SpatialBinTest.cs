@@ -3,7 +3,7 @@ using OpenTK.Mathematics;
 using PathTracer.Pathtracing.AccelerationStructures.SBVH;
 using PathTracer.Utilities;
 
-namespace UnitTests.Raytracing.AccelerationStructure.SBVH {
+namespace UnitTests.Pathtracing.AccelerationStructure.SBVH {
     [TestClass]
     public class SpatialBinTest {
         [TestMethod]

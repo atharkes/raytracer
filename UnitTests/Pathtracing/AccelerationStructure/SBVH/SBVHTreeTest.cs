@@ -6,7 +6,7 @@ using PathTracer.Utilities;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace UnitTests.Raytracing.AccelerationStructure.SBVH {
+namespace UnitTests.Pathtracing.AccelerationStructure.SBVH {
     [TestClass]
     public class SBVHTreeTest {
         static SBVHTree RandomSBVH(int primitiveAmount) {

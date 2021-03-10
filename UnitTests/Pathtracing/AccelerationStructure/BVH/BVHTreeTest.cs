@@ -6,7 +6,7 @@ using PathTracer.Utilities;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace UnitTests.Raytracing.AccelerationStructure.BVH {
+namespace UnitTests.Pathtracing.AccelerationStructure.BVH {
     [TestClass]
     public class BVHTreeTest {
         static BVHTree RandomBVH(int primitiveAmount) {

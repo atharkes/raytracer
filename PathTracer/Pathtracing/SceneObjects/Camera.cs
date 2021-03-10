@@ -56,8 +56,8 @@ namespace PathTracer.Pathtracing.SceneObjects {
         /// <summary> Turn the view direction of the camera </summary>
         /// <param name="direction">The direction to turn the camera in</param>
         public void Turn(Vector3 direction) {
-            Config.ViewDirection += direction * Config.ViewSensitivity;
-            Config.ViewDirection.Normalize();
+            Vector3 newDirection = Config.ViewDirection + direction * Config.ViewSensitivity;
+            Config.ViewDirection = newDirection.Normalized();
             ScreenPlane.Update();
         }
 

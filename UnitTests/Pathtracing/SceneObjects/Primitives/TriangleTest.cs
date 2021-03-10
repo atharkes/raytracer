@@ -5,7 +5,7 @@ using PathTracer.Pathtracing.SceneObjects.Primitives;
 using PathTracer.Utilities;
 using System.Collections.Generic;
 
-namespace UnitTests.Raytracing.SceneObjects.Primitives {
+namespace UnitTests.Pathtracing.SceneObjects.Primitives {
     [TestClass]
     public class TriangleTest {
         [TestMethod]

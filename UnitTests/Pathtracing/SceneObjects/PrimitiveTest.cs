@@ -4,7 +4,7 @@ using PathTracer.Pathtracing.AccelerationStructures.SBVH;
 using PathTracer.Pathtracing.SceneObjects;
 using PathTracer.Utilities;
 
-namespace UnitTests.Raytracing.SceneObjects {
+namespace UnitTests.Pathtracing.SceneObjects {
     [TestClass]
     public class PrimitiveTest {
         [TestMethod]

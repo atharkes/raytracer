@@ -1,9 +1,10 @@
 ﻿using OpenTK.Mathematics;
+using PathTracer.Pathtracing.SceneObjects.Primitives;
 using PathTracer.Utilities;
 
 namespace PathTracer.Pathtracing.SceneObjects.CameraParts {
     /// <summary> A cavity of the accumulator that catches light </summary>
-    public class Cavity {
+    public class Cavity : Rectangle {
         /// <summary> The amount of light in the cavity </summary>
         public Vector3 Light { get; private set; } = Vector3.Zero;
         /// <summary> The amount of photons caught by the cavity </summary>

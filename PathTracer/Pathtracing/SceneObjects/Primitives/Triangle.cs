@@ -2,20 +2,20 @@
 using System;
 
 namespace PathTracer.Pathtracing.SceneObjects.Primitives {
-    /// <summary> A triangle primitive for the 3d scene </summary>
+    /// <summary> A <see cref="Triangle"/> <see cref="Primitive"/> </summary>
     public class Triangle : Primitive {
         /// <summary> Epsilon used for the Möller–Trumbore triangle intersection </summary>
         public const float IntersectionEpsilon = 0.0000001f;
 
-        /// <summary> The first point of the triangle </summary>
+        /// <summary> The first point of the <see cref="Triangle"/> </summary>
         public Vector3 P1 { get; }
-        /// <summary> The second point of the triangle </summary>
+        /// <summary> The second point of the <see cref="Triangle"/> </summary>
         public Vector3 P2 { get; }
-        /// <summary> The third point of the triangle </summary>
+        /// <summary> The third point of the <see cref="Triangle"/> </summary>
         public Vector3 P3 { get; }
-        /// <summary> The normal of the triangle </summary>
+        /// <summary> The normal of the <see cref="Triangle"/> </summary>
         public Vector3 Normal { get; }
-        /// <summary> Get the AABB bounds of the triangle </summary>
+        /// <summary> The bounds of the <see cref="Triangle"/> </summary>
         public override Vector3[] Bounds {
             get {
                 Vector3 min = Vector3.ComponentMin(P1, Vector3.ComponentMin(P2, P3));
@@ -23,24 +23,26 @@ namespace PathTracer.Pathtracing.SceneObjects.Primitives {
                 return new Vector3[] { min, max };
             }
         }
+        /// <summary> The surface area of the <see cref="Triangle"/> </summary>
+        public override float SurfaceArea => Vector3.Cross(P2 - P1, P3 - P1).Length * 0.5f;
 
-        /// <summary> Create a new triangle object for the 3d scene </summary>
-        /// <param name="p1">The first point of the triangle</param>
-        /// <param name="p2">The second point of the triangle</param>
-        /// <param name="p3">The third point of the triangle</param>
-        /// <param name="normal">The optional normal value; default is clockwise</param>
-        /// <param name="material">The material of the triangle</param>
+        /// <summary> Create a new <see cref="Triangle"/></summary>
+        /// <param name="p1">The first point of the <see cref="Triangle"/></param>
+        /// <param name="p2">The second point of the <see cref="Triangle"/></param>
+        /// <param name="p3">The third point of the <see cref="Triangle"/></param>
+        /// <param name="normal">The normal of the <see cref="Triangle"/>. Clockwise in order of points is the default.</param>
+        /// <param name="material">The <see cref="Material"/> of the <see cref="Triangle"/></param>
         public Triangle(Vector3 p1, Vector3 p2, Vector3 p3, Vector3? normal = null, Material? material = null) : base((p1 + p2 + p3) / 3f, material) {
             P1 = p1;
             P2 = p2;
             P3 = p3;
-            Normal = normal ?? Vector3.Cross(p2 - p1, p3 - p1).Normalized();
+            Normal = normal?.Normalized() ?? Vector3.Cross(p2 - p1, p3 - p1).Normalized();
         }
 
-        /// <summary> Create a <paramref name="random"/> point on the surface of the <see cref="Triangle"/> </summary>
-        /// <param name="random">The <see cref="Random"/> to determine the location of the point</param>
+        /// <summary> Get a <paramref name="random"/> point on the surface of the <see cref="Triangle"/> </summary>
+        /// <param name="random">The <see cref="Random"/> to decide the position on the surface</param>
         /// <returns>A <paramref name="random"/> point on the surface of the <see cref="Triangle"/></returns>
-        public override Vector3 GetSurfacePoint(Random random) {
+        public override Vector3 PointOnSurface(Random random) {
             Vector3 P1toP2 = P2 - P1;
             Vector3 P1toP3 = P3 - P1;
             float r1 = (float)random.NextDouble();
@@ -52,24 +54,18 @@ namespace PathTracer.Pathtracing.SceneObjects.Primitives {
             return P1 + P1toP2 * r1 + P1toP3 * r2;
         }
 
-        /// <summary> Get the normal of the triangle </summary>
-        /// <param name="surfacePoint">The intersection point to get the normal at</param>
-        /// <returns>The normal of the triangle at the intersection point</returns>
+        /// <summary> Get the normal of the <see cref="Triangle"/> </summary>
+        /// <param name="surfacePoint">The surface point to get the normal for</param>
+        /// <returns>The normal of the <see cref="Triangle"/></returns>
         public override Vector3 GetNormal(Vector3 surfacePoint) {
             return Normal;
         }
 
-        /// <summary> Intersect the <see cref="Triangle"/> with a <paramref name="ray"/> </summary>
+        /// <summary> Intersect the <see cref="Triangle"/> with a <paramref name="ray"/>.
+        /// Using Möller–Trumbore's triangle intersection. </summary>
         /// <param name="ray">The <see cref="Ray"/> to intersect the <see cref="Triangle"/> with</param>
-        /// <returns>Whether the <paramref name="ray"/> intersects the <see cref="Triangle"/></returns>
-        public override bool IntersectBool(Ray ray) {
-            return Intersect(ray) != null;
-        }
-
-        /// <summary> Intersect the triangle with a ray (Möller–Trumbore triangle intersection) </summary>
-        /// <param name="ray">The ray to intersect the triangle with</param>
-        /// <returns>The intersection with the triangle if there is any</returns>
-        public override Intersection? Intersect(Ray ray) {
+        /// <returns>Whether and when the <paramref name="ray"/> intersects the <see cref="Triangle"/></returns>
+        public override float? Intersect(Ray ray) {
             // Get vectors for two edges sharing V1
             Vector3 P1toP2 = P2 - P1;
             Vector3 P1toP3 = P3 - P1;
@@ -82,7 +78,7 @@ namespace PathTracer.Pathtracing.SceneObjects.Primitives {
             float determinantInverted = 1f / determinant;
 
             // Calculate distance from V1 to ray origin
-            Vector3 T = ray.Origin - P1;
+            Vector3 T = ray.Origin.Position - P1;
 
             // Calculate u parameter and test bound
             float u = Vector3.Dot(T, P) * determinantInverted;
@@ -97,18 +93,18 @@ namespace PathTracer.Pathtracing.SceneObjects.Primitives {
             if (t < IntersectionEpsilon || t > ray.Length) {
                 return null;
             } else {
-                return new Intersection(ray, t, this);
+                return t;
             }
         }
 
-        /// <summary> Clip this triangle by a plane </summary>
-        /// <param name="plane">The clipping plane to clip the triangle with</param>
-        /// <returns>The points that are left after clipping the triangle</returns>
+        /// <summary> Clip the <see cref="Triangle"/> by a <paramref name="plane"/> </summary>
+        /// <param name="plane">The <see cref="AxisAlignedPlane"/> to clip the <see cref="triangle"/> with</param>
+        /// <returns>The new points of the clipped <see cref="Triangle"/></returns>
         public Vector3[] GetClippedPoints(AxisAlignedPlane plane) {
             Vector3 v0 = P1 - plane.Position, v1 = P2 - plane.Position, v2 = P3 - plane.Position, v3;
             const float clipEpsilon = 0.00001f, clipEpsilon2 = 0.01f;
             // Distances to the plane (this is an array parallel to v[], stored as a vec3)
-            Vector3 dist = new Vector3(Vector3.Dot(v0, plane.Normal), Vector3.Dot(v1, plane.Normal), Vector3.Dot(v2, plane.Normal));
+            Vector3 dist = new(Vector3.Dot(v0, plane.Normal), Vector3.Dot(v1, plane.Normal), Vector3.Dot(v2, plane.Normal));
             if (dist.X < clipEpsilon2 && dist.Y < clipEpsilon2 && dist.Z < clipEpsilon2) {
                 // Case 1 (all clipped)
                 return Array.Empty<Vector3>();
@@ -147,7 +143,5 @@ namespace PathTracer.Pathtracing.SceneObjects.Primitives {
                 return new Vector3[] { v0, v1, v2 };
             }
         }
-
-        
     }
 }

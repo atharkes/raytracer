@@ -60,7 +60,7 @@ namespace PathTracer.Pathtracing.AccelerationStructures.SBVH {
                 SpatialBin left = new SpatialBin(binningDirection, binStart, binSize * i);
                 SpatialBin right = new SpatialBin(binningDirection, binSize * i, binEnd);
                 // Populate Split
-                foreach (Primitive primitive in AABB.Primitives) {
+                foreach (Primitive primitive in AABB.SceneObjects) {
                     int binID1 = (int)(k1 * (axis(primitive.Bounds[0]) - axis(AABB.MinBound)));
                     int binID2 = (int)(k1 * (axis(primitive.Bounds[1]) - axis(AABB.MinBound)));
                     if (binID1 < i && binID2 < i) left.AABB.Add(primitive);

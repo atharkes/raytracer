@@ -21,5 +21,17 @@ namespace PathTracer.Pathtracing.AccelerationStructures {
         public SBVHTree(List<Primitive> primitives) {
             Root = new SBVHNode(primitives);
         }
+
+        /// <summary> Intersect the <see cref="SBVHTree"/> with a <paramref name="ray"/> </summary>
+        /// <param name="ray">The <see cref="Ray"/> to intersect the <see cref="SBVHTree"/> with</param>
+        /// <returns>The found <see cref="Primitive"/> and distance along the <paramref name="ray"/></returns>
+        public override (Primitive Primitive, float Distance)? Intersect(Ray ray) {
+            (Primitive Primitive, float Distance)? intersection = base.Intersect(ray);
+            if (intersection.HasValue && intersection.Value.Primitive is PrimitiveFragment fragment) {
+                return (fragment.Original, intersection.Value.Distance);
+            } else {
+                return intersection;
+            }
+        }
     }
 }

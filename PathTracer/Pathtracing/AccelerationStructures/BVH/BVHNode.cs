@@ -58,7 +58,7 @@ namespace PathTracer.Pathtracing.AccelerationStructures.BVH {
         /// <summary> Get the best split for this node </summary>
         /// <returns>The best split for this BVH node</returns>
         protected virtual Split? GetSplit() {
-            if (BVHTree.Bin && AABB.Primitives.Count > BVHTree.BinAmount) {
+            if (BVHTree.Bin && AABB.SceneObjects.Count > BVHTree.BinAmount) {
                 Vector3 size = AABB.Size;
                 if (size.X > size.Y && size.X > size.Z) return BestBinSplit(Vector3.UnitX, v => v.X);
                 else if (size.Y > size.Z) return BestBinSplit(Vector3.UnitY, v => v.Y);
@@ -83,12 +83,12 @@ namespace PathTracer.Pathtracing.AccelerationStructures.BVH {
         /// <summary> Split linearly over primitives after using a sorting function </summary>
         /// <param name="axisSortingFunc">The sorting function to sort the primitives with before finding splits</param>
         /// <returns>The best split using the sorting funciton</returns>
-        Split? BestLinearSplitAfterSort(Vector3 sortDirection, Func<IAABB, float> axisSortingFunc) {
-            List<IAABB> orderedPrimitives = AABB.Primitives.OrderBy(axisSortingFunc).ToList();
-            Split? split = new Split(sortDirection, new AABB(), new AABB(orderedPrimitives));
-            IAABB? bestSplitPrimitive = null;
+        Split? BestLinearSplitAfterSort(Vector3 sortDirection, Func<IBoundable, float> axisSortingFunc) {
+            List<IBoundable> orderedPrimitives = AABB.SceneObjects.OrderBy(axisSortingFunc).ToList();
+            Split? split = new(sortDirection, new AABB(), new AABB(orderedPrimitives));
+            IBoundable? bestSplitPrimitive = null;
             float bestSplitCost = AABB.SurfaceAreaHeuristic;
-            foreach (IAABB primitive in orderedPrimitives) {
+            foreach (IBoundable primitive in orderedPrimitives) {
                 split.Left.Add(primitive);
                 split.Right.Remove(primitive);
                 float splitCost = split.SurfaceAreaHeuristic;
@@ -99,8 +99,8 @@ namespace PathTracer.Pathtracing.AccelerationStructures.BVH {
             }
             if (bestSplitPrimitive == null) return null;
             int bestSplitPrimitiveIndex = orderedPrimitives.IndexOf(bestSplitPrimitive) + 1;
-            List<IAABB> primitivesLeft = orderedPrimitives.GetRange(0, bestSplitPrimitiveIndex);
-            List<IAABB> primitivesRight = orderedPrimitives.GetRange(bestSplitPrimitiveIndex, orderedPrimitives.Count - bestSplitPrimitiveIndex);
+            List<IBoundable> primitivesLeft = orderedPrimitives.GetRange(0, bestSplitPrimitiveIndex);
+            List<IBoundable> primitivesRight = orderedPrimitives.GetRange(bestSplitPrimitiveIndex, orderedPrimitives.Count - bestSplitPrimitiveIndex);
             return new Split(sortDirection, primitivesLeft, primitivesRight);
         }
 
@@ -116,7 +116,7 @@ namespace PathTracer.Pathtracing.AccelerationStructures.BVH {
                 AABB left = new();
                 AABB right = new();
                 // Populate Split
-                foreach (IAABB primitive in AABB.Primitives) {
+                foreach (IBoundable primitive in AABB.SceneObjects) {
                     int binID = (int)(k1 * (axis(primitive.Center) - axis(AABB.MinBound)));
                     if (binID < i) left.Add(primitive);
                     else right.Add(primitive);
@@ -135,7 +135,7 @@ namespace PathTracer.Pathtracing.AccelerationStructures.BVH {
         /// <summary> Intersect and traverse the node with a ray </summary>
         /// <param name="ray">The ray to intersect the node with</param>
         /// <returns>The intersection in the node or any of its children</returns>
-        public Intersection? Intersect(Ray ray) {
+        public (Primitive Primitive, float Distance)? Intersect(Ray ray) {
             if (ray is CameraRay cameraRay) cameraRay.BVHTraversals++;
             if (!AABB.IntersectBool(ray)) {
                 return null;
@@ -149,9 +149,9 @@ namespace PathTracer.Pathtracing.AccelerationStructures.BVH {
         /// <summary> Intersect the children of this node </summary>
         /// <param name="ray">The ray to intersect the children with</param>
         /// <returns>The intersection in the children if there is any</returns>
-        Intersection? IntersectChildren(Ray ray) {
-            Intersection? firstIntersection;
-            Intersection? secondIntersection;
+        (Primitive Primitive, float Distance)? IntersectChildren(Ray ray) {
+            (Primitive Primitive, float Distance)? firstIntersection;
+            (Primitive Primitive, float Distance)? secondIntersection;
             if (Vector3.Dot(SplitDirection, ray.Direction) < 0) {
                 firstIntersection = Left?.Intersect(ray);
                 secondIntersection = Right?.Intersect(ray);
@@ -175,8 +175,8 @@ namespace PathTracer.Pathtracing.AccelerationStructures.BVH {
             if (!AABB.IntersectBool(ray)) {
                 return false;
             } else if (Leaf) {
-                foreach (Primitive primitive in AABB.Primitives) {
-                    if (primitive.IntersectBool(ray)) return true;
+                foreach (Primitive primitive in AABB.SceneObjects) {
+                    if (primitive.Intersects(ray)) return true;
                 }
                 return false;
             } else {

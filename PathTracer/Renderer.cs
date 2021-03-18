@@ -11,7 +11,7 @@ namespace PathTracer {
     /// <summary> Main class of the raytracer </summary>
     public class Renderer {
         /// <summary> Whether next event estimation is used </summary>
-        public bool NextEvenEstimation { get; set; } = true;
+        public bool NextEvenEstimation { get; set; } = false;
 
         /// <summary> The 3d scene in which the raytracing takes place </summary>
         public Scene Scene { get; }
@@ -49,7 +49,7 @@ namespace PathTracer {
         void TraceRays(int from, int to) {
             ICollection<Ray> rays = Guider.Samples(to - from, Utils.Random);
             foreach(Ray ray in rays) {
-                Vector3 pixelColor = Sample(ray, 0);
+                Vector3 pixelColor = Sample(ray);
                 if (ray is CameraRay cameraRay) {
                     cameraRay.Cavity.AddSample(pixelColor, cameraRay.BVHTraversals, cameraRay.Intersection);
                 }
@@ -60,81 +60,37 @@ namespace PathTracer {
         /// <param name="ray">The ray to intersect the scene with</param>
         /// <param name="recursionDepth">The recursion depth of tracing rays</param>
         /// <returns>The color at the origin of the ray</returns>
-        public Vector3 Sample(Ray ray, int recursionDepth = 0) {
-            if (recursionDepth > Ray.MaxRecursionDepth) {
-                return Vector3.Zero;
-            }
-            // Intersect with Scene
-            Intersection? intersection = ray.Trace(Scene);
-            if (intersection == null) return Vector3.Zero;
-            Vector3 directIllumination = Vector3.Zero;
-            if (NextEvenEstimation) {
-                directIllumination = NextEventEstimation(intersection);
-            }
+        public Vector3 Sample(Ray ray) {
+            if (ray.RecursionDepth > Ray.MaxRecursionDepth) return Vector3.Zero;
+
+            SurfacePoint? surfacePoint = ray.Trace(Scene);
+            if (surfacePoint == null) return Vector3.Zero;
             
-            Vector3 indirectIllumination = Vector3.Zero;
-            ICollection<Ray> samples = Guider.IndirectIllumination(intersection, Utils.Random);
+            Vector3 irradianceIn = Vector3.Zero;
+            ICollection<Ray> samples = Guider.IndirectIllumination(ray, surfacePoint, Utils.Random);
             foreach (Ray sample in samples) {
-                float NdotL = Vector3.Dot(intersection.Normal, sample.Direction);
-                indirectIllumination += NdotL * intersection.Primitive.Material.Color * Sample(sample, recursionDepth + 1);
+                irradianceIn += Sample(sample) * Vector3.Dot(sample.Direction, surfacePoint.Normal);
             }
-            Vector3 incomingLight = directIllumination + indirectIllumination;
 
-            Vector3 radianceOut;
-            if (intersection.Primitive.Material.Specularity > 0) {
-                // Specular
-                Vector3 reflectedIn = Sample(intersection.GetReflectedRay(), recursionDepth + 1);
-                Vector3 reflectedOut = reflectedIn * intersection.Primitive.Material.Color;
-                radianceOut = incomingLight * (1 - intersection.Primitive.Material.Specularity) + reflectedOut * intersection.Primitive.Material.Specularity;
-            } else if (intersection.Primitive.Material.Dielectric > 0) {
-                // Dielectric
-                float reflected = intersection.GetReflectivity();
-                float refracted = 1 - reflected;
-                Ray? refractedRay = intersection.GetRefractedRay();
-                Vector3 incRefractedLight = refractedRay != null ? Sample(refractedRay, recursionDepth + 1) : Vector3.Zero;
-                Vector3 incReflectedLight = Sample(intersection.GetReflectedRay(), recursionDepth + 1);
-                radianceOut = incomingLight * (1f - intersection.Primitive.Material.Dielectric) + (incRefractedLight * refracted + incReflectedLight * reflected) * intersection.Primitive.Material.Dielectric * intersection.Primitive.Material.Color;
-            } else {
-                // Diffuse
-                radianceOut = incomingLight;
-            }
-            if (!NextEvenEstimation) {
-                radianceOut += intersection.Primitive.GetEmmitance(ray);
-            }
-            return radianceOut;
-        }
-
-        /// <summary> Cast shadow rays from an intersection to every light and calculate the color </summary>
-        /// <param name="intersection">The intersection to cast the shadow rays from</param>
-        /// <returns>The color at the intersection</returns>
-        public Vector3 NextEventEstimation(Intersection intersection) {
-            Vector3 radianceOut = Vector3.Zero;
-            foreach (ShadowRay shadowRay in Guider.NextEventEstimation(intersection, Utils.Random)) {
-                float NdotL = Vector3.Dot(intersection.Normal, shadowRay.Direction);
-                if (NdotL < 0) {
-                    continue;
-                }
-                Intersection? lightIntersection = shadowRay.Trace(Scene);
-                if (lightIntersection == null) {
-                    continue;
-                }
-                Vector3 radianceIn = shadowRay.Light.GetEmmitance(shadowRay);
-                Vector3 irradiance = radianceIn * NdotL;
-                //if (intersection.Primitive.Material.Glossyness > 0) {
-                //    // Glossy Object: Phong-Shading
-                //    Vector3 glossyDirection = shadowRay.Direction + 2 * Vector3.Dot(shadowRay.Direction, -intersection.Normal) * intersection.Normal;
-                //    float dot = Vector3.Dot(glossyDirection, intersection.Ray.Direction);
-                //    if (dot > 0) {
-                //        float glossyness = (float)Math.Pow(dot, intersection.Primitive.Material.GlossSpecularity);
-                //        irradiance = radianceIn * ((1 - intersection.Primitive.Material.Glossyness) * NdotL + intersection.Primitive.Material.Glossyness * glossyness);
-                //    } else {
-                //        irradiance = radianceIn * (1 - intersection.Primitive.Material.Glossyness) * NdotL;
-                //    }
-                //}
-                // Absorption
-                radianceOut += irradiance * intersection.Primitive.Material.Color;
-            }
-            return radianceOut;
+            //Vector3 radianceOut;
+            //if (surfacePoint.Primitive.Material.Specularity > 0) {
+            //    // Specular
+            //    Vector3 reflectedIn = Sample(intersection.Reflect());
+            //    Vector3 reflectedOut = reflectedIn * intersection.SurfacePoint.Primitive.Material.Color;
+            //    radianceOut = irradianceIn * (1 - intersection.SurfacePoint.Primitive.Material.Specularity) + reflectedOut * surfacePoint.Primitive.Material.Specularity;
+            //} else if (surfacePoint.Primitive.Material.Dielectric > 0) {
+            //    // Dielectric
+            //    float reflected = intersection.Reflectivity();
+            //    float refracted = 1 - reflected;
+            //    Ray? refractedRay = intersection.Refract();
+            //    Vector3 incRefractedLight = refractedRay != null ? Sample(refractedRay) : Vector3.Zero;
+            //    Vector3 incReflectedLight = Sample(intersection.Reflect());
+            //    radianceOut = irradianceIn * (1f - surfacePoint.Primitive.Material.Dielectric) + (incRefractedLight * refracted + incReflectedLight * reflected) * surfacePoint.Primitive.Material.Dielectric * surfacePoint.Primitive.Material.Color;
+            //} else {
+            //    // Diffuse
+            //    radianceOut = irradianceIn;
+            //}
+            return irradianceIn * surfacePoint.Primitive.Material.Color + surfacePoint.Primitive.GetEmmitance(ray);
         }
     }
 }

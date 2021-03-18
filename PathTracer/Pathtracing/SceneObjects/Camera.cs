@@ -93,7 +93,10 @@ namespace PathTracer.Pathtracing.SceneObjects {
         /// <param name="y">The y position of the pixel</param>
         /// <returns>The ray from the camera through the screen plane</returns>
         public CameraRay CreateCameraRay(int x, int y) {
-            return new CameraRay(Position, ScreenPlane.GetPixelPosition(x, y) - Position, ScreenPlane.Accumulator.Cavities[x + y * ScreenPlane.Screen.Width]);
+            Cavity cavity = ScreenPlane.Accumulator.Cavities[x + y * ScreenPlane.Screen.Width];
+            SurfacePoint origin = new SurfacePoint(cavity, Position, Front);
+            Vector3 direction = ScreenPlane.GetPixelPosition(x, y) - Position;
+            return new CameraRay(origin, direction, cavity);
         }
 
         /// <summary> Returns how many rays should be traced in the next tick </summary>

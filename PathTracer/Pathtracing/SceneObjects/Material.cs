@@ -8,9 +8,9 @@ namespace PathTracer.Pathtracing.SceneObjects {
         /// <summary> The color of the primitive </summary>
         public Vector3 Color { get; set; } = Vector3.One;
         /// <summary> How specular this primitive is. A specular object reflects light like a mirror. </summary>
-        public float Specularity { get; set; } = 0;
+        public float Specularity { get; set; } = 0f;
         /// <summary> How dielectric this primitive is. A dielectric object both passes light and reflects it like water or glass. </summary>
-        public float Dielectric { get; set; } = 0;
+        public float Dielectric { get; set; } = 0f;
         /// <summary> The refraction index of this primitive if it is a dielectric. This is typically a value between 1 and 3.
         /// <para> Vacuum 1 </para>
         /// <para> Gases at 0 °C: Air 1.000293, Helium 1.000036, Hydrogen 1.000132, Carbon dioxide 1.00045 </para>
@@ -18,19 +18,19 @@ namespace PathTracer.Pathtracing.SceneObjects {
         /// <para> Solids: Ice 1.31, Fused silica(quartz) 1.46, Plexiglas 1.49, Window glass 1.52, 
         /// Flint glass 1.62, Sapphire 1.77, Cubic zirconia 2.15, Diamond 2.42, Moissanite 2.65 </para>
         /// </summary>
-        public float RefractionIndex { get; set; } = 1;
+        public float RefractionIndex { get; set; } = 1f;
         /// <summary> The glossyness of the primitive </summary>
-        public float Glossyness { get; set; } = 0;
+        public float Glossyness { get; set; } = 0f;
         /// <summary> The gloss specularity of the primitive </summary>
-        public float GlossSpecularity { get; set; } = 0;
+        public float GlossSpecularity { get; set; } = 0f;
 
         /// <summary> How much light this material is emitting (in watt/m^2) </summary>
-        public float EmittingStrength { get; set; } = 0;
+        public float EmittingStrength { get; set; } = 0f;
 
         /// <summary> The light this material is emitting </summary>
         public Vector3 EmittingLight => Color * EmittingStrength;
         /// <summary> Whether this material is emitting light </summary>
-        public bool Emitting => EmittingStrength > 0;
+        public bool Emitting => EmittingStrength > 0f;
 
         /// <summary> Create a new material </summary>
         /// <param name="color">The color of the material</param>
@@ -81,19 +81,25 @@ namespace PathTracer.Pathtracing.SceneObjects {
             return new Material(Utils.DetRandom.Next(1, 50), Utils.DetRandom.Vector());
         }
 
+        /// <summary> The default material is bright green </summary>
+        public static Material Default => new(new Vector3(0f, float.MaxValue, 0f));
+        /// <summary> Create a diffuse white material </summary>
+        public static Material DiffuseWhite => new(new Vector3(0.8f, 0.8f, 0.8f));
         /// <summary> Create a diffuse green material </summary>
-        public static Material DiffuseGreen => new(new Vector3(0.1f, 0.4f, 0.1f));
+        public static Material DiffuseGreen => new(new Vector3(0.2f, 0.8f, 0.2f));
         /// <summary> Create a diffuse yellow material </summary>
-        public static Material DiffuseYellow => new(new Vector3(0.4f, 0.4f, 0.1f));
+        public static Material DiffuseYellow => new(new Vector3(0.8f, 0.8f, 0.2f));
         /// <summary> Create a glossy red material </summary>
-        public static Material GlossyRed => new(new Vector3(0.4f, 0.1f, 0.1f), 0, 0, 1, 0.5f, 15f);
+        public static Material GlossyRed => new(new Vector3(0.8f, 0.2f, 0.2f), 0, 0, 1, 0.5f, 15f);
         /// <summary> Create a glossy green material </summary>
-        public static Material GlossyGreen => new(new Vector3(1, 1, 0.8f), 0, 0, 1, 0.7f, 50f);
+        public static Material GlossyGreen => new(new Vector3(0.2f, 0.8f, 0.2f), 0, 0, 1, 0.7f, 50f);
         /// <summary> Create a glossy mirror with a purple hue </summary>
-        public static Material GlossyPurpleMirror => new(new Vector3(1, 0.8f, 1), 0.4f, 0, 1, 0.7f, 50f);
+        public static Material GlossyPurpleMirror => new(new Vector3(0.8f, 0.2f, 0.8f), 0.4f, 0, 1, 0.7f, 50f);
         /// <summary> Create a mirror material </summary>
         public static Material Mirror => new(new Vector3(0.9f, 0.9f, 0.9f), 0.97f);
         /// <summary> Create a glass material </summary>
-        public static Material Glass => new(new Vector3(0.4f, 0.4f, 0.9f), 0, 0.97f, 1.62f);
+        public static Material Glass => new(new Vector3(0.9f, 0.9f, 0.9f), 0, 0.97f, 1.62f);
+
+        public static Material WhiteLight => new(1f, Vector3.One);
     }
 }

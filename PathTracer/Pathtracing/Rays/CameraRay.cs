@@ -15,7 +15,7 @@ namespace PathTracer.Pathtracing.Rays {
         /// <param name="origin">The origin of the ray</param>
         /// <param name="direction">The direction of the ray</param>
         /// <param name="cavity">The cavity from which this ray originates</param>
-        public CameraRay(Vector3 origin, Vector3 direction, Cavity cavity, float length = float.PositiveInfinity) : base(origin, direction, length, 0) {
+        public CameraRay(SurfacePoint origin, Vector3 direction, Cavity cavity, float length = float.PositiveInfinity) : base(origin, direction, length, 0) {
             Cavity = cavity;
         }
     }

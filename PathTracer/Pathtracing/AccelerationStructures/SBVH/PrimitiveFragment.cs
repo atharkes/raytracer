@@ -3,53 +3,59 @@ using PathTracer.Pathtracing.SceneObjects;
 using System;
 
 namespace PathTracer.Pathtracing.AccelerationStructures.SBVH {
-    /// <summary> A fragment of a primitive for the SBVH construction </summary>
+    /// <summary> A fragment of a <see cref="Primitive"/> used for spatial splits in the <see cref="SBVHTree"/> </summary>
     public class PrimitiveFragment : Primitive {
-        /// <summary> The original primitive of the fragment </summary>
+        /// <summary> The original <see cref="Primitive"/> of the <see cref="PrimitiveFragment"/> </summary>
         public Primitive Original { get; }
-        /// <summary> The bounds of the fragment </summary>
+        /// <summary> The bounds of the <see cref="PrimitiveFragment"/> </summary>
         public override Vector3[] Bounds { get; }
+        /// <summary> The surface area of the <see cref="PrimitiveFragment"/> </summary>
+        public override float SurfaceArea => Original.SurfaceArea;
 
-        /// <summary> Create a new fragment of a primitive </summary>
-        /// <param name="original">The original primitive</param>
-        /// <param name="bounds">The bounds of the fragment</param>
+        /// <summary> Create a new <see cref="PrimitiveFragment"/> </summary>
+        /// <param name="original">The original <see cref="Primitive"/></param>
+        /// <param name="bounds">The bounds of the <see cref="PrimitiveFragment"/></param>
         public PrimitiveFragment(Primitive original, Vector3[] bounds) {
             Original = original;
             Bounds = bounds;
             Position = bounds[0] + 0.5f * (bounds[1] - bounds[0]);
         }
 
-        /// <summary> Intersect the fragment with a ray by intersecting its original primitive </summary>
-        /// <param name="ray">The ray to intersect the fragment with</param>
-        /// <returns>The intersection with the original primitive if there is any</returns>
-        public override Intersection? Intersect(Ray ray) {
+        /// <summary> Intersect the <see cref="PrimitiveFragment"/> with a <paramref name="ray"/> </summary>
+        /// <param name="ray">The <see cref="Ray"/> to intersect the <see cref="PrimitiveFragment"/> with</param>
+        /// <returns>Whether and when the <paramref name="ray"/> intersects the <see cref="PrimitiveFragment"/></returns>
+        public override float? Intersect(Ray ray) {
             return Original.Intersect(ray);
         }
 
-        /// <summary> Intersect the fragment with a ray by intersecting its original primitive </summary>
-        /// <param name="ray">The <see cref="Ray"/> to intersect the <see cref="Primitive"/> with</param>
-        /// <returns>Whether the <paramref name="ray"/> intersects the original primitive</returns>
-        public override bool IntersectBool(Ray ray) {
-            return Original.IntersectBool(ray);
+        /// <summary> Intersect the <see cref="PrimitiveFragment"/> with a <paramref name="ray"/> </summary>
+        /// <param name="ray">The <see cref="Ray"/> to intersect the <see cref="PrimitiveFragment"/> with</param>
+        /// <returns>Whether the <paramref name="ray"/> intersects the <see cref="PrimitiveFragment"/></returns>
+        public override bool Intersects(Ray ray) {
+            return Original.Intersects(ray);
         }
 
         /// <summary> Get a <paramref name="random"/> surface point on the <see cref="PrimitiveFragment"/> </summary>
-        /// <param name="random">The <see cref="Random"/> to determine the location of the surface point</param>
-        /// <returns>A <paramref name="random"/> surface point on the <see cref="Original"/></returns>
-        public override Vector3 GetSurfacePoint(Random random) {
-            return Original.GetSurfacePoint(random);
+        /// <param name="random">The <see cref="Random"/> to determine the position on the surface</param>
+        /// <returns>A <paramref name="random"/> surface point on the <see cref="PrimitiveFragment"/></returns>
+        public override Vector3 PointOnSurface(Random random) {
+            return Original.PointOnSurface(random);
         }
 
-        /// <summary> Get the normal of the fragment at an intersect location using the original primitive </summary>
-        /// <param name="surfacePoint">The intersection point to get the normal at</param>
-        /// <returns>The normal of the original primitive at the intersection point</returns>
+        /// <summary> Get the normal of the <see cref="PrimitiveFragment"/> at a specified <paramref name="surfacePoint"/> </summary>
+        /// <param name="surfacePoint">The surface point to get the normal for</param>
+        /// <returns>The normal of the <see cref="PrimitiveFragment"/> at the specified <paramref name="surfacePoint"/> </returns>
         public override Vector3 GetNormal(Vector3 surfacePoint) {
             return Original.GetNormal(surfacePoint);
         }
 
-        /// <summary> Clipping a fragment doesn't create a fragment of a fragment </summary>
-        /// <param name="plane">The plane to clip the fragment with</param>
-        /// <returns>Creates a smaller fragment of the original primitive</returns>
+        public override Vector3 GetEmmitance(Ray ray) {
+            return Original.GetEmmitance(ray);
+        }
+
+        /// <summary> Clip the <see cref="PrimitiveFragment"/> by a <paramref name="plane"/></summary>
+        /// <param name="plane">The <see cref="AxisAlignedPlane"/> to clip the <see cref="PrimitiveFragment"/> with</param>
+        /// <returns>A new <see cref="PrimitiveFragment"/> with clipped bounds</returns>
         public override PrimitiveFragment? Clip(AxisAlignedPlane plane) {
             PrimitiveFragment? newFragment = Original.Clip(plane);
             if (newFragment == null) {

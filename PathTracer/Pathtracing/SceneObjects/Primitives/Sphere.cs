@@ -2,56 +2,54 @@
 using System;
 
 namespace PathTracer.Pathtracing.SceneObjects.Primitives {
-    /// <summary> A sphere primitive for the 3d scene </summary>
+    /// <summary> A <see cref="Sphere"/> <see cref="Primitive"/> to represent objects in the <see cref="Scene"/> </summary>
     public class Sphere : Primitive {
-        /// <summary> The radius of the sphere </summary>
+        /// <summary> The radius of the <see cref="Sphere"/> </summary>
         public float Radius { get; set; }
-        /// <summary> Get the AABB bounds of the sphere </summary>
+        /// <summary> The bounds of the <see cref="Sphere"/> </summary>
         public override Vector3[] Bounds => new Vector3[] { Position - Vector3.One * Radius, Position + Vector3.One * Radius };
+        /// <summary> The surface area of the <see cref="Sphere"/> </summary>
+        public override float SurfaceArea => 4f * (float)Math.PI * Radius * Radius;
 
-        /// <summary> Create a new sphere object for the 3d scene </summary>
-        /// <param name="position">The position of the sphere</param>
-        /// <param name="radius">The radius of the sphere</param>
-        /// <param name="material">The material of the sphere</param>
+        /// <summary> Create a new <see cref="Sphere"/> </summary>
+        /// <param name="position">The position of the <see cref="Sphere"/></param>
+        /// <param name="radius">The radius of the <see cref="Sphere"/></param>
+        /// <param name="material">The material of the <see cref="Sphere"/></param>
         public Sphere(Vector3 position, float radius = 1, Material? material = null) : base(position, material) {
             Radius = radius;
         }
 
-        public override Vector3 GetSurfacePoint(Random random) {
+        /// <summary> Get a <paramref name="random"/> point on the surface of the <see cref="Sphere"/> </summary>
+        /// <param name="random">The <see cref="Random"/> to decide the position on the surface</param>
+        /// <returns>A <paramref name="random"/> point on the surface of the <see cref="Sphere"/></returns>
+        public override Vector3 PointOnSurface(Random random) {
             throw new NotImplementedException();
         }
 
-        /// <summary> Get the normal of the sphere at a point of intersection </summary>
-        /// <param name="surfacePoint">The intersection point to get the normal at</param>
-        /// <returns>The normal at the point of intersection</returns>
+        /// <summary> Get the normal of the <see cref="Sphere"/> at a specified <paramref name="surfacePoint"/> </summary>
+        /// <param name="surfacePoint">The surface point to get the normal for</param>
+        /// <returns>The normal at the <paramref name="surfacePoint"/></returns>
         public override Vector3 GetNormal(Vector3 surfacePoint) {
             return (surfacePoint - Position).Normalized();
         }
 
-        /// <summary> Intersect the sphere with a ray </summary>
-        /// <param name="ray">The ray to intersect the sphere with</param>
-        /// <returns>Whether the ray intersects the sphere</returns>
-        public override bool IntersectBool(Ray ray) {
-            return Intersect(ray) != null;
-        }
-
-        /// <summary> Intersect the sphere with a ray </summary>
-        /// <param name="ray">The ray to intersect the sphere with</param>
-        /// <returns>The intersection with the sphere if there is any</returns>
-        public override Intersection? Intersect(Ray ray) {
-            Vector3 sphereFromRayOrigin = Position - ray.Origin;
-            float sphereInDirectionOfRay = Vector3.Dot(sphereFromRayOrigin, ray.Direction);
-            float rayNormalDistance = Vector3.Dot(sphereFromRayOrigin, sphereFromRayOrigin) - sphereInDirectionOfRay * sphereInDirectionOfRay;
+        /// <summary> Intersect the <see cref="Sphere"/> with a <paramref name="ray"/> </summary>
+        /// <param name="ray">The <see cref="Ray"/> to intersect the <see cref="Sphere"/> with</param>
+        /// <returns>Whether and when the <see cref="Ray"/>intersects the <see cref="Sphere"/></returns>
+        public override float? Intersect(Ray ray) {
+            Vector3 rayOriginToSpherePosition = Position - ray.Origin.Position;
+            float sphereInDirectionOfRay = Vector3.Dot(rayOriginToSpherePosition, ray.Direction);
+            float rayNormalDistance = rayOriginToSpherePosition.LengthSquared - sphereInDirectionOfRay * sphereInDirectionOfRay;
             if (rayNormalDistance > Radius * Radius) {
                 return null;
             }
-            float raySphereDist = (float)Math.Sqrt(Radius * Radius - rayNormalDistance);
-            float intersection1 = sphereInDirectionOfRay - raySphereDist;
-            float intersection2 = sphereInDirectionOfRay + raySphereDist;
+            float raySphereDistance = (float)Math.Sqrt(Radius * Radius - rayNormalDistance);
+            float intersection1 = sphereInDirectionOfRay - raySphereDistance;
+            float intersection2 = sphereInDirectionOfRay + raySphereDistance;
             if (ray.WithinBounds(intersection1)) {
-                return new Intersection(ray, intersection1, this);
+                return intersection1;
             } else if (ray.WithinBounds(intersection2)) {
-                return new Intersection(ray, intersection2, this);
+                return intersection2;
             } else {
                 return null;
             }

@@ -2,10 +2,11 @@
 using PathTracer.Pathtracing.AccelerationStructures.BVH;
 using PathTracer.Pathtracing.AccelerationStructures.SBVH;
 using System;
+using System.Diagnostics;
 
 namespace PathTracer.Pathtracing.SceneObjects {
-    /// <summary> An abstract primitive for the 3d scene </summary>
-    public abstract class Primitive : ISceneObject, IAABB {
+    /// <summary> An abstract <see cref="Primitive"/> for displaying objects in the <see cref="Scene"/> </summary>
+    public abstract class Primitive : ISceneObject, IBoundable {
         /// <summary> The position of the primitive </summary>
         public Vector3 Position { get; set; }
         /// <summary> The material of the primitive </summary>
@@ -16,34 +17,38 @@ namespace PathTracer.Pathtracing.SceneObjects {
         public Vector3 Size => Bounds[1] - Bounds[0];
         /// <summary> The center of the AABB of the primitive equals the position </summary>
         public Vector3 Center => Position;
+        /// <summary> Get the surface area of the <see cref="Primitive"/> </summary>
+        public abstract float SurfaceArea { get; }
 
         /// <summary> Create a new <see cref="Primitive"/> </summary>
         /// <param name="position">The <see cref="Position"/> of the <see cref="Primitive"/></param>
         /// <param name="material">The <see cref="Material"/> of the <see cref="Primitive"/></param>
         protected Primitive(Vector3? position = null, Material? material = null) {
             Position = position ?? Vector3.Zero;
-            Material = material ?? Material.Random();
+            Material = material ?? Material.Default;
         }
 
         /// <summary> Get a <paramref name="random"/> point on the surface of the <see cref="Primitive"/> </summary>
         /// <param name="random">The <see cref="Random"/> to decide the location of the point </param>
+        /// <param name="origin">The origin to offset the position and normal towards</param>
         /// <returns>A <paramref name="random"/> point on the surface of the <see cref="Primitive"/></returns>
-        public abstract Vector3 GetSurfacePoint(Random random);
+        public abstract Vector3 PointOnSurface(Random random);
 
         /// <summary> Get the normal at a <paramref name="surfacePoint"/> on this <see cref="Primitive"/> </summary>
         /// <param name="surfacePoint">The surface point to get the normal at</param>
+        /// <param name="origin">The origin to point the normal towards</param>
         /// <returns>The normal at the specified <paramref name="surfacePoint"/> on the <see cref="Primitive"/></returns>
         public abstract Vector3 GetNormal(Vector3 surfacePoint);
 
         /// <summary> Intersect the <see cref="Primitive"/> with a <paramref name="ray"/> </summary>
         /// <param name="ray">The <see cref="Ray"/> to intersect the <see cref="Primitive"/> with</param>
         /// <returns>Whether the <paramref name="ray"/> intersects the <see cref="Primitive"/></returns>
-        public abstract bool IntersectBool(Ray ray);
+        public virtual bool Intersects(Ray ray) => Intersect(ray).HasValue;
 
         /// <summary> Intersect this <see cref="Primitive"/> with a <paramref name="ray"/> </summary>
         /// <param name="ray">The <see cref="Ray"/> to intersect the <see cref="Primitive"/> with</param>
         /// <returns>The distance if the <see cref="Primitive"/> is hit by the <paramref name="ray"/></returns>
-        public abstract Intersection? Intersect(Ray ray);
+        public abstract float? Intersect(Ray ray);
 
         /// <summary> Clip the <see cref="Bounds"/> of the <see cref="Primitive"/> using a <paramref name="plane"/> </summary>
         /// <param name="plane">The <see cref="AxisAlignedPlane"/> to clip the <see cref="Bounds"/> with</param>
@@ -70,7 +75,8 @@ namespace PathTracer.Pathtracing.SceneObjects {
         }
 
         public virtual Vector3 GetEmmitance(Ray ray) {
-            return Material.EmittingLight * Vector3.Dot(GetNormal(ray.Destination), ray.Direction);
+            Debug.Assert(ray.Destination?.SurfacePoint.Primitive == this);
+            return Material.EmittingLight * Vector3.Dot(-ray.Destination.SurfacePoint.Normal, ray.Direction);
         }
     }
 }

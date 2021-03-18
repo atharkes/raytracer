@@ -33,7 +33,7 @@ namespace PathTracer.Pathtracing.AccelerationStructures.BVH {
         /// <summary> Create a new split with primitives </summary>
         /// <param name="primitivesLeft">The primitives for the left AABB</param>
         /// <param name="primitivesRight">The primitives for the right AABB</param>
-        public Split(Vector3 direction, IEnumerable<IAABB> primitivesLeft, IEnumerable<IAABB> primitivesRight) {
+        public Split(Vector3 direction, IEnumerable<IBoundable> primitivesLeft, IEnumerable<IBoundable> primitivesRight) {
             Direction = direction;
             Left = new AABB(primitivesLeft);
             Right = new AABB(primitivesRight);

@@ -1,9 +1,9 @@
 ﻿using OpenTK.Mathematics;
-using PathTracer.Pathtracing.SceneObjects;
+using PathTracer.Pathtracing.SceneDescription;
 using System;
 
 namespace PathTracer.Pathtracing {
-    /// <summary> A point on the surface of a <see cref="SceneObjects.Primitive"/>  </summary>
+    /// <summary> A point on the surface of a <see cref="SceneDescription.Shape"/>  </summary>
     public class SurfacePoint {
         /// <summary>
         /// Epsilon used to raise the surface point away from the primitive.
@@ -11,11 +11,11 @@ namespace PathTracer.Pathtracing {
         /// </summary>
         public const float RaiseEpsilon = 0.001f;
 
-        /// <summary> The <see cref="SceneObjects.Primitive"/> on which the <see cref="SurfacePoint"/> is lying </summary>
+        /// <summary> The <see cref="SceneDescription.Shape"/> on which the <see cref="SurfacePoint"/> is lying </summary>
         public Primitive Primitive { get; }
-        /// <summary> The point on the surface of a <see cref="SceneObjects.Primitive"/> </summary>
+        /// <summary> The point on the surface of a <see cref="SceneDescription.Shape"/> </summary>
         public Vector3 Position { get; }
-        /// <summary> The normal of the <see cref="SceneObjects.Primitive"/> at the <see cref="Position"/></summary>
+        /// <summary> The normal of the <see cref="SceneDescription.Shape"/> at the <see cref="Position"/></summary>
         public Vector3 Normal { get; }
         /// <summary> The amount to raise or lower <see cref="RaisedSurfacePoint"/>s </summary>
         public Vector3 Raise { get; }
@@ -25,7 +25,7 @@ namespace PathTracer.Pathtracing {
         public RaisedSurfacePoint BelowSurfacePoint { get; }
 
         /// <summary> Create a <see cref="SurfacePoint"/> </summary>
-        /// <param name="primitive">The <see cref="SceneObjects.Primitive"/> of the surface at the <paramref name="position"/> </param>
+        /// <param name="primitive">The <see cref="SceneDescription.Primitive"/> of the surface at the <paramref name="position"/> </param>
         /// <param name="position">The location of the <see cref="SurfacePoint"/></param>
         /// <param name="normal">The normal of the <paramref name="primitive"/> at the <paramref name="position"/></param>
         public SurfacePoint(Primitive primitive, Vector3 position, Vector3 normal) {
@@ -84,7 +84,7 @@ namespace PathTracer.Pathtracing {
             float refraction = n1 / n2;
             float cosThetaInc = Vector3.Dot(-Normal, direction);
             float k = 1f - refraction * refraction * (1f - cosThetaInc * cosThetaInc);
-            if (k < 0f) return 1f;
+            if (k < 0f) return 1f; // Full internal reflection
             float cosThetaOut = (float)Math.Sqrt(k);
             float reflectSPolarized = (float)Math.Pow((n1 * cosThetaInc - n2 * cosThetaOut) / (n1 * cosThetaInc + n2 * cosThetaOut), 2);
             float reflectPPolarized = (float)Math.Pow((n1 * cosThetaOut - n2 * cosThetaInc) / (n1 * cosThetaOut + n2 * cosThetaInc), 2);

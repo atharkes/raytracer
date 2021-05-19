@@ -22,4 +22,8 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Pathtracing\ScatteringPoints\" />
+  </ItemGroup>
+
 </Project>

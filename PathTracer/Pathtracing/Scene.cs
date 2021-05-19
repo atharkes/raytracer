@@ -1,16 +1,15 @@
 ﻿using OpenTK.Mathematics;
-using PathTracer.Pathtracing.AccelerationStructures;
-using PathTracer.Pathtracing.SceneObjects;
-using PathTracer.Pathtracing.SceneObjects.CameraParts;
-using PathTracer.Pathtracing.SceneObjects.Primitives;
-using PathTracer.Utilities;
+using PathTracer.Pathtracing.SceneDescription;
+using PathTracer.Pathtracing.SceneDescription.CameraParts;
+using PathTracer.Pathtracing.SceneDescription.Primitives;
+using PathTracer.Pathtracing.SceneDescription.Shapes;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace PathTracer.Pathtracing {
     /// <summary> The 3d scene in which the ray tracing takes place </summary>
-    public class Scene {
+    public class Scene : Aggregate {
         /// <summary> The camera in the scene </summary>
         public Camera Camera { get; }
         /// <summary> The acceleration structure used to find intersections </summary>
@@ -48,19 +47,19 @@ namespace PathTracer.Pathtracing {
 
         /// <summary> The primitives in the default scene </summary>
         public static List<Primitive> DefaultPrimitives => new() {
-            new AxisAlignedBox(new Vector3(-10, -5, -10), new Vector3(10, 10, 10), true) { Material = Material.WhiteLight },
-            new Sphere(new Vector3(-3, 1, 5), 1, Material.DiffuseGreen),
-            new Sphere(new Vector3(3, 1, 5), 1, Material.GlossyRed),
-            new Sphere(new Vector3(0, 1, 5), 1, Material.Mirror),
-            new Sphere(new Vector3(-1, 1, 2), 0.5f, Material.Glass),
-            new Triangle(new Vector3(-5, 0, 0), new Vector3(5, 0, 0), new Vector3(5, 0, 10), null, Material.GlossyPurpleMirror),
-            new Triangle(new Vector3(-5, 0, 0), new Vector3(5, 0, 10), new Vector3(-5, 0, 10), null, Material.DiffuseYellow),
+            new Primitive(new AxisAlignedBox(new Vector3(-10, -5, -10), new Vector3(10, 10, 10), true), Material.WhiteLight),
+            new Primitive(new Sphere(new Vector3(-3, 1, 5), 1), Material.DiffuseGreen),
+            new Primitive(new Sphere(new Vector3(3, 1, 5), 1), Material.GlossyRed),
+            new Primitive(new Sphere(new Vector3(0, 1, 5), 1), Material.Mirror),
+            new Primitive(new Sphere(new Vector3(-1, 1, 2), 0.5f), Material.Glass),
+            new Primitive(new Triangle(new Vector3(-5, 0, 0), new Vector3(5, 0, 0), new Vector3(5, 0, 10), null), Material.GlossyPurpleMirror),
+            new Primitive(new Triangle(new Vector3(-5, 0, 0), new Vector3(5, 0, 10), new Vector3(-5, 0, 10), null), Material.DiffuseYellow),
         };
 
         /// <summary> Intersect the <see cref="Scene"/> with a <paramref name="ray"/> </summary>
         /// <param name="ray">The <see cref="Ray"/> to intersect the <see cref="Scene"/> with</param>
         /// <returns>The <see cref="RaySurfaceInteraction"/> if there is any</returns>
-        public (Primitive, float)? Intersect(Ray ray) {
+        public (Shape, float)? Intersect(Ray ray) {
             return AccelerationStructure.Intersect(ray);
         }
 

@@ -1,5 +1,5 @@
 ﻿using OpenTK.Mathematics;
-using PathTracer.Pathtracing.SceneObjects.CameraParts;
+using PathTracer.Pathtracing.SceneDescription.CameraParts;
 
 namespace PathTracer.Pathtracing.Rays {
     /// <summary> A ray sent from the camera into the scene </summary>

@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenTK.Mathematics;
 using PathTracer.Pathtracing.AccelerationStructures.SBVH;
-using PathTracer.Pathtracing.SceneObjects;
+using PathTracer.Pathtracing.SceneDescription;
 using PathTracer.Utilities;
 
 namespace UnitTests.Pathtracing.SceneObjects {
@@ -9,13 +9,13 @@ namespace UnitTests.Pathtracing.SceneObjects {
     public class PrimitiveTest {
         [TestMethod]
         public void Constructor() {
-            Primitive primitive = Utils.Random.Primitive();
+            Shape primitive = Utils.Random.Primitive();
         }
 
         [TestMethod]
         public void Clip() {
             for (int i = 0; i < 100; i++) {
-                Primitive primitive = Utils.Random.Sphere();
+                Shape primitive = Utils.Random.Sphere();
                 Vector3[] bounds = primitive.Bounds;
                 AxisAlignedPlane plane = new AxisAlignedPlane(Utils.Random.UnitVector(), primitive.Position);
                 PrimitiveFragment fragment = primitive.Clip(plane);

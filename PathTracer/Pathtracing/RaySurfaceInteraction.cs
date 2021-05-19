@@ -1,13 +1,12 @@
 ﻿using OpenTK.Mathematics;
-using PathTracer.Pathtracing.SceneObjects;
 using System;
 
 namespace PathTracer.Pathtracing {
-    /// <summary> An interaction between a <see cref="Ray"/> and a <see cref="Primitive"/> at a <see cref="Pathtracing.SurfacePoint"/> </summary>
+    /// <summary> An interaction between a <see cref="Ray"/> and a <see cref="Shape"/> at a <see cref="Pathtracing.SurfacePoint"/> </summary>
     public class RaySurfaceInteraction {
         /// <summary> The <see cref="Ray"/> that interacts with a <see cref="Pathtracing.SurfacePoint"/> </summary>
         public Ray IncomingRay { get; }
-        /// <summary> The interaction point at a surface of a <see cref="Primitive"/> </summary>
+        /// <summary> The interaction point at a surface of a <see cref="Shape"/> </summary>
         public SurfacePoint SurfacePoint { get; }
 
         /// <summary> The distance from the origin of the ray to the intersection </summary>
@@ -19,7 +18,7 @@ namespace PathTracer.Pathtracing {
 
         /// <summary> Create a new <see cref="RaySurfaceInteraction"/> between a <see cref="Ray"/> and a <see cref="Pathtracing.SurfacePoint"/> </summary>
         /// <param name="incomingRay">The <see cref="Ray"/> that interacts with the <paramref name="surfacePoint"/></param>
-        /// <param name="surfacePoint">The <see cref="Pathtracing.SurfacePoint"/> of a <see cref="Primitive"/></param>
+        /// <param name="surfacePoint">The <see cref="Pathtracing.SurfacePoint"/> of a <see cref="Shape"/></param>
         public RaySurfaceInteraction(Ray incomingRay, SurfacePoint surfacePoint) {
             IncomingRay = incomingRay;
             SurfacePoint = surfacePoint;

@@ -1,6 +1,6 @@
 ﻿using OpenTK.Mathematics;
 using PathTracer.Pathtracing.AccelerationStructures.SBVH;
-using PathTracer.Pathtracing.SceneObjects;
+using PathTracer.Pathtracing.SceneDescription;
 using System.Diagnostics;
 
 namespace PathTracer.Pathtracing {
@@ -65,9 +65,9 @@ namespace PathTracer.Pathtracing {
         /// <param name="scene">The <see cref="Scene"/> to trace through</param>
         /// <returns>An <see cref="RaySurfaceInteraction"/> if there is one</returns>
         public virtual SurfacePoint? Trace(Scene scene) {
-            (Primitive, float)? intersection = scene.Intersect(this);
+            (Shape, float)? intersection = scene.Intersect(this);
             if (intersection.HasValue) {
-                (Primitive primitive, float distance) = intersection.Value;
+                (Shape primitive, float distance) = intersection.Value;
                 Vector3 position = WalkAlong(distance);
                 Vector3 normal = primitive.GetNormal(position);
                 SurfacePoint surfacePoint = new(primitive, position, normal);

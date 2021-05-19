@@ -2,7 +2,7 @@
 using PathTracer.Pathtracing;
 using PathTracer.Pathtracing.Guiding;
 using PathTracer.Pathtracing.Rays;
-using PathTracer.Pathtracing.SceneObjects.CameraParts;
+using PathTracer.Pathtracing.SceneDescription.CameraParts;
 using PathTracer.Utilities;
 using System;
 using System.Collections.Generic;

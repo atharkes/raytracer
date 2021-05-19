@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PathTracer.Pathtracing.AccelerationStructures;
 using PathTracer.Pathtracing.AccelerationStructures.BVH;
-using PathTracer.Pathtracing.SceneObjects;
+using PathTracer.Pathtracing.SceneDescription;
 using PathTracer.Utilities;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -10,7 +10,7 @@ namespace UnitTests.Pathtracing.AccelerationStructure.SBVH {
     [TestClass]
     public class SBVHTreeTest {
         static SBVHTree RandomSBVH(int primitiveAmount) {
-            List<Primitive> primitives = new List<Primitive>(primitiveAmount);
+            List<Shape> primitives = new List<Shape>(primitiveAmount);
             for (int i = 0; i < primitiveAmount; i++) {
                 primitives.Add(Utils.Random.Primitive(100f, 100f));
             }
@@ -32,7 +32,7 @@ namespace UnitTests.Pathtracing.AccelerationStructure.SBVH {
                 Assert.IsTrue(nodeCount <= primitiveCount * 4);
             }
 
-            static int CountNodes(IBVHNode? node) {
+            static int CountNodes(IBinaryTree? node) {
                 if (node == null) return 0;
                 else if (node.Leaf) return 1;
                 else return CountNodes(node.Left) + 1 + CountNodes(node.Right);

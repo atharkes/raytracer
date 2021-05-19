@@ -1,6 +1,6 @@
 ﻿using OpenTK.Mathematics;
 using PathTracer.Pathtracing.Rays;
-using PathTracer.Pathtracing.SceneObjects;
+using PathTracer.Pathtracing.SceneDescription;
 using System;
 using System.Collections.Generic;
 
@@ -36,7 +36,7 @@ namespace PathTracer.Pathtracing.Guiding {
 
         public ICollection<ShadowRay> NextEventEstimation(Ray incomingRay, SurfacePoint surfacePoint, Random random) {
             List<ShadowRay> rays = new();
-            foreach (Primitive lightsource in Scene.Lights) {
+            foreach (Shape lightsource in Scene.Lights) {
                 Vector3 point = lightsource.PointOnSurface(random);
                 Vector3 normal = lightsource.GetNormal(point);
                 SurfacePoint destination = new(lightsource, point, normal);

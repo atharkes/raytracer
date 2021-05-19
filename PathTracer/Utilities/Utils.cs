@@ -1,6 +1,6 @@
 ﻿using OpenTK.Mathematics;
-using PathTracer.Pathtracing.SceneObjects;
-using PathTracer.Pathtracing.SceneObjects.Primitives;
+using PathTracer.Pathtracing.SceneDescription;
+using PathTracer.Pathtracing.SceneDescription.Shapes;
 using System;
 using System.Threading;
 
@@ -35,8 +35,8 @@ namespace PathTracer.Utilities {
         /// <param name="posRange">The range around which the primitive can be</param>
         /// <param name="scale">The possible scale of the random primitive</param>
         /// <returns>A random primitive</returns>
-        public static Primitive Primitive(this Random r, float posRange = 1f, float scale = 1f) {
-            return r.NextDouble() < 0.5f ? r.Sphere(posRange, scale) : r.Triangle(posRange, scale) as Primitive;
+        public static Shape Primitive(this Random r, float posRange = 1f, float scale = 1f) {
+            return r.NextDouble() < 0.5f ? r.Sphere(posRange, scale) : r.Triangle(posRange, scale) as Shape;
         }
 
         /// <summary> Create a random Triangle </summary>

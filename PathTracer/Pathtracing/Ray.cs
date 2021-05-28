@@ -1,7 +1,4 @@
 ﻿using OpenTK.Mathematics;
-using PathTracer.Pathtracing.AccelerationStructures.SBVH;
-using PathTracer.Pathtracing.SceneDescription;
-using System.Diagnostics;
 
 namespace PathTracer.Pathtracing {
     /// <summary> A <see cref="Ray"/> used for tracing through the <see cref="Scene"/> </summary>

@@ -1,4 +1,4 @@
-# Pathtracing Work Bench
+# Pathtracing Workbench
 **by Theo Harkes**
 
 #### Required:

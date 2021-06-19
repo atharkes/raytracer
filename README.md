@@ -1,6 +1,5 @@
-# Whitted Raytracer
-*Made during the course Advanced Graphics in 2019-2020 at Utrecht University by:*
-**Theo Harkes (5672120)**
+# Pathtracing Work Bench
+**by Theo Harkes**
 
 #### Required:
 Visual Studio 2019 with:

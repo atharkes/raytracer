@@ -1,5 +1,6 @@
 # Pathtracing Workbench
 **by Theo Harkes**
+
 *Disclaimer: This framework is by no means efficient at pathtracing. It's main goal is to be general enough to be able to support a multitude of different (monte carlo) rendering algorithms, while breaking them into smaller pieces to avoid blobs and code duplication.*
 
 #### Required:

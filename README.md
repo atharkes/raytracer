@@ -7,24 +7,13 @@ Visual Studio 2019 with:
 - Class Designer (to view the class diagram)
 
 #### Features:
-- Raytracing architecture
+- Pathtracing architecture
 - Camera: Position, Orientation, FOV, Aspect ratio
 - Input handling: see controls
-- Debug information
-- Primitives: Planes, Spheres, Triangles
-- Lights: Pointlights
-- Materials: Diffuse, Specular, Dielectric (Snell & Fresnel), Glossy (Phong Shading)
+- Primitives: Planes, Spheres, Triangles, etc.
+- Materials: Diffuse, Specular, Dielectric (Snell & Fresnel), Glossy (Phong Shading), etc.
 - Acceleration Structure: SBVH, BVH (SAH, Binning, Split-Ordered-Traversal & BVH rendering)
 - Multithreading: Threadpool with worker threads
-
-#### Added For Final Assignment:
-- SBVH (Split Bounding Volume Hierarchy): I didn't find time to add scene importing (yet) so it is hard to demonstrate the usefulness of the SBVH.
-    I added pictures to show that it is actually doing something different which must result in a lower overall SAH for the entire tree. 
-- Unit tests for BVH/SBVH (node count)
-- Randomized pixel sampling to increase FPS
-- Check BVHTraversals with F2
-- Save Camera Configuration on exit with ESC
-- Raytracing architecture: I tried to setup my code from the rendered scene point of view. So theoretically this framework can easily duplicate the camera and support multiple gamewindows.
     This framework is by no means an efficient ray tracer, but I did try to make the code part of the features and therefore is hopefully easily digestible.
 
 #### Controls:
@@ -56,11 +45,3 @@ Visual Studio 2019 with:
 - Depth of Field (Introducing a lense somewhere)
 - Anti-Aliasing (Random point on screenplane pixels)
 - Motion Blur (Random point in time)
-
-#### Monte Carlo integration preferred for:
-- Multiple lightsources
-- Dielectric refraction or reflection
-
-#### Other interesting notes:
-- Where there is Monte Carlo integration there can be Russian Roulette, Multiple Importance Sampling, Machine Learning
-- Light is actually a spectrum

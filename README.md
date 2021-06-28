@@ -1,5 +1,6 @@
 # Pathtracing Workbench
 **by Theo Harkes**
+*Disclaimer: This framework is by no means efficient at pathtracing. It's main goal is to be general enough to be able to support a multitude of different (monte carlo) rendering algorithms, while breaking them into smaller pieces to avoid blobs and code duplication.*
 
 #### Required:
 Visual Studio 2019 with:
@@ -14,7 +15,6 @@ Visual Studio 2019 with:
 - Materials: Diffuse, Specular, Dielectric (Snell & Fresnel), Glossy (Phong Shading), etc.
 - Acceleration Structure: SBVH, BVH (SAH, Binning, Split-Ordered-Traversal & BVH rendering)
 - Multithreading: Threadpool with worker threads
-    This framework is by no means an efficient ray tracer, but I did try to make the code part of the features and therefore is hopefully easily digestible.
 
 #### Controls:
 - Arrow keys:   Rotate Camera

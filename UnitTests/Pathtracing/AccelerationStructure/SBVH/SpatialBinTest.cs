@@ -33,10 +33,10 @@ namespace UnitTests.Pathtracing.AccelerationStructure.SBVH {
             float end = 1f;
             SpatialBin bin = new SpatialBin(direction, start, end);
             for (int i = 0; i < 1000; i++) {
-                bin.AABB.Add(Utils.Random.Sphere(0f, 1f));
+                bin.Aggregate.Add(Utils.Random.Sphere(0f, 1f));
                 bin.ClipAndAdd(Utils.Random.Primitive(1f, 3f));
             }
-            Vector3[] bounds = bin.AABB.Bounds;
+            Vector3[] bounds = bin.Aggregate.Bounds;
             Assert.AreEqual(-1f, bounds[0].X);
             Assert.AreEqual(1f, bounds[1].X);
         }

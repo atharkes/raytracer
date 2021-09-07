@@ -8,6 +8,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Pathtracing\ScatteringPoints\**" />
+    <EmbeddedResource Remove="Pathtracing\ScatteringPoints\**" />
+    <None Remove="Pathtracing\ScatteringPoints\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="OpenTK" Version="4.4.0" />
     <PackageReference Include="System.Drawing.Common" Version="5.0.0" />
@@ -20,10 +26,6 @@
     <None Update="Drawing\shader.vert">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Pathtracing\ScatteringPoints\" />
   </ItemGroup>
 
 </Project>

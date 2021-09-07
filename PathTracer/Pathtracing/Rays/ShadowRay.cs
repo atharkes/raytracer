@@ -1,4 +1,6 @@
-﻿namespace PathTracer.Pathtracing.Rays {
+﻿using PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates;
+
+namespace PathTracer.Pathtracing.Paths {
     public class ShadowRay : Ray {
         public ShadowRay(SurfacePoint origin, SurfacePoint destination, int recursionDepth) : base(origin, destination, recursionDepth) { }
 

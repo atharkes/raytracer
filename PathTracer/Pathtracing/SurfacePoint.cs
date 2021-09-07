@@ -1,5 +1,5 @@
 ﻿using OpenTK.Mathematics;
-using PathTracer.Pathtracing.SceneDescription;
+using PathTracer.Pathtracing.SceneDescription.SceneObjects.Primitives;
 using System;
 
 namespace PathTracer.Pathtracing {

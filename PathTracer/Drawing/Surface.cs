@@ -1,5 +1,5 @@
 ﻿using OpenTK.Graphics.OpenGL;
-using PathTracer.Pathtracing.SceneDescription.CameraParts;
+using PathTracer.Pathtracing.SceneDescription.SceneObjects.CameraParts;
 using System;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -39,7 +39,7 @@ namespace PathTracer.Drawing {
         /// <summary> Create a new surface from a file </summary>
         /// <param name="fileName">The name of the file to create a surface of</param>
         public Surface(string fileName) {
-            Bitmap bmp = new Bitmap(fileName);
+            Bitmap bmp = new(fileName);
             Width = bmp.Width;
             Height = bmp.Height;
             Pixels = new int[Width * Height];

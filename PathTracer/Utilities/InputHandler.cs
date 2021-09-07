@@ -1,5 +1,5 @@
 ﻿using OpenTK.Windowing.GraphicsLibraryFramework;
-using PathTracer.Pathtracing.SceneDescription;
+using PathTracer.Pathtracing.SceneDescription.SceneObjects.Primitives;
 
 namespace PathTracer.Utilities {
     public class InputHandler {

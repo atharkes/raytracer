@@ -10,7 +10,7 @@ namespace PathTracer.Pathtracing {
         public SurfacePoint SurfacePoint { get; }
 
         /// <summary> The distance from the origin of the ray to the intersection </summary>
-        public float Distance => (SurfacePoint.Position - IncomingRay.Origin.Position).Length;
+        public float Distance => (SurfacePoint.Position - IncomingRay.Origin).Length;
         /// <summary> Whether the ray is entering the primitive or exiting it </summary>
         public bool IntoSurface => SurfacePoint.IntoSurface(IncomingRay.Direction);
         /// <summary> The conversion factor when converting irradiance to radiance </summary>

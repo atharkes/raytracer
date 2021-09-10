@@ -40,13 +40,13 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Primitives {
         /// <summary> Intersect the <see cref="Primitive"/> with a <paramref name="ray"/> </summary>
         /// <param name="ray">The <see cref="Ray"/> to intersect the <see cref="Primitive"/> with</param>
         /// <returns>Whether the <paramref name="ray"/> intersects the <see cref="Primitive"/></returns>
-        public bool Intersects(Ray ray) => Shape.Intersects(ray);
+        public bool Intersects(IRay ray) => Shape.Intersects(ray);
         public bool Inside(Vector3 position) => Shape.Inside(position);
         public Vector3 PointOnSurface(Random random) => Shape.PointOnSurface(random);
         public bool OnSurface(Vector3 position, float epsilon = 0.001F) => Shape.OnSurface(position, epsilon);
         public Vector3 SurfaceNormal(Vector3 position) => Shape.SurfaceNormal(position);
-        public IEnumerable<float> IntersectDistances(Ray ray) => Shape.IntersectDistances(ray);
-        public IEnumerable<IBoundaryPoint> Intersect(Ray ray) => Shape.Intersect(ray);
+        public IEnumerable<float> IntersectDistances(IRay ray) => Shape.IntersectDistances(ray);
+        public IEnumerable<IBoundaryPoint> Intersect(IRay ray) => Shape.Intersect(ray);
 
         IEnumerable<IShape> IDivisible<IShape>.Clip(AxisAlignedPlane plane) => Clip(plane);
 

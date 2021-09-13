@@ -20,8 +20,8 @@ namespace PathTracer.Pathtracing.Guiding {
     }
 
     public interface IDistancePDF : IPDF<double> {
-        public static IDistancePDF operator *(IDistancePDF left, IDistancePDF right) {
-            throw new NotImplementedException();
+        public static IDistancePDF operator +(IDistancePDF left, IDistancePDF right) {
+            throw new NotImplementedException("Left and right have to be pattern matched. Also: sampling combined exponential pdfs is trouble");
         }
     }
 

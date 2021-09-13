@@ -1,6 +1,8 @@
 ﻿using OpenTK.Mathematics;
+using PathTracer.Pathtracing.Guiding;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Planars;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics;
+using PathTracer.Spectra;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -52,7 +54,7 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates {
             return false;
         }
 
-        public virtual bool Intersects(Ray ray) {
+        public virtual bool Intersects(IRay ray) {
             return BoundingBox.Intersects(ray) && Children.Any(c => c.Intersects(ray));
         }
 
@@ -68,12 +70,12 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates {
             }
         }
 
-        public virtual IEnumerable<IBoundaryPoint> Intersect(Ray ray) {
+        public virtual IEnumerable<IBoundaryPoint> Intersect(IRay ray) {
             throw new NotImplementedException("Return all boundary points?");
         }
 
-        public ISurfacePoint? Trace(Ray ray) {
-            throw new NotImplementedException("Return IScatteringPoint with the lowest distance");
+        public (IPDF<float>, IPDF<float, IMaterial>) Trace(IRay ray, ISpectrum spectrum) {
+            throw new NotImplementedException("Requires combine operations for pdfs");
         }
 
         public bool Inside(Vector3 position) => Items.Any(i => i.Inside(position));

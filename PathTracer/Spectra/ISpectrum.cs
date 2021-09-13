@@ -10,10 +10,35 @@ namespace PathTracer.Spectra {
 
         /// <summary> Convert the <see cref="ISpectrum"/> to an integer </summary>
         /// <returns>An RGB integer</returns>
-        public int IntRGB();
+        public int ToRGBInt();
 
         /// <summary> Convert the <see cref="ISpectrum"/> to a vector </summary>
         /// <returns>An RGB vector</returns>
-        public Vector3 VectorRGB();
+        public Vector3 ToRGBVector();
+
+
+        public static ISpectrum operator +(ISpectrum left, ISpectrum right) {
+            throw new System.NotImplementedException();
+        }
+
+        public static ISpectrum operator -(ISpectrum left, ISpectrum right) {
+            throw new System.NotImplementedException();
+        }
+
+        public static ISpectrum operator *(ISpectrum left, ISpectrum right) {
+            throw new System.NotImplementedException();
+        }
+
+        public static ISpectrum operator *(ISpectrum left, float right) {
+            throw new System.NotImplementedException();
+        }
+
+        public static ISpectrum operator /(ISpectrum left, ISpectrum right) {
+            throw new System.NotImplementedException();
+        }
+
+        public static ISpectrum operator /(ISpectrum left, float right) {
+            throw new System.NotImplementedException();
+        }
     }
 }

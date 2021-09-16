@@ -1,7 +1,8 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenTK.Mathematics;
-using PathTracer.Pathtracing.AccelerationStructures.SBVH;
-using PathTracer.Pathtracing.SceneDescription;
+using PathTracer.Pathtracing.SceneDescription.SceneObjects.Primitives;
+using PathTracer.Pathtracing.SceneDescription.Shapes;
+using PathTracer.Pathtracing.SceneDescription.Shapes.Planars;
 using PathTracer.Utilities;
 
 namespace UnitTests.Pathtracing.SceneObjects {

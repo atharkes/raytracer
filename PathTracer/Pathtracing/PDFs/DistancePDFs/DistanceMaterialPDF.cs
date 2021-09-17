@@ -1,18 +1,9 @@
 ﻿using MathNet.Numerics.Distributions;
+using PathTracer.Pathtracing.PDFs.MaterialPDFs;
 using PathTracer.Pathtracing.SceneDescription;
 using System;
 
 namespace PathTracer.Pathtracing.PDFs.DistancePDFs {
-    public interface IDistanceMaterialPDF : IDistancePDF, IPDF<double, IMaterial> {
-        public static IDistanceMaterialPDF operator +(IDistanceMaterialPDF left, IDistanceMaterialPDF right) {
-            return new SumDistanceMaterialPDF(left, right);
-        }
-
-        public static IDistanceMaterialPDF operator *(IDistanceMaterialPDF left, IDistanceMaterialPDF right) {
-            return new ProductDistanceMaterialPDF(left, right);
-        }
-    }
-
     public abstract class DistanceMaterialPDF : IDistanceMaterialPDF {
         public bool SingleSolution { get; }
         public abstract double DomainStart { get; }
@@ -29,7 +20,7 @@ namespace PathTracer.Pathtracing.PDFs.DistancePDFs {
         public abstract double CumulativeDistribution(double sample);
 
         public abstract bool Contains((double, IMaterial) sample);
-        public abstract IPDF<IMaterial> ExtractPDF(double sample);
+        public abstract IMaterialPDF ExtractPDF(double sample);
         public abstract (double, IMaterial) SampleDouble(Random random);
         public abstract double Probability((double, IMaterial) sample);
         public abstract double CumulativeDistribution((double, IMaterial) sample);
@@ -46,7 +37,6 @@ namespace PathTracer.Pathtracing.PDFs.DistancePDFs {
         IPDF<(double, IMaterial)> IRecursivePDF<(double, IMaterial)>.Right => Right;
 
         public override double DomainStart => Math.Min(Left.DomainStart, Right.DomainStart);
-
         public override double DomainEnd => Math.Max(Left.DomainEnd, Right.DomainEnd);
 
         public SumDistanceMaterialPDF(IDistanceMaterialPDF left, IDistanceMaterialPDF right) {
@@ -54,25 +44,12 @@ namespace PathTracer.Pathtracing.PDFs.DistancePDFs {
             Right = right;
         }
 
-        public override bool Contains((double, IMaterial) sample) {
-            return Left.Contains(sample) || Right.Contains(sample);
-        }
+        public override double SampleSingle(Random random) => Math.Min((Left as IPDF<double>).Sample(random), (Right as IPDF<double>).Sample(random));
+        public override double Probability(double sample) => (this as IRecursivePDF<double>).Probability(sample);
+        public override double CumulativeDistribution(double sample) => IsAfter(sample) ? 0 : (this as IRecursivePDF<double>).CumulativeDistribution(sample);
 
-        public override double SampleSingle(Random random) {
-            return Math.Min((Left as IPDF<double>).Sample(random), (Right as IPDF<double>).Sample(random));
-        }
-
-        public override double Probability(double sample) {
-            return (this as IRecursivePDF<double>).Probability(sample);
-        }
-
-        public override double CumulativeDistribution(double sample) {
-            return IsAfter(sample) ? 0 : (this as IRecursivePDF<double>).CumulativeDistribution(sample);
-        }
-
-        public override IPDF<IMaterial> ExtractPDF(double sample) {
-            throw new NotImplementedException("Requires an implementation of a MaterialPDF");
-        }
+        public override bool Contains((double, IMaterial) sample) => Left.Contains(sample) || Right.Contains(sample);
+        public override IMaterialPDF ExtractPDF(double sample) => Left.ExtractPDF(sample) + Right.ExtractPDF(sample);
 
         public override (double, IMaterial) SampleDouble(Random random) {
             (double Distance, IMaterial Material) left = Left.SampleDouble(random);

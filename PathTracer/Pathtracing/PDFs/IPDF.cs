@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PathTracer.Pathtracing.PDFs.DistancePDFs;
+using System;
 
 namespace PathTracer.Pathtracing.PDFs {
     public interface IPDF {

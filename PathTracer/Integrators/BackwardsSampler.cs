@@ -1,6 +1,6 @@
 ﻿using OpenTK.Mathematics;
 using PathTracer.Pathtracing;
-using PathTracer.Pathtracing.Guiding;
+using PathTracer.Pathtracing.PDFs;
 using PathTracer.Utilities;
 using System;
 using System.Collections.Generic;

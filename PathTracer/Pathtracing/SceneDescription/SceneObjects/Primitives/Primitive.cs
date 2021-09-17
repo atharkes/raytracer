@@ -1,5 +1,5 @@
 ﻿using OpenTK.Mathematics;
-using PathTracer.Pathtracing.Guiding;
+using PathTracer.Pathtracing.PDFs;
 using PathTracer.Pathtracing.SceneDescription.Materials;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Planars;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics;

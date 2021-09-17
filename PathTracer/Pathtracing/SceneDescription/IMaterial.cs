@@ -1,5 +1,5 @@
 ﻿using OpenTK.Mathematics;
-using PathTracer.Pathtracing.Guiding;
+using PathTracer.Pathtracing.PDFs;
 using PathTracer.Pathtracing.SceneDescription.Materials;
 using PathTracer.Spectra;
 using System.Collections.Generic;

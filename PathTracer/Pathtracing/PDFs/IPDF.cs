@@ -1,13 +1,12 @@
 ﻿using MathNet.Numerics.Distributions;
 using OpenTK.Mathematics;
+using PathTracer.Pathtracing.SceneDescription;
 using System;
 
-namespace PathTracer.Pathtracing.Guiding {
+namespace PathTracer.Pathtracing.PDFs {
     public interface IPDF {
         bool SingleSolution { get; }
-        double DomainStart { get; }
-        double DomainEnd { get; }
-        double DomainSize => DomainEnd - DomainStart;
+        double DomainSize { get; }
     }
 
     public interface IPDF<T> : IPDF {
@@ -16,10 +15,18 @@ namespace PathTracer.Pathtracing.Guiding {
         double CumulativeDistribution(T sample);
     }
 
+    public interface IPDF<In, Out> {
+        Out Sample(In input, Random random);
+        double Probability(In input, Out sample);
+    }
+
     public interface IDistancePDF : IPDF<double> {
-        public bool IsAfter(double sample);
-        public bool IsBefore(double sample);
-        public bool Contains(double sample);
+        double DomainStart { get; }
+        double DomainEnd { get; }
+
+        bool IsBefore(double sample);
+        bool Contains(double sample);
+        bool IsAfter(double sample);
 
         public static IDistancePDF operator +(IDistancePDF left, IDistancePDF right) {
             return new SumDistancePDF(left, right);
@@ -30,14 +37,19 @@ namespace PathTracer.Pathtracing.Guiding {
         }
     }
 
+    public interface IDistanceMaterialPDF : IPDF<double, IMaterial> {
+
+    }
+
     public abstract class DistancePDF : IDistancePDF {
         public abstract bool SingleSolution { get; }
         public abstract double DomainStart { get; }
         public abstract double DomainEnd { get; }
+        public double DomainSize => DomainEnd - DomainStart;
 
-        public bool IsAfter(double sample) => sample < DomainStart;
-        public bool IsBefore(double sample) => sample > DomainEnd;
+        public bool IsBefore(double sample) => DomainEnd < sample;
         public bool Contains(double sample) => DomainStart <= sample && sample <= DomainEnd;
+        public bool IsAfter(double sample) => DomainStart > sample;
 
         public abstract double CumulativeDistribution(double sample);
         public abstract double Probability(double sample);
@@ -87,7 +99,6 @@ namespace PathTracer.Pathtracing.Guiding {
                 double r = Right.CumulativeDistribution(sample);
                 return l + r - l * r;
             }
-            
         }
     }
 
@@ -189,8 +200,5 @@ namespace PathTracer.Pathtracing.Guiding {
         }
     }
 
-    public interface IPDF<In, Out> {
-        Out Sample(In input, Random random);
-        double Probability(In input, Out sample);
-    }
+
 }

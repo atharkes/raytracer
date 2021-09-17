@@ -1,4 +1,4 @@
-﻿using PathTracer.Pathtracing.Guiding;
+﻿using PathTracer.Pathtracing.PDFs;
 using PathTracer.Spectra;
 
 namespace PathTracer.Pathtracing.SceneDescription {

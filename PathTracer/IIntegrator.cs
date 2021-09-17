@@ -1,6 +1,6 @@
 ﻿using OpenTK.Mathematics;
 using PathTracer.Pathtracing;
-using PathTracer.Pathtracing.Guiding;
+using PathTracer.Pathtracing.PDFs;
 
 namespace PathTracer {
     /// <summary> An integrator to render a <see cref="IScene"/> </summary>

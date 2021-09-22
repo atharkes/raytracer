@@ -19,7 +19,5 @@ namespace PathTracer.Pathtracing.PDFs {
 
         (T1, T2) IPDF<(T1, T2)>.Sample(Random random) => SampleDouble(random);
         (T1, T2) SampleDouble(Random random);
-
-        IPDF<T2> ExtractPDF(T1 sample);
     }
 }

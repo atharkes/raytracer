@@ -1,5 +1,6 @@
 ﻿using OpenTK.Mathematics;
 using PathTracer.Pathtracing.PDFs;
+using PathTracer.Pathtracing.PDFs.DistancePDFs;
 using PathTracer.Pathtracing.SceneDescription.Materials;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Planars;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics;
@@ -36,9 +37,9 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Primitives {
         /// <param name="ray">The <see cref="IRay"/> to intersect the <see cref="Primitive"/> with</param>
         /// <param name="spectrum">The <see cref="ISpectrum"/> of the <paramref name="ray"/></param>
         /// <returns>The distance and material pdfs</returns>
-        public (IPDF<float>, IPDF<float, IMaterial>) Trace(IRay ray, ISpectrum spectrum) {
+        public IDistanceMaterialPDF Trace(IRay ray, ISpectrum spectrum) {
             IEnumerable<IBoundaryPoint> boundaries = Shape.Intersect(ray);
-            return Material.DistancePDFs(ray, spectrum, boundaries);
+            return Material.DistanceMaterialPDF(ray, spectrum, boundaries);
         }
 
         /// <summary> Intersect the <see cref="Primitive"/> with a <paramref name="ray"/> </summary>
@@ -65,16 +66,12 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Primitives {
             }
         }
 
-        public (IPDF<float>, IPDF<float, IMaterial>) DistancePDFs(IRay ray, ISpectrum spectrum, IEnumerable<IBoundaryPoint> boundaryPoints)
-            => Material.DistancePDFs(ray, spectrum, boundaryPoints);
-        public IPDF<float> DistancePDF(IRay ray, ISpectrum spectrum, IEnumerable<IBoundaryPoint> boundaryPoints)
+        public IDistancePDF DistancePDF(IRay ray, ISpectrum spectrum, IEnumerable<IBoundaryPoint> boundaryPoints)
             => Material.DistancePDF(ray, spectrum, boundaryPoints);
-        public IPDF<float, IMaterial> DistanceMaterialPDF(IRay ray, ISpectrum spectrum, IEnumerable<IBoundaryPoint> boundaryPoints) 
+        public IDistanceMaterialPDF DistanceMaterialPDF(IRay ray, ISpectrum spectrum, IEnumerable<IBoundaryPoint> boundaryPoints) 
             => Material.DistanceMaterialPDF(ray, spectrum, boundaryPoints);
         public IPDF<IMaterial> MaterialPDF(IRay ray, ISpectrum spectrum, IEnumerable<IBoundaryPoint> boundaryPoints, float distance)
             => Material.MaterialPDF(ray, spectrum, boundaryPoints, distance);
-        public (IPDF<Vector3>, IPDF<Vector3, IMedium>) DirectionalPDFs(Vector3 incomingDirection, ISpectrum spectrum, ISurfacePoint surfacePoint)
-            => Material.DirectionalPDFs(incomingDirection, spectrum, surfacePoint);
         public IPDF<Vector3> DirectionPDF(Vector3 incomingDirection, ISpectrum spectrum, ISurfacePoint surfacePoint)
             => Material.DirectionPDF(incomingDirection, spectrum, surfacePoint);
         public IPDF<Vector3, IMedium> DirectionMediumPDF(Vector3 incomingDirection, ISpectrum spectrum, ISurfacePoint surfacePoint)

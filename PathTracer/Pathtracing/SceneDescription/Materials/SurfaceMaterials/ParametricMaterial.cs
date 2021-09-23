@@ -2,7 +2,7 @@
 using PathTracer.Utilities;
 using System;
 
-namespace PathTracer.Pathtracing.SceneDescription.Materials {
+namespace PathTracer.Pathtracing.SceneDescription.Materials.SurfaceMaterials {
     /// <summary> A material class for primitives in the scene </summary>
     public class ParametricMaterial : Material {
         /// <summary> The color of the primitive </summary>

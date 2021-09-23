@@ -6,19 +6,17 @@
         bool IsBefore(double sample);
         bool IsAfter(double sample);
 
-        public static IDistancePDF operator +(IDistancePDF left, IDistancePDF right) {
-            return new SumDistancePDF(left, right);
-        }
-
-        public static IDistancePDF operator *(IDistancePDF left, IDistancePDF right) {
-            return new ProductDistancePDF(left, right);
+        public static IDistancePDF operator +(IDistancePDF? left, IDistancePDF right) {
+            return left == null ? right : new SumDistancePDF(left, right);
         }
     }
 
-    public interface IRecursiveDistancePDF<T> : IPDF<T> {
+    public interface IRecursivePDF<T> : IPDF<T> {
         IPDF<T> Left { get; }
         IPDF<T> Right { get; }
+    }
 
+    public interface ISumDistancePDF<T> : IRecursivePDF<T> {
         new double Probability(T sample) {
             if (!Contains(sample)) {
                 return 0;

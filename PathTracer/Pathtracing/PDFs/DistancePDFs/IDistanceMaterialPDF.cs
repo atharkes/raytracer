@@ -11,7 +11,7 @@ namespace PathTracer.Pathtracing.PDFs.DistancePDFs {
         }
     }
 
-    public interface IDistanceMaterial {
+    public interface IDistanceMaterial : IComparable<IDistanceMaterial>, IEquatable<IDistanceMaterial> {
         double Distance { get; }
         IMaterial Material { get; }
     }

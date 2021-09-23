@@ -1,4 +1,4 @@
-﻿using PathTracer.Pathtracing.PDFs;
+﻿using PathTracer.Pathtracing.PDFs.DistancePDFs;
 using PathTracer.Spectra;
 
 namespace PathTracer.Pathtracing.SceneDescription {
@@ -8,7 +8,7 @@ namespace PathTracer.Pathtracing.SceneDescription {
         /// <param name="ray">The <see cref="IRay"/> to trace through the <see cref="ISceneObject"/></param>
         /// <param name="spectrum">The <see cref="ISpectrum"/> of the <see cref="IRay"/></param>
         /// <returns>The distance and material PDFs</returns>
-        (IPDF<float>, IPDF<float, IMaterial>) Trace(IRay ray, ISpectrum spectrum);
+        IDistanceMaterialPDF Trace(IRay ray, ISpectrum spectrum);
     }
 }
 

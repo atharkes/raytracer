@@ -17,7 +17,7 @@ namespace PathTracer.Pathtracing.PDFs.DistancePDFs {
         public abstract double CumulativeDistribution(double sample);
     }
 
-    public class SumDistancePDF : DistancePDF, IRecursivePDF<double> {
+    public class SumDistancePDF : DistancePDF, ISumDistancePDF<double> {
         public IDistancePDF Left { get; }
         public IDistancePDF Right { get; }
 
@@ -44,32 +44,6 @@ namespace PathTracer.Pathtracing.PDFs.DistancePDFs {
 
         public override double CumulativeDistribution(double sample) {
             return IsAfter(sample) ? 0 : (this as IRecursivePDF<double>).CumulativeDistribution(sample);
-        }
-    }
-
-    public class ProductDistancePDF : DistancePDF {
-        public IDistancePDF Left { get; }
-        public IDistancePDF Right { get; }
-
-        public override bool SingleSolution => throw new NotImplementedException();
-        public override double DomainStart => throw new NotImplementedException();
-        public override double DomainEnd => throw new NotImplementedException();
-
-        public ProductDistancePDF(IDistancePDF left, IDistancePDF right) {
-            Left = left;
-            Right = right;
-        }
-
-        public override double Sample(Random random) {
-            throw new NotImplementedException();
-        }
-
-        public override double Probability(double sample) {
-            throw new NotImplementedException();
-        }
-
-        public override double CumulativeDistribution(double sample) {
-            throw new NotImplementedException();
         }
     }
 

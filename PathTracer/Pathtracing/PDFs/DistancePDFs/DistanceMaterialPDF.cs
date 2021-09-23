@@ -11,6 +11,14 @@ namespace PathTracer.Pathtracing.PDFs.DistancePDFs {
             Distance = distance;
             Material = material;
         }
+
+        public int CompareTo(IDistanceMaterial? other) {
+            return Distance.CompareTo(other?.Distance);
+        }
+
+        public bool Equals(IDistanceMaterial? other) {
+            return Distance.Equals(other?.Distance) && Material.Equals(other?.Material);
+        }
     }
 
     public abstract class DistanceMaterialPDF : IDistanceMaterialPDF {
@@ -34,8 +42,10 @@ namespace PathTracer.Pathtracing.PDFs.DistancePDFs {
         public abstract double CumulativeDistribution(IDistanceMaterial sample);
     }
 
-    public class SumDistanceMaterialPDF : DistanceMaterialPDF, IRecursivePDF<double>, IRecursivePDF<IDistanceMaterial> {
-        public override bool SingleSolution => throw new NotImplementedException();
+    public class SumDistanceMaterialPDF : DistanceMaterialPDF, ISumDistancePDF<double>, ISumDistancePDF<IDistanceMaterial> {
+        public override bool SingleSolution => Left.SingleSolution && Right.SingleSolution;
+        public override double DomainStart => Math.Min(Left.DomainStart, Right.DomainStart);
+        public override double DomainEnd => Math.Max(Left.DomainEnd, Right.DomainEnd);
         public override bool Leaf => false;
         public IDistanceMaterialPDF Left { get; }
         public IDistanceMaterialPDF Right { get; }
@@ -44,9 +54,6 @@ namespace PathTracer.Pathtracing.PDFs.DistancePDFs {
         IPDF<double> IRecursivePDF<double>.Right => Right;
         IPDF<IDistanceMaterial> IRecursivePDF<IDistanceMaterial>.Left => Left;
         IPDF<IDistanceMaterial> IRecursivePDF<IDistanceMaterial>.Right => Right;
-
-        public override double DomainStart => Math.Min(Left.DomainStart, Right.DomainStart);
-        public override double DomainEnd => Math.Max(Left.DomainEnd, Right.DomainEnd);
 
         public SumDistanceMaterialPDF(IDistanceMaterialPDF left, IDistanceMaterialPDF right) {
             Left = left;

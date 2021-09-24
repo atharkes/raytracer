@@ -6,8 +6,8 @@ namespace PathTracer.Pathtracing.PDFs.DistancePDFs {
         IDistanceMaterial IPDF<IDistanceMaterial>.Sample(Random random) => SampleWithMaterial(random);
         public abstract IDistanceMaterial SampleWithMaterial(Random random);
 
-        public static IDistanceMaterialPDF operator +(IDistanceMaterialPDF left, IDistanceMaterialPDF right) {
-            return new SumDistanceMaterialPDF(left, right);
+        public static IDistanceMaterialPDF? operator +(IDistanceMaterialPDF? left, IDistanceMaterialPDF? right) {
+            return left is null ? right : (right is null ? left : new SumDistanceMaterialPDF(left, right));
         }
     }
 

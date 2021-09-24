@@ -24,7 +24,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes {
         /// <param name="position">The position to check</param>
         /// <returns>Whether the <paramref name="position"/> is inside the <see cref="Shape"/></returns>
         public virtual bool Inside(Vector3 position) {
-            throw new NotImplementedException("Requires a concrete and simple implementation of the IRay");
+            throw new NotImplementedException("Requires an implementation of IRay");
         }
 
         /// <summary> Check whether a <paramref name="position"/> is on the surface of the <see cref="Shape"/> </summary>
@@ -51,18 +51,23 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes {
         /// <summary> Intersect the <see cref="Shape"/> with a <paramref name="ray"/> </summary>
         /// <param name="ray">The <see cref="Ray"/> to intersect the <see cref="Shape"/> with</param>
         /// <returns>Whether the <paramref name="ray"/> intersects the <see cref="Shape"/></returns>
-        public virtual bool Intersects(IRay ray) => IntersectDistances(ray).Any(d => d > 0F && d < ray.Length);
+        public virtual bool Intersects(IRay ray) => IntersectDistances(ray).Any();
 
         /// <summary> Intersect the <see cref="Shape"/> with a <paramref name="ray"/> </summary>
         /// <param name="ray">The <see cref="Ray"/> to intersect the <see cref="Shape"/></param>
         /// <returns>The <see cref="IBoundaryPoint"/> of the intersections with the <see cref="Shape"/>, if there are any</returns>
-        public virtual IEnumerable<IBoundaryPoint> Intersect(IRay ray) {
-            foreach (float distance in IntersectDistances(ray)) {
-                Vector3 position = ray.Travel(distance);
-                Vector3 normal = SurfaceNormal(position);
-                throw new NotImplementedException("Requires an IBoundaryPoint implementation");
+        public virtual IBoundary? Intersect(IRay ray) {
+            var distances = IntersectDistances(ray);
+            if (distances.Any()) {
+                foreach (float distance in distances.OrderBy(d => d)) {
+                    Vector3 position = ray.Travel(distance);
+                    Vector3 normal = SurfaceNormal(position);
+                    throw new NotImplementedException("Requires an IBoundaryPoint implementation");
+                }
+                throw new NotImplementedException("Requires an IBoundary implementation");
+            } else {
+                return null;
             }
-            yield break;
         }
 
         /// <summary> Clip the <see cref="Shape"/> by a <paramref name="plane"/> </summary>

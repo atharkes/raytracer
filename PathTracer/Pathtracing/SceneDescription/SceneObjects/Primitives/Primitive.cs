@@ -7,6 +7,7 @@ using PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics;
 using PathTracer.Spectra;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Primitives {
     /// <summary> A simple primitive object for the scene </summary>
@@ -37,9 +38,9 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Primitives {
         /// <param name="ray">The <see cref="IRay"/> to intersect the <see cref="Primitive"/> with</param>
         /// <param name="spectrum">The <see cref="ISpectrum"/> of the <paramref name="ray"/></param>
         /// <returns>The distance and material pdfs</returns>
-        public IDistanceMaterialPDF Trace(IRay ray, ISpectrum spectrum) {
-            IEnumerable<IBoundaryPoint> boundaries = Shape.Intersect(ray);
-            return Material.DistanceMaterialPDF(ray, spectrum, boundaries);
+        public IDistanceMaterialPDF? Trace(IRay ray, ISpectrum spectrum) {
+            IBoundary? boundary = Shape.Intersect(ray);
+            return boundary is not null ? Material.DistanceMaterialPDF(ray, spectrum, boundary) : null;
         }
 
         /// <summary> Intersect the <see cref="Primitive"/> with a <paramref name="ray"/> </summary>
@@ -52,7 +53,7 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Primitives {
         public bool OnSurface(Vector3 position, float epsilon = 0.001F) => Shape.OnSurface(position, epsilon);
         public Vector3 SurfaceNormal(Vector3 position) => Shape.SurfaceNormal(position);
         public IEnumerable<float> IntersectDistances(IRay ray) => Shape.IntersectDistances(ray);
-        public IEnumerable<IBoundaryPoint> Intersect(IRay ray) => Shape.Intersect(ray);
+        public IBoundary? Intersect(IRay ray) => Shape.Intersect(ray);
 
         IEnumerable<IShape> IDivisible<IShape>.Clip(AxisAlignedPlane plane) => Clip(plane);
 
@@ -66,12 +67,12 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Primitives {
             }
         }
 
-        public IDistancePDF DistancePDF(IRay ray, ISpectrum spectrum, IEnumerable<IBoundaryPoint> boundaryPoints)
-            => Material.DistancePDF(ray, spectrum, boundaryPoints);
-        public IDistanceMaterialPDF DistanceMaterialPDF(IRay ray, ISpectrum spectrum, IEnumerable<IBoundaryPoint> boundaryPoints) 
-            => Material.DistanceMaterialPDF(ray, spectrum, boundaryPoints);
-        public IPDF<IMaterial> MaterialPDF(IRay ray, ISpectrum spectrum, IEnumerable<IBoundaryPoint> boundaryPoints, float distance)
-            => Material.MaterialPDF(ray, spectrum, boundaryPoints, distance);
+        public IDistancePDF DistancePDF(IRay ray, ISpectrum spectrum, IBoundary boundary)
+            => Material.DistancePDF(ray, spectrum, boundary);
+        public IDistanceMaterialPDF DistanceMaterialPDF(IRay ray, ISpectrum spectrum, IBoundary boundary)
+            => Material.DistanceMaterialPDF(ray, spectrum, boundary);
+        public IPDF<IMaterial> MaterialPDF(IRay ray, ISpectrum spectrum, IBoundary boundary, float distance)
+            => Material.MaterialPDF(ray, spectrum, boundary, distance);
         public IPDF<Vector3> DirectionPDF(Vector3 incomingDirection, ISpectrum spectrum, ISurfacePoint surfacePoint)
             => Material.DirectionPDF(incomingDirection, spectrum, surfacePoint);
         public IPDF<Vector3, IMedium> DirectionMediumPDF(Vector3 incomingDirection, ISpectrum spectrum, ISurfacePoint surfacePoint)
@@ -83,4 +84,4 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Primitives {
         public ISpectrum Emit(ISurfacePoint surfacePoint, Vector3 direction)
             => Material.Emit(surfacePoint, direction);
     }
-} 
+}

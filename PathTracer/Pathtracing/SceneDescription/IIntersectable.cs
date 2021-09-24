@@ -16,6 +16,6 @@ namespace PathTracer.Pathtracing.SceneDescription {
         /// <summary> Intersect the <see cref="IIntersectable"/> with a <paramref name="ray"/> </summary>
         /// <param name="ray">The <see cref="IRay"/> to intersect the <see cref="IIntersectable"/></param>
         /// <returns>The <see cref="IBoundaryPoint"/> of the intersections with the <see cref="IIntersectable"/>, if there are any</returns>
-        IEnumerable<IBoundaryPoint> Intersect(IRay ray);
+        IBoundary? Intersect(IRay ray);
     }
 }

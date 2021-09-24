@@ -8,7 +8,7 @@ namespace PathTracer.Pathtracing.SceneDescription {
         /// <param name="ray">The <see cref="IRay"/> to trace through the <see cref="ISceneObject"/></param>
         /// <param name="spectrum">The <see cref="ISpectrum"/> of the <see cref="IRay"/></param>
         /// <returns>The distance and material PDFs</returns>
-        IDistanceMaterialPDF Trace(IRay ray, ISpectrum spectrum);
+        IDistanceMaterialPDF? Trace(IRay ray, ISpectrum spectrum);
     }
 }
 

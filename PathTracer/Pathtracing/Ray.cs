@@ -91,5 +91,19 @@ namespace PathTracer.Pathtracing {
         public bool WithinBounds(float distance) {
             return 0 < distance && distance < Length;
         }
+
+        /// <summary> Check whether the <see cref="Ray"/> enters given a specified surface <paramref name="normal"/> </summary>
+        /// <param name="normal">The surface normal to check the entry for</param>
+        /// <returns>Whether the <see cref="Ray"/> enters for the specified surface <paramref name="normal"/></returns>
+        public bool Enters(Vector3 normal) {
+            return Vector3.Dot(Direction, normal) < 0;
+        }
+
+        /// <summary> Check whether the <see cref="Ray"/> exits given a specified surface <paramref name="normal"/> </summary>
+        /// <param name="normal">The surface normal to check the exit for</param>
+        /// <returns>Whether the <see cref="Ray"/> exits for the specified surface <paramref name="normal"/></returns>
+        public bool Exits(Vector3 normal) {
+            return Vector3.Dot(Direction, normal) > 0;
+        }
     }
 }

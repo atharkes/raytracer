@@ -1,26 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace PathTracer.Pathtracing.Boundaries {
+    /// <summary> A collection of <see cref="IBoundaryInterval"/>s </summary>
     public struct BoundaryCollection : IBoundaryCollection {
-        public IEnumerable<IBoundaryInterval> BoundaryIntervals => throw new NotImplementedException();
+        /// <summary> Return an <see cref="IEnumerable{T}"/> of <see cref="IBoundaryInterval"/>s </summary>
+        public IEnumerable<IBoundaryInterval> BoundaryIntervals => intervals;
 
-        SortedSet<IBoundaryInterval> intervals;
+        readonly SortedSet<IBoundaryInterval> intervals;
 
-        public BoundaryCollection() {
-            intervals.
+        /// <summary> Create a new <see cref="BoundaryCollection"/> </summary>
+        /// <param name="interval">The <see cref="IBoundaryInterval"/> to add to the <see cref="BoundaryCollection"/></param>
+        public BoundaryCollection(IBoundaryInterval interval) {
+            intervals = new SortedSet<IBoundaryInterval>() { interval };
         }
 
-        public IBoundaryPoint Entry(int index) {
-            throw new NotImplementedException();
+        /// <summary> Create a new <see cref="BoundaryCollection"/> </summary>
+        /// <param name="intervals">The <see cref="IBoundaryInterval"/>s to add to the <see cref="BoundaryCollection"/></param>
+        public BoundaryCollection(IEnumerable<IBoundaryInterval> intervals) {
+            this.intervals = new SortedSet<IBoundaryInterval>(intervals);
         }
 
-        public IBoundaryPoint Exit(int index) {
-            throw new NotImplementedException();
-        }
-
-        public IBoundaryPoint FirstEntry(double start, double end) {
-            throw new NotImplementedException();
+        /// <summary> Add another <see cref="IBoundaryCollection"/> to this <see cref="IBoundaryCollection"/> </summary>
+        /// <param name="other">The other <see cref="IBoundaryCollection"/></param>
+        public void AddRange(IBoundaryCollection other) {
+            intervals.UnionWith(other.BoundaryIntervals);
         }
     }
 }

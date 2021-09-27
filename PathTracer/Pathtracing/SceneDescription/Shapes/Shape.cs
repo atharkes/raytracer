@@ -4,6 +4,7 @@ using PathTracer.Pathtracing.SceneDescription.Shapes.Planars;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace PathTracer.Pathtracing.SceneDescription.Shapes {
@@ -58,12 +59,21 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes {
         public virtual IBoundaryCollection? Intersect(IRay ray) {
             var distances = IntersectDistances(ray);
             if (distances.Any()) {
+                SortedSet<IBoundaryInterval> intervals = new SortedSet<IBoundaryInterval>();
+                Queue<IBoundaryPoint> entries = new Queue<IBoundaryPoint>();
                 foreach (float distance in distances.OrderBy(d => d)) {
                     Vector3 position = ray.Travel(distance);
                     Vector3 normal = SurfaceNormal(position);
-                    throw new NotImplementedException("Requires an IBoundaryPoint implementation");
+                    IBoundaryPoint boundaryPoint = new BoundaryPoint(distance, position, normal);
+                    if (boundaryPoint.IsEntered(ray)) {
+                        Debug.Assert(entries.Count > 0, "Boundary intersection is invalid (More exits than entries). Warning: Geometry might be degenerate.");
+                        entries.Enqueue(boundaryPoint);
+                    } else {
+                        intervals.Add(new BoundaryInterval(entries.Dequeue(), boundaryPoint));
+                    }
                 }
-                throw new NotImplementedException("Requires an IBoundary implementation");
+                Debug.Assert(entries.Count == 0, "Boundary intersection is invalid (More entries than exits). Warning: Geometry might be degenerate.");
+                return new BoundaryCollection(intervals);
             } else {
                 return null;
             }

@@ -35,7 +35,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Planars {
                 IBoundaryPoint entry = boundaryPoint.IsEntered(ray) ? boundaryPoint : boundaryPoint.FlippedNormal;
                 IBoundaryPoint exit = entry == boundaryPoint ? boundaryPoint.FlippedNormal : boundaryPoint;
                 IBoundaryInterval interval = new BoundaryInterval(entry, exit);
-                throw new NotImplementedException("Copy boundary point but flip normal. Requires IBoundaryPoint and Collection implementation");
+                return new BoundaryCollection(interval);
             } else {
                 return null;
             }

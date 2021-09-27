@@ -1,7 +1,5 @@
 ﻿using OpenTK.Mathematics;
-using PathTracer.Pathtracing.PDFs;
 using PathTracer.Pathtracing.PDFs.DistancePDFs;
-using PathTracer.Pathtracing.SceneDescription.Materials;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Planars;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics;
 using PathTracer.Spectra;
@@ -22,7 +20,7 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates {
         public float SurfaceArea => Children.Sum(c => c.SurfaceArea);
         /// <summary> The bounding box of the <see cref="Aggregate"/> </summary>
         public AxisAlignedBox BoundingBox { get; protected set; } = new(Vector3.PositiveInfinity, Vector3.NegativeInfinity);
-        
+
         protected ICollection<ISceneObject> Items { get; set; } = new HashSet<ISceneObject>();
 
         public ISpectrum Albedo => throw new NotImplementedException();
@@ -62,7 +60,7 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates {
             return BoundingBox.Intersects(ray) && Children.Any(c => c.Intersects(ray));
         }
 
-        public virtual IEnumerable<float> IntersectDistances(Ray ray) {
+        public virtual IEnumerable<float> IntersectDistances(IRay ray) {
             if (BoundingBox.Intersects(ray)) {
                 foreach (ISceneObject item in Items) {
                     foreach (float distance in item.IntersectDistances(ray)) {
@@ -74,8 +72,8 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates {
             }
         }
 
-        public virtual IEnumerable<IBoundaryPoint> Intersect(IRay ray) {
-            throw new NotImplementedException("Return all boundary points?");
+        public IBoundary? Intersect(IRay ray) {
+            throw new NotImplementedException();
         }
 
         public IDistanceMaterialPDF? Trace(IRay ray, ISpectrum spectrum) {
@@ -89,7 +87,11 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates {
         public bool Inside(Vector3 position) => Items.Any(i => i.Inside(position));
 
         public Vector3 PointOnSurface(Random random) {
-            throw new NotImplementedException("Draw random item to choose a point for");
+            if (Items.Count > 0) {
+                return Items.Where(i => !(i is IAggregate a) || a.Children.Any()).ElementAt(random.Next(0, Items.Count)).PointOnSurface(random);
+            } else {
+                throw new InvalidOperationException("Aggregate without children doesn't have any surface to choose a point on.");
+            }
         }
 
         public bool OnSurface(Vector3 position, float epsilon = 0.001F) => Items.Any(i => i.OnSurface(position, epsilon));
@@ -100,52 +102,12 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates {
                     return item.SurfaceNormal(position);
                 }
             }
-            throw new NotImplementedException("Position is not part of the surface of any of the Items. Return nullable maybe?");
+            throw new InvalidOperationException("Position is not part of the surface of any of the Items. Return nullable maybe?");
         }
 
         IEnumerable<IShape> IDivisible<IShape>.Clip(AxisAlignedPlane plane) => Clip(plane);
 
         public IEnumerable<ISceneObject> Clip(AxisAlignedPlane plane) {
-            throw new NotImplementedException();
-        }
-
-        IDistanceMaterialPDF ISceneObject.Trace(IRay ray, ISpectrum spectrum) {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerable<float> IntersectDistances(IRay ray) {
-            throw new NotImplementedException();
-        }
-
-        IBoundary? IIntersectable.Intersect(IRay ray) {
-            throw new NotImplementedException();
-        }
-
-        public IDistancePDF DistancePDF(IRay ray, ISpectrum spectrum, IBoundary boundary) {
-            throw new NotImplementedException();
-        }
-
-        public IDistanceMaterialPDF DistanceMaterialPDF(IRay ray, ISpectrum spectrum, IBoundary boundary) {
-            throw new NotImplementedException();
-        }
-
-        public IPDF<IMaterial> MaterialPDF(IRay ray, ISpectrum spectrum, IBoundary boundary, float distance) {
-            throw new NotImplementedException();
-        }
-
-        public IPDF<Vector3> DirectionPDF(Vector3 incomingDirection, ISpectrum spectrum, ISurfacePoint surfacePoint) {
-            throw new NotImplementedException();
-        }
-
-        public IPDF<Vector3, IMedium> DirectionMediumPDF(Vector3 incomingDirection, ISpectrum spectrum, ISurfacePoint surfacePoint) {
-            throw new NotImplementedException();
-        }
-
-        public IPDF<IMedium> MediumPDF(Vector3 incomingDirection, ISpectrum spectrum, ISurfacePoint surfacePoint, Vector3 outgoingDirection) {
-            throw new NotImplementedException();
-        }
-
-        public IRay CreateRay(ISurfacePoint surfacePoint, Vector3 direction) {
             throw new NotImplementedException();
         }
     }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using PathTracer.Pathtracing.Boundaries;
+using System.Collections.Generic;
 
 namespace PathTracer.Pathtracing.SceneDescription {
     /// <summary> An interface that defines that an object can be intersected by a <see cref="IRay"/>. (requirement for path tracing) </summary>

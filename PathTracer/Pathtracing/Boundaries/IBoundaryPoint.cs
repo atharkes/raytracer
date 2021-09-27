@@ -1,6 +1,6 @@
 ﻿using OpenTK.Mathematics;
 
-namespace PathTracer.Pathtracing {
+namespace PathTracer.Pathtracing.Boundaries {
     /// <summary> A point in space where a scattering event occurs to a <see cref="Ray"/> </summary>
     public interface IBoundaryPoint {
         /// <summary> The distance travelled along a <see cref="Ray"/> to find this <see cref="IBoundaryPoint"/> </summary>

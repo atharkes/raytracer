@@ -22,18 +22,8 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials.Mediums {
             return RefractiveIndex.Equals(other?.RefractiveIndex);
         }
 
-        public override IPDF<Vector3> DirectionPDF(Vector3 incomingDirection, ISpectrum spectrum, ISurfacePoint surfacePoint) {
-            throw new NotImplementedException();
-        }
-
         public override IPDF<Vector3, IMedium> DirectionMediumPDF(Vector3 incomingDirection, ISpectrum spectrum, ISurfacePoint surfacePoint) {
             throw new NotImplementedException();
         }
-
-        public override IPDF<IMedium> MediumPDF(Vector3 incomingDirection, ISpectrum spectrum, ISurfacePoint surfacePoint, Vector3 outgoingDirection) {
-            throw new NotImplementedException();
-        }
-
-        
     }
 }

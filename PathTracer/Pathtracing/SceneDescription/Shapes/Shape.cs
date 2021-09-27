@@ -1,4 +1,5 @@
 ﻿using OpenTK.Mathematics;
+using PathTracer.Pathtracing.Boundaries;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Planars;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics;
 using System;

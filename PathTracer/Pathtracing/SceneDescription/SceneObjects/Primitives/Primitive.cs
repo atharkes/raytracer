@@ -67,21 +67,9 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Primitives {
             }
         }
 
-        public IDistancePDF DistancePDF(IRay ray, ISpectrum spectrum, IBoundary boundary)
-            => Material.DistancePDF(ray, spectrum, boundary);
-        public IDistanceMaterialPDF DistanceMaterialPDF(IRay ray, ISpectrum spectrum, IBoundary boundary)
+        public IDistanceMaterialPDF? DistanceMaterialPDF(IRay ray, ISpectrum spectrum, IBoundary boundary)
             => Material.DistanceMaterialPDF(ray, spectrum, boundary);
-        public IPDF<IMaterial> MaterialPDF(IRay ray, ISpectrum spectrum, IBoundary boundary, float distance)
-            => Material.MaterialPDF(ray, spectrum, boundary, distance);
-        public IPDF<Vector3> DirectionPDF(Vector3 incomingDirection, ISpectrum spectrum, ISurfacePoint surfacePoint)
-            => Material.DirectionPDF(incomingDirection, spectrum, surfacePoint);
-        public IPDF<Vector3, IMedium> DirectionMediumPDF(Vector3 incomingDirection, ISpectrum spectrum, ISurfacePoint surfacePoint)
+        public IPDF<Vector3, IMedium>? DirectionMediumPDF(Vector3 incomingDirection, ISpectrum spectrum, ISurfacePoint surfacePoint)
             => Material.DirectionMediumPDF(incomingDirection, spectrum, surfacePoint);
-        public IPDF<IMedium> MediumPDF(Vector3 incomingDirection, ISpectrum spectrum, ISurfacePoint surfacePoint, Vector3 outgoingDirection)
-            => Material.MediumPDF(incomingDirection, spectrum, surfacePoint, outgoingDirection);
-        public ISpectrum Absorb(Vector3 direction, ISurfacePoint surfacePoint, ISpectrum spectrum)
-            => Material.Absorb(direction, surfacePoint, spectrum);
-        public ISpectrum Emit(ISurfacePoint surfacePoint, Vector3 direction)
-            => Material.Emit(surfacePoint, direction);
     }
 }

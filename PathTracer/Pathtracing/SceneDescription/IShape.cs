@@ -24,7 +24,7 @@ namespace PathTracer.Pathtracing.SceneDescription {
         /// <summary> Get a <paramref name="random"/> point on the surface of the <see cref="IShape"/> </summary>
         /// <param name="random">The <see cref="Random"/> to decide the location of the point </param>
         /// <returns>A <paramref name="random"/> point on the surface of the <see cref="IShape"/></returns>
-        public abstract Vector3 PointOnSurface(Random random);
+        Vector3 PointOnSurface(Random random);
 
         /// <summary> Check whether a <paramref name="position"/> is on the surface of the <see cref="IShape"/> </summary>
         /// <param name="position">The position to check</param>

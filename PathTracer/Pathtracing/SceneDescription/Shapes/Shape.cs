@@ -18,14 +18,12 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes {
         /// <summary> The bounding box of the <see cref="Shape"/> </summary>
         public abstract AxisAlignedBox BoundingBox { get; }
 
-        /// <summary> Create a new <see cref="Shape"/> </summary>
-        protected Shape() { }
-
         /// <summary> Check whether a <paramref name="position"/> is inside the <see cref="Shape"/> </summary>
         /// <param name="position">The position to check</param>
         /// <returns>Whether the <paramref name="position"/> is inside the <see cref="Shape"/></returns>
         public virtual bool Inside(Vector3 position) {
-            throw new NotImplementedException("Requires an implementation of IRay");
+            IRay ray = new Ray(position, Vector3.UnitX);
+            return Intersect(ray)?.Inside(0) ?? false;
         }
 
         /// <summary> Check whether a <paramref name="position"/> is on the surface of the <see cref="Shape"/> </summary>
@@ -45,19 +43,19 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes {
         public abstract Vector3 SurfaceNormal(Vector3 position);
 
         /// <summary> Intersect the <see cref="Shape"/> with a <paramref name="ray"/> </summary>
-        /// <param name="ray">The <see cref="Ray"/> to intersect the <see cref="Shape"/> with</param>
-        /// <returns>The distances of the intersections with a <see cref="Shape"/>, if there are any</returns>
-        public abstract IEnumerable<float> IntersectDistances(IRay ray);
-
-        /// <summary> Intersect the <see cref="Shape"/> with a <paramref name="ray"/> </summary>
-        /// <param name="ray">The <see cref="Ray"/> to intersect the <see cref="Shape"/> with</param>
+        /// <param name="ray">The <see cref="IRay"/> to intersect the <see cref="Shape"/> with</param>
         /// <returns>Whether the <paramref name="ray"/> intersects the <see cref="Shape"/></returns>
         public virtual bool Intersects(IRay ray) => IntersectDistances(ray).Any();
 
         /// <summary> Intersect the <see cref="Shape"/> with a <paramref name="ray"/> </summary>
-        /// <param name="ray">The <see cref="Ray"/> to intersect the <see cref="Shape"/></param>
+        /// <param name="ray">The <see cref="IRay"/> to intersect the <see cref="Shape"/> with</param>
+        /// <returns>The distances of the intersections with a <see cref="Shape"/>, if there are any</returns>
+        public abstract IEnumerable<float> IntersectDistances(IRay ray);
+
+        /// <summary> Intersect the <see cref="Shape"/> with a <paramref name="ray"/> </summary>
+        /// <param name="ray">The <see cref="IRay"/> to intersect the <see cref="Shape"/></param>
         /// <returns>The <see cref="IBoundaryPoint"/> of the intersections with the <see cref="Shape"/>, if there are any</returns>
-        public virtual IBoundary? Intersect(IRay ray) {
+        public virtual IBoundaryCollection? Intersect(IRay ray) {
             var distances = IntersectDistances(ray);
             if (distances.Any()) {
                 foreach (float distance in distances.OrderBy(d => d)) {

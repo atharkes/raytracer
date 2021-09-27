@@ -70,7 +70,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Planars {
         /// Using Möller–Trumbore's triangle intersection. </summary>
         /// <param name="ray">The <see cref="Ray"/> to intersect the <see cref="Triangle"/> with</param>
         /// <returns>Whether and when the <paramref name="ray"/> intersects the <see cref="Triangle"/></returns>
-        public override IEnumerable<float> IntersectDistances(IRay ray) {
+        public override float? IntersectDistance(IRay ray) {
             // Get vectors for two edges sharing V1
             Vector3 P1toP2 = P2 - P1;
             Vector3 P1toP3 = P3 - P1;
@@ -79,7 +79,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Planars {
             Vector3 P = Vector3.Cross(ray.Direction, P1toP3);
             // If determinant is near zero, ray lies in plane of triangle
             float determinant = Vector3.Dot(P1toP2, P);
-            if (determinant > -IntersectionEpsilon && determinant < IntersectionEpsilon) yield break;
+            if (determinant > -IntersectionEpsilon && determinant < IntersectionEpsilon) return null;
             float determinantInverted = 1f / determinant;
 
             // Calculate distance from P1 to ray origin
@@ -87,15 +87,15 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Planars {
 
             // Calculate u and test bound
             float u = Vector3.Dot(T, P) * determinantInverted;
-            if (u < 0f || u > 1f) yield break;
+            if (u < 0f || u > 1f) return null;
 
             // Calculate v and test bound
             Vector3 Q = Vector3.Cross(T, P1toP2);
             float v = Vector3.Dot(ray.Direction, Q) * determinantInverted;
-            if (v < 0f || u + v > 1f)  yield break;
+            if (v < 0f || u + v > 1f) return null;
 
             float t = Vector3.Dot(P1toP3, Q) * determinantInverted;
-            yield return t;
+            return t;
         }
 
         /// <summary> Clip the <see cref="Triangle"/> by a <paramref name="plane"/> </summary>

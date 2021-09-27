@@ -50,8 +50,8 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Planars {
         /// <summary> Intersect the <see cref="Plane"/> with a <paramref name="ray"/> </summary>
         /// <param name="ray">The <see cref="Ray"/> to intersect the <see cref="Plane"/> with</param>
         /// <returns>Whether and when the <paramref name="ray"/> interescts the <see cref="Plane"/></returns>
-        public override IEnumerable<float> IntersectDistances(IRay ray) {
-            yield return -((Vector3.Dot(ray.Origin, Normal) - Distance) / Vector3.Dot(ray.Direction, Normal));
+        public override float? IntersectDistance(IRay ray) {
+           return -((Vector3.Dot(ray.Origin, Normal) - Distance) / Vector3.Dot(ray.Direction, Normal));
         }
     }
 }

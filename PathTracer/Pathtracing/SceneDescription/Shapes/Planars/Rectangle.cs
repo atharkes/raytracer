@@ -1,7 +1,6 @@
 ﻿using OpenTK.Mathematics;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics;
 using System;
-using System.Collections.Generic;
 
 namespace PathTracer.Pathtracing.SceneDescription.Shapes.Planars {
     /// <summary> A quad primitive </summary>
@@ -23,7 +22,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Planars {
             throw new NotImplementedException();
         }
 
-        public override IEnumerable<float> IntersectDistances(IRay ray) {
+        public override float? IntersectDistance(IRay ray) {
             throw new NotImplementedException();
         }
     }

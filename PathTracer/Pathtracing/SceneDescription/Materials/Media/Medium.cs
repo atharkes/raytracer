@@ -4,7 +4,7 @@ using PathTracer.Pathtracing.SceneDescription.Materials.SurfaceMaterials;
 using PathTracer.Spectra;
 using System;
 
-namespace PathTracer.Pathtracing.SceneDescription.Materials.Mediums {
+namespace PathTracer.Pathtracing.SceneDescription.Materials.Media {
     public class Medium : SurfaceMaterial, IMedium {
         public double RefractiveIndex { get; }
         public double Priority { get; }

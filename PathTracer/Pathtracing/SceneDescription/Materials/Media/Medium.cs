@@ -23,7 +23,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials.Media {
         }
 
         public override IPDF<Vector3, IMedium> DirectionMediumPDF(Vector3 incomingDirection, ISpectrum spectrum, ISurfacePoint surfacePoint) {
-            throw new NotImplementedException();
+            throw new NotImplementedException("Requires other media information from the parameters. Some overarching structure needs to save media in a priority queue.");
         }
     }
 }

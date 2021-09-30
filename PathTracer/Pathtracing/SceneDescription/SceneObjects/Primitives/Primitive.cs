@@ -1,4 +1,5 @@
 ﻿using OpenTK.Mathematics;
+using PathTracer.Pathtracing.Boundaries;
 using PathTracer.Pathtracing.PDFs;
 using PathTracer.Pathtracing.PDFs.DistancePDFs;
 using PathTracer.Pathtracing.SceneDescription.Materials;
@@ -7,7 +8,6 @@ using PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics;
 using PathTracer.Spectra;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Primitives {
     /// <summary> A simple primitive object for the scene </summary>
@@ -39,7 +39,7 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Primitives {
         /// <param name="spectrum">The <see cref="ISpectrum"/> of the <paramref name="ray"/></param>
         /// <returns>The distance and material pdfs</returns>
         public IDistanceMaterialPDF? Trace(IRay ray, ISpectrum spectrum) {
-            IBoundary? boundary = Shape.Intersect(ray);
+            IBoundaryCollection? boundary = Shape.Intersect(ray);
             return boundary is not null ? Material.DistanceMaterialPDF(ray, spectrum, boundary) : null;
         }
 
@@ -53,7 +53,7 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Primitives {
         public bool OnSurface(Vector3 position, float epsilon = 0.001F) => Shape.OnSurface(position, epsilon);
         public Vector3 SurfaceNormal(Vector3 position) => Shape.SurfaceNormal(position);
         public IEnumerable<float> IntersectDistances(IRay ray) => Shape.IntersectDistances(ray);
-        public IBoundary? Intersect(IRay ray) => Shape.Intersect(ray);
+        public IBoundaryCollection? Intersect(IRay ray) => Shape.Intersect(ray);
 
         IEnumerable<IShape> IDivisible<IShape>.Clip(AxisAlignedPlane plane) => Clip(plane);
 
@@ -67,7 +67,7 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Primitives {
             }
         }
 
-        public IDistanceMaterialPDF? DistanceMaterialPDF(IRay ray, ISpectrum spectrum, IBoundary boundary)
+        public IDistanceMaterialPDF? DistanceMaterialPDF(IRay ray, ISpectrum spectrum, IBoundaryCollection boundary)
             => Material.DistanceMaterialPDF(ray, spectrum, boundary);
         public IPDF<Vector3, IMedium>? DirectionMediumPDF(Vector3 incomingDirection, ISpectrum spectrum, ISurfacePoint surfacePoint)
             => Material.DirectionMediumPDF(incomingDirection, spectrum, surfacePoint);

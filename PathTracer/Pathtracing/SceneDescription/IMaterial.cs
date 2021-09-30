@@ -1,4 +1,5 @@
 ﻿using OpenTK.Mathematics;
+using PathTracer.Pathtracing.Boundaries;
 using PathTracer.Pathtracing.PDFs;
 using PathTracer.Pathtracing.PDFs.DistancePDFs;
 using PathTracer.Pathtracing.SceneDescription.Materials;
@@ -29,7 +30,7 @@ namespace PathTracer.Pathtracing.SceneDescription {
         /// <param name="spectrum">The <see cref="ISpectrum"/> of the <paramref name="ray"/></param>
         /// <param name="boundary">The <see cref="IBoundary"/>s of the <see cref="IMaterial"/> along the <paramref name="ray"/></param>
         /// <returns>A distance-material PDF of the <paramref name="ray"/> through the <see cref="IMaterial"/></returns>
-        IDistanceMaterialPDF? DistanceMaterialPDF(IRay ray, ISpectrum spectrum, IBoundary boundary);
+        IDistanceMaterialPDF? DistanceMaterialPDF(IRay ray, ISpectrum spectrum, IBoundaryCollection boundary);
 
         /// <summary> Get a material PDF for a scattering <paramref name="distance"/> of a <paramref name="ray"/> </summary>
         /// <param name="ray">The scattering <see cref="IRay"/></param>

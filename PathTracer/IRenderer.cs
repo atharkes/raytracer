@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace PathTracer {
     /// <summary> A renderer that uses an <see cref="IIntegrator"/> to render a <see cref=""/>. </summary>
@@ -13,5 +9,9 @@ namespace PathTracer {
         IIntegrator Integrator { get; }
         /// <summary> The <see cref="IObserver"/> that views the scene </summary>
         IObserver Observer { get; }
+
+        /// <summary> Render the <see cref="Scene"/> </summary>
+        /// <param name="renderTime">The <see cref="TimeSpan"/> to spent on rendering</param>
+        void Render(TimeSpan renderTime);
     }
 }

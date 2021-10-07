@@ -81,11 +81,10 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.CameraParts {
             Screen.Print($"Light: {Camera.ScreenPlane.Accumulator.AverageLight()}", 1, 17);
             Screen.Print($"Rays Traced: {Camera.Statistics.RaysTracedLastTick}", 1, 33);
             Screen.Print($"Frame Time (ms): {(int)Camera.Statistics.FrameTime.LastTick.TotalMilliseconds}", 1, 49);
-            Screen.Print($"Tracing Time (ms): {(int)Camera.Statistics.TracingTime.LastTick.TotalMilliseconds}", 1, 65);
+            Screen.Print($"Integrator Time (ms): {(int)Camera.Statistics.IntegratorTime.LastTick.TotalMilliseconds}", 1, 65);
             Screen.Print($"Drawing Time (ms): {(int)Camera.Statistics.DrawingTime.LastTick.TotalMilliseconds}", 1, 81);
             Screen.Print($"OpenTK Time (ms): {(int)Camera.Statistics.OpenTKTime.LastTick.TotalMilliseconds}", 1, 97);
-            Screen.Print($"Multithreading Overhead (ms): {(int)Camera.Statistics.MultithreadingOverhead.LastTick.TotalMilliseconds}", 1, 113);
-            Screen.Print($"FOV: {Camera.FOV}", 1, 129);
+            Screen.Print($"FOV: {Camera.FOV}", 1, 113);
         }
     }
 }

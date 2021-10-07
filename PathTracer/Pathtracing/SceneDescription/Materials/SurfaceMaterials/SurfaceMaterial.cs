@@ -1,6 +1,5 @@
 ﻿using OpenTK.Mathematics;
 using PathTracer.Pathtracing.Boundaries;
-using PathTracer.Pathtracing.PDFs;
 using PathTracer.Pathtracing.PDFs.DistancePDFs;
 using PathTracer.Spectra;
 using System.Linq;

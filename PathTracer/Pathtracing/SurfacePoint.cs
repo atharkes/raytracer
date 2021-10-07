@@ -1,10 +1,11 @@
 ﻿using OpenTK.Mathematics;
+using PathTracer.Pathtracing.SceneDescription.SceneObjects;
 using PathTracer.Pathtracing.SceneDescription.SceneObjects.Primitives;
 using System;
 
 namespace PathTracer.Pathtracing {
     /// <summary> A point on the surface of a <see cref="SceneDescription.Shape"/>  </summary>
-    public class SurfacePoint {
+    public class SurfacePoint : ISurfacePoint {
         /// <summary>
         /// Epsilon used to raise the surface point away from the primitive.
         /// Used to avoid the intersection falling behind the primitive by rounding errors.
@@ -12,7 +13,7 @@ namespace PathTracer.Pathtracing {
         public const float RaiseEpsilon = 0.001f;
 
         /// <summary> The <see cref="SceneDescription.Shape"/> on which the <see cref="SurfacePoint"/> is lying </summary>
-        public Primitive Primitive { get; }
+        public IPrimitive Primitive { get; }
         /// <summary> The point on the surface of a <see cref="SceneDescription.Shape"/> </summary>
         public Vector3 Position { get; }
         /// <summary> The normal of the <see cref="SceneDescription.Shape"/> at the <see cref="Position"/></summary>

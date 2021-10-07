@@ -1,6 +1,7 @@
 ﻿using OpenTK.Mathematics;
-using PathTracer.Pathtracing.SceneDescription;
 using PathTracer.Pathtracing.SceneDescription.Shapes;
+using PathTracer.Pathtracing.SceneDescription.Shapes.Planars;
+using PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics;
 using System;
 using System.Threading;
 

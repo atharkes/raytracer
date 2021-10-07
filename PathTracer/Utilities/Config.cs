@@ -1,23 +1,10 @@
 ﻿using Newtonsoft.Json;
 using OpenTK.Mathematics;
-using PathTracer.Pathtracing.SceneDescription.CameraParts;
-using System;
 using System.IO;
 
 namespace PathTracer.Utilities {
     /// <summary> A file that holds the configuration of the camera </summary>
     public class Config {
-        /// <summary> Whether it is drawing debug information </summary>
-        public bool DebugInfo { get; set; } = false;
-        /// <summary> Whether to draw the amount of BVH traversals instead of normal light </summary>
-        public DrawingMode DrawingMode { get; set; } = DrawingMode.Light;
-        /// <summary> Minimum amount of rays to trace in a tick </summary>
-        public int MinimumRayCount { get; set; } = 10_000;
-        /// <summary> The targeted framerate of the raytracer </summary>
-        public int TargetFrameRate { get; set; } = 30;
-        /// <summary> The targeted frame time computed from the targeted frame rate </summary>
-        public TimeSpan TargetFrameTime => new(0, 0, 0, 0, 1000 / TargetFrameRate);
-
         /// <summary> The position of the camera. This value should be modified in the camera </summary>
         [JsonIgnore] public Vector3 Position { get; set; } = new Vector3(0, 1, 0);
         /// <summary> The x position of the camera. This value should be modified in the camera </summary>
@@ -38,10 +25,6 @@ namespace PathTracer.Utilities {
 
         /// <summary> The field of view of the camera. This value should be modified in the camera </summary>
         public float FOV { get; set; } = 90f;
-        /// <summary> The sensitivity of turning the camera </summary>
-        public float ViewSensitivity { get; set; } = 0.05f;
-        /// <summary> The speed at which the camera moves </summary>
-        public float MoveSpeed { get; set; } = 0.1f;
 
         /// <summary> The name of the file in which the config is saved </summary>
         public const string FileName = "CameraConfig.json";
@@ -57,7 +40,7 @@ namespace PathTracer.Utilities {
         /// <summary> Save the camera configuration to the file </summary>
         public void SaveToFile() {
             FileStream.SetLength(0);
-            StreamWriter streamWriter = new StreamWriter(FileStream);
+            StreamWriter streamWriter = new(FileStream);
             JsonSerializer.Serialize(streamWriter, this);
             streamWriter.Flush();
         }
@@ -66,7 +49,7 @@ namespace PathTracer.Utilities {
         /// <returns>The camera configuration from the file</returns>
         public static Config LoadFromFile() {
             if (!File.Exists(FilePath)) return new Config();
-            JsonTextReader reader = new JsonTextReader(new StreamReader(FileStream));
+            JsonTextReader reader = new(new StreamReader(FileStream));
             return JsonSerializer.Deserialize<Config>(reader) ?? new Config();
         }
     }

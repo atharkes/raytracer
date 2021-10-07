@@ -11,7 +11,7 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Primitives {
         /// <summary> Create a new <see cref="PrimitiveFragment"/> </summary>
         /// <param name="original">The original <see cref="Shape"/></param>
         /// <param name="bounds">The bounds of the <see cref="PrimitiveFragment"/></param>
-        public PrimitiveFragment(IPrimitive original, IShape clippedShape) : base (clippedShape, original.Material) {
+        public PrimitiveFragment(IPrimitive original, IShape clippedShape) : base(clippedShape, original.Material) {
             Original = original;
         }
 

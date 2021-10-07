@@ -1,33 +1,19 @@
 ﻿using System.Diagnostics;
 
 namespace PathTracer.Utilities {
-    /// <summary> Statistics for the raytracer </summary>
+    /// <summary> Statistics for the <see cref="IRenderer"/> </summary>
     public class Statistics {
-        /// <summary> Amount of rays traced </summary>
-        public int RaysTraced { get; private set; } = 0;
-        /// <summary> Amount of rays traced in the previous tick </summary>
-        public int RaysTracedLastTick { get; private set; } = 0;
-
         /// <summary> A log for the frame times </summary>
-        public readonly TimeLog FrameTime = new TimeLog();
+        public readonly TimeLog FrameTime = new();
         /// <summary> A log for the time used by OpenTK </summary>
-        public readonly TimeLog OpenTKTime = new TimeLog();
-        /// <summary> A log for the overhead created by multithreading </summary>
-        public readonly TimeLog MultithreadingOverhead = new TimeLog();
+        public readonly TimeLog OpenTKTime = new();
         /// <summary> A log for the time required by tracing rays </summary>
-        public readonly TimeLog TracingTime = new TimeLog();
+        public readonly TimeLog IntegratorTime = new();
         /// <summary> A log for the time required by drawing on the screen </summary>
-        public readonly TimeLog DrawingTime = new TimeLog();
+        public readonly TimeLog DrawingTime = new();
 
         readonly Stopwatch frameTimer = Stopwatch.StartNew();
         readonly Stopwatch taskTimer = Stopwatch.StartNew();
-
-        /// <summary> Log how many rays where traced in this tick </summary>
-        /// <param name="tickRayAmount">The amount of rays traced this tick</param>
-        public void LogTickRays(int tickRayAmount) {
-            RaysTraced += tickRayAmount;
-            RaysTracedLastTick = tickRayAmount;
-        }
 
         /// <summary> Log the time used for this frame </summary>
         public void LogFrameTime() {

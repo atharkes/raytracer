@@ -1,22 +1,18 @@
 ﻿using OpenTK.Mathematics;
 using PathTracer.Pathtracing;
-using PathTracer.Pathtracing.PDFs;
+using PathTracer.Pathtracing.Paths;
+using PathTracer.Pathtracing.PDFs.DistancePDFs;
 using PathTracer.Utilities;
 using System;
 using System.Collections.Generic;
 
-namespace PathTracer {
-    public class BackwardsSampler : IIntegrator {
-        /// <summary> The path guiding method used to guide random decisions </summary>
-        public Pathguider Guider { get; } = new Pathguider();
+namespace PathTracer.Integrators {
+    public class BackwardsSampler : Integrator {
         /// <summary> The maximum recursion depth for sampling </summary>
         public int MaxRecursionDepth { get; } = 5;
 
-        public void Integrate(IScene scene) {
-            scene.Camera.Statistics.LogFrameTime();
-            scene.Camera.Statistics.LogTaskTime(scene.Camera.Statistics.OpenTKTime);
-            int rayCount = scene.Camera.RayCountNextTick();
-            scene.Camera.Statistics.LogTickRays(rayCount);
+        public override void Integrate(IScene scene, TimeSpan integrationTime) {
+            int rayCount = null;
             Action[] tasks = new Action[Program.Threadpool.MultithreadingTaskCount];
             float size = rayCount / Program.Threadpool.MultithreadingTaskCount;
             for (int i = 0; i < Program.Threadpool.MultithreadingTaskCount; i++) {
@@ -24,19 +20,15 @@ namespace PathTracer {
                 int higherbound = (int)((i + 1) * size);
                 tasks[i] = () => TraceRays(scene, lowerbound, higherbound);
             }
-            scene.Camera.Statistics.LogTaskTime(scene.Camera.Statistics.MultithreadingOverhead);
             Program.Threadpool.DoTasks(tasks);
             Program.Threadpool.WaitTillDone();
-            scene.Camera.Statistics.LogTaskTime(scene.Camera.Statistics.TracingTime);
-            scene.Camera.ScreenPlane.Draw();
-            scene.Camera.Statistics.LogTaskTime(scene.Camera.Statistics.DrawingTime);
         }
 
         void TraceRays(IScene scene, int from, int to) {
-            ICollection<IRay> rays = scene.Camera.GetCameraRays(to - from, Utils.Random);
-            foreach (IRay ray in rays) {
+            ICollection<CameraRay> rays = scene.Camera.GetCameraRays(to - from, Utils.Random);
+            foreach (CameraRay ray in rays) {
                 Vector3 pixelColor = Sample(scene, ray);
-                cameraRay.Cavity.AddSample(pixelColor, cameraRay.BVHTraversals, cameraRay.Intersection);
+                ray.Cavity.AddSample(pixelColor, ray.BVHTraversals, ray.Intersection);
             }
         }
 
@@ -47,16 +39,18 @@ namespace PathTracer {
         public Vector3 Sample(IScene scene, ISample sample) {
             if (sample.RecursionDepth > MaxRecursionDepth) return Vector3.Zero;
 
-            ISurfacePoint? scatteringPoint = scene.Trace(sample.Ray);
-            if (scatteringPoint == null) return Vector3.Zero;
+            /// Distance Sampling
+            IDistanceMaterialPDF? distancePDF = scene.Trace(sample.Ray, );
+            if (distancePDF == null) return Vector3.Zero;
+            IDistanceMaterial distanceMaterial = distancePDF.SampleWithMaterial(Utils.Random);
 
             /// Direct Illumination
-            Vector3 outgoingLight = scatteringPoint.Emittance(sample.Ray);
+            Vector3 outgoingLight = distancePDF.Emittance(sample.Ray);
             /// Indirect Illumination
-            ISample incSample = scatteringPoint.BSDF().Sample(sample, Utils.Random);
+            ISample incSample = distancePDF.BSDF().Sample(sample, Utils.Random);
             Vector3 incLight = Sample(scene, incSample);
-            Vector3 scatteredLight = incLight * scatteringPoint.Absorption(incSample.Ray);
-            Vector3 relevantLight = scatteredLight * Vector3.Dot(incSample.Ray.Direction, scatteringPoint.Normal);
+            Vector3 scatteredLight = incLight * distancePDF.Absorption(incSample.Ray);
+            Vector3 relevantLight = scatteredLight * Vector3.Dot(incSample.Ray.Direction, distancePDF.Normal);
             outgoingLight += relevantLight;
 
             return outgoingLight;

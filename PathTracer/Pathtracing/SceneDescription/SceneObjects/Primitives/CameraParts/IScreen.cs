@@ -1,10 +1,14 @@
-﻿namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.CameraParts {
+﻿using OpenTK.Mathematics;
+
+namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.CameraParts {
     /// <summary> An interface for a 2d screen used for displaying the 3d scene using raytracing </summary>
     public interface IScreen {
-        /// <summary> The width of the screen </summary>
-        int Width { get; }
-        /// <summary> The height of the screen </summary>
-        int Height { get; }
+        /// <summary> The size of the <see cref="IScreen"/> </summary>
+        Vector2i Size { get; }
+        /// <summary> The width of the <see cref="IScreen"/> </summary>
+        int Width => Size.X;
+        /// <summary> The height of the <see cref="IScreen"/> </summary>
+        int Height => Size.Y;
 
         /// <summary> Clear the screen </summary>
         /// <param name="color">The color to clear the screen width</param>

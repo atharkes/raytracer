@@ -31,7 +31,7 @@ namespace PathTracer.Drawing {
         };
 
         public RenderWindow(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings) : base(gameWindowSettings, nativeWindowSettings) {
-            GameWindow = new Surface();
+            GameWindow = new Surface(nativeWindowSettings.Size);
             GameWindowID = GameWindow.GenTexture();
             shader = new Shader("Drawing\\shader.vert", "Drawing\\shader.frag");
         }

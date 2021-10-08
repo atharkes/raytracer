@@ -1,4 +1,5 @@
 ﻿using OpenTK.Graphics.OpenGL;
+using OpenTK.Mathematics;
 using PathTracer.Pathtracing.SceneDescription.SceneObjects.CameraParts;
 using System;
 using System.Drawing;
@@ -7,15 +8,11 @@ using System.Drawing.Imaging;
 namespace PathTracer.Drawing {
     /// <summary> A pixel surface to display </summary>
     public class Surface : IScreen {
-        /// <summary> The width of the surface </summary>
-        public int Width { get; }
-        /// <summary> The height of the surface </summary>
-        public int Height { get; }
-        /// <summary> The pixels of the surface </summary>
-        public readonly int[] Pixels;
-
+        /// <summary> The font used to write text with </summary>
         public static Surface Font { get; } = new Surface("../../../assets/font.png");
+
         static int[] fontRedir = FontRedir();
+
         static int[] FontRedir() {
             string ch = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_-+={}[];:<>,.?/\\ ";
             fontRedir = new int[256];
@@ -27,21 +24,35 @@ namespace PathTracer.Drawing {
             return fontRedir;
         }
 
-        /// <summary> Create a new empty surface </summary>
-        /// <param name="width">The width of the surface</param>
-        /// <param name="height">The height of the surface</param>
-        public Surface(int width = 1280, int height = 720) {
-            Width = width;
-            Height = height;
+        /// <summary> The size of the <see cref="Surface"/> </summary>
+        public Vector2i Size { get; }
+        /// <summary> The width of the <see cref="Surface"/> </summary>
+        public int Width => Size.X;
+        /// <summary> The height of the <see cref="Surface"/> </summary>
+        public int Height => Size.Y;
+        /// <summary> The pixel array of the <see cref="Surface"/> </summary>
+        public readonly int[] Pixels;
+
+        /// <summary> Create a new <see cref="Surface"/> </summary>
+        /// <param name="size">The size of the <see cref="Surface"/></param>
+        public Surface(Vector2i size) {
+            Size = size;
+            Pixels = new int[size.X * size.Y];
+        }
+
+        /// <summary> Create a new <see cref="Surface"/> </summary>
+        /// <param name="width">The width of the <see cref="Surface"/></param>
+        /// <param name="height">The height of the <see cref="Surface"/></param>
+        public Surface(int width, int height) {
+            Size = new Vector2i(width, height);
             Pixels = new int[width * height];
         }
 
-        /// <summary> Create a new surface from a file </summary>
+        /// <summary> Create a <see cref="Surface"/> from a file </summary>
         /// <param name="fileName">The name of the file to create a surface of</param>
         public Surface(string fileName) {
             Bitmap bmp = new(fileName);
-            Width = bmp.Width;
-            Height = bmp.Height;
+            Size = new Vector2i(bmp.Width, bmp.Height);
             Pixels = new int[Width * Height];
             BitmapData data = bmp.LockBits(new Rectangle(0, 0, Width, Height), ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
             System.Runtime.InteropServices.Marshal.Copy(data.Scan0, Pixels, 0, Width * Height);

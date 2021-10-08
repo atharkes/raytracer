@@ -48,7 +48,7 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Primitives {
         /// <param name="rotation">The rotation <see cref="Quaternion"/> of the <see cref="Camera"/></param>
         /// <param name="aspectRatio">The aspect ratio of the <see cref="Camera"/></param>
         /// <param name="fov">The field of view of the <see cref="Camera"/></param>
-        public Camera(IScreen screen, Vector3 position, Quaternion rotation, float aspectRatio, float fov) {
+        public Camera(Vector3 position, Quaternion rotation, float aspectRatio, float fov) {
             this.position  = position;
             this.rotation = rotation;
             this.fov = fov;

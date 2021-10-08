@@ -22,7 +22,7 @@ namespace PathTracer {
         /// <summary> The speed at which the camera moves </summary>
         public float MoveSpeed { get; set; } = 0.1f;
         /// <summary> The sensitivity of turning the camera </summary>
-        public float RotateSensitivity { get; set; } = 0.05f;
+        public float RotateSensitivity { get; set; } = 5f;
         /// <summary> The sensitivity when changing the FOV of the camera </summary>
         public float FOVSensitivity { get; set; } = 0.1f;
 

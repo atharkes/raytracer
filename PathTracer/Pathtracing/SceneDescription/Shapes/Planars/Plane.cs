@@ -1,7 +1,6 @@
 ﻿using OpenTK.Mathematics;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics;
 using System;
-using System.Collections.Generic;
 
 namespace PathTracer.Pathtracing.SceneDescription.Shapes.Planars {
     /// <summary> A <see cref="Plane"/> <see cref="Shape"/> </summary>
@@ -16,6 +15,8 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Planars {
         public override float SurfaceArea => float.PositiveInfinity;
         /// <summary> The bounding box of the <see cref="Plane"/> </summary>
         public override AxisAlignedBox BoundingBox => new(Vector3.NegativeInfinity, Vector3.PositiveInfinity);
+        /// <summary> The plane of existence of the plane is the plane itself </summary>
+        public override Plane PlaneOfExistence => this;
 
         /// <summary> Create a new <see cref="Plane"/> using a <paramref name="normal"/> and a <paramref name="distance"/> </summary>
         /// <param name="normal">The normal of the <see cref="Plane"/></param>

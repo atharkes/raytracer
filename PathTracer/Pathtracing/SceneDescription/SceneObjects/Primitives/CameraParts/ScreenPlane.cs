@@ -28,9 +28,6 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.CameraParts {
         /// <summary> The bottom right corner of the screen plane </summary>
         public Vector3 BottomRight { get; private set; }
 
-        /// <summary> The scale to draw the debug information </summary>
-        public float DebugScale => Math.Min(Screen.Width, Screen.Height) / 16f;
-
         Vector3 center;
 
         /// <summary> Create a new screen plane linked to a camera </summary>
@@ -67,24 +64,6 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.CameraParts {
         /// <returns>The position of the pixel in worldspace</returns>
         public Vector3 GetPixelPosition(int x, int y) {
             return TopLeft + (float)x / (Screen.Width - 1) * (TopRight - TopLeft) + (float)y / (Screen.Height - 1) * (BottomLeft - TopLeft);
-        }
-
-        /// <summary> Draw an image to this screen plane </summary>
-        public void Draw() {
-            Screen.Clear();
-            Accumulator.DrawImage(Screen, Camera.Config.DrawingMode);
-            if (Camera.Config.DebugInfo) DrawDebugInformation();
-        }
-
-        public void DrawDebugInformation() {
-            Screen.Print($"FPS: {1000 / (int)Camera.Statistics.FrameTime.LastTick.TotalMilliseconds}", 1, 1);
-            Screen.Print($"Light: {Camera.ScreenPlane.Accumulator.AverageLight()}", 1, 17);
-            Screen.Print($"Rays Traced: {Camera.Statistics.RaysTracedLastTick}", 1, 33);
-            Screen.Print($"Frame Time (ms): {(int)Camera.Statistics.FrameTime.LastTick.TotalMilliseconds}", 1, 49);
-            Screen.Print($"Integrator Time (ms): {(int)Camera.Statistics.IntegratorTime.LastTick.TotalMilliseconds}", 1, 65);
-            Screen.Print($"Drawing Time (ms): {(int)Camera.Statistics.DrawingTime.LastTick.TotalMilliseconds}", 1, 81);
-            Screen.Print($"OpenTK Time (ms): {(int)Camera.Statistics.OpenTKTime.LastTick.TotalMilliseconds}", 1, 97);
-            Screen.Print($"FOV: {Camera.FOV}", 1, 113);
         }
     }
 }

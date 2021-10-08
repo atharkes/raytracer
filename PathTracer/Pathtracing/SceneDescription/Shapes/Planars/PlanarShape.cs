@@ -1,6 +1,5 @@
 ﻿using OpenTK.Mathematics;
 using PathTracer.Pathtracing.Boundaries;
-using System;
 using System.Collections.Generic;
 
 namespace PathTracer.Pathtracing.SceneDescription.Shapes.Planars {
@@ -10,6 +9,8 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Planars {
         public override bool Volumetric => false;
         /// <summary> The volume of the <see cref="PlanarShape"/> </summary>
         public override float Volume => 0F;
+        /// <summary> The plane in which the <see cref="PlanarShape"/> lies </summary>
+        public abstract Plane PlaneOfExistence { get; }
 
         /// <summary> Intersect the <see cref="PlanarShape"/> with a <paramref name="ray"/> </summary>
         /// <param name="ray">The <see cref="IRay"/> to intersect the <see cref="PlanarShape"/> with</param>

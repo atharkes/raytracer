@@ -36,6 +36,8 @@ namespace PathTracer {
 
         /// <summary> Draw a frame to the screen of the <see cref="IObserver"/> </summary>
         public void DrawFrame() {
+            Screen.Clear();
+            Camera.ScreenPlane.Accumulator.DrawImage(Screen, DrawingMode);
             if (DebugInfo) DrawDebugInformation();
             throw new NotImplementedException();
         }
@@ -59,15 +61,15 @@ namespace PathTracer {
             if (keyboard.IsKeyDown(Keys.Space)) Camera.Move(Camera.Up * MoveSpeed);
             if (keyboard.IsKeyDown(Keys.LeftShift)) Camera.Move(Camera.Down * MoveSpeed);
             if (keyboard.IsKeyDown(Keys.W)) Camera.Move(Camera.Front * MoveSpeed);
-            if (keyboard.IsKeyDown(Keys.S)) Camera.Move(Camera.Back * MoveSpeed);
             if (keyboard.IsKeyDown(Keys.A)) Camera.Move(Camera.Left * MoveSpeed);
+            if (keyboard.IsKeyDown(Keys.S)) Camera.Move(Camera.Back * MoveSpeed);
             if (keyboard.IsKeyDown(Keys.D)) Camera.Move(Camera.Right * MoveSpeed);
             if (keyboard.IsKeyPressed(Keys.KeyPadAdd)) Camera.FOV *= 1f + FOVSensitivity;
             if (keyboard.IsKeyPressed(Keys.KeyPadSubtract)) Camera.FOV /= 1f + FOVSensitivity;
-            if (keyboard.IsKeyDown(Keys.Left)) Camera.Rotate(Camera.Left * RotateSensitivity);
-            if (keyboard.IsKeyDown(Keys.Right)) Camera.Rotate(Camera.Right * RotateSensitivity);
-            if (keyboard.IsKeyDown(Keys.Up)) Camera.Rotate(Camera.Up * RotateSensitivity);
-            if (keyboard.IsKeyDown(Keys.Down)) Camera.Rotate(Camera.Down * RotateSensitivity);
+            if (keyboard.IsKeyDown(Keys.Up)) Camera.Rotate(Camera.Left, -RotateSensitivity);
+            if (keyboard.IsKeyDown(Keys.Down)) Camera.Rotate(Camera.Left, RotateSensitivity);
+            if (keyboard.IsKeyDown(Keys.Right)) Camera.Rotate(Camera.Up, -RotateSensitivity);
+            if (keyboard.IsKeyDown(Keys.Left)) Camera.Rotate(Camera.Up, RotateSensitivity);
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using OpenTK.Mathematics;
 using PathTracer.Pathtracing.SceneDescription.SceneObjects;
-using PathTracer.Pathtracing.SceneDescription.SceneObjects.Primitives;
 using System;
 
 namespace PathTracer.Pathtracing {
@@ -29,7 +28,7 @@ namespace PathTracer.Pathtracing {
         /// <param name="primitive">The <see cref="SceneDescription.Primitive"/> of the surface at the <paramref name="position"/> </param>
         /// <param name="position">The location of the <see cref="SurfacePoint"/></param>
         /// <param name="normal">The normal of the <paramref name="primitive"/> at the <paramref name="position"/></param>
-        public SurfacePoint(Primitive primitive, Vector3 position, Vector3 normal) {
+        public SurfacePoint(IPrimitive primitive, Vector3 position, Vector3 normal) {
             Primitive = primitive;
             Position = position;
             Normal = normal;

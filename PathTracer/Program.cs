@@ -4,7 +4,7 @@ using PathTracer.Drawing;
 using PathTracer.Integrators;
 using PathTracer.Multithreading;
 using PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates;
-using PathTracer.Pathtracing.SceneDescription.SceneObjects.Primitives;
+using PathTracer.Pathtracing.SceneDescription.SceneObjects.Cameras;
 using PathTracer.Utilities;
 
 namespace PathTracer {

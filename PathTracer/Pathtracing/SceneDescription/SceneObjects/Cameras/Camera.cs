@@ -1,21 +1,19 @@
 ﻿using OpenTK.Mathematics;
 using PathTracer.Pathtracing.Paths;
 using PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates;
-using PathTracer.Pathtracing.SceneDescription.SceneObjects.CameraParts;
+using PathTracer.Pathtracing.SceneDescription.SceneObjects.Cameras.Parts;
+using PathTracer.Pathtracing.SceneDescription.Shapes.Planars;
 using System;
 
-namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Primitives {
+namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Cameras {
     /// <summary> The camera object in the 3d scene </summary>
-    public class Camera : Aggregate {
+    public class Camera : Aggregate, ICamera {
         /// <summary> The default viewing direction of the <see cref="Camera"/> when no rotation is applied </summary>
         public static readonly Vector3 DefaultFront = Vector3.UnitZ;
         /// <summary> The default right vector of the <see cref="Camera"/> when no rotation is applied </summary>
         public static readonly Vector3 DefaultRight = Vector3.UnitX;
         /// <summary> The default up vector of the <see cref="Camera"/> when no rotation is applied </summary>
         public static readonly Vector3 DefaultUp = Vector3.UnitY;
-
-        /// <summary> The screen plane in front of the camera </summary>
-        public readonly ScreenPlane ScreenPlane;
 
         /// <summary> The position of the <see cref="Camera"/> </summary>
         public Vector3 Position { get => position; set => SetPosition(value); }
@@ -39,6 +37,13 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Primitives {
         /// <summary> Vector going left from the view direction of the camera </summary>
         public Vector3 Left => -Right;
 
+        public float ScreenDistance => (screenPlane.Rectangle.Center - position).Length;
+        public float HorizontalFOV => 2 * (float)(Math.Tanh(screenPlane.Rectangle.Width * 0.5 / ScreenDistance) * 180 / Math.PI);
+        public float VerticalFOV => 2 * (float)(Math.Tanh(screenPlane.Rectangle.Height * 0.5 / ScreenDistance) * 180 / Math.PI);
+        /// <summary> The distance of the screenplane from the  </summary>
+        public float ScreenPlaneDistance => 0.5f * screenPlane.Rectangle.Height / ((float)Math.Tan(FOV / 360 * Math.PI));
+
+        ScreenPlane screenPlane;
         Vector3 position;
         Quaternion rotation;
         float fov;
@@ -52,7 +57,9 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Primitives {
             this.position  = position;
             this.rotation = rotation;
             this.fov = fov;
-            ScreenPlane = new ScreenPlane(this, screen);
+            Rectangle screenPlaneRectangle = new(Position + ViewDirection * ScreenPlaneDistance, new Vector2(aspectRatio, 1), Rotation);
+            screenPlane = new ScreenPlane(screenPlaneRectangle, );
+            Items.Add(screenPlane);
         }
 
         /// <summary> Move the camera in a direction </summary>
@@ -63,7 +70,7 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Primitives {
         /// <param name="position">The new position of the <see cref="Camera"/></param>
         public void SetPosition(Vector3 position) {
             this.position = position;
-            ScreenPlane.Update();
+            ResetScreenPlane();
         }
 
         /// <summary> Turn the view direction of the <see cref="Camera"/> </summary>
@@ -75,7 +82,7 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Primitives {
         /// <param name="rotation">The new rotation <see cref="Quaternion"/></param>
         public void SetRotation(Quaternion rotation) {
             this.rotation = rotation;
-            ScreenPlane.Update();
+            ResetScreenPlane();
         }
 
         /// <summary> Set the view direction of the camera </summary>
@@ -92,7 +99,13 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Primitives {
         /// <param name="degrees">The new degrees of the field of view</param>
         public void SetFOV(float degrees) {
             fov = degrees;
-            ScreenPlane.Update();
+            ResetScreenPlane();
+        }
+
+        public void ResetScreenPlane() {
+            screenPlane.Rectangle.Position = Position + ViewDirection * ScreenPlaneDistance;
+            screenPlane.Rectangle.Rotation = Rotation;
+            screenPlane.Accumulator.Clear();
         }
 
         /// <summary> Get a random amount of camera rays </summary>
@@ -101,8 +114,8 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Primitives {
         public CameraRay[] GetCameraRays(int amount, Random random) {
             CameraRay[] rays = new CameraRay[amount];
             for (int i = 0; i < amount; i++) {
-                int x = random.Next(0, ScreenPlane.Screen.Width);
-                int y = random.Next(0, ScreenPlane.Screen.Height);
+                int x = random.Next(0, screenPlane.Screen.Width);
+                int y = random.Next(0, screenPlane.Screen.Height);
                 rays[i] = CreateCameraRay(x, y);
             }
             return rays;
@@ -113,9 +126,9 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Primitives {
         /// <param name="y">The y position of the pixel</param>
         /// <returns>The ray from the camera through the screen plane</returns>
         public CameraRay CreateCameraRay(int x, int y, float xOffset, float yOffset) {
-            Cavity cavity = ScreenPlane.Accumulator.Cavities[x + y * ScreenPlane.Screen.Width];
+            Cavity cavity = screenPlane.Accumulator.Cavities[x + y * screenPlane.Screen.Width];
             SurfacePoint origin = new SurfacePoint(cavity, Position, Front);
-            Vector3 direction = ScreenPlane.GetPixelPosition(x, y) - Position;
+            Vector3 direction = screenPlane.GetPixelPosition(x, y) - Position;
             return new CameraRay(origin, direction, cavity);
         }
     }

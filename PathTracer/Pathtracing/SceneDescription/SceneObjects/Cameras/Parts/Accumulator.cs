@@ -2,7 +2,7 @@
 using PathTracer.Utilities;
 using System;
 
-namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.CameraParts {
+namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Cameras.Parts {
     /// <summary> The drawing mode of the accumulator </summary>
     public enum DrawingMode {
         Light,

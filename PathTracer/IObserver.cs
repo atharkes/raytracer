@@ -1,6 +1,6 @@
 ﻿using OpenTK.Windowing.GraphicsLibraryFramework;
-using PathTracer.Pathtracing.SceneDescription.SceneObjects.CameraParts;
-using PathTracer.Pathtracing.SceneDescription.SceneObjects.Primitives;
+using PathTracer.Pathtracing.SceneDescription.SceneObjects.Cameras;
+using PathTracer.Pathtracing.SceneDescription.SceneObjects.Cameras.Parts;
 using System;
 
 namespace PathTracer {

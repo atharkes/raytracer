@@ -8,6 +8,9 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics {
     public class AxisAlignedBox : VolumetricShape {
         /// <summary> The bounds of the <see cref="AxisAlignedBox"/> </summary>
         public Vector3[] Bounds { get; }
+        /// <summary> Whether the normals of the <see cref="AxisAlignedBox"/> are pointing inwards or outwards </summary>
+        public bool InwardNormals { get; set; } = false;
+
         /// <summary> The minimum bound of the <see cref="AxisAlignedBox"/> </summary>
         public Vector3 MinCorner { get => Bounds[0]; set => Bounds[0] = value; }
         /// <summary> The maximum bound of the <see cref="AxisAlignedBox"/> </summary>
@@ -16,8 +19,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics {
         public Vector3 Size => MaxCorner - MinCorner;
         /// <summary> The center of the <see cref="AxisAlignedBox"/> </summary>
         public Vector3 Center => MinCorner + Size / 2f;
-        /// <summary> Whether the normals of the <see cref="AxisAlignedBox"/> are pointing inwards or outwards </summary>
-        public bool InwardNormals { get; set; } = false;
+
         /// <summary> The volume of the <see cref="AxisAlignedBox"/> </summary>
         public override float Volume => Size.X * Size.Y * Size.Z;
         /// <summary> The surface area of the <see cref="AxisAlignedBox"/> </summary>

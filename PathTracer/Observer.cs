@@ -1,8 +1,7 @@
 ﻿using OpenTK.Windowing.GraphicsLibraryFramework;
-using PathTracer.Pathtracing.SceneDescription.SceneObjects.CameraParts;
-using PathTracer.Pathtracing.SceneDescription.SceneObjects.Primitives;
+using PathTracer.Pathtracing.SceneDescription.SceneObjects.Cameras;
+using PathTracer.Pathtracing.SceneDescription.SceneObjects.Cameras.Parts;
 using PathTracer.Utilities;
-using System;
 
 namespace PathTracer {
     /// <summary> An <see cref="IObserver"/> that observes a <see cref="IScene"/> </summary>

@@ -26,7 +26,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Planars {
         public Vector3 BottomToTop => Up * Height;
 
         /// <summary> The center of the <see cref="Rectangle"/> </summary>
-        public Vector3 Center => Position;
+        public Vector3 Center { get => Position; set => Position = value; }
         /// <summary> The bottom left corner of the <see cref="Rectangle"/> </summary>
         public Vector3 BottomLeft => Center - LeftToRight * 0.5f - BottomToTop * 0.5f;
         /// <summary> The bottom right corner of the <see cref="Rectangle"/> </summary>

@@ -2,7 +2,7 @@
 using PathTracer.Pathtracing.SceneDescription.Shapes.Planars;
 using PathTracer.Utilities;
 
-namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.CameraParts {
+namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Cameras.Parts {
     /// <summary> A cavity of the accumulator that catches light </summary>
     public class Cavity : Rectangle {
         /// <summary> The amount of light in the cavity </summary>

@@ -17,13 +17,7 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Cameras {
         /// <summary> The viewing direction of the <see cref="Camera"/> </summary>
         public Vector3 ViewDirection => Rotation * ICamera.DefaultFront;
 
-        public float ScreenDistance => (screenPlane.Rectangle.Center - position).Length;
-        public float HorizontalFOV => 2 * (float)(Math.Tanh(screenPlane.Rectangle.Width * 0.5 / ScreenDistance) * 180 / Math.PI);
-        public float VerticalFOV => 2 * (float)(Math.Tanh(screenPlane.Rectangle.Height * 0.5 / ScreenDistance) * 180 / Math.PI);
-        /// <summary> The distance of the screenplane from the  </summary>
-        public float ScreenPlaneDistance => 0.5f * screenPlane.Rectangle.Height / ((float)Math.Tan(FOV / 360 * Math.PI));
-
-        ScreenPlane screenPlane;
+        readonly ScreenPlane screenPlane;
         Vector3 position;
         Quaternion rotation;
         float fov;
@@ -84,7 +78,8 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Cameras {
         }
 
         public void ResetScreenPlane() {
-            screenPlane.Rectangle.Position = Position + ViewDirection * ScreenPlaneDistance;
+            float distance = 0.5f * screenPlane.Rectangle.Height / ((float)Math.Tan(FOV / 360 * Math.PI));
+            screenPlane.Rectangle.Position = Position + ViewDirection * distance;
             screenPlane.Rectangle.Rotation = Rotation;
             screenPlane.Accumulator.Clear();
         }

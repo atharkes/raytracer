@@ -11,12 +11,13 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Planars {
         public float Distance { get; set; }
         /// <summary> The position of the <see cref="Plane"/> </summary>
         public Vector3 Position => Normal * Distance;
+
         /// <summary> The surface area of the <see cref="Plane"/> </summary>
         public override float SurfaceArea => float.PositiveInfinity;
-        /// <summary> The bounding box of the <see cref="Plane"/> </summary>
-        public override AxisAlignedBox BoundingBox => new(Vector3.NegativeInfinity, Vector3.PositiveInfinity);
         /// <summary> The plane of existence of the plane is the plane itself </summary>
         public override Plane PlaneOfExistence => this;
+        /// <summary> The bounding box of the <see cref="Plane"/> </summary>
+        public override AxisAlignedBox BoundingBox => new(Vector3.NegativeInfinity, Vector3.PositiveInfinity);
 
         /// <summary> Create a new <see cref="Plane"/> using a <paramref name="normal"/> and a <paramref name="distance"/> </summary>
         /// <param name="normal">The normal of the <see cref="Plane"/></param>
@@ -24,6 +25,14 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Planars {
         public Plane(Vector3 normal, float distance) {
             Normal = normal.Normalized();
             Distance = distance;
+        }
+
+        /// <summary> Create a new <see cref="Plane"/> with a <paramref name="position"/> on the plane and a <paramref name="normal"/> </summary>
+        /// <param name="position">The position on the <see cref="Plane"/></param>
+        /// <param name="normal">The normal of the <see cref="Plane"/></param>
+        public Plane(Vector3 position, Vector3 normal) {
+            Normal = normal;
+            Distance = Vector3.Dot(position, normal);
         }
 
         /// <summary> Get a <paramref name="random"/> point on the surface of the <see cref="Plane"/> </summary>

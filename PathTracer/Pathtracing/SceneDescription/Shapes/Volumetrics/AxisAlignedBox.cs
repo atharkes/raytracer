@@ -25,12 +25,24 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics {
         /// <summary> The bounding box of the <see cref="AxisAlignedBox"/> </summary>
         public override AxisAlignedBox BoundingBox => this;
 
-        /// <summary> Create an <see cref="AxisAlignedBox"/> </summary>
+        /// <summary> Create an <see cref="AxisAlignedBox"/> using two corners </summary>
         /// <param name="corner1">The first corner of the <see cref="AxisAlignedBox"/></param>
         /// <param name="corner2">The corner on the opposite side of the <see cref="AxisAlignedBox"/></param>
         public AxisAlignedBox(Vector3 corner1, Vector3 corner2) {
             Vector3 minCorner = Vector3.ComponentMin(corner1, corner2);
             Vector3 maxCorner = Vector3.ComponentMax(corner1, corner2);
+            Bounds = new Vector3[] { minCorner, maxCorner };
+        }
+
+        /// <summary> Create an <see cref="AxisAlignedBox"/> that encompasses <paramref name="positions"/> </summary>
+        /// <param name="positions">The positions that the <see cref="AxisAlignedBox"/> should encompass</param>
+        public AxisAlignedBox(params Vector3[] positions) {
+            Vector3 minCorner = Vector3.PositiveInfinity;
+            Vector3 maxCorner = Vector3.NegativeInfinity;
+            foreach (Vector3 position in positions) {
+                minCorner = Vector3.ComponentMin(minCorner, position);
+                maxCorner = Vector3.ComponentMax(maxCorner, position);
+            }
             Bounds = new Vector3[] { minCorner, maxCorner };
         }
 

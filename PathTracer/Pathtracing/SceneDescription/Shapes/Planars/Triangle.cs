@@ -10,18 +10,20 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Planars {
         public const float IntersectionEpsilon = 0.0000001f;
 
         /// <summary> The first point of the <see cref="Triangle"/> </summary>
-        public Vector3 P1 { get; set; }
+        public Vector3 P1 { get; }
         /// <summary> The second point of the <see cref="Triangle"/> </summary>
-        public Vector3 P2 { get; set; }
+        public Vector3 P2 { get; }
         /// <summary> The third point of the <see cref="Triangle"/> </summary>
-        public Vector3 P3 { get; set; }
+        public Vector3 P3 { get; }
         /// <summary> The normal of the <see cref="Triangle"/> </summary>
         public Vector3 Normal { get; }
 
         /// <summary> The surface area of the <see cref="Triangle"/> </summary>
         public override float SurfaceArea => Vector3.Cross(P2 - P1, P3 - P1).Length * 0.5f;
-
-        public override AxisAlignedBox BoundingBox => new(Vector3.ComponentMin(P1, Vector3.ComponentMin(P2, P3)), Vector3.ComponentMax(P1, Vector3.ComponentMax(P2, P3)));
+        /// <summary> The <see cref="Plane"/> in which the <see cref="Triangle"/> lies </summary>
+        public override Plane PlaneOfExistence => new(P1, Normal);
+        /// <summary> The bounding box of the <see cref="Triangle"/> </summary>
+        public override AxisAlignedBox BoundingBox => new(P1, P2, P3);
 
         /// <summary> Create a new <see cref="Triangle"/></summary>
         /// <param name="p1">The first point of the <see cref="Triangle"/></param>
@@ -68,7 +70,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Planars {
 
         /// <summary> Intersect the <see cref="Triangle"/> with a <paramref name="ray"/>.
         /// Using Möller–Trumbore's triangle intersection. </summary>
-        /// <param name="ray">The <see cref="Ray"/> to intersect the <see cref="Triangle"/> with</param>
+        /// <param name="ray">The <see cref="IRay"/> to intersect the <see cref="Triangle"/> with</param>
         /// <returns>Whether and when the <paramref name="ray"/> intersects the <see cref="Triangle"/></returns>
         public override float? IntersectDistance(IRay ray) {
             // Get vectors for two edges sharing V1

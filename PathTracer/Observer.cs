@@ -39,7 +39,6 @@ namespace PathTracer {
             Screen.Clear();
             Camera.ScreenPlane.Accumulator.DrawImage(Screen, DrawingMode);
             if (DebugInfo) DrawDebugInformation();
-            throw new NotImplementedException();
         }
 
         void DrawDebugInformation() {

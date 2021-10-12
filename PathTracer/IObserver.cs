@@ -1,5 +1,5 @@
 ﻿using OpenTK.Windowing.GraphicsLibraryFramework;
-using PathTracer.Pathtracing.SceneDescription.SceneObjects.Cameras;
+using PathTracer.Pathtracing.SceneDescription.SceneObjects;
 using PathTracer.Pathtracing.SceneDescription.SceneObjects.Cameras.Parts;
 using System;
 
@@ -8,8 +8,8 @@ namespace PathTracer {
     public interface IObserver {
         /// <summary> The gamewindow of the <see cref="IObserver"/> </summary>
         IScreen Screen { get; }
-        /// <summary> The virtual camera object of the <see cref="IObserver"/> </summary>
-        Camera Camera { get; }
+        /// <summary> The virtual <see cref="ICamera"/> object of the <see cref="IObserver"/> </summary>
+        ICamera Camera { get; }
 
         /// <summary> The targeted framerate of the <see cref="IObserver"/> </summary>
         int TargetFrameRate { get; set; }

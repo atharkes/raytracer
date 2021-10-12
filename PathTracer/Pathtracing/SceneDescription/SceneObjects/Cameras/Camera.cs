@@ -6,36 +6,16 @@ using PathTracer.Pathtracing.SceneDescription.Shapes.Planars;
 using System;
 
 namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Cameras {
-    /// <summary> The camera object in the 3d scene </summary>
+    /// <summary> An <see cref="ICamera"/> scene object </summary>
     public class Camera : Aggregate, ICamera {
-        /// <summary> The default viewing direction of the <see cref="Camera"/> when no rotation is applied </summary>
-        public static readonly Vector3 DefaultFront = Vector3.UnitZ;
-        /// <summary> The default right vector of the <see cref="Camera"/> when no rotation is applied </summary>
-        public static readonly Vector3 DefaultRight = Vector3.UnitX;
-        /// <summary> The default up vector of the <see cref="Camera"/> when no rotation is applied </summary>
-        public static readonly Vector3 DefaultUp = Vector3.UnitY;
-
         /// <summary> The position of the <see cref="Camera"/> </summary>
         public Vector3 Position { get => position; set => SetPosition(value); }
         /// <summary> The rotation <see cref="Quaternion"/> of the <see cref="Camera"/> </summary>
         public Quaternion Rotation { get => rotation; set => SetRotation(value); }
-        /// <summary> The field of view of the camera. It determines the distance to the screen plane </summary>
+        /// <summary> The field of view of the <see cref="Camera"/> </summary>
         public float FOV { get => fov; set => SetFOV(value); }
-
-        /// <summary> The direction the camera is facing </summary>
-        public Vector3 ViewDirection { get => Rotation * DefaultFront; set => SetViewDirection(value); }
-        /// <summary> Vector going along the view direction of the camera </summary>
-        public Vector3 Front => ViewDirection;
-        /// <summary> Vector going from the view direction of the camera </summary>
-        public Vector3 Back => -ViewDirection;
-        /// <summary> Vector going up from the view direction of the camera </summary>
-        public Vector3 Up => Rotation * DefaultUp;
-        /// <summary> Vector going down from the view direction of the camera </summary>
-        public Vector3 Down => -Up;
-        /// <summary> Vector going right from the view direction of the camera </summary>
-        public Vector3 Right => Rotation * DefaultRight;
-        /// <summary> Vector going left from the view direction of the camera </summary>
-        public Vector3 Left => -Right;
+        /// <summary> The viewing direction of the <see cref="Camera"/> </summary>
+        public Vector3 ViewDirection => Rotation * ICamera.DefaultFront;
 
         public float ScreenDistance => (screenPlane.Rectangle.Center - position).Length;
         public float HorizontalFOV => 2 * (float)(Math.Tanh(screenPlane.Rectangle.Width * 0.5 / ScreenDistance) * 180 / Math.PI);
@@ -57,13 +37,14 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Cameras {
             this.position  = position;
             this.rotation = rotation;
             this.fov = fov;
-            Rectangle screenPlaneRectangle = new(Position + ViewDirection * ScreenPlaneDistance, new Vector2(aspectRatio, 1), Rotation);
+            Rectangle screenPlaneRectangle = new(Position, new Vector2(aspectRatio, 1), rotation);
             screenPlane = new ScreenPlane(screenPlaneRectangle, );
+            ResetScreenPlane();
             Items.Add(screenPlane);
         }
 
-        /// <summary> Move the camera in a direction </summary>
-        /// <param name="direction">The direction to move the camera in</param>
+        /// <summary> Move the <see cref="Camera"/> in a <paramref name="direction"/> </summary>
+        /// <param name="direction">The direction in which to move the <see cref="Camera"/></param>
         public void Move(Vector3 direction) => SetPosition(position + direction);
 
         /// <summary> Set the position of the <see cref="Camera"/> </summary>
@@ -73,7 +54,7 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Cameras {
             ResetScreenPlane();
         }
 
-        /// <summary> Turn the view direction of the <see cref="Camera"/> </summary>
+        /// <summary> Rotate the <see cref="Camera"/> around a specified <paramref name="axis"/> </summary>
         /// <param name="axis">The axis to rotate around</param>
         /// <param name="degrees">The amount of degrees to rotate</param>
         public void Rotate(Vector3 axis, float degrees) => SetRotation(Rotation * Quaternion.FromAxisAngle(axis, degrees).Normalized());

@@ -13,7 +13,7 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates {
     /// <summary> The 3d scene in which the ray tracing takes place </summary>
     public class Scene : Aggregate, IScene {
         /// <summary> The camera in the scene </summary>
-        public Camera Camera { get; }
+        public ICamera Camera { get; }
         /// <summary> The lightsources in the <see cref="Scene"/> </summary>
         public IEnumerable<ISceneObject> Lights { get; }
 

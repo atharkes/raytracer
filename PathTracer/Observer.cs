@@ -1,15 +1,15 @@
 ﻿using OpenTK.Windowing.GraphicsLibraryFramework;
-using PathTracer.Pathtracing.SceneDescription.SceneObjects.Cameras;
+using PathTracer.Pathtracing.SceneDescription.SceneObjects;
 using PathTracer.Pathtracing.SceneDescription.SceneObjects.Cameras.Parts;
 using PathTracer.Utilities;
 
 namespace PathTracer {
     /// <summary> An <see cref="IObserver"/> that observes a <see cref="IScene"/> </summary>
     public class Observer : IObserver {
-        /// <summary> The <see cref="IScreen"/> used for giving visual output </summary>
+        /// <summary> The <see cref="IScreen"/> used for visual output </summary>
         public IScreen Screen { get; }
-        /// <summary> The virtual <see cref="Camera"/> object of the <see cref="Observer"/> </summary>
-        public Camera Camera { get; }
+        /// <summary> The virtual <see cref="ICamera"/> object of the <see cref="Observer"/> </summary>
+        public ICamera Camera { get; }
 
         /// <summary> The targeted framerate of the raytracer </summary>
         public int TargetFrameRate { get; set; } = 30;
@@ -27,8 +27,8 @@ namespace PathTracer {
 
         /// <summary> Create a new <see cref="Observer"/> </summary>
         /// <param name="screen">The <see cref="IScreen"/> of the <see cref="Observer"/></param>
-        /// <param name="camera">The camera of the <see cref="Observer"/></param>
-        public Observer(IScreen screen, Camera camera) {
+        /// <param name="camera">The <see cref="ICamera"/> of the <see cref="Observer"/></param>
+        public Observer(IScreen screen, ICamera camera) {
             Screen = screen;
             Camera = camera;
         }

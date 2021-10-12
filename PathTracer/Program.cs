@@ -22,15 +22,15 @@ namespace PathTracer {
             Title = "C# .NET 5 OpenTK Pathtracer",
             WindowBorder = WindowBorder.Resizable
         };
-        /// <summary> The scene to render </summary>
-        public static readonly Scene Scene = Scene.Default(Window.GameWindow);
-        /// <summary> The <see cref="IIntegrator"/> to integrate the scene </summary>
-        public static readonly IIntegrator Integrator = new BackwardsSampler();
         /// <summary> The <see cref="IObserver"/> viewing the scene </summary>
         public static readonly IObserver Observer = new Observer(Window.GameWindow, new Camera(Config.Position, Config.Rotation, Config.AspectRatio, Config.FOV)) {
             DrawingMode = Config.DrawingMode,
             DebugInfo = Config.DebugInfo
         };
+        /// <summary> The <see cref="IIntegrator"/> to integrate the scene </summary>
+        public static readonly IIntegrator Integrator = new BackwardsSampler();
+        /// <summary> The scene to render </summary>
+        public static readonly Scene Scene = Scene.Default(Window.GameWindow);
         /// <summary> The <see cref="IRenderer"/> to supply images </summary>
         public static readonly IRenderer Renderer = new Renderer(Scene, Integrator, Observer);
 

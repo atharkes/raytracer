@@ -14,18 +14,11 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Cameras.Parts {
     public class Accumulator {
         /// <summary> The cavities in which the light is accumulated </summary>
         public Cavity[] Cavities { get; }
-        /// <summary> The width of the accumulator </summary>
-        public int Width { get; }
-        /// <summary> The height of the accumulator </summary>
-        public int Height { get; }
 
         /// <summary> Create a new accumulator </summary>
-        /// <param name="width">The width of the accumulator</param>
-        /// <param name="height">The height of the accumulator</param>
-        public Accumulator(int width, int height) {
-            Width = width;
-            Height = height;
-            Cavities = new Cavity[width * height];
+        /// <param name="count">The amount of cavities in the accumulator</param>
+        public Accumulator(int count) {
+            Cavities = new Cavity[count];
             for (int i = 0; i < Cavities.Length; i++) {
                 Cavities[i] = new Cavity();
             }

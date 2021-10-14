@@ -1,12 +1,12 @@
 ﻿using OpenTK.Mathematics;
-using PathTracer.Pathtracing.SceneDescription.Shapes.Planars;
+using PathTracer.Spectra;
 using PathTracer.Utilities;
 
 namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Cameras.Parts {
     /// <summary> A cavity of the accumulator that catches light </summary>
-    public class Cavity : Rectangle {
+    public class Cavity {
         /// <summary> The amount of light in the cavity </summary>
-        public Vector3 Light { get; private set; } = Vector3.Zero;
+        public ISpectrum Light { get; private set; } = new RGBSpectrum(Vector3.Zero);
         /// <summary> The amount of photons caught by the cavity </summary>
         public int Samples { get; private set; } = 0;
         /// <summary> Amount of times the bvh is traversed by photons in the cavity </summary>
@@ -15,7 +15,7 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Cameras.Parts {
         public int Intersections { get; private set; } = 0;
 
         /// <summary> Average light of the photons in the cavity </summary>
-        public Vector3 AverageLight => Light == Vector3.Zero ? Vector3.Zero : Light / Samples;
+        public ISpectrum AverageLight => Light.IsBlack || Samples == 0 ? ISpectrum.Black : Light / Samples;
         /// <summary> Average BVH traversals of photons in the cavity </summary>
         public float AverageBVHTraversals => Samples > 0 ? BVHTraversals / Samples : 0f;
         /// <summary> The green to red color fade for the BVH traversals </summary>
@@ -27,7 +27,7 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Cameras.Parts {
 
         /// <summary> Add a sample to the cavity </summary>
         /// <param name="light">The light to add to the cavity</param>
-        public void AddSample(Vector3 light, int bvhTraversals, bool intersection) {
+        public void AddSample(ISpectrum light, int bvhTraversals, bool intersection) {
             Light += light;
             BVHTraversals += bvhTraversals;
             if (intersection) Intersections++;
@@ -36,7 +36,7 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Cameras.Parts {
 
         /// <summary> Clear the light in the cavity </summary>
         public void Clear() {
-            Light = Vector3.Zero;
+            Light = ISpectrum.Black;
             BVHTraversals = 0;
             Intersections = 0;
             Samples = 0;

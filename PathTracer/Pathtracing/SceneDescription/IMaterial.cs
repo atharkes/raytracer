@@ -2,6 +2,7 @@
 using PathTracer.Pathtracing.Boundaries;
 using PathTracer.Pathtracing.PDFs;
 using PathTracer.Pathtracing.PDFs.DistancePDFs;
+using PathTracer.Pathtracing.Rays;
 using PathTracer.Pathtracing.SceneDescription.Materials;
 using PathTracer.Spectra;
 

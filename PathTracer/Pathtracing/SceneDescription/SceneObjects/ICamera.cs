@@ -1,4 +1,6 @@
 ﻿using OpenTK.Mathematics;
+using PathTracer.Pathtracing.SceneDescription.SceneObjects.Cameras.Parts;
+using PathTracer.Spectra;
 
 namespace PathTracer.Pathtracing.SceneDescription.SceneObjects {
     /// <summary> A virtual camera object that registers light transport in the <see cref="IScene"/> </summary>
@@ -16,6 +18,9 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects {
         Quaternion Rotation { get; }
         /// <summary> The (horizontal) field of view of the <see cref="ICamera"/> (in degrees) </summary>
         float FOV { get; set; }
+
+        /// <summary> The average accumulated light in the <see cref="ICamera"/> </summary>
+        ISpectrum AccumulatedLight { get; }
 
         /// <summary> The viewing direction of the <see cref="ICamera"/> </summary>
         Vector3 ViewDirection => Front;
@@ -44,5 +49,10 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects {
         /// <summary> Set the viewing direction of the <see cref="ICamera"/> </summary>
         /// <param name="direction">The new viewing direction of the <see cref="ICamera"/></param>
         void SetViewDirection(Vector3 direction);
+
+        /// <summary> Draw the light registered on the <see cref="ICamera"/> to the <paramref name="screen"/> </summary>
+        /// <param name="screen">The <see cref="IScreen"/> to draw the light to</param>
+        /// <param name="mode">The mode to draw to the <paramref name="screen"/> with</param>
+        void Draw(IScreen screen, DrawingMode mode);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using PathTracer.Pathtracing.PDFs.DistancePDFs;
+using PathTracer.Pathtracing.Rays;
 using PathTracer.Spectra;
 
 namespace PathTracer.Pathtracing.SceneDescription {

@@ -1,8 +1,8 @@
 ﻿using OpenTK.Mathematics;
-using PathTracer.Pathtracing.Paths;
 using PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates;
 using PathTracer.Pathtracing.SceneDescription.SceneObjects.Cameras.Parts;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Planars;
+using PathTracer.Spectra;
 using System;
 
 namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Cameras {
@@ -16,6 +16,8 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Cameras {
         public float FOV { get => fov; set => SetFOV(value); }
         /// <summary> The viewing direction of the <see cref="Camera"/> </summary>
         public Vector3 ViewDirection => Rotation * ICamera.DefaultFront;
+
+        public ISpectrum AccumulatedLight => screenPlane.Accumulator.AverageLight();
 
         readonly ScreenPlane screenPlane;
         Vector3 position;
@@ -106,6 +108,10 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Cameras {
             SurfacePoint origin = new SurfacePoint(cavity, Position, Front);
             Vector3 direction = screenPlane.GetPixelPosition(x, y) - Position;
             return new CameraRay(origin, direction, cavity);
+        }
+
+        public void DrawLight(IScreen screen, DrawingMode mode) {
+            screenPlane.Accumulator.DrawImage(screen, mode);
         }
     }
 }

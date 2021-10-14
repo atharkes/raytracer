@@ -1,7 +1,7 @@
 ﻿using OpenTK.Mathematics;
 using PathTracer.Pathtracing;
-using PathTracer.Pathtracing.Paths;
 using PathTracer.Pathtracing.PDFs.DistancePDFs;
+using PathTracer.Pathtracing.Rays;
 using PathTracer.Utilities;
 using System;
 using System.Collections.Generic;
@@ -10,9 +10,11 @@ namespace PathTracer.Integrators {
     public class BackwardsSampler : Integrator {
         /// <summary> The maximum recursion depth for sampling </summary>
         public int MaxRecursionDepth { get; } = 5;
+        /// <summary> The amount of evaluated samples </summary>
+        public override int SampleCount { get; } = 0;
 
         public override void Integrate(IScene scene, TimeSpan integrationTime) {
-            int rayCount = null;
+            int rayCount = ;
             Action[] tasks = new Action[Program.Threadpool.MultithreadingTaskCount];
             float size = rayCount / Program.Threadpool.MultithreadingTaskCount;
             for (int i = 0; i < Program.Threadpool.MultithreadingTaskCount; i++) {
@@ -43,6 +45,11 @@ namespace PathTracer.Integrators {
             IDistanceMaterialPDF? distancePDF = scene.Trace(sample.Ray, );
             if (distancePDF == null) return Vector3.Zero;
             IDistanceMaterial distanceMaterial = distancePDF.SampleWithMaterial(Utils.Random);
+            sample.Ray.Length = (float)distanceMaterial.Distance;
+            ISurfacePoint surfacePoint = new SurfacePoint();
+
+            /// Direction Sampling
+            distanceMaterial.Material.DirectionMediumPDF(sample.Ray.Direction, sample.Color, )
 
             /// Direct Illumination
             Vector3 outgoingLight = distancePDF.Emittance(sample.Ray);

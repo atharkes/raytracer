@@ -41,7 +41,7 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Cameras.Parts {
         /// <param name="color">The color of the box</param>
         void Box(int x1, int y1, int x2, int y2, int color = 0xffffff);
 
-        /// <summary> Print some text on the screen </summary>
+        /// <summary> Print text on the screen </summary>
         /// <param name="text">The text to print on the screen</param>
         /// <param name="x">The x position of the topleft of the text</param>
         /// <param name="y">The y position of the topleft of the text</param>

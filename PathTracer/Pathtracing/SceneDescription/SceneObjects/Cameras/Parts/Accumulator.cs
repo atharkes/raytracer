@@ -1,4 +1,4 @@
-﻿using OpenTK.Mathematics;
+﻿using PathTracer.Spectra;
 using PathTracer.Utilities;
 using System;
 
@@ -34,7 +34,7 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Cameras.Parts {
                 int higherbound = (int)((i + 1) * size);
                 switch (drawingMode) {
                     case DrawingMode.Light:
-                        tasks[i] = () => { for (int i = lowerbound; i < higherbound; i++) screen.Plot(i, Cavities[i].AverageLight.ToIntColor()); };
+                        tasks[i] = () => { for (int i = lowerbound; i < higherbound; i++) screen.Plot(i, Cavities[i].AverageLight.ToRGBInt()); };
                         break;
                     case DrawingMode.BVHNodeTraversals:
                         tasks[i] = () => { for (int i = lowerbound; i < higherbound; i++) screen.Plot(i, Cavities[i].AverageBVHTraversalColor.ToIntColor()); };
@@ -50,8 +50,8 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Cameras.Parts {
 
         /// <summary> Get the total average light in the accumulator </summary>
         /// <returns>The total average light in the accumulator</returns>
-        public Vector3 AverageLight() {
-            Vector3 averageLight = Vector3.Zero;
+        public ISpectrum AverageLight() {
+            ISpectrum averageLight = ISpectrum.Black;
             foreach (Cavity cavity in Cavities) {
                 averageLight += cavity.AverageLight;
             }

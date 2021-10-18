@@ -14,6 +14,8 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials {
         }
 
         public abstract IRay CreateRay(ISurfacePoint surfacePoint, Vector3 direction);
+        public abstract ISurfacePoint CreateSurfacePoint(IRay ray, IBoundaryInterval interval, float distance);
+
         public abstract IDistanceDistribution? DistanceDistribution(IRay ray, ISpectrum spectrum, IBoundaryCollection boundary);
         public abstract IDirectionDistribution? DirectionDistribution(Vector3 incomingDirection, ISpectrum spectrum, ISurfacePoint surfacePoint);
     }

@@ -1,4 +1,5 @@
 ﻿using OpenTK.Mathematics;
+using PathTracer.Pathtracing.Rays;
 using PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates;
 using PathTracer.Pathtracing.SceneDescription.SceneObjects.Cameras.Parts;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Planars;
@@ -103,14 +104,14 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Cameras {
         /// <param name="x">The x position of the pixel</param>
         /// <param name="y">The y position of the pixel</param>
         /// <returns>The ray from the camera through the screen plane</returns>
-        public CameraRay CreateCameraRay(int x, int y, float xOffset, float yOffset) {
+        public CameraRay CreateCameraRay(int x, int y) {
             Cavity cavity = screenPlane.Accumulator.Cavities[x + y * screenPlane.Screen.Width];
             SurfacePoint origin = new SurfacePoint(cavity, Position, Front);
             Vector3 direction = screenPlane.GetPixelPosition(x, y) - Position;
             return new CameraRay(origin, direction, cavity);
         }
 
-        public void DrawLight(IScreen screen, DrawingMode mode) {
+        public void Draw(IScreen screen, DrawingMode mode) {
             screenPlane.Accumulator.DrawImage(screen, mode);
         }
     }

@@ -17,6 +17,13 @@ namespace PathTracer.Pathtracing.SceneDescription {
         /// <returns>An <see cref="IRay"/> from the <paramref name="surfacePoint"/> with the specified <paramref name="direction"/></returns>
         IRay CreateRay(ISurfacePoint surfacePoint, Vector3 direction);
 
+        /// <summary> Create a <see cref="ISurfacePoint"/> at a specified <paramref name="distance"/> along a <paramref name="ray"/> </summary>
+        /// <param name="ray">The <see cref="IRay"/> that finds a <see cref="ISurfacePoint"/></param>
+        /// <param name="interval">The <see cref="IBoundaryInterval"/> in which the <see cref="ISurfacePoint"/> is found</param>
+        /// <param name="distance">The specified distance at which the <see cref="ISurfacePoint"/> is found</param>
+        /// <returns>An <see cref="ISurfacePoint"/> at the specified <paramref name="distance"/> along the <paramref name="ray"/></returns>
+        ISurfacePoint CreateSurfacePoint(IRay ray, IBoundaryInterval interval, float distance);
+
         /// <summary> Get a distance-material PDF of a <paramref name="ray"/> </summary>
         /// <param name="ray">The scattering <see cref="IRay"/></param>
         /// <param name="spectrum">The <see cref="ISpectrum"/> of the <paramref name="ray"/></param>

@@ -1,6 +1,6 @@
 ﻿using OpenTK.Mathematics;
 using PathTracer.Pathtracing.Boundaries;
-using PathTracer.Pathtracing.PDFs.DistancePDFs;
+using PathTracer.Pathtracing.Distributions.Distance;
 using PathTracer.Pathtracing.Rays;
 using PathTracer.Spectra;
 using System.Linq;
@@ -19,9 +19,9 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials.SurfaceMaterials {
             return new Ray(surfacePoint.Position + surfacePoint.Normal * 0.001f, direction);
         }
 
-        public override IDistanceMaterialPDF? DistanceMaterialPDF(IRay ray, ISpectrum spectrum, IBoundaryCollection boundary) {
+        public override IDistanceDistribution? DistanceDistribution(IRay ray, ISpectrum spectrum, IBoundaryCollection boundary) {
             float entry = boundary.BoundaryIntervals.First(i => i.Entry.Distance > 0).Entry.Distance;
-            return new SingleDistanceMaterialPDF(new DistanceMaterial(entry, this));
+            return new SingleDistanceDistribution(new DistanceMaterial(entry, this));
         }
     }
 }

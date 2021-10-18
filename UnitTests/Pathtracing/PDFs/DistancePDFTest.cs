@@ -1,5 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using PathTracer.Pathtracing.PDFs;
+using PathTracer.Pathtracing.Distributions;
 
 namespace UnitTests.Pathtracing.PDFs {
     [TestClass]

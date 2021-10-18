@@ -1,6 +1,6 @@
 ﻿using OpenTK.Mathematics;
 using PathTracer.Pathtracing.Boundaries;
-using PathTracer.Pathtracing.PDFs.DistancePDFs;
+using PathTracer.Pathtracing.Distributions.Distance;
 using PathTracer.Spectra;
 using System;
 
@@ -16,8 +16,8 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials.VolumetricMaterials 
             return new Ray(surfacePoint.Position, direction);
         }
 
-        public override IDistanceMaterialPDF? DistanceMaterialPDF(IRay ray, ISpectrum spectrum, IBoundaryCollection boundary) {
-            IDistanceMaterialPDF? result = null;
+        public override IDistanceDistribution? DistanceMaterialPDF(IRay ray, ISpectrum spectrum, IBoundaryCollection boundary) {
+            IDistanceDistribution? result = null;
             foreach (IBoundaryInterval interval in boundary.BoundaryIntervals) {
                 if (interval.Exit.Distance > 0 && interval.Entry.Distance < ray.Length) {
                     result += new ExponentialDistanceMaterialPDF(Math.Max(0, interval.Entry.Distance), Math.Min(ray.Length, interval.Exit.Distance), Density, this);

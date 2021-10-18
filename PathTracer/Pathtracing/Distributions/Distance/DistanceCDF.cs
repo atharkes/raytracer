@@ -1,8 +1,8 @@
 ﻿using MathNet.Numerics.Distributions;
 using System;
 
-namespace PathTracer.Pathtracing.PDFs.DistancePDFs {
-    public abstract class DistancePDF : IDistancePDF {
+namespace PathTracer.Pathtracing.Distributions.Distance {
+    public abstract class DistanceCDF : IDistanceCDF {
         public abstract bool SingleSolution { get; }
         public abstract double DomainStart { get; }
         public abstract double DomainEnd { get; }
@@ -17,18 +17,18 @@ namespace PathTracer.Pathtracing.PDFs.DistancePDFs {
         public abstract double CumulativeDistribution(double sample);
     }
 
-    public class SumDistancePDF : DistancePDF, ISumDistancePDF<double> {
-        public IDistancePDF Left { get; }
-        public IDistancePDF Right { get; }
+    public class SumDistanceCDF : DistanceCDF, ISumDistanceCDF<double> {
+        public IDistanceCDF Left { get; }
+        public IDistanceCDF Right { get; }
 
-        IPDF<double> IRecursivePDF<double>.Left => Left;
-        IPDF<double> IRecursivePDF<double>.Right => Right;
+        ICDF<double> IRecursiveCDF<double>.Left => Left;
+        ICDF<double> IRecursiveCDF<double>.Right => Right;
 
         public override bool SingleSolution => Left.SingleSolution && Right.SingleSolution;
         public override double DomainStart => Math.Min(Left.DomainStart, Right.DomainStart);
         public override double DomainEnd => Math.Max(Left.DomainEnd, Right.DomainEnd);
 
-        public SumDistancePDF(IDistancePDF left, IDistancePDF right) {
+        public SumDistanceCDF(IDistanceCDF left, IDistanceCDF right) {
             Left = left;
             Right = right;
         }
@@ -39,21 +39,21 @@ namespace PathTracer.Pathtracing.PDFs.DistancePDFs {
         }
 
         public override double Probability(double sample) {
-            return (this as IRecursivePDF<double>).Probability(sample);
+            return (this as IRecursiveCDF<double>).Probability(sample);
         }
 
         public override double CumulativeDistribution(double sample) {
-            return IsAfter(sample) ? 0 : (this as IRecursivePDF<double>).CumulativeDistribution(sample);
+            return IsAfter(sample) ? 0 : (this as IRecursiveCDF<double>).CumulativeDistribution(sample);
         }
     }
 
-    public class SingleDistancePDF : DistancePDF {
+    public class SingleDistanceCDF : DistanceCDF {
         public override bool SingleSolution => true;
         public override double DomainStart => Value;
         public override double DomainEnd => Value;
         public double Value { get; }
 
-        public SingleDistancePDF(double value) {
+        public SingleDistanceCDF(double value) {
             Value = value;
         }
 
@@ -70,13 +70,13 @@ namespace PathTracer.Pathtracing.PDFs.DistancePDFs {
         }
     }
 
-    public class ExponentialDistancePDF : DistancePDF {
+    public class ExponentialDistanceCDF : DistanceCDF {
         public override bool SingleSolution => false;
         public override double DomainStart { get; }
         public override double DomainEnd { get; }
         public Exponential Distribution { get; }
 
-        public ExponentialDistancePDF(double start, double end, double rate) {
+        public ExponentialDistanceCDF(double start, double end, double rate) {
             Distribution = new Exponential(rate);
             DomainStart = start;
             DomainEnd = end;

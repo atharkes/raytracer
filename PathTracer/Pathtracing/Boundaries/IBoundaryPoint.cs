@@ -1,4 +1,5 @@
 ﻿using OpenTK.Mathematics;
+using PathTracer.Pathtracing.Rays;
 
 namespace PathTracer.Pathtracing.Boundaries {
     /// <summary> An interface for a point in space where a boundary is encountered along a traced <see cref="IRay"/> </summary>
@@ -16,11 +17,11 @@ namespace PathTracer.Pathtracing.Boundaries {
         /// <summary> Check if a <paramref name="ray"/> enters at the <see cref="IBoundaryPoint"/> </summary>
         /// <param name="ray">The <see cref="IRay"/> to check for</param>
         /// <returns>Whether the <paramref name="ray"/> enters at the <see cref="IBoundaryPoint"/></returns>
-        bool IsEntered(IRay ray) => Vector3.Dot(ray.Direction, Normal) < 0;
+        bool IsEnteredBy(IRay ray) => Vector3.Dot(ray.Direction, Normal) < 0;
 
         /// <summary> Check if a <paramref name="ray"/> exits at the <see cref="IBoundaryPoint"/> </summary>
         /// <param name="ray">The <see cref="IRay"/> to check for</param>
         /// <returns>Whether the <paramref name="ray"/> exits at the <see cref="IBoundaryPoint"/></returns>
-        bool IsExited(IRay ray) => Vector3.Dot(ray.Direction, Normal) > 0;
+        bool IsExitedBy(IRay ray) => Vector3.Dot(ray.Direction, Normal) > 0;
     }
 }

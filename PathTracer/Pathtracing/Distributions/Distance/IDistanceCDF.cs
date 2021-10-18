@@ -1,22 +1,22 @@
-﻿namespace PathTracer.Pathtracing.PDFs.DistancePDFs {
-    public interface IDistancePDF : IPDF<double> {
+﻿namespace PathTracer.Pathtracing.Distributions.Distance {
+    public interface IDistanceCDF : ICDF<double> {
         double DomainStart { get; }
         double DomainEnd { get; }
 
         bool IsBefore(double sample);
         bool IsAfter(double sample);
 
-        public static IDistancePDF operator +(IDistancePDF? left, IDistancePDF right) {
-            return left == null ? right : new SumDistancePDF(left, right);
+        public static IDistanceCDF operator +(IDistanceCDF? left, IDistanceCDF right) {
+            return left == null ? right : new SumDistanceCDF(left, right);
         }
     }
 
-    public interface IRecursivePDF<T> : IPDF<T> {
-        IPDF<T> Left { get; }
-        IPDF<T> Right { get; }
+    public interface IRecursiveCDF<T> : ICDF<T> {
+        ICDF<T> Left { get; }
+        ICDF<T> Right { get; }
     }
 
-    public interface ISumDistancePDF<T> : IRecursivePDF<T> {
+    public interface ISumDistanceCDF<T> : IRecursiveCDF<T> {
         new double Probability(T sample) {
             if (!Contains(sample)) {
                 return 0;

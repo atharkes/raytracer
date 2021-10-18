@@ -1,7 +1,7 @@
 ﻿using OpenTK.Mathematics;
 using PathTracer.Pathtracing.Boundaries;
-using PathTracer.Pathtracing.PDFs;
-using PathTracer.Pathtracing.PDFs.DistancePDFs;
+using PathTracer.Pathtracing.Distributions;
+using PathTracer.Pathtracing.Distributions.Distance;
 using PathTracer.Pathtracing.SceneDescription.Materials;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Planars;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics;
@@ -38,7 +38,7 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Primitives {
         /// <param name="ray">The <see cref="IRay"/> to intersect the <see cref="Primitive"/> with</param>
         /// <param name="spectrum">The <see cref="ISpectrum"/> of the <paramref name="ray"/></param>
         /// <returns>The distance and material pdfs</returns>
-        public IDistanceMaterialPDF? Trace(IRay ray, ISpectrum spectrum) {
+        public IDistanceDistribution? Trace(IRay ray, ISpectrum spectrum) {
             IBoundaryCollection? boundary = Shape.Intersect(ray);
             return boundary is not null ? Material.DistanceMaterialPDF(ray, spectrum, boundary) : null;
         }
@@ -67,9 +67,9 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Primitives {
             }
         }
 
-        public IDistanceMaterialPDF? DistanceMaterialPDF(IRay ray, ISpectrum spectrum, IBoundaryCollection boundary)
+        public IDistanceDistribution? DistanceMaterialPDF(IRay ray, ISpectrum spectrum, IBoundaryCollection boundary)
             => Material.DistanceMaterialPDF(ray, spectrum, boundary);
         public IPDF<Vector3, IMedium>? DirectionMediumPDF(Vector3 incomingDirection, ISpectrum spectrum, ISurfacePoint surfacePoint)
-            => Material.DirectionMediumPDF(incomingDirection, spectrum, surfacePoint);
+            => Material.DirectionDistribution(incomingDirection, spectrum, surfacePoint);
     }
 }

@@ -1,6 +1,6 @@
 ﻿using OpenTK.Mathematics;
 using PathTracer.Pathtracing;
-using PathTracer.Pathtracing.PDFs.DistancePDFs;
+using PathTracer.Pathtracing.Distributions.Distance;
 using PathTracer.Pathtracing.Rays;
 using PathTracer.Utilities;
 using System;
@@ -42,7 +42,7 @@ namespace PathTracer.Integrators {
             if (sample.RecursionDepth > MaxRecursionDepth) return Vector3.Zero;
 
             /// Distance Sampling
-            IDistanceMaterialPDF? distancePDF = scene.Trace(sample.Ray, );
+            IDistanceDistribution? distancePDF = scene.Trace(sample.Ray, );
             if (distancePDF == null) return Vector3.Zero;
             IDistanceMaterial distanceMaterial = distancePDF.SampleWithMaterial(Utils.Random);
             sample.Ray.Length = (float)distanceMaterial.Distance;

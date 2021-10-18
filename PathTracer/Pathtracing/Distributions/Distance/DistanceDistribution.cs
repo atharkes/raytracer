@@ -2,7 +2,7 @@
 using PathTracer.Pathtracing.SceneDescription;
 using System;
 
-namespace PathTracer.Pathtracing.PDFs.DistancePDFs {
+namespace PathTracer.Pathtracing.Distributions.Distance {
     public struct DistanceMaterial : IDistanceMaterial {
         public double Distance { get; }
         public IMaterial Material { get; }
@@ -21,7 +21,7 @@ namespace PathTracer.Pathtracing.PDFs.DistancePDFs {
         }
     }
 
-    public abstract class DistanceMaterialPDF : IDistanceMaterialPDF {
+    public abstract class DistanceDistribution : IDistanceDistribution {
         public abstract bool SingleSolution { get; }
         public abstract double DomainStart { get; }
         public abstract double DomainEnd { get; }
@@ -32,56 +32,56 @@ namespace PathTracer.Pathtracing.PDFs.DistancePDFs {
         public bool IsBefore(double sample) => DomainEnd < sample;
         public bool IsAfter(double sample) => DomainStart > sample;
 
-        public abstract double Sample(Random random);
+        public abstract double SampleDistance(Random random);
         public abstract double Probability(double sample);
         public abstract double CumulativeDistribution(double sample);
 
         public abstract bool Contains(IDistanceMaterial sample);
-        public abstract IDistanceMaterial SampleWithMaterial(Random random);
+        public abstract IDistanceMaterial Sample(Random random);
         public abstract double Probability(IDistanceMaterial sample);
         public abstract double CumulativeDistribution(IDistanceMaterial sample);
     }
 
-    public class SumDistanceMaterialPDF : DistanceMaterialPDF, ISumDistancePDF<double>, ISumDistancePDF<IDistanceMaterial> {
+    public class SumDistanceDistribution : DistanceDistribution, ISumDistanceCDF<double>, ISumDistanceCDF<IDistanceMaterial> {
         public override bool SingleSolution => Left.SingleSolution && Right.SingleSolution;
         public override double DomainStart => Math.Min(Left.DomainStart, Right.DomainStart);
         public override double DomainEnd => Math.Max(Left.DomainEnd, Right.DomainEnd);
         public override bool Leaf => false;
-        public IDistanceMaterialPDF Left { get; }
-        public IDistanceMaterialPDF Right { get; }
+        public IDistanceDistribution Left { get; }
+        public IDistanceDistribution Right { get; }
 
-        IPDF<double> IRecursivePDF<double>.Left => Left;
-        IPDF<double> IRecursivePDF<double>.Right => Right;
-        IPDF<IDistanceMaterial> IRecursivePDF<IDistanceMaterial>.Left => Left;
-        IPDF<IDistanceMaterial> IRecursivePDF<IDistanceMaterial>.Right => Right;
+        ICDF<double> IRecursiveCDF<double>.Left => Left;
+        ICDF<double> IRecursiveCDF<double>.Right => Right;
+        ICDF<IDistanceMaterial> IRecursiveCDF<IDistanceMaterial>.Left => Left;
+        ICDF<IDistanceMaterial> IRecursiveCDF<IDistanceMaterial>.Right => Right;
 
-        public SumDistanceMaterialPDF(IDistanceMaterialPDF left, IDistanceMaterialPDF right) {
+        public SumDistanceDistribution(IDistanceDistribution left, IDistanceDistribution right) {
             Left = left;
             Right = right;
         }
 
-        public override double Sample(Random random) => Math.Min((Left as IPDF<double>).Sample(random), (Right as IPDF<double>).Sample(random));
-        public override double Probability(double sample) => (this as IRecursivePDF<double>).Probability(sample);
-        public override double CumulativeDistribution(double sample) => IsAfter(sample) ? 0 : (this as IRecursivePDF<double>).CumulativeDistribution(sample);
+        public override double SampleDistance(Random random) => Math.Min((Left as IPDF<double>).Sample(random), (Right as IPDF<double>).Sample(random));
+        public override double Probability(double sample) => (this as IRecursiveCDF<double>).Probability(sample);
+        public override double CumulativeDistribution(double sample) => IsAfter(sample) ? 0 : (this as IRecursiveCDF<double>).CumulativeDistribution(sample);
 
         public override bool Contains(IDistanceMaterial sample) => Left.Contains(sample) || Right.Contains(sample);
 
-        public override IDistanceMaterial SampleWithMaterial(Random random) {
-            IDistanceMaterial left = Left.SampleWithMaterial(random);
-            IDistanceMaterial right = Right.SampleWithMaterial(random);
+        public override IDistanceMaterial Sample(Random random) {
+            IDistanceMaterial left = (Left as IPDF<IDistanceMaterial>).Sample(random);
+            IDistanceMaterial right = (Right as IPDF<IDistanceMaterial>).Sample(random);
             return left.Distance < right.Distance ? left : right;
         }
 
         public override double Probability(IDistanceMaterial sample) {
-            return (this as IRecursivePDF<IDistanceMaterial>).Probability(sample);
+            return (this as IRecursiveCDF<IDistanceMaterial>).Probability(sample);
         }
 
         public override double CumulativeDistribution(IDistanceMaterial sample) {
-            return IsAfter(sample.Distance) ? 0 : (this as IRecursivePDF<IDistanceMaterial>).CumulativeDistribution(sample);
+            return IsAfter(sample.Distance) ? 0 : (this as IRecursiveCDF<IDistanceMaterial>).CumulativeDistribution(sample);
         }
     }
 
-    public class SingleDistanceMaterialPDF : DistanceMaterialPDF {
+    public class SingleDistanceDistribution : DistanceDistribution {
         public override bool SingleSolution => true;
         public override double DomainStart => DistanceMaterial.Distance;
         public override double DomainEnd => DistanceMaterial.Distance;
@@ -89,11 +89,11 @@ namespace PathTracer.Pathtracing.PDFs.DistancePDFs {
 
         public override bool Leaf => throw new NotImplementedException();
 
-        public SingleDistanceMaterialPDF(IDistanceMaterial distanceMaterial) {
+        public SingleDistanceDistribution(IDistanceMaterial distanceMaterial) {
             DistanceMaterial = distanceMaterial;
         }
 
-        public override double Sample(Random random) {
+        public override double SampleDistance(Random random) {
             return DistanceMaterial.Distance;
         }
 
@@ -109,7 +109,7 @@ namespace PathTracer.Pathtracing.PDFs.DistancePDFs {
             return sample == DistanceMaterial;
         }
 
-        public override IDistanceMaterial SampleWithMaterial(Random random) {
+        public override IDistanceMaterial Sample(Random random) {
             return DistanceMaterial;
         }
 
@@ -122,7 +122,7 @@ namespace PathTracer.Pathtracing.PDFs.DistancePDFs {
         }
     }
 
-    public class ExponentialDistanceMaterialPDF : DistanceMaterialPDF {
+    public class ExponentialDistanceDistribution : DistanceDistribution {
         public override bool SingleSolution => false;
         public override double DomainStart { get; }
         public override double DomainEnd { get; }
@@ -131,14 +131,14 @@ namespace PathTracer.Pathtracing.PDFs.DistancePDFs {
 
         public override bool Leaf => throw new NotImplementedException();
 
-        public ExponentialDistanceMaterialPDF(double start, double end, double rate, IMaterial material) {
+        public ExponentialDistanceDistribution(double start, double end, double rate, IMaterial material) {
             Distribution = new Exponential(rate);
             DomainStart = start;
             DomainEnd = end;
             Material = material;
         }
 
-        public override double Sample(Random random) {
+        public override double SampleDistance(Random random) {
             double distance = DomainStart + Distribution.InverseCumulativeDistribution(random.NextDouble());
             if (distance > DomainEnd) {
                 distance = double.PositiveInfinity;
@@ -172,8 +172,8 @@ namespace PathTracer.Pathtracing.PDFs.DistancePDFs {
             return Material == sample.Material && Contains(sample.Distance);
         }
 
-        public override IDistanceMaterial SampleWithMaterial(Random random) {
-            return new DistanceMaterial(Sample(random), Material); 
+        public override IDistanceMaterial Sample(Random random) {
+            return new DistanceMaterial(SampleDistance(random), Material); 
         }
 
         public override double Probability(IDistanceMaterial sample) {

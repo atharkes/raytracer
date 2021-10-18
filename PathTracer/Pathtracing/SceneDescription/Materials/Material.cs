@@ -1,7 +1,7 @@
 ﻿using OpenTK.Mathematics;
 using PathTracer.Pathtracing.Boundaries;
-using PathTracer.Pathtracing.PDFs;
-using PathTracer.Pathtracing.PDFs.DistancePDFs;
+using PathTracer.Pathtracing.Distributions.Direction;
+using PathTracer.Pathtracing.Distributions.Distance;
 using PathTracer.Pathtracing.Rays;
 using PathTracer.Spectra;
 
@@ -14,7 +14,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials {
         }
 
         public abstract IRay CreateRay(ISurfacePoint surfacePoint, Vector3 direction);
-        public abstract IDistanceMaterialPDF? DistanceMaterialPDF(IRay ray, ISpectrum spectrum, IBoundaryCollection boundary);
-        public abstract IPDF<Vector3, IMedium>? DirectionMediumPDF(Vector3 incomingDirection, ISpectrum spectrum, ISurfacePoint surfacePoint);
+        public abstract IDistanceDistribution? DistanceDistribution(IRay ray, ISpectrum spectrum, IBoundaryCollection boundary);
+        public abstract IDirectionDistribution? DirectionDistribution(Vector3 incomingDirection, ISpectrum spectrum, ISurfacePoint surfacePoint);
     }
 }

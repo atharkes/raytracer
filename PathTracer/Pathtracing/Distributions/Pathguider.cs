@@ -4,7 +4,7 @@ using PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates;
 using System;
 using System.Collections.Generic;
 
-namespace PathTracer.Pathtracing.PDFs {
+namespace PathTracer.Pathtracing.Distributions {
     public class Pathguider {
         /// <summary> Create a new path guider </summary>
         public Pathguider() { }

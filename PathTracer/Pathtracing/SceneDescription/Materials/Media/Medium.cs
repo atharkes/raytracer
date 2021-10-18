@@ -1,5 +1,5 @@
 ﻿using OpenTK.Mathematics;
-using PathTracer.Pathtracing.PDFs;
+using PathTracer.Pathtracing.Distributions;
 using PathTracer.Pathtracing.SceneDescription.Materials.SurfaceMaterials;
 using PathTracer.Spectra;
 using System;
@@ -22,7 +22,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials.Media {
             return RefractiveIndex.Equals(other?.RefractiveIndex);
         }
 
-        public override IPDF<Vector3, IMedium> DirectionMediumPDF(Vector3 incomingDirection, ISpectrum spectrum, ISurfacePoint surfacePoint) {
+        public override IPDF<Vector3, IMedium> DirectionDistribution(Vector3 incomingDirection, ISpectrum spectrum, ISurfacePoint surfacePoint) {
             throw new NotImplementedException("Fresnel requires information of other media. Some overarching structure needs to accomodate for the other media.");
         }
     }

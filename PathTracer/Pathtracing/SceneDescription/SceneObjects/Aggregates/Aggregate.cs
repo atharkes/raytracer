@@ -1,6 +1,6 @@
 ﻿using OpenTK.Mathematics;
 using PathTracer.Pathtracing.Boundaries;
-using PathTracer.Pathtracing.PDFs.DistancePDFs;
+using PathTracer.Pathtracing.Distributions.Distance;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Planars;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics;
 using PathTracer.Spectra;
@@ -81,8 +81,8 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates {
             return result;
         }
 
-        public IDistanceMaterialPDF? Trace(IRay ray, ISpectrum spectrum) {
-            IDistanceMaterialPDF? result = null;
+        public IDistanceDistribution? Trace(IRay ray, ISpectrum spectrum) {
+            IDistanceDistribution? result = null;
             foreach (ISceneObject sceneObject in Items) {
                 result += sceneObject.Trace(ray, spectrum);
             }

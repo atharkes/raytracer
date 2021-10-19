@@ -1,5 +1,7 @@
 ﻿using OpenTK.Mathematics;
-using PathTracer.Pathtracing.Boundaries;
+using PathTracer.Pathtracing.Points;
+using PathTracer.Pathtracing.Points.Boundaries;
+using PathTracer.Pathtracing.Rays;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Planars;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics;
 using System;
@@ -65,7 +67,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes {
                     Vector3 position = ray.Travel(distance);
                     Vector3 normal = SurfaceNormal(position);
                     IBoundaryPoint boundaryPoint = new BoundaryPoint(distance, position, normal);
-                    if (boundaryPoint.IsEntered(ray)) {
+                    if (boundaryPoint.IsTowards(ray.Direction)) {
                         Debug.Assert(entries.Count > 0, "Boundary intersection is invalid (More exits than entries). Warning: Geometry might be degenerate.");
                         entries.Enqueue(boundaryPoint);
                     } else {

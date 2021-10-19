@@ -1,11 +1,11 @@
 ﻿using OpenTK.Mathematics;
-using PathTracer.Pathtracing.Boundaries;
-using PathTracer.Pathtracing.Distributions;
 using PathTracer.Pathtracing.Distributions.Distance;
+using PathTracer.Pathtracing.Points.Boundaries;
+using PathTracer.Pathtracing.Rays;
 using PathTracer.Pathtracing.SceneDescription.Materials;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Planars;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics;
-using PathTracer.Spectra;
+using PathTracer.Pathtracing.Spectra;
 using System;
 using System.Collections.Generic;
 
@@ -38,9 +38,16 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Primitives {
         /// <param name="ray">The <see cref="IRay"/> to intersect the <see cref="Primitive"/> with</param>
         /// <param name="spectrum">The <see cref="ISpectrum"/> of the <paramref name="ray"/></param>
         /// <returns>The distance and material pdfs</returns>
-        public IDistanceDistribution? Trace(IRay ray, ISpectrum spectrum) {
+        public IDistanceQuery? Trace(IRay ray, ISpectrum spectrum) {
             IBoundaryCollection? boundary = Shape.Intersect(ray);
-            return boundary is not null ? Material.DistanceMaterialPDF(ray, spectrum, boundary) : null;
+            if (boundary is null) {
+                return null;
+            }
+            IDistanceDistribution? distanceDistribution = Material.DistanceDistribution(ray, spectrum, boundary);
+            if (distanceDistribution is null) {
+                return null;
+            }
+            return new DistanceQuery(ray, this, boundary, distanceDistribution);
         }
 
         /// <summary> Intersect the <see cref="Primitive"/> with a <paramref name="ray"/> </summary>

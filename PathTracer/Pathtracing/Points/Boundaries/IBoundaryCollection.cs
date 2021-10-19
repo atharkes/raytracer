@@ -1,10 +1,11 @@
 ﻿using PathTracer.Pathtracing.SceneDescription;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace PathTracer.Pathtracing.Points.Boundaries {
     /// <summary> The boundary collection of a <see cref="IShape"/>-<see cref="IRay"/> intersection </summary>
-    public interface IBoundaryCollection {
+    public interface IBoundaryCollection : IEnumerable<IBoundaryInterval> {
         /// <summary> The <see cref="IBoundaryInterval"/>s making up the <see cref="IBoundaryCollection"/> </summary>
         IEnumerable<IBoundaryInterval> BoundaryIntervals { get; }
 
@@ -30,6 +31,18 @@ namespace PathTracer.Pathtracing.Points.Boundaries {
             }
         }
 
+        /// <summary> Get the <see cref="IEnumerator{T}"/> of the <see cref="IBoundaryCollection"/> </summary>
+        /// <returns>The <see cref="IEnumerator{T}"/> of the <see cref="IBoundaryCollection"/></returns>
+        new IEnumerator<IBoundaryInterval> GetEnumerator() => BoundaryIntervals.GetEnumerator();
+
+        /// <summary> Get the <see cref="IEnumerator{T}"/> of the <see cref="IBoundaryCollection"/> </summary>
+        /// <returns>The <see cref="IEnumerator{T}"/> of the <see cref="IBoundaryCollection"/></returns>
+        IEnumerator<IBoundaryInterval> IEnumerable<IBoundaryInterval>.GetEnumerator() => GetEnumerator();
+
+        /// <summary> Get the <see cref="IEnumerator"/> of the <see cref="IBoundaryCollection"/> </summary>
+        /// <returns>The <see cref="IEnumerator"/> of the <see cref="IBoundaryCollection"/></returns>
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
         /// <summary> Add another <see cref="IBoundaryCollection"/> to this <see cref="IBoundaryCollection"/> </summary>
         /// <param name="other">The other <see cref="IBoundaryCollection"/></param>
         void AddRange(IBoundaryCollection other);
@@ -37,7 +50,7 @@ namespace PathTracer.Pathtracing.Points.Boundaries {
         /// <summary> Check whether the specified <paramref name="distance"/> falls inside the <see cref="IBoundaryCollection"/> </summary>
         /// <param name="distance">the specified distance to check for</param>
         /// <returns>Whether the specified <paramref name="distance"/> falls inside the <see cref="IBoundaryCollection"/></returns>
-        bool Inside(double distance) => BoundaryIntervals.Any(i => i.Inside(distance));
+        bool Inside(double distance) => BoundaryIntervals.Any(i => i.Includes(distance));
 
         /// <summary> Check whether the specified <paramref name="distance"/> falls outside the <see cref="IBoundaryCollection"/> </summary>
         /// <param name="distance">the specified distance to check for</param>

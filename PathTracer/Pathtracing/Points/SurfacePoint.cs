@@ -1,4 +1,5 @@
 ﻿using OpenTK.Mathematics;
+using PathTracer.Pathtracing.SceneDescription;
 using PathTracer.Pathtracing.SceneDescription.SceneObjects;
 using System;
 
@@ -6,18 +7,18 @@ namespace PathTracer.Pathtracing.Points {
     /// <summary> A point on the surface of a <see cref="SceneDescription.Shape"/>  </summary>
     public class SurfacePoint : ISurfacePoint {
         /// <summary> The <see cref="IPrimitive"/> on which the <see cref="SurfacePoint"/> is lying </summary>
-        public IPrimitive Primitive { get; }
+        public IMaterial Material { get; }
         /// <summary> The point on the surface of an <see cref="IPrimitive"/> </summary>
         public Vector3 Position { get; }
         /// <summary> The surface normal at the <see cref="Position"/></summary>
         public Vector3 Normal { get; }
 
         /// <summary> Create a <see cref="SurfacePoint"/> </summary>
-        /// <param name="primitive">The <see cref="IPrimitive"/> of the surface at the <paramref name="position"/> </param>
+        /// <param name="material">The <see cref="IMaterial"/> of the surface at the <paramref name="position"/> </param>
         /// <param name="position">The location of the <see cref="SurfacePoint"/></param>
-        /// <param name="normal">The normal of the <paramref name="primitive"/> at the <paramref name="position"/></param>
-        public SurfacePoint(IPrimitive primitive, Vector3 position, Vector3 normal) {
-            Primitive = primitive;
+        /// <param name="normal">The normal of the <paramref name="material"/> at the <paramref name="position"/></param>
+        public SurfacePoint(IMaterial material, Vector3 position, Vector3 normal) {
+            Material = material;
             Position = position;
             Normal = normal;
         }

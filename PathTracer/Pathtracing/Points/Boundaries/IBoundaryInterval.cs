@@ -18,11 +18,11 @@ namespace PathTracer.Pathtracing.Points.Boundaries {
         /// <summary> Check whether the specified <paramref name="distance"/> falls inside the <see cref="IBoundaryInterval"/> </summary>
         /// <param name="distance">the specified distance to check for</param>
         /// <returns>Whether the specified <paramref name="distance"/> falls inside the <see cref="IBoundaryInterval"/></returns>
-        bool Inside(double distance) => Entry.Distance <= distance && distance <= Exit.Distance;
+        bool Includes(double distance) => Entry.Distance <= distance && distance <= Exit.Distance;
 
         /// <summary> Check whether the specified <paramref name="distance"/> falls outside the <see cref="IBoundaryInterval"/> </summary>
         /// <param name="distance">the specified distance to check for</param>
         /// <returns>Whether the specified <paramref name="distance"/> falls outside the <see cref="IBoundaryInterval"/></returns>
-        bool Outside(double distance) => distance < Entry.Distance || Exit.Distance < distance;
+        bool Excludes(double distance) => distance < Entry.Distance || Exit.Distance < distance;
     }
 }

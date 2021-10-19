@@ -1,4 +1,5 @@
-﻿using PathTracer.Pathtracing.Boundaries;
+﻿using PathTracer.Pathtracing.Points;
+using PathTracer.Pathtracing.Points.Boundaries;
 using PathTracer.Pathtracing.Rays;
 using PathTracer.Pathtracing.SceneDescription;
 

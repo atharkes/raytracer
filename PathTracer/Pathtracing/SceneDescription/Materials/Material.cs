@@ -1,14 +1,16 @@
 ﻿using OpenTK.Mathematics;
-using PathTracer.Pathtracing.Boundaries;
 using PathTracer.Pathtracing.Distributions.Direction;
 using PathTracer.Pathtracing.Distributions.Distance;
 using PathTracer.Pathtracing.Points;
+using PathTracer.Pathtracing.Points.Boundaries;
 using PathTracer.Pathtracing.Rays;
-using PathTracer.Spectra;
+using PathTracer.Pathtracing.Spectra;
 
 namespace PathTracer.Pathtracing.SceneDescription.Materials {
     public abstract class Material : IMaterial {
         public ISpectrum Albedo { get; }
+        public abstract bool IsEmitting { get; }
+        public abstract bool IsSensing { get; }
 
         public Material(ISpectrum albedo) {
             Albedo = albedo;

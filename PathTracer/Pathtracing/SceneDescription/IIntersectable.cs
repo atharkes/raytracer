@@ -1,4 +1,4 @@
-﻿using PathTracer.Pathtracing.Boundaries;
+﻿using PathTracer.Pathtracing.Points.Boundaries;
 using PathTracer.Pathtracing.Rays;
 using System.Collections.Generic;
 

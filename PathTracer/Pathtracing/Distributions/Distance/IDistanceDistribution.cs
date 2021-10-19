@@ -14,5 +14,10 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
     public interface IDistanceMaterial : IComparable<IDistanceMaterial>, IEquatable<IDistanceMaterial> {
         double Distance { get; }
         IMaterial Material { get; }
+
+        void Deconstruct(out double distance, out IMaterial material) {
+            distance = Distance;
+            material = Material;
+        }
     }
 }

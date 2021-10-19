@@ -1,9 +1,10 @@
 ﻿using OpenTK.Mathematics;
-using PathTracer.Pathtracing.Boundaries;
 using PathTracer.Pathtracing.Distributions.Distance;
 using PathTracer.Pathtracing.Points;
+using PathTracer.Pathtracing.Points.Boundaries;
 using PathTracer.Pathtracing.Rays;
-using PathTracer.Spectra;
+using PathTracer.Pathtracing.Spectra;
+using System.Diagnostics;
 using System.Linq;
 
 namespace PathTracer.Pathtracing.SceneDescription.Materials.SurfaceMaterials {
@@ -13,8 +14,8 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials.SurfaceMaterials {
     /// </summary>
     public abstract class SurfaceMaterial : Material, IMaterial {
         /// <summary>
-        /// Epsilon used to raise the surface point away from the primitive.
-        /// Used to avoid the intersection falling behind the primitive by rounding errors.
+        /// Epsilon used to raise the exiting <see cref="IRay"/>s away from the scene object.
+        /// Used to avoid the intersection falling behind the scene object due to rounding errors.
         /// </summary>
         public const float RaiseEpsilon = 0.001f;
 
@@ -24,6 +25,11 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials.SurfaceMaterials {
 
         public override IRay CreateRay(ISurfacePoint surfacePoint, Vector3 direction) {
             return new Ray(surfacePoint.Position + surfacePoint.Normal * RaiseEpsilon, direction);
+        }
+
+        public override ISurfacePoint CreateSurfacePoint(IRay ray, IBoundaryInterval interval, float distance) {
+            Debug.Assert(interval.Entry.Distance == distance);
+            return new SurfacePoint(this, interval.Entry.Position, interval.Entry.Normal);
         }
 
         public override IDistanceDistribution? DistanceDistribution(IRay ray, ISpectrum spectrum, IBoundaryCollection boundary) {

@@ -3,9 +3,9 @@
 namespace PathTracer.Pathtracing.Points {
     /// <summary> A point in space with a normal specifying the outwards hemisphere of the point </summary>
     public interface IPoint {
-        /// <summary> The position of the <see cref="IBoundaryPoint"/> </summary>
+        /// <summary> The position of the <see cref="IPoint"/> </summary>
         Vector3 Position { get; }
-        /// <summary> The outward-pointing normal of the boundary at the <see cref="Position"/> </summary>
+        /// <summary> The normal specifying the outwards direction from the <see cref="IPoint"/> </summary>
         Vector3 Normal { get; }
 
         /// <summary> Check whether a <paramref name="direction"/> goes into the <see cref="IPoint"/> </summary>

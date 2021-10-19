@@ -1,6 +1,7 @@
-﻿using System;
+﻿using PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates;
+using System;
 
-namespace PathTracer {
+namespace PathTracer.Pathtracing.Integrators {
     /// <summary> An integrator to render a <see cref="IScene"/> </summary>
     public interface IIntegrator {
         /// <summary> The amount of samples the <see cref="IIntegrator"/> evaluated </summary>

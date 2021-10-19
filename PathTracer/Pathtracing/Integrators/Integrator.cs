@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PathTracer.Integrators {
+namespace PathTracer.Pathtracing.Integrators {
     /// <summary> An abstract <see cref="IIntegrator"/> </summary>
     public abstract class Integrator : IIntegrator {
         /// <summary> The amount of samples the <see cref="Integrator"/> evaluated </summary>

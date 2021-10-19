@@ -1,6 +1,6 @@
 ﻿using OpenTK.Mathematics;
 using PathTracer.Pathtracing.SceneDescription.SceneObjects.Cameras.Parts;
-using PathTracer.Spectra;
+using PathTracer.Pathtracing.Spectra;
 
 namespace PathTracer.Pathtracing.SceneDescription.SceneObjects {
     /// <summary> A virtual camera object that registers light transport in the <see cref="IScene"/> </summary>

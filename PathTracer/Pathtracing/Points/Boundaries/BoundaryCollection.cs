@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace PathTracer.Pathtracing.Boundaries {
+namespace PathTracer.Pathtracing.Points.Boundaries {
     /// <summary> A collection of <see cref="IBoundaryInterval"/>s </summary>
     public struct BoundaryCollection : IBoundaryCollection {
         /// <summary> Return an <see cref="IEnumerable{T}"/> of <see cref="IBoundaryInterval"/>s </summary>

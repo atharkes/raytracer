@@ -27,18 +27,4 @@ namespace PathTracer.Pathtracing.Distributions {
         /// <returns>The probability (density) of the <paramref name="sample"/></returns>
         double Probability(T sample);
     }
-
-    /// <summary> A cummulative distribution/density function </summary>
-    /// <typeparam name="T">The variable of the distribution function</typeparam>
-    public interface ICDF<T> : IPDF<T> {
-        /// <summary> Get the cummulative probability of a <paramref name="sample"/> in the <see cref="ICDF{T}"/> </summary>
-        /// <param name="sample">The sample to get the cummulative probability for</param>
-        /// <returns>The cummulative probability of the <paramref name="sample"/></returns>
-        double CumulativeDistribution(T sample);
-    }
-
-    /// <summary> A joint probability function </summary>
-    /// <typeparam name="T1">The first variable of the joint probability function</typeparam>
-    /// <typeparam name="T2">The second variable of the joint probability function</typeparam>
-    public interface IJPF<T1, T2> : IPDF<(T1, T2)> { }
 }

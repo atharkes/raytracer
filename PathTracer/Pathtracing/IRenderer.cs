@@ -1,6 +1,8 @@
-﻿using System;
+﻿using PathTracer.Pathtracing.Integrators;
+using PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates;
+using System;
 
-namespace PathTracer {
+namespace PathTracer.Pathtracing {
     /// <summary> A renderer that uses an <see cref="IIntegrator"/> to render a <see cref=""/>. </summary>
     public interface IRenderer {
         /// <summary> The <see cref="IScene"/> to be rendered </summary>

@@ -1,6 +1,6 @@
 ﻿using OpenTK.Mathematics;
 
-namespace PathTracer.Spectra {
+namespace PathTracer.Pathtracing.Spectra {
     /// <summary> A spectrum of electromagnetic radiation that can contain different wavelengths  </summary>
     public interface ISpectrum {
         /// <summary> An <see cref="ISpectrum"/> that represents no light </summary>

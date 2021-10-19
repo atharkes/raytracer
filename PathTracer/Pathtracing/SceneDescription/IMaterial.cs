@@ -1,15 +1,21 @@
 ﻿using OpenTK.Mathematics;
-using PathTracer.Pathtracing.Boundaries;
 using PathTracer.Pathtracing.Distributions.Direction;
 using PathTracer.Pathtracing.Distributions.Distance;
+using PathTracer.Pathtracing.Points;
+using PathTracer.Pathtracing.Points.Boundaries;
 using PathTracer.Pathtracing.Rays;
-using PathTracer.Spectra;
+using PathTracer.Pathtracing.Spectra;
 
 namespace PathTracer.Pathtracing.SceneDescription {
     /// <summary> An interface for a material of a <see cref="ISceneObject"/> </summary>
     public interface IMaterial {
         /// <summary> The albedo <see cref="ISpectrum"/> of the <see cref="IMaterial"/> </summary>
         ISpectrum Albedo { get; }
+
+        /// <summary> Whether the <see cref="IMaterial"/> is emitting light or not </summary>
+        bool IsEmitting { get; }
+        /// <summary> Whether the <see cref="IMaterial"/> is sensing light or not </summary>
+        bool IsSensing { get; }
 
         /// <summary> Create an outgoing <see cref="IRay"/> from a <paramref name="surfacePoint"/> along a specified <paramref name="direction"/> </summary>
         /// <param name="surfacePoint">The <see cref="ISurfacePoint"/> from which the <see cref="IRay"/> leaves</param>

@@ -1,11 +1,20 @@
-﻿using OpenTK.Windowing.Common;
+﻿using OpenTK.Mathematics;
+using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using PathTracer.Drawing;
-using PathTracer.Integrators;
 using PathTracer.Multithreading;
+using PathTracer.Pathtracing;
+using PathTracer.Pathtracing.Integrators;
+using PathTracer.Pathtracing.SceneDescription;
+using PathTracer.Pathtracing.SceneDescription.Materials;
+using PathTracer.Pathtracing.SceneDescription.SceneObjects;
 using PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates;
 using PathTracer.Pathtracing.SceneDescription.SceneObjects.Cameras;
+using PathTracer.Pathtracing.SceneDescription.SceneObjects.Primitives;
+using PathTracer.Pathtracing.SceneDescription.Shapes.Planars;
+using PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics;
 using PathTracer.Utilities;
+using System.Collections.Generic;
 
 namespace PathTracer {
     public static class Program {
@@ -30,7 +39,7 @@ namespace PathTracer {
         /// <summary> The <see cref="IIntegrator"/> to integrate the scene </summary>
         public static readonly IIntegrator Integrator = new BackwardsSampler();
         /// <summary> The scene to render </summary>
-        public static readonly Scene Scene = Scene.Default(Window.GameWindow);
+        public static readonly IScene Scene = new Scene(Observer.Camera, DefaultLights, DefaultPrimitives);
         /// <summary> The <see cref="IRenderer"/> to supply images </summary>
         public static readonly IRenderer Renderer = new Renderer(Scene, Integrator, Observer);
 
@@ -50,5 +59,20 @@ namespace PathTracer {
         static void HandleInput(FrameEventArgs obj) {
             Renderer.Observer.HandleInput(Window.KeyboardState, Window.MouseState);
         }
+
+        #region Default Scene Definition
+        /// <summary> The primitives in the default scene </summary>
+        public static List<ISceneObject> DefaultPrimitives => new() {
+            new Primitive(new AxisAlignedBox(new Vector3(-10, -5, -10), new Vector3(10, 10, 10)) { InwardNormals = true }, Material.WhiteLight),
+            new Primitive(new Sphere(new Vector3(-3, 1, 5), 1), Material.DiffuseGreen),
+            new Primitive(new Sphere(new Vector3(3, 1, 5), 1), Material.GlossyRed),
+            new Primitive(new Sphere(new Vector3(0, 1, 5), 1), Material.Mirror),
+            new Primitive(new Sphere(new Vector3(-1, 1, 2), 0.5f), Material.Glass),
+            new Primitive(new Triangle(new Vector3(-5, 0, 0), new Vector3(5, 0, 0), new Vector3(5, 0, 10), null), Material.GlossyPurpleMirror),
+            new Primitive(new Triangle(new Vector3(-5, 0, 0), new Vector3(5, 0, 10), new Vector3(-5, 0, 10), null), Material.DiffuseYellow),
+        };
+
+        public static List<ISceneObject> DefaultLights => DefaultPrimitives.FindAll(s => (s is IPrimitive p) ? p.Material.IsEmitting : false);
+        #endregion
     }
 }

@@ -1,4 +1,4 @@
-﻿using PathTracer.Spectra;
+﻿using PathTracer.Pathtracing.Spectra;
 using PathTracer.Utilities;
 using System;
 

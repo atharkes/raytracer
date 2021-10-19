@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace PathTracer.Pathtracing.Boundaries {
+namespace PathTracer.Pathtracing.Points.Boundaries {
     /// <summary> A boundary interval for an <see cref="IRay"/> traced through a (volumetric) <see cref="IShape"/> </summary>
     public struct BoundaryInterval : IBoundaryInterval {
         /// <summary> The entry-point of the <see cref="BoundaryInterval"/> </summary>

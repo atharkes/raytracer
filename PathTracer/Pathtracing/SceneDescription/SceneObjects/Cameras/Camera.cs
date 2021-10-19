@@ -1,9 +1,10 @@
 ﻿using OpenTK.Mathematics;
+using PathTracer.Pathtracing.Points;
 using PathTracer.Pathtracing.Rays;
 using PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates;
 using PathTracer.Pathtracing.SceneDescription.SceneObjects.Cameras.Parts;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Planars;
-using PathTracer.Spectra;
+using PathTracer.Pathtracing.Spectra;
 using System;
 
 namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Cameras {
@@ -18,6 +19,7 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Cameras {
         /// <summary> The viewing direction of the <see cref="Camera"/> </summary>
         public Vector3 ViewDirection => Rotation * ICamera.DefaultFront;
 
+        /// <summary> The average accumulated light in the <see cref="Camera"/> </summary>
         public ISpectrum AccumulatedLight => screenPlane.Accumulator.AverageLight();
 
         readonly ScreenPlane screenPlane;
@@ -106,9 +108,9 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Cameras {
         /// <returns>The ray from the camera through the screen plane</returns>
         public CameraRay CreateCameraRay(int x, int y) {
             Cavity cavity = screenPlane.Accumulator.Cavities[x + y * screenPlane.Screen.Width];
-            SurfacePoint origin = new SurfacePoint(cavity, Position, Front);
+            SurfacePoint origin = new SurfacePoint(cavity, Position, (this as ICamera).Front);
             Vector3 direction = screenPlane.GetPixelPosition(x, y) - Position;
-            return new CameraRay(origin, direction, cavity);
+            return new CameraRay(origin.Position, direction, cavity);
         }
 
         public void Draw(IScreen screen, DrawingMode mode) {

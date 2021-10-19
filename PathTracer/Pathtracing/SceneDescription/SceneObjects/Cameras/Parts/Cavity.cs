@@ -1,5 +1,5 @@
 ﻿using OpenTK.Mathematics;
-using PathTracer.Spectra;
+using PathTracer.Pathtracing.Spectra;
 using PathTracer.Utilities;
 
 namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Cameras.Parts {

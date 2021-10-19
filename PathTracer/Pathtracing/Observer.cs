@@ -3,7 +3,7 @@ using PathTracer.Pathtracing.SceneDescription.SceneObjects;
 using PathTracer.Pathtracing.SceneDescription.SceneObjects.Cameras.Parts;
 using PathTracer.Utilities;
 
-namespace PathTracer {
+namespace PathTracer.Pathtracing {
     /// <summary> An <see cref="IObserver"/> that observes a <see cref="IScene"/> </summary>
     public class Observer : IObserver {
         /// <summary> The <see cref="IScreen"/> used for visual output </summary>

@@ -1,6 +1,6 @@
 ﻿using PathTracer.Pathtracing.SceneDescription;
 
-namespace PathTracer.Pathtracing.Boundaries {
+namespace PathTracer.Pathtracing.Points.Boundaries {
     /// <summary> An interface for a boundary interval for an <see cref="IRay"/> traced through a (volumetric) <see cref="IShape"/> </summary>
     public interface IBoundaryInterval {
         /// <summary> The entry-point of the <see cref="IBoundaryInterval"/> </summary>

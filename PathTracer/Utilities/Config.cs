@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using OpenTK.Mathematics;
-using PathTracer.Pathtracing.SceneDescription.SceneObjects.CameraParts;
+using PathTracer.Pathtracing;
+using PathTracer.Pathtracing.SceneDescription.SceneObjects.Cameras.Parts;
 using System.IO;
 
 namespace PathTracer.Utilities {

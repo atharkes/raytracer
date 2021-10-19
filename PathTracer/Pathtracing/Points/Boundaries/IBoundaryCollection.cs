@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace PathTracer.Pathtracing.Boundaries {
+namespace PathTracer.Pathtracing.Points.Boundaries {
     /// <summary> The boundary collection of a <see cref="IShape"/>-<see cref="IRay"/> intersection </summary>
     public interface IBoundaryCollection {
         /// <summary> The <see cref="IBoundaryInterval"/>s making up the <see cref="IBoundaryCollection"/> </summary>

@@ -1,12 +1,11 @@
 ﻿using OpenTK.Mathematics;
-using PathTracer.Pathtracing;
 using PathTracer.Pathtracing.Distributions.Distance;
 using PathTracer.Pathtracing.Rays;
 using PathTracer.Utilities;
 using System;
 using System.Collections.Generic;
 
-namespace PathTracer.Integrators {
+namespace PathTracer.Pathtracing.Integrators {
     public class BackwardsSampler : Integrator {
         /// <summary> The maximum recursion depth for sampling </summary>
         public int MaxRecursionDepth { get; } = 5;

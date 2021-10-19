@@ -1,6 +1,6 @@
 ﻿using OpenTK.Mathematics;
 
-namespace PathTracer.Pathtracing.Boundaries {
+namespace PathTracer.Pathtracing.Points {
     /// <summary> A point in space where a boundary is encountered along a traced <see cref="IRay"/> </summary>
     public struct BoundaryPoint : IBoundaryPoint {
         /// <summary> The distance travelled along a <see cref="IRay"/> to find this <see cref="BoundaryPoint"/> </summary>

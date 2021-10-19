@@ -1,8 +1,6 @@
-﻿using PathTracer.Pathtracing.SceneDescription;
-using PathTracer.Pathtracing.SceneDescription.SceneObjects;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-namespace PathTracer {
+namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates {
     /// <summary> An interface for a static scene </summary>
     public interface IScene : IAggregate {
         /// <summary> The <see cref="ICamera"/> that register light in the <see cref="IScene"/> </summary>

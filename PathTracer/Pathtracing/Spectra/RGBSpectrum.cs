@@ -1,6 +1,6 @@
 ﻿using OpenTK.Mathematics;
 
-namespace PathTracer.Spectra {
+namespace PathTracer.Pathtracing.Spectra {
     /// <summary> A color <see cref="ISpectrum"/> that holds a single value for red, green, and blue </summary>
     public struct RGBSpectrum : ISpectrum {
         /// <summary> Whether the <see cref="RGBSpectrum"/> is black </summary>

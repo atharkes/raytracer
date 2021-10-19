@@ -2,6 +2,7 @@
 using PathTracer.Pathtracing.Boundaries;
 using PathTracer.Pathtracing.Distributions.Direction;
 using PathTracer.Pathtracing.Distributions.Distance;
+using PathTracer.Pathtracing.Points;
 using PathTracer.Pathtracing.Rays;
 using PathTracer.Spectra;
 

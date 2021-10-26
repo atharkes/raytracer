@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates;
+using System;
 
 namespace PathTracer.Pathtracing.Integrators {
     /// <summary> An abstract <see cref="IIntegrator"/> </summary>

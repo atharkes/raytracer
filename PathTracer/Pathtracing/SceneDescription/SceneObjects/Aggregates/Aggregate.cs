@@ -1,9 +1,11 @@
-﻿using OpenTK.Mathematics;
-using PathTracer.Pathtracing.Boundaries;
+﻿using PathTracer.Geometry.Normals;
+using PathTracer.Geometry.Positions;
 using PathTracer.Pathtracing.Distributions.Distance;
+using PathTracer.Pathtracing.Points.Boundaries;
+using PathTracer.Pathtracing.Rays;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Planars;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics;
-using PathTracer.Spectra;
+using PathTracer.Pathtracing.Spectra;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +13,8 @@ using System.Linq;
 namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates {
     /// <summary> Simple container <see cref="ISceneObject"/> holding multiple <see cref="ISceneObject"/>s </summary>
     public class Aggregate : IAggregate {
+        /// <summary> The amount of children of the <see cref="Aggregate"/> </summary>
+        public int ChildrenCount => Items.Count;
         /// <summary> The <see cref="ISceneObject"/> children of the <see cref="Aggregate"/> </summary>
         public IEnumerable<ISceneObject> Children => Items;
         /// <summary> Whether any the children of the <see cref="Aggregate"/> encompasses a volume </summary>
@@ -20,7 +24,7 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates {
         /// <summary> The total surface area of the children of the <see cref="Aggregate"/> </summary>
         public float SurfaceArea => Children.Sum(c => c.SurfaceArea);
         /// <summary> The bounding box of the <see cref="Aggregate"/> </summary>
-        public AxisAlignedBox BoundingBox { get; protected set; } = new(Vector3.PositiveInfinity, Vector3.NegativeInfinity);
+        public AxisAlignedBox BoundingBox { get; protected set; } = new(Position3.PositiveInfinity, Position3.NegativeInfinity);
 
         protected ICollection<ISceneObject> Items { get; set; } = new HashSet<ISceneObject>();
 
@@ -36,8 +40,8 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates {
 
         public void Add(ISceneObject item) {
             Items.Add(item);
-            BoundingBox.MinCorner = Vector3.ComponentMin(BoundingBox.MinCorner, item.BoundingBox.MinCorner);
-            BoundingBox.MaxCorner = Vector3.ComponentMax(BoundingBox.MaxCorner, item.BoundingBox.MaxCorner);
+            BoundingBox.MinCorner = Position3.ComponentMin(BoundingBox.MinCorner, item.BoundingBox.MinCorner);
+            BoundingBox.MaxCorner = Position3.ComponentMax(BoundingBox.MaxCorner, item.BoundingBox.MaxCorner);
         }
 
         public void AddRange(IEnumerable<ISceneObject> items) {
@@ -61,10 +65,10 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates {
             return BoundingBox.Intersects(ray) && Children.Any(c => c.Intersects(ray));
         }
 
-        public virtual IEnumerable<float> IntersectDistances(IRay ray) {
+        public virtual IEnumerable<Position1> IntersectDistances(IRay ray) {
             if (BoundingBox.Intersects(ray)) {
                 foreach (ISceneObject item in Items) {
-                    foreach (float distance in item.IntersectDistances(ray)) {
+                    foreach (Position1 distance in item.IntersectDistances(ray)) {
                         yield return distance;
                     }
                 }
@@ -81,27 +85,27 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates {
             return result;
         }
 
-        public IDistanceDistribution? Trace(IRay ray, ISpectrum spectrum) {
-            IDistanceDistribution? result = null;
+        public IDistanceQuery? Trace(IRay ray, ISpectrum spectrum) {
+            IDistanceQuery? result = null;
             foreach (ISceneObject sceneObject in Items) {
                 result += sceneObject.Trace(ray, spectrum);
             }
             return result;
         }
 
-        public bool Inside(Vector3 position) => Items.Any(i => i.Inside(position));
+        public bool Inside(Position3 position) => Items.Any(i => i.Inside(position));
 
-        public Vector3 PointOnSurface(Random random) {
+        public Position3 SurfacePosition(Random random) {
             if (Items.Count > 0) {
-                return Items.Where(i => !(i is IAggregate a) || a.Children.Any()).ElementAt(random.Next(0, Items.Count)).PointOnSurface(random);
+                return Items.Where(i => !(i is IAggregate a) || a.Children.Any()).ElementAt(random.Next(0, Items.Count)).SurfacePosition(random);
             } else {
                 throw new InvalidOperationException("Aggregate without children doesn't have any surface to choose a point on.");
             }
         }
 
-        public bool OnSurface(Vector3 position, float epsilon = 0.001F) => Items.Any(i => i.OnSurface(position, epsilon));
+        public bool OnSurface(Position3 position, float epsilon = 0.001F) => Items.Any(i => i.OnSurface(position, epsilon));
 
-        public Vector3 SurfaceNormal(Vector3 position) {
+        public Normal3 SurfaceNormal(Position3 position) {
             foreach (ISceneObject item in Items) {
                 if (item.OnSurface(position)) {
                     return item.SurfaceNormal(position);

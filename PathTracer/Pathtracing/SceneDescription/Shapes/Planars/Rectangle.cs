@@ -1,5 +1,10 @@
 ﻿using OpenTK.Mathematics;
-using PathTracer.Pathtracing.SceneDescription.SceneObjects.Primitives;
+using PathTracer.Geometry.Directions;
+using PathTracer.Geometry.Normals;
+using PathTracer.Geometry.Points;
+using PathTracer.Geometry.Positions;
+using PathTracer.Geometry.Vectors;
+using PathTracer.Pathtracing.Rays;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics;
 using System;
 
@@ -7,39 +12,39 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Planars {
     /// <summary> A quad primitive </summary>
     public class Rectangle : PlanarShape {
         /// <summary> The position of the <see cref="Rectangle"/> </summary>
-        public Vector3 Position { get; set; }
+        public Position3 Position { get; set; }
         /// <summary> The size of the <see cref="Rectangle"/> </summary>
-        public Vector2 Size { get; set; }
+        public Position2 Size { get; set; }
         /// <summary> The rotation <see cref="Quaternion"/> of the <see cref="Rectangle"/> </summary>
         public Quaternion Rotation { get; set; }
 
         /// <summary> The normal vector of the <see cref="Rectangle"/> </summary>
-        public Vector3 Normal => Rotation * Camera.DefaultFront;
+        public Normal3 Normal => Rotation * IDirection3.DefaultFront;
         /// <summary> The vector going right along the width of the <see cref="Rectangle"/> </summary>
-        public Vector3 Right => Rotation * Camera.DefaultRight;
+        public Normal3 Right => Rotation * IDirection3.DefaultRight;
         /// <summary> The vector going up along the height of the <see cref="Rectangle"/> </summary>
-        public Vector3 Up => Rotation * Camera.DefaultUp;
+        public Normal3 Up => Rotation * IDirection3.DefaultUp;
 
         /// <summary> The vector that goes from the left of the <see cref="Rectangle"/> to the right </summary>
-        public Vector3 LeftToRight => Right * Width;
+        public Direction3 LeftToRight => Right * Width;
         /// <summary> The vector that goes from the bottom of the <see cref="Rectangle"/> to the top </summary>
-        public Vector3 BottomToTop => Up * Height;
+        public Direction3 BottomToTop => Up * Height;
 
         /// <summary> The center of the <see cref="Rectangle"/> </summary>
-        public Vector3 Center { get => Position; set => Position = value; }
+        public Position3 Center { get => Position; set => Position = value; }
         /// <summary> The bottom left corner of the <see cref="Rectangle"/> </summary>
-        public Vector3 BottomLeft => Center - LeftToRight * 0.5f - BottomToTop * 0.5f;
+        public Position3 BottomLeft => Center - LeftToRight * 0.5f - BottomToTop * 0.5f;
         /// <summary> The bottom right corner of the <see cref="Rectangle"/> </summary>
-        public Vector3 BottomRight => Center + LeftToRight * 0.5f - BottomToTop * 0.5f;
+        public Position3 BottomRight => Center + LeftToRight * 0.5f - BottomToTop * 0.5f;
         /// <summary> The top left corner of the <see cref="Rectangle"/> </summary>
-        public Vector3 TopLeft => Center - LeftToRight * 0.5f + BottomToTop * 0.5f;
+        public Position3 TopLeft => Center - LeftToRight * 0.5f + BottomToTop * 0.5f;
         /// <summary> The top right corner of the <see cref="Rectangle"/> </summary>
-        public Vector3 TopRight => Center + LeftToRight * 0.5f + BottomToTop * 0.5f;
+        public Position3 TopRight => Center + LeftToRight * 0.5f + BottomToTop * 0.5f;
         
         /// <summary> The width of the <see cref="Rectangle"/> </summary>
-        public float Width => Size.X;
+        public Position1 Width => Size.X;
         /// <summary> The height of the <see cref="Rectangle"/> </summary>
-        public float Height => Size.Y;
+        public Position1 Height => Size.Y;
         /// <summary> The aspect ratio of the <see cref="Rectangle"/> </summary>
         public float AspectRatio => Width / Height;
 
@@ -54,7 +59,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Planars {
         /// <param name="position">The (center) position of the <see cref="Rectangle"/></param>
         /// <param name="size">The size of the <see cref="Rectangle"/></param>
         /// <param name="rotation">The rotation <see cref="Quaternion"/> of the <see cref="Rectangle"/></param>
-        public Rectangle(Vector3 position, Vector2 size, Quaternion rotation) {
+        public Rectangle(Position3 position, Position2 size, Quaternion rotation) {
             Position = position;
             Size = size;
             Rotation = rotation;
@@ -65,46 +70,50 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Planars {
         /// <param name="width">The width of the <see cref="Rectangle"/></param>
         /// <param name="height">The height of the <see cref="Rectangle"/></param>
         /// <param name="rotation">The rotation <see cref="Quaternion"/> of the <see cref="Rectangle"/></param>
-        public Rectangle(Vector3 position, float width, float height, Quaternion rotation) {
+        public Rectangle(Position3 position, Position1 width, Position1 height, Quaternion rotation) {
             Position = position;
-            Size = new Vector2(width, height);
+            Size = new Position2(width, height);
             Rotation = rotation;
         }
 
         /// <summary> Get a <paramref name="random"/> point on the surface of the <see cref="Rectangle"/> </summary>
         /// <param name="random">The <see cref="Random"/> to decide the position on the surface</param>
         /// <returns>A <paramref name="random"/> point on the surface of the <see cref="Rectangle"/></returns>
-        public override Vector3 PointOnSurface(Random random) {
+        public override Position3 SurfacePosition(Random random) {
             throw new NotImplementedException();
+        }
+
+        public Position3 SurfacePosition(Position2 uvPosition) {
+            return BottomLeft + LeftToRight * uvPosition.X + BottomToTop * uvPosition.Y;
         }
 
         /// <summary> Check whether a <paramref name="position"/> is on the surface of the <see cref="Rectangle"/> </summary>
         /// <param name="position">The position to check</param>
         /// <param name="epsilon">The epsilon to specify the precision</param>
         /// <returns>Whether the <paramref name="position"/> is on the surface of the <see cref="Rectangle"/></returns>
-        public override bool OnSurface(Vector3 position, float epsilon = 0.001F) {
+        public override bool OnSurface(Position3 position, float epsilon = 0.001F) {
             throw new NotImplementedException();
         }
 
         /// <summary> Get the normal of the <see cref="Rectangle"/> </summary>
         /// <param name="surfacePoint">The surface point to get the normal for</param>
         /// <returns>The normal of the <see cref="Rectangle"/></returns>
-        public override Vector3 SurfaceNormal(Vector3 surfacePoint) {
+        public override Normal3 SurfaceNormal(Position3 surfacePoint) {
             return Normal;
         }
 
         /// <summary> Intersect the <see cref="Rectangle"/> with a <paramref name="ray"/> </summary>
         /// <param name="ray">The <see cref="IRay"/> to intersect the <see cref="Rectangle"/> with</param>
         /// <returns>Whether and when the <paramref name="ray"/> intersects the <see cref="Rectangle"/></returns>
-        public override float? IntersectDistance(IRay ray) {
-            float? planeDistance = PlaneOfExistence.IntersectDistance(ray);
+        public override Position1? IntersectDistance(IRay ray) {
+            Position1? planeDistance = PlaneOfExistence.IntersectDistance(ray);
             if (!planeDistance.HasValue) {
                 return null;
             } else {
-                Vector3 planeIntersection = ray.Origin + ray.Direction * planeDistance.Value;
-                Vector3 relativeIntersection = planeIntersection - Position;
-                float u = Vector3.Dot(LeftToRight, relativeIntersection) / LeftToRight.LengthSquared;
-                float v = Vector3.Dot(BottomToTop, relativeIntersection) / BottomToTop.LengthSquared;
+                Position3 planeIntersection = ray.Origin + ray.Direction * planeDistance.Value;
+                IDirection3 relativeIntersection = planeIntersection - Position;
+                Position1 u = (Position1)IDirection3.Dot(LeftToRight, relativeIntersection) / LeftToRight.LengthSquared;
+                Position1 v = (Position1)IDirection3.Dot(BottomToTop, relativeIntersection) / BottomToTop.LengthSquared;
                 if (0f <= u && u <= 1f && 0f <= v && v <= 1f) {
                     return planeDistance.Value;
                 } else {

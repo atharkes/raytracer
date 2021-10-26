@@ -1,50 +1,54 @@
 ﻿using OpenTK.Mathematics;
+using PathTracer.Geometry.Directions;
+using PathTracer.Geometry.Normals;
+using PathTracer.Geometry.Points;
+using PathTracer.Geometry.Positions;
 using PathTracer.Pathtracing.SceneDescription;
 using PathTracer.Pathtracing.SceneDescription.SceneObjects;
 using System;
 
 namespace PathTracer.Pathtracing.Points {
     /// <summary> A point on the surface of a <see cref="SceneDescription.Shape"/>  </summary>
-    public class SurfacePoint : ISurfacePoint {
-        /// <summary> The <see cref="IPrimitive"/> on which the <see cref="SurfacePoint"/> is lying </summary>
+    public class MaterialPoint1 : IMaterialPoint1 {
+        /// <summary> The <see cref="IPrimitive"/> on which the <see cref="MaterialPoint1"/> is lying </summary>
         public IMaterial Material { get; }
         /// <summary> The point on the surface of an <see cref="IPrimitive"/> </summary>
-        public Vector3 Position { get; }
+        public Position1 Position { get; }
         /// <summary> The surface normal at the <see cref="Position"/></summary>
-        public Vector3 Normal { get; }
+        public Normal1 Normal { get; }
 
-        /// <summary> Create a <see cref="SurfacePoint"/> </summary>
+        /// <summary> Create a <see cref="MaterialPoint1"/> </summary>
         /// <param name="material">The <see cref="IMaterial"/> of the surface at the <paramref name="position"/> </param>
-        /// <param name="position">The location of the <see cref="SurfacePoint"/></param>
+        /// <param name="position">The location of the <see cref="MaterialPoint1"/></param>
         /// <param name="normal">The normal of the <paramref name="material"/> at the <paramref name="position"/></param>
-        public SurfacePoint(IMaterial material, Vector3 position, Vector3 normal) {
+        public MaterialPoint1(IMaterial material, Position1 position, Normal1 normal) {
             Material = material;
             Position = position;
             Normal = normal;
         }
 
-        /// <summary> Check whether a <paramref name="direction"/> goes into the surface at this <see cref="SurfacePoint"/> </summary>
+        /// <summary> Check whether a <paramref name="direction"/> goes into the surface at this <see cref="MaterialPoint1"/> </summary>
         /// <param name="direction">The direction</param>
         /// <returns>Whether the <paramref name="direction"/> goes into the surface</returns>
-        public bool IsTowards(Vector3 direction) => (this as IPoint).IsTowards(direction);
+        public bool IsTowards(IDirection1 direction) => (this as IPoint1).IsTowards(direction);
 
-        /// <summary> Check whether a <paramref name="direction"/> goes away from the surface at this <see cref="SurfacePoint"/> </summary>
+        /// <summary> Check whether a <paramref name="direction"/> goes away from the surface at this <see cref="MaterialPoint1"/> </summary>
         /// <param name="direction">The direction</param>
         /// <returns>Whether the <paramref name="direction"/> goes away from the surface</returns>
-        public bool IsFrom(Vector3 direction) => (this as IPoint).IsFrom(direction);
+        public bool IsFrom(IDirection1 direction) => (this as IPoint1).IsFrom(direction);
 
         #region Too be (re)moved
-        /// <summary> Get the reflected <paramref name="direction"/> at this <see cref="SurfacePoint"/> </summary>
+        /// <summary> Get the reflected <paramref name="direction"/> at this <see cref="MaterialPoint1"/> </summary>
         /// <param name="direction">The incoming direction</param>
         /// <returns>The reflected <paramref name="direction"/></returns>
         public Vector3 Reflect(Vector3 direction) {
             return direction - 2 * Vector3.Dot(direction, Normal) * Normal;
         }
 
-        /// <summary> Get the refracted <paramref name="direction"/> at this <see cref="SurfacePoint"/> </summary>
+        /// <summary> Get the refracted <paramref name="direction"/> at this <see cref="MaterialPoint1"/> </summary>
         /// <param name="direction">The incoming direction</param>
         /// <returns>The refracted <paramref name="direction"/></returns>
-        /// <exception cref="InvalidOperationException">When the <see cref="SurfacePoint"/> doesn't refract at the angle of the incoming <paramref name="direction"/></exception>
+        /// <exception cref="InvalidOperationException">When the <see cref="MaterialPoint1"/> doesn't refract at the angle of the incoming <paramref name="direction"/></exception>
         public Vector3 Refract(Vector3 direction) {
             float n1 = IsTowards(direction) ? 1f : Primitive.Material.RefractionIndex;
             float n2 = IsTowards(direction) ? Primitive.Material.RefractionIndex : 1f;
@@ -55,8 +59,8 @@ namespace PathTracer.Pathtracing.Points {
             return refraction * direction + Normal * (refraction * cosThetaInc - (float)Math.Sqrt(k));
         }
 
-        /// <summary> Get the reflectivity of the <see cref="SurfacePoint"/> under the incoming <paramref name="direction"/> using the Fresnel equations </summary>
-        /// <returns>The reflectivity at the <see cref="SurfacePoint"/> under the incoming <paramref name="direction"/></returns>
+        /// <summary> Get the reflectivity of the <see cref="MaterialPoint1"/> under the incoming <paramref name="direction"/> using the Fresnel equations </summary>
+        /// <returns>The reflectivity at the <see cref="MaterialPoint1"/> under the incoming <paramref name="direction"/></returns>
         public float Reflectivity(Vector3 direction) {
             float n1 = IsTowards(direction) ? 1f : Primitive.Material.RefractionIndex;
             float n2 = IsTowards(direction) ? Primitive.Material.RefractionIndex : 1f;

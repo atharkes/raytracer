@@ -10,7 +10,7 @@ using System.Linq;
 namespace PathTracer.Pathtracing.SceneDescription.Materials.SurfaceMaterials {
     /// <summary>
     /// A surface <see cref="IMaterial"/>.
-    /// To prevent self-intersection issues <see cref="IRay"/>s are raised from their <see cref="ISurfacePoint"/> on creation.
+    /// To prevent self-intersection issues <see cref="IRay"/>s are raised from their <see cref="IMaterialPoint1"/> on creation.
     /// </summary>
     public abstract class SurfaceMaterial : Material, IMaterial {
         /// <summary>
@@ -23,11 +23,11 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials.SurfaceMaterials {
         /// <param name="albedo">The albedo <see cref="ISpectrum"/> of the new <see cref="SurfaceMaterial"/></param>
         public SurfaceMaterial(ISpectrum albedo) : base(albedo) { }
 
-        public override IRay CreateRay(ISurfacePoint surfacePoint, Vector3 direction) {
+        public override IRay CreateRay(IMaterialPoint1 surfacePoint, Vector3 direction) {
             return new Ray(surfacePoint.Position + surfacePoint.Normal * RaiseEpsilon, direction);
         }
 
-        public override ISurfacePoint CreateSurfacePoint(IRay ray, IBoundaryInterval interval, float distance) {
+        public override IMaterialPoint1 CreateSurfacePoint(IRay ray, IBoundaryInterval interval, float distance) {
             Debug.Assert(interval.Entry.Distance == distance);
             return new SurfacePoint(this, interval.Entry.Position, interval.Entry.Normal);
         }

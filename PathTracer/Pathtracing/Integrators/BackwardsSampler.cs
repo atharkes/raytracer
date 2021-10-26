@@ -1,6 +1,7 @@
 ﻿using OpenTK.Mathematics;
 using PathTracer.Pathtracing.Distributions.Distance;
 using PathTracer.Pathtracing.Rays;
+using PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates;
 using PathTracer.Utilities;
 using System;
 using System.Collections.Generic;
@@ -29,7 +30,7 @@ namespace PathTracer.Pathtracing.Integrators {
             ICollection<CameraRay> rays = scene.Camera.GetCameraRays(to - from, Utils.Random);
             foreach (CameraRay ray in rays) {
                 Vector3 pixelColor = Sample(scene, ray);
-                ray.Cavity.AddSample(pixelColor, ray.BVHTraversals, ray.Intersection);
+                ray.Film.AddSample(pixelColor, ray.BVHTraversals, ray.Intersection);
             }
         }
 

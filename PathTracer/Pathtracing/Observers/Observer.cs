@@ -1,15 +1,17 @@
 ﻿using OpenTK.Windowing.GraphicsLibraryFramework;
-using PathTracer.Pathtracing.SceneDescription.SceneObjects;
-using PathTracer.Pathtracing.SceneDescription.SceneObjects.Cameras.Parts;
+using PathTracer.Pathtracing.Observers.Accumulators;
+using PathTracer.Pathtracing.Observers.Cameras;
 using PathTracer.Utilities;
 
-namespace PathTracer.Pathtracing {
+namespace PathTracer.Pathtracing.Observers {
     /// <summary> An <see cref="IObserver"/> that observes a <see cref="IScene"/> </summary>
     public class Observer : IObserver {
-        /// <summary> The <see cref="IScreen"/> used for visual output </summary>
-        public IScreen Screen { get; }
         /// <summary> The virtual <see cref="ICamera"/> object of the <see cref="Observer"/> </summary>
         public ICamera Camera { get; }
+        /// <summary> The <see cref="IAccumulator"/> used for storing the samples registered by the <see cref="Observer"/> </summary>
+        public IAccumulator Accumulator { get; }
+        /// <summary> The <see cref="IScreen"/> used for visual output to the <see cref="Observer"/> </summary>
+        public IScreen Screen { get; }
 
         /// <summary> The targeted framerate of the raytracer </summary>
         public int TargetFrameRate { get; set; } = 30;
@@ -29,20 +31,23 @@ namespace PathTracer.Pathtracing {
         /// <param name="screen">The <see cref="IScreen"/> of the <see cref="Observer"/></param>
         /// <param name="camera">The <see cref="ICamera"/> of the <see cref="Observer"/></param>
         public Observer(IScreen screen, ICamera camera) {
-            Screen = screen;
             Camera = camera;
+            Accumulator = new Accumulator(screen.Width, screen.Height);
+            Screen = screen;
+            Camera.OnMoved += (_, _) => Accumulator.Clear();
+            Camera.Film.SampleRegistered += (_, sample) => Accumulator.Add(sample);
         }
 
         /// <summary> Draw a frame to the screen of the <see cref="IObserver"/> </summary>
         public void DrawFrame() {
             Screen.Clear();
-            Camera.ScreenPlane.Accumulator.DrawImage(Screen, DrawingMode);
+            Accumulator.DrawImage(Screen, DrawingMode);
             if (DebugInfo) DrawDebugInformation();
         }
 
         void DrawDebugInformation() {
             Screen.Print($"FPS: {1000 / (int)Renderer.Statistics.FrameTime.LastTick.TotalMilliseconds}", 1, 1);
-            Screen.Print($"Light: {Camera.ScreenPlane.Accumulator.AverageLight()}", 1, 17);
+            Screen.Print($"Light: {Accumulator.AccumulatedLight}", 1, 17);
             Screen.Print($"Frame Time (ms): {(int)Renderer.Statistics.FrameTime.LastTick.TotalMilliseconds}", 1, 33);
             Screen.Print($"Integrator Time (ms): {(int)Renderer.Statistics.IntegratorTime.LastTick.TotalMilliseconds}", 1, 49);
             Screen.Print($"Drawing Time (ms): {(int)Renderer.Statistics.DrawingTime.LastTick.TotalMilliseconds}", 1, 65);

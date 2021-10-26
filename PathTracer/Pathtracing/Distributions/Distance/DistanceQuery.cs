@@ -22,24 +22,27 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
             DistanceDistribution = distanceDistribution;
         }
 
-        public bool Contains(ISurfacePoint sample) {
+        public bool Contains(IMaterialPoint1 sample) {
             throw new NotImplementedException();
         }
 
-        public double CumulativeDistribution(ISurfacePoint sample) {
+        public double CumulativeDistribution(IMaterialPoint1 sample) {
             throw new NotImplementedException();
         }
 
-        public double Probability(ISurfacePoint sample) {
+        public double Probability(IMaterialPoint1 sample) {
+            float distanceProbability = DistanceDistribution.Probability(sample.Position);
             throw new NotImplementedException("Consists of the probability of the distance sample, and the normal sample");
         }
 
-        public ISurfacePoint Sample(Random random) {
+        public IMaterialPoint1 Sample(Random random) {
             (double distance, IMaterial material) = (DistanceDistribution as IPDF<IDistanceMaterial>).Sample(random);
             IBoundaryInterval interval = Boundaries.First(b => b.Includes(distance));
             return material.CreateSurfacePoint(Ray, interval, (float)distance);
         }
     }
 
-    public class SumDistanceQuery : DistanceQuery { }
+    public class CombinedDistanceQuery : IDistanceQuery { 
+    
+    }
 }

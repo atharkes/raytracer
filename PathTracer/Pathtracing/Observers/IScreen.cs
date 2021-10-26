@@ -1,6 +1,6 @@
 ﻿using OpenTK.Mathematics;
 
-namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Cameras.Parts {
+namespace PathTracer.Pathtracing.Observers {
     /// <summary> An interface for a 2d screen used for displaying the 3d scene using raytracing </summary>
     public interface IScreen {
         /// <summary> The size of the <see cref="IScreen"/> </summary>

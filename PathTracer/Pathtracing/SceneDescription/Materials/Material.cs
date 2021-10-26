@@ -16,10 +16,10 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials {
             Albedo = albedo;
         }
 
-        public abstract IRay CreateRay(ISurfacePoint surfacePoint, Vector3 direction);
-        public abstract ISurfacePoint CreateSurfacePoint(IRay ray, IBoundaryInterval interval, float distance);
+        public abstract IRay CreateRay(IMaterialPoint1 surfacePoint, Vector3 direction);
+        public abstract IMaterialPoint1 CreateSurfacePoint(IRay ray, IBoundaryInterval interval, float distance);
 
         public abstract IDistanceDistribution? DistanceDistribution(IRay ray, ISpectrum spectrum, IBoundaryCollection boundary);
-        public abstract IDirectionDistribution? DirectionDistribution(Vector3 incomingDirection, ISpectrum spectrum, ISurfacePoint surfacePoint);
+        public abstract IDirectionDistribution? DirectionDistribution(Vector3 incomingDirection, ISpectrum spectrum, IMaterialPoint1 surfacePoint);
     }
 }

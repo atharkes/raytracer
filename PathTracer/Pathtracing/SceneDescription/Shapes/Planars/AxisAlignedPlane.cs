@@ -1,4 +1,4 @@
-﻿using OpenTK.Mathematics;
+﻿using PathTracer.Geometry.Normals;
 
 namespace PathTracer.Pathtracing.SceneDescription.Shapes.Planars {
     /// <summary> A <see cref="Plane"/> of which the normal is a unitvector </summary>
@@ -6,10 +6,10 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Planars {
         /// <summary> Create a new <see cref="AxisAlignedPlane"/> using a <paramref name="normal"/> and a <paramref name="distance"/> </summary>
         /// <param name="normal">The normal of the <see cref="AxisAlignedPlane"/></param>
         /// <param name="distance">The distance of the <see cref="AxisAlignedPlane"/> from the origin along the <paramref name="normal"/></param>
-        private AxisAlignedPlane(Vector3 normal, float distance) : base(normal, distance) { }
+        private AxisAlignedPlane(Normal3 normal, float distance) : base(normal, distance) { }
 
-        public static AxisAlignedPlane X(bool positive, float xPosition) => new(positive ? Vector3.UnitX : -Vector3.UnitX, xPosition);
-        public static AxisAlignedPlane Y(bool positive, float yPosition) => new(positive ? Vector3.UnitY : -Vector3.UnitY, yPosition);
-        public static AxisAlignedPlane Z(bool positive, float zPosition) => new(positive ? Vector3.UnitZ : -Vector3.UnitZ, zPosition);
+        public static AxisAlignedPlane X(bool positive, float xPosition) => new(positive ? Normal3.UnitX : -Normal3.UnitX, xPosition);
+        public static AxisAlignedPlane Y(bool positive, float yPosition) => new(positive ? Normal3.UnitY : -Normal3.UnitY, yPosition);
+        public static AxisAlignedPlane Z(bool positive, float zPosition) => new(positive ? Normal3.UnitZ : -Normal3.UnitZ, zPosition);
     }
 }

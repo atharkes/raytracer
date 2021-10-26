@@ -2,7 +2,7 @@
 using PathTracer.Pathtracing.Spectra;
 using PathTracer.Utilities;
 
-namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Cameras.Parts {
+namespace PathTracer.Pathtracing.Observers.Accumulators {
     /// <summary> A cavity of the accumulator that catches light </summary>
     public class Cavity {
         /// <summary> The amount of light in the cavity </summary>

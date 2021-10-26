@@ -1,4 +1,5 @@
 ﻿using PathTracer.Pathtracing.Integrators;
+using PathTracer.Pathtracing.Observers;
 using PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates;
 using PathTracer.Utilities;
 using System;

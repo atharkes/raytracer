@@ -1,4 +1,5 @@
-﻿using PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates.AccelerationStructures.SBVH;
+﻿using PathTracer.Pathtracing.Observers.Cameras;
+using PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates.AccelerationStructures.SBVH;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

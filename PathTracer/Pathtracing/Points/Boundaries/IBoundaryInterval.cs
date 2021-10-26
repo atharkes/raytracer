@@ -4,9 +4,9 @@ namespace PathTracer.Pathtracing.Points.Boundaries {
     /// <summary> An interface for a boundary interval for an <see cref="IRay"/> traced through a (volumetric) <see cref="IShape"/> </summary>
     public interface IBoundaryInterval {
         /// <summary> The entry-point of the <see cref="IBoundaryInterval"/> </summary>
-        IBoundaryPoint Entry { get; }
+        IShapePoint1 Entry { get; }
         /// <summary> The exit-point of the <see cref="IBoundaryInterval"/> </summary>
-        IBoundaryPoint Exit { get; }
+        IShapePoint1 Exit { get; }
 
         /// <summary> Whether the <see cref="IBoundaryInterval"/> is a valid interval </summary>
         bool Valid => Entry.Distance <= Exit.Distance;

@@ -1,4 +1,5 @@
-﻿using PathTracer.Pathtracing.Points.Boundaries;
+﻿using PathTracer.Geometry.Positions;
+using PathTracer.Pathtracing.Points.Boundaries;
 using PathTracer.Pathtracing.Rays;
 using System.Collections.Generic;
 
@@ -13,7 +14,7 @@ namespace PathTracer.Pathtracing.SceneDescription {
         /// <summary> Intersect the <see cref="IIntersectable"/> with a <paramref name="ray"/> </summary>
         /// <param name="ray">The <see cref="IRay"/> to intersect the <see cref="IIntersectable"/> with</param>
         /// <returns>The distances of the intersections with a <see cref="IIntersectable"/>, if there are any</returns>
-        IEnumerable<float> IntersectDistances(IRay ray);
+        IEnumerable<Position1> IntersectDistances(IRay ray);
 
         /// <summary> Intersect the <see cref="IIntersectable"/> with a <paramref name="ray"/> </summary>
         /// <param name="ray">The <see cref="IRay"/> to intersect the <see cref="IIntersectable"/></param>

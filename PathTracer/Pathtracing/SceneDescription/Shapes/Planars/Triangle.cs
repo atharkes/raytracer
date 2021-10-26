@@ -41,7 +41,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Planars {
         /// <summary> Get a <paramref name="random"/> point on the surface of the <see cref="Triangle"/> </summary>
         /// <param name="random">The <see cref="Random"/> to decide the position on the surface</param>
         /// <returns>A <paramref name="random"/> point on the surface of the <see cref="Triangle"/></returns>
-        public override Vector3 PointOnSurface(Random random) {
+        public override Vector3 SurfacePosition(Random random) {
             Vector3 P1toP2 = P2 - P1;
             Vector3 P1toP3 = P3 - P1;
             float r1 = (float)random.NextDouble();

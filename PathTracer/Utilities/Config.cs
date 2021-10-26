@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using OpenTK.Mathematics;
+using PathTracer.Geometry.Positions;
 using PathTracer.Pathtracing;
-using PathTracer.Pathtracing.SceneDescription.SceneObjects.Cameras.Parts;
 using System.IO;
 
 namespace PathTracer.Utilities {
@@ -29,13 +29,13 @@ namespace PathTracer.Utilities {
         public bool DebugInfo { get; set; } = false;
 
         /// <summary> The position of the camera </summary>
-        [JsonIgnore] public Vector3 Position { get; set; } = new Vector3(0, 1, 0);
+        [JsonIgnore] public Position3 Position { get; set; } = new Position3(0, 1, 0);
         /// <summary> The x position of the camera </summary>
-        public float PositionX { get => Position.X; set => Position = new Vector3(value, Position.Y, Position.Z); }
+        public float PositionX { get => Position.X.Vector.Value; set => Position = new Position3(value, Position.Y, Position.Z); }
         /// <summary> The y position of the camera </summary>
-        public float PositionY { get => Position.Y; set => Position = new Vector3(Position.X, value, Position.Z); }
+        public float PositionY { get => Position.Y.Vector.Value; set => Position = new Position3(Position.X, value, Position.Z); }
         /// <summary> The z position of the camera </summary>
-        public float PositionZ { get => Position.Z; set => Position = new Vector3(Position.X, Position.Y, value); }
+        public float PositionZ { get => Position.Z.Vector.Value; set => Position = new Position3(Position.X, Position.Y, value); }
 
         /// <summary> The rotation quaternion of the camera </summary>
         [JsonIgnore] public Quaternion Rotation { get; set; } = Quaternion.Identity;

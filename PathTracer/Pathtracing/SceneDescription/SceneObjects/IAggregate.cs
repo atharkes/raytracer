@@ -3,6 +3,8 @@
 namespace PathTracer.Pathtracing.SceneDescription.SceneObjects {
     /// <summary> A container <see cref="ISceneObject"/> </summary>
     public interface IAggregate : ISceneObject {
+        /// <summary> The amount of children of the <see cref="IAggregate"/> </summary>
+        int ChildrenCount { get; }
         /// <summary> The children of this <see cref="IAggregate"/> </summary>
         IEnumerable<ISceneObject> Children { get; }
 

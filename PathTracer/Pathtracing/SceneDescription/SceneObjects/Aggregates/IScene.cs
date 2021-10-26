@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using PathTracer.Pathtracing.Observers.Cameras;
+using System.Collections.Generic;
 
 namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates {
     /// <summary> An interface for a static scene </summary>

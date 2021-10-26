@@ -1,4 +1,6 @@
-﻿using OpenTK.Mathematics;
+﻿using PathTracer.Geometry.Directions;
+using PathTracer.Geometry.Normals;
+using PathTracer.Geometry.Vectors;
 using PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates.AccelerationStructures.BVH;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Planars;
 using System;
@@ -32,13 +34,13 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates.Accele
             Split? bvhSplit = base.GetSplit();
             // TODO: Introduce Alpha to just use regular split
             Split? sbvhSplit;
-            Vector3 size = BoundingBox.Size;
+            IDirection3 size = BoundingBox.Size;
             if (size.X > size.Y && size.X > size.Z) {
-                sbvhSplit = BestSpatialBinSplit(Vector3.UnitX, AxisAlignedPlane.X, v => v.X);
+                sbvhSplit = BestSpatialBinSplit(Normal3.UnitX, AxisAlignedPlane.X, v => v.X);
             } else if (size.Y > size.Z) {
-                sbvhSplit = BestSpatialBinSplit(Vector3.UnitY, AxisAlignedPlane.Y, v => v.Y);
+                sbvhSplit = BestSpatialBinSplit(Normal3.UnitY, AxisAlignedPlane.Y, v => v.Y);
             } else {
-                sbvhSplit = BestSpatialBinSplit(Vector3.UnitZ, AxisAlignedPlane.Z, v => v.Z);
+                sbvhSplit = BestSpatialBinSplit(Normal3.UnitZ, AxisAlignedPlane.Z, v => v.Z);
             }
             if (bvhSplit == null) return sbvhSplit;
             if (sbvhSplit == null) return bvhSplit;
@@ -60,11 +62,11 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates.Accele
         /// <param name="clipPlaneCreator">The direction the binning proces is going</param>
         /// <param name="axis">The axis selector</param>
         /// <returns>The best spatial binning split in the specified direction</returns>
-        Split? BestSpatialBinSplit(Vector3 splitDirection, Func<bool, float, AxisAlignedPlane> clipPlaneCreator, Func<Vector3, float> axis) {
-            float binStart = axis(BoundingBox.MinCorner);
-            float binEnd = axis(BoundingBox.MaxCorner);
-            float binSize = axis(BoundingBox.Size) / SpatialBinAmount;
-            float k1 = SpatialBinAmount * BinningEpsilon / axis(BoundingBox.Size);
+        Split? BestSpatialBinSplit(Normal3 splitDirection, Func<bool, float, AxisAlignedPlane> clipPlaneCreator, Func<Vector3, float> axis) {
+            float binStart = axis(BoundingBox.MinCorner.Vector);
+            float binEnd = axis(BoundingBox.MaxCorner.Vector);
+            float binSize = axis(BoundingBox.Size.Vector) / SpatialBinAmount;
+            float k1 = SpatialBinAmount * BinningEpsilon / axis(BoundingBox.Size.Vector);
             float bestSplitCost = SurfaceAreaHeuristic(Items.Count, BoundingBox.SurfaceArea);
             Split? bestSplit = null;
             for (int i = 1; i < SpatialBinAmount; i++) {
@@ -72,8 +74,8 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates.Accele
                 SpatialBin right = new(clipPlaneCreator, binSize * i, binEnd);
                 // Populate Split
                 foreach (ISceneObject primitive in Items) {
-                    int binID1 = (int)(k1 * (axis(primitive.BoundingBox.MinCorner) - axis(BoundingBox.MinCorner)));
-                    int binID2 = (int)(k1 * (axis(primitive.BoundingBox.MaxCorner) - axis(BoundingBox.MinCorner)));
+                    int binID1 = (int)(k1 * (axis(primitive.BoundingBox.MinCorner.Vector) - axis(BoundingBox.MinCorner.Vector)));
+                    int binID2 = (int)(k1 * (axis(primitive.BoundingBox.MaxCorner.Vector) - axis(BoundingBox.MinCorner.Vector)));
                     if (binID1 < i && binID2 < i) left.Aggregate.Add(primitive);
                     else if (binID1 > i && binID2 > i) right.Aggregate.Add(primitive);
                     else {

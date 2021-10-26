@@ -1,15 +1,24 @@
 ﻿using OpenTK.Windowing.GraphicsLibraryFramework;
-using PathTracer.Pathtracing.SceneDescription.SceneObjects;
-using PathTracer.Pathtracing.SceneDescription.SceneObjects.Cameras.Parts;
+using PathTracer.Pathtracing.Observers.Accumulators;
+using PathTracer.Pathtracing.Observers.Cameras;
 using System;
 
-namespace PathTracer.Pathtracing {
+namespace PathTracer.Pathtracing.Observers {
+    /// <summary> The drawing mode of the accumulator </summary>
+    public enum DrawingMode {
+        Light,
+        BVHNodeTraversals,
+        Intersections,
+    }
+
     /// <summary> An observer of a <see cref="IScene"/> </summary>
     public interface IObserver {
-        /// <summary> The gamewindow of the <see cref="IObserver"/> </summary>
-        IScreen Screen { get; }
         /// <summary> The virtual <see cref="ICamera"/> object of the <see cref="IObserver"/> </summary>
         ICamera Camera { get; }
+        /// <summary> The <see cref="IAccumulator"/> used for storing the samples registered by the <see cref="IObserver"/> </summary>
+        IAccumulator Accumulator { get; }
+        /// <summary> The <see cref="IScreen"/> used for visual output to the <see cref="IObserver"/> </summary>
+        IScreen Screen { get; }
 
         /// <summary> The targeted framerate of the <see cref="IObserver"/> </summary>
         int TargetFrameRate { get; set; }

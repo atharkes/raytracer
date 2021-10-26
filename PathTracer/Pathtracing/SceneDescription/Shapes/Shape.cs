@@ -1,4 +1,6 @@
-﻿using OpenTK.Mathematics;
+﻿using PathTracer.Geometry.Directions;
+using PathTracer.Geometry.Normals;
+using PathTracer.Geometry.Positions;
 using PathTracer.Pathtracing.Points;
 using PathTracer.Pathtracing.Points.Boundaries;
 using PathTracer.Pathtracing.Rays;
@@ -24,8 +26,8 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes {
         /// <summary> Check whether a <paramref name="position"/> is inside the <see cref="Shape"/> </summary>
         /// <param name="position">The position to check</param>
         /// <returns>Whether the <paramref name="position"/> is inside the <see cref="Shape"/></returns>
-        public virtual bool Inside(Vector3 position) {
-            IRay ray = new Ray(position, Vector3.UnitX);
+        public virtual bool Inside(Position3 position) {
+            IRay ray = new Ray(position, new Normal3(1, 0, 0));
             return Intersect(ray)?.Inside(0) ?? false;
         }
 
@@ -33,17 +35,17 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes {
         /// <param name="position">The position to check</param>
         /// <param name="epsilon">The epsilon to specify the precision</param>
         /// <returns>Whether the <paramref name="position"/> is on the surface of the <see cref="Shape"/></returns>
-        public abstract bool OnSurface(Vector3 position, float epsilon = 0.001F);
+        public abstract bool OnSurface(Position3 position, float epsilon = 0.001F);
 
         /// <summary> Get a <paramref name="random"/> point on the surface of the <see cref="Shape"/> </summary>
         /// <param name="random">The <see cref="Random"/> to decide the location of the point </param>
         /// <returns>A <paramref name="random"/> point on the surface of the <see cref="Shape"/></returns>
-        public abstract Vector3 PointOnSurface(Random random);
+        public abstract Position3 SurfacePosition(Random random);
 
         /// <summary> Get the surface normal at a specified <paramref name="position"/>, assuming the position is on the surface </summary>
         /// <param name="position">The specified surface position</param>
         /// <returns>The outward-pointing surface normal at the specified <paramref name="position"/></returns>
-        public abstract Vector3 SurfaceNormal(Vector3 position);
+        public abstract Normal3 SurfaceNormal(Position3 position);
 
         /// <summary> Intersect the <see cref="Shape"/> with a <paramref name="ray"/> </summary>
         /// <param name="ray">The <see cref="IRay"/> to intersect the <see cref="Shape"/> with</param>
@@ -53,21 +55,21 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes {
         /// <summary> Intersect the <see cref="Shape"/> with a <paramref name="ray"/> </summary>
         /// <param name="ray">The <see cref="IRay"/> to intersect the <see cref="Shape"/> with</param>
         /// <returns>The distances of the intersections with a <see cref="Shape"/>, if there are any</returns>
-        public abstract IEnumerable<float> IntersectDistances(IRay ray);
+        public abstract IEnumerable<Position1> IntersectDistances(IRay ray);
 
         /// <summary> Intersect the <see cref="Shape"/> with a <paramref name="ray"/> </summary>
         /// <param name="ray">The <see cref="IRay"/> to intersect the <see cref="Shape"/></param>
-        /// <returns>The <see cref="IBoundaryPoint"/> of the intersections with the <see cref="Shape"/>, if there are any</returns>
+        /// <returns>The <see cref="IShapePoint1"/> of the intersections with the <see cref="Shape"/>, if there are any</returns>
         public virtual IBoundaryCollection? Intersect(IRay ray) {
             var distances = IntersectDistances(ray);
             if (distances.Any()) {
                 SortedSet<IBoundaryInterval> intervals = new SortedSet<IBoundaryInterval>();
-                Queue<IBoundaryPoint> entries = new Queue<IBoundaryPoint>();
-                foreach (float distance in distances.OrderBy(d => d)) {
-                    Vector3 position = ray.Travel(distance);
-                    Vector3 normal = SurfaceNormal(position);
-                    IBoundaryPoint boundaryPoint = new BoundaryPoint(distance, position, normal);
-                    if (boundaryPoint.IsTowards(ray.Direction)) {
+                Queue<IShapePoint1> entries = new Queue<IShapePoint1>();
+                foreach (Position1 distance in distances.OrderBy(d => d)) {
+                    Position3 position = ray.Travel(distance);
+                    Normal1 normal = (SurfaceNormal(position) as IDirection3).SimilarAs(ray.Direction) ? Normal1.One : -Normal1.One;
+                    IShapePoint1 boundaryPoint = new ShapePoint1(this, distance, normal);
+                    if (boundaryPoint.Normal == -Normal1.One) {
                         Debug.Assert(entries.Count > 0, "Boundary intersection is invalid (More exits than entries). Warning: Geometry might be degenerate.");
                         entries.Enqueue(boundaryPoint);
                     } else {

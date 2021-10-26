@@ -1,12 +1,15 @@
 ﻿using OpenTK.Mathematics;
+using PathTracer.Geometry.Directions;
+using PathTracer.Geometry.Normals;
+using PathTracer.Geometry.Positions;
 
 namespace PathTracer.Pathtracing.Rays {
     /// <summary> A <see cref="Ray"/> used for tracing through the <see cref="IScene"/> </summary>
     public class Ray : IRay {
         /// <summary> The origin of the <see cref="Ray"/> </summary>
-        public Vector3 Origin { get; }
+        public Position3 Origin { get; }
         /// <summary> The normalized direction of the <see cref="Ray"/> </summary>
-        public Vector3 Direction { get; }
+        public Normal3 Direction { get; }
         /// <summary> The distance the <see cref="Ray"/> is travelling </summary>
         public float Length { get => length; set => length = value; }
 
@@ -22,7 +25,7 @@ namespace PathTracer.Pathtracing.Rays {
         /// <param name="direction">The direction of the <see cref="Ray"/></param>
         /// <param name="length">The length the <see cref="Ray"/> will try to travel</param>
         /// <param name="recursionDepth">The recursion depth of the <see cref="Ray"/></param>
-        public Ray(Vector3 origin, Vector3 direction, float length = float.PositiveInfinity) {
+        public Ray(Position3 origin, Normal3 direction, float length = float.PositiveInfinity) {
             Origin = origin;
             Direction = direction.Normalized();
             Length = length;

@@ -3,11 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace PathTracer.Pathtracing.Points.Boundaries {
+namespace PathTracer.Pathtracing.Distributions.Boundaries {
     /// <summary> The boundary collection of a <see cref="IShape"/>-<see cref="IRay"/> intersection </summary>
-    public interface IBoundaryCollection : IEnumerable<IBoundaryInterval> {
-        /// <summary> The <see cref="IBoundaryInterval"/>s making up the <see cref="IBoundaryCollection"/> </summary>
-        IEnumerable<IBoundaryInterval> BoundaryIntervals { get; }
+    public interface IBoundaryCollection : IEnumerable<IShapeInterval> {
+        /// <summary> The <see cref="IShapeInterval"/>s making up the <see cref="IBoundaryCollection"/> </summary>
+        IEnumerable<IShapeInterval> BoundaryIntervals { get; }
 
         /// <summary> Whether the <see cref="IBoundaryCollection"/> is volumetric </summary>
         bool Volumetric => BoundaryIntervals.Any(i => i.Volumetric);
@@ -19,7 +19,7 @@ namespace PathTracer.Pathtracing.Points.Boundaries {
         /// <summary> Add two <see cref="IBoundaryCollection"/>s together </summary>
         /// <param name="left">The left <see cref="IBoundaryCollection"/></param>
         /// <param name="right">The right <see cref="IBoundaryCollection"/></param>
-        /// <returns>An <see cref="IBoundaryCollection"/> containing the combined <see cref="IBoundaryInterval"/>s of <paramref name="left"/> and <paramref name="right"/></returns>
+        /// <returns>An <see cref="IBoundaryCollection"/> containing the combined <see cref="IShapeInterval"/>s of <paramref name="left"/> and <paramref name="right"/></returns>
         public static IBoundaryCollection? operator +(IBoundaryCollection? left, IBoundaryCollection? right) {
             if (right is null) {
                 return left;
@@ -33,11 +33,11 @@ namespace PathTracer.Pathtracing.Points.Boundaries {
 
         /// <summary> Get the <see cref="IEnumerator{T}"/> of the <see cref="IBoundaryCollection"/> </summary>
         /// <returns>The <see cref="IEnumerator{T}"/> of the <see cref="IBoundaryCollection"/></returns>
-        new IEnumerator<IBoundaryInterval> GetEnumerator() => BoundaryIntervals.GetEnumerator();
+        new IEnumerator<IShapeInterval> GetEnumerator() => BoundaryIntervals.GetEnumerator();
 
         /// <summary> Get the <see cref="IEnumerator{T}"/> of the <see cref="IBoundaryCollection"/> </summary>
         /// <returns>The <see cref="IEnumerator{T}"/> of the <see cref="IBoundaryCollection"/></returns>
-        IEnumerator<IBoundaryInterval> IEnumerable<IBoundaryInterval>.GetEnumerator() => GetEnumerator();
+        IEnumerator<IShapeInterval> IEnumerable<IShapeInterval>.GetEnumerator() => GetEnumerator();
 
         /// <summary> Get the <see cref="IEnumerator"/> of the <see cref="IBoundaryCollection"/> </summary>
         /// <returns>The <see cref="IEnumerator"/> of the <see cref="IBoundaryCollection"/></returns>

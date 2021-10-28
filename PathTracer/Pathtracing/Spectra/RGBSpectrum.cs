@@ -1,11 +1,8 @@
-﻿using OpenTK.Mathematics;
+﻿using PathTracer.Geometry.Vectors;
 
 namespace PathTracer.Pathtracing.Spectra {
     /// <summary> A color <see cref="ISpectrum"/> that holds a single value for red, green, and blue </summary>
     public struct RGBSpectrum : ISpectrum {
-        /// <summary> Whether the <see cref="RGBSpectrum"/> is black </summary>
-        public bool IsBlack => rgb == Vector3.Zero;
-
         Vector3 rgb;
 
         /// <summary> Create an <see cref="RGBSpectrum"/> using an <paramref name="rgb"/> vector </summary>
@@ -29,7 +26,7 @@ namespace PathTracer.Pathtracing.Spectra {
         /// <summary> Convert the <see cref="ISpectrum"/> to an rgb integer </summary>
         /// <returns>An rgb integer</returns>
         public int ToRGBInt() {
-            Vector3 color = Vector3.Clamp(rgb, new Vector3(0, 0, 0), new Vector3(1, 1, 1));
+            Vector3 color = Vector3.Clamp(rgb, Vector3.Zero, Vector3.One);
             int r = (int)(color.X * 255) << 16;
             int g = (int)(color.Y * 255) << 8;
             int b = (int)(color.Z * 255) << 0;

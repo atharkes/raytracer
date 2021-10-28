@@ -36,6 +36,13 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics {
             throw new NotImplementedException();
         }
 
+        /// <summary> Get the UV-position for a specified <paramref name="position"/> </summary>
+        /// <param name="position">The surface position for which to get the UV-position</param>
+        /// <returns>The UV-position for the <paramref name="position"/></returns>
+        public override Position2 UVPosition(Position3 position) {
+            throw new NotImplementedException();
+        }
+
         /// <summary> Check whether a <paramref name="position"/> is on the surface of the <see cref="Sphere"/> </summary>
         /// <param name="position">The position to check</param>
         /// <param name="epsilon">The epsilon to specify the precision</param>
@@ -44,12 +51,17 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics {
             throw new NotImplementedException();
         }
 
-        /// <summary> Get the normal of the <see cref="Sphere"/> at a specified <paramref name="surfacePoint"/> </summary>
-        /// <param name="surfacePoint">The surface point to get the normal for</param>
-        /// <returns>The normal at the <paramref name="surfacePoint"/></returns>
-        public override Normal3 SurfaceNormal(Position3 surfacePoint) {
-            return (surfacePoint - Position).Normalized();
+        /// <summary> Get the normal of the <see cref="Sphere"/> at a specified <paramref name="position"/> </summary>
+        /// <param name="position">The surface point to get the normal for</param>
+        /// <returns>The normal at the <paramref name="position"/></returns>
+        public override Normal3 SurfaceNormal(Position3 position) {
+            return (position - Position).Normalized();
         }
+
+        /// <summary> Get the outwards direction for a specified <paramref name="position"/> </summary>
+        /// <param name="position">The position to get the outwards direction from</param>
+        /// <returns>The outwards direction at the specified <paramref name="position"/></returns>
+        public override Normal3 OutwardsDirection(Position3 position) => SurfaceNormal(position);
 
         /// <summary> Intersect the <see cref="Sphere"/> with a <paramref name="ray"/> </summary>
         /// <param name="ray">The <see cref="Ray"/> to intersect the <see cref="Sphere"/> with</param>

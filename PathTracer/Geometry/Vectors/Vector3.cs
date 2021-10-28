@@ -29,6 +29,10 @@ namespace PathTracer.Geometry.Vectors {
         /// <summary> The value of the <see cref="Vector3"/> </summary>
         public OpenTK.Mathematics.Vector3 Value { get; }
 
+        /// <summary> Get a value at the specified <paramref name="index"/> </summary>
+        /// <param name="index">The index to get the value at</param>
+        /// <returns>The value at the specified <paramref name="index"/></returns>
+        public Vector1 this[int index] => Value[index];
         /// <summary> The X-component of the <see cref="Vector3"/> </summary>
         public Vector1 X => Value.X;
         /// <summary> The Y-component of the <see cref="Vector3"/> </summary>
@@ -55,6 +59,7 @@ namespace PathTracer.Geometry.Vectors {
         public static implicit operator Vector3((float X, float Y, float Z) tuple) => new(tuple.X, tuple.Y, tuple.Z);
         public static implicit operator Vector3((Vector1 X, Vector1 Y, Vector1 Z) tuple) => new(tuple.X, tuple.Y, tuple.Z);
         public static implicit operator Vector3(OpenTK.Mathematics.Vector3 value) => new(value);
+        public static implicit operator OpenTK.Mathematics.Vector3(Vector3 value) => value.Value;
 
         public static bool operator ==(Vector3 left, Vector3 right) => left.Equals(right);
         public static bool operator !=(Vector3 left, Vector3 right) => !(left == right);
@@ -68,13 +73,15 @@ namespace PathTracer.Geometry.Vectors {
         public static Vector3 operator *(OpenTK.Mathematics.Quaternion left, Vector3 right) => left * right.Value;
         public static Vector3 operator /(Vector3 left, Vector1 right) => left.Value / right.Value;
         public static Vector3 operator /(Vector1 left, Vector3 right) => new Vector3(left, left, left) / right;
-        public static Vector3 operator /(Vector3 left, Vector3 right) => OpenTK.Mathematics.Vector3.Divide(left.Value, right.Value);
+        public static Vector3 operator /(Vector3 left, Vector3 right) => OpenTK.Mathematics.Vector3.Divide(left, right);
 
-        public static Vector1 Dot(Vector3 left, Vector3 right) => OpenTK.Mathematics.Vector3.Dot(left.Value, right.Value);
-        public static Vector3 Cross(Vector3 left, Vector3 right) => OpenTK.Mathematics.Vector3.Cross(left.Value, right.Value);
-        public static Vector3 ComponentMin(Vector3 left, Vector3 right) => OpenTK.Mathematics.Vector3.ComponentMin(left.Value, right.Value);
-        public static Vector3 ComponentMax(Vector3 left, Vector3 right) => OpenTK.Mathematics.Vector3.ComponentMax(left.Value, right.Value);
+        public static Vector1 Dot(Vector3 left, Vector3 right) => OpenTK.Mathematics.Vector3.Dot(left, right);
+        public static Vector3 Cross(Vector3 left, Vector3 right) => OpenTK.Mathematics.Vector3.Cross(left, right);
+        public static Vector3 ComponentMin(Vector3 left, Vector3 right) => OpenTK.Mathematics.Vector3.ComponentMin(left, right);
+        public static Vector3 ComponentMax(Vector3 left, Vector3 right) => OpenTK.Mathematics.Vector3.ComponentMax(left, right);
         public static Vector3 Abs(Vector3 vector) => new(Vector1.Abs(vector.X), Vector1.Abs(vector.Y), Vector1.Abs(vector.Z));
+        public static Vector3 Clamp(Vector3 vector, Vector3 min, Vector3 max) => OpenTK.Mathematics.Vector3.Clamp(vector, min, max);
+        public static Vector3 Lerp(Vector3 a, Vector3 b, Vector1 blend) => OpenTK.Mathematics.Vector3.Lerp(a, b, blend);
 
         public override bool Equals(object? obj) => Value.Equals(obj);
         public bool Equals(Vector3 other) => Value.Equals(other.Value);

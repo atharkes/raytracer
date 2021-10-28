@@ -1,10 +1,9 @@
-﻿using OpenTK.Mathematics;
-using PathTracer.Geometry.Normals;
+﻿using PathTracer.Geometry.Normals;
 using PathTracer.Geometry.Positions;
+using PathTracer.Pathtracing.Distributions;
+using PathTracer.Pathtracing.Distributions.Boundaries;
 using PathTracer.Pathtracing.Distributions.Direction;
 using PathTracer.Pathtracing.Distributions.Distance;
-using PathTracer.Pathtracing.Points;
-using PathTracer.Pathtracing.Points.Boundaries;
 using PathTracer.Pathtracing.Rays;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Planars;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics;
@@ -29,6 +28,10 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Primitives {
         /// <summary> The bounding box of the <see cref="Primitive"/> </summary>
         public virtual AxisAlignedBox BoundingBox => Shape.BoundingBox;
 
+        public bool IsEmitting => throw new NotImplementedException();
+
+        public bool IsSensing => throw new NotImplementedException();
+
         /// <summary> Create a new <see cref="Primitive"/> with a <paramref name="shape"/> and <paramref name="material"/> </summary>
         /// <param name="shape">The <see cref="SceneDescription.Shape"/> of the <see cref="Primitive"/></param>
         /// <param name="material">The <see cref="SceneDescription.Material"/> of the <see cref="Primitive"/></param>
@@ -41,33 +44,18 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Primitives {
         /// <param name="ray">The <see cref="IRay"/> to intersect the <see cref="Primitive"/> with</param>
         /// <param name="spectrum">The <see cref="ISpectrum"/> of the <paramref name="ray"/></param>
         /// <returns>The distance and material pdfs</returns>
-        public IDistanceQuery? Trace(IRay ray, ISpectrum spectrum) {
+        public IDistanceDistribution? Trace(IRay ray, ISpectrum spectrum) {
             IBoundaryCollection? boundary = Shape.Intersect(ray);
             if (boundary is null) {
                 return null;
             }
-            IDistanceDistribution? distanceDistribution = Material.DistanceDistribution(ray, spectrum, boundary);
-            if (distanceDistribution is null) {
-                return null;
-            }
-            return new DistanceQuery(ray, this, boundary, distanceDistribution);
+            return Material.DistanceDistribution(ray, spectrum, boundary);
         }
 
-        /// <summary> Intersect the <see cref="Primitive"/> with a <paramref name="ray"/> </summary>
-        /// <param name="ray">The <see cref="Ray"/> to intersect the <see cref="Primitive"/> with</param>
-        /// <returns>Whether the <paramref name="ray"/> intersects the <see cref="Primitive"/></returns>
-        public bool Intersects(IRay ray) => Shape.Intersects(ray);
-
-        public bool Inside(Position3 position) => Shape.Inside(position);
-        public Position3 SurfacePosition(Random random) => Shape.SurfacePosition(random);
-        public bool OnSurface(Position3 position, float epsilon = 0.001F) => Shape.OnSurface(position, epsilon);
-        public Normal3 SurfaceNormal(Position3 position) => Shape.SurfaceNormal(position);
-        public IEnumerable<Position1> IntersectDistances(IRay ray) => Shape.IntersectDistances(ray);
-        public IBoundaryCollection? Intersect(IRay ray) => Shape.Intersect(ray);
 
         IEnumerable<IShape> IDivisible<IShape>.Clip(AxisAlignedPlane plane) => Clip(plane);
 
-        public virtual IEnumerable<ISceneObject> Clip(AxisAlignedPlane plane) {
+        public virtual IEnumerable<IPrimitive> Clip(AxisAlignedPlane plane) {
             foreach (IShape shape in Shape.Clip(plane)) {
                 if (shape == Shape) {
                     yield return this;
@@ -77,9 +65,6 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Primitives {
             }
         }
 
-        public IDistanceDistribution? DistanceMaterialPDF(IRay ray, ISpectrum spectrum, IBoundaryCollection boundary)
-            => Material.DistanceDistribution(ray, spectrum, boundary);
-        public IDirectionDistribution? DirectionMediumPDF(Vector3 incomingDirection, ISpectrum spectrum, IMaterialPoint1 surfacePoint)
-            => Material.DirectionDistribution(incomingDirection, spectrum, surfacePoint);
+
     }
 }

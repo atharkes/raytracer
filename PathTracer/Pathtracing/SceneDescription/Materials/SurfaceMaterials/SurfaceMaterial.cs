@@ -1,16 +1,16 @@
-﻿using OpenTK.Mathematics;
+﻿using PathTracer.Geometry.Normals;
+using PathTracer.Geometry.Positions;
+using PathTracer.Pathtracing.Distributions;
+using PathTracer.Pathtracing.Distributions.Boundaries;
 using PathTracer.Pathtracing.Distributions.Distance;
-using PathTracer.Pathtracing.Points;
-using PathTracer.Pathtracing.Points.Boundaries;
 using PathTracer.Pathtracing.Rays;
 using PathTracer.Pathtracing.Spectra;
 using System.Diagnostics;
-using System.Linq;
 
 namespace PathTracer.Pathtracing.SceneDescription.Materials.SurfaceMaterials {
     /// <summary>
     /// A surface <see cref="IMaterial"/>.
-    /// To prevent self-intersection issues <see cref="IRay"/>s are raised from their <see cref="IMaterialPoint1"/> on creation.
+    /// To prevent self-intersection issues <see cref="IRay"/>s are raised from their <see cref="Position3"/> on creation.
     /// </summary>
     public abstract class SurfaceMaterial : Material, IMaterial {
         /// <summary>
@@ -23,18 +23,21 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials.SurfaceMaterials {
         /// <param name="albedo">The albedo <see cref="ISpectrum"/> of the new <see cref="SurfaceMaterial"/></param>
         public SurfaceMaterial(ISpectrum albedo) : base(albedo) { }
 
-        public override IRay CreateRay(IMaterialPoint1 surfacePoint, Vector3 direction) {
-            return new Ray(surfacePoint.Position + surfacePoint.Normal * RaiseEpsilon, direction);
+        public override IDistanceDistribution? DistanceDistribution(IRay ray, ISpectrum spectrum, IShapeInterval interval) {
+            return new SingleDistanceDistribution(new DistanceMaterial(interval.Entry, this));
         }
 
-        public override IMaterialPoint1 CreateSurfacePoint(IRay ray, IBoundaryInterval interval, float distance) {
-            Debug.Assert(interval.Entry.Distance == distance);
-            return new SurfacePoint(this, interval.Entry.Position, interval.Entry.Normal);
+        public override Position3 GetPosition(IRay ray, IShapeInterval interval, Position1 distance) {
+            Debug.Assert(interval.Entry == distance);
+            return interval.Shape.IntersectPosition(ray, distance);
         }
 
-        public override IDistanceDistribution? DistanceDistribution(IRay ray, ISpectrum spectrum, IBoundaryCollection boundary) {
-            float entry = boundary.BoundaryIntervals.First(i => i.Entry.Distance > 0).Entry.Distance;
-            return new SingleDistanceDistribution(new DistanceMaterial(entry, this));
+        public override IPDF<Normal3> GetOrientationDistribution(IRay ray, IShape shape, Position3 position) {
+            return new PMF<Normal3>(shape.OutwardsDirection(position));
+        }
+
+        public override IRay CreateRay(Position3 position, Normal3 normal, Normal3 direction) {
+            return new Ray(position + normal * RaiseEpsilon, direction);
         }
     }
 }

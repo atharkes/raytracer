@@ -1,14 +1,15 @@
-﻿using OpenTK.Mathematics;
+﻿using PathTracer.Geometry.Normals;
+using PathTracer.Geometry.Positions;
+using PathTracer.Pathtracing.Distributions;
+using PathTracer.Pathtracing.Distributions.Boundaries;
 using PathTracer.Pathtracing.Distributions.Direction;
 using PathTracer.Pathtracing.Distributions.Distance;
-using PathTracer.Pathtracing.Points;
-using PathTracer.Pathtracing.Points.Boundaries;
 using PathTracer.Pathtracing.Rays;
 using PathTracer.Pathtracing.Spectra;
 
 namespace PathTracer.Pathtracing.SceneDescription.Materials {
     public abstract class Material : IMaterial {
-        public ISpectrum Albedo { get; }
+        public ISpectrum Albedo { get; set; }
         public abstract bool IsEmitting { get; }
         public abstract bool IsSensing { get; }
 
@@ -16,10 +17,11 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials {
             Albedo = albedo;
         }
 
-        public abstract IRay CreateRay(IMaterialPoint1 surfacePoint, Vector3 direction);
-        public abstract IMaterialPoint1 CreateSurfacePoint(IRay ray, IBoundaryInterval interval, float distance);
+        public abstract IDistanceDistribution? DistanceDistribution(IRay ray, ISpectrum spectrum, IShapeInterval interval);
+        public abstract Position3 GetPosition(IRay ray, IShapeInterval interval, Position1 distance);
+        public abstract IPDF<Normal3> GetOrientationDistribution(IRay ray, IShape shape, Position3 position);
 
-        public abstract IDistanceDistribution? DistanceDistribution(IRay ray, ISpectrum spectrum, IBoundaryCollection boundary);
-        public abstract IDirectionDistribution? DirectionDistribution(Vector3 incomingDirection, ISpectrum spectrum, IMaterialPoint1 surfacePoint);
+        public abstract IDirectionDistribution? DirectionDistribution(Normal3 incomingDirection, ISpectrum spectrum, Position3 position);
+        public abstract IRay CreateRay(Position3 position, Normal3 normal, Normal3 direction);
     }
 }

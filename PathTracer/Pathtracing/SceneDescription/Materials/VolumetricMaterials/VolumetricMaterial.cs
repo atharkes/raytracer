@@ -1,7 +1,7 @@
-﻿using OpenTK.Mathematics;
+﻿using PathTracer.Geometry.Normals;
+using PathTracer.Geometry.Positions;
+using PathTracer.Pathtracing.Distributions.Boundaries;
 using PathTracer.Pathtracing.Distributions.Distance;
-using PathTracer.Pathtracing.Points;
-using PathTracer.Pathtracing.Points.Boundaries;
 using PathTracer.Pathtracing.Rays;
 using PathTracer.Pathtracing.Spectra;
 using System;
@@ -14,23 +14,20 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials.VolumetricMaterials 
             Density = density;
         }
 
-        public override IRay CreateRay(IMaterialPoint1 surfacePoint, Vector3 direction) {
-            return new Ray(surfacePoint.Position, direction);
-        }
-
-        public override IMaterialPoint1 CreateSurfacePoint(IRay ray, IBoundaryInterval interval, float distance) {
-            throw new NotImplementedException("Normal is supposed to be a random vector or a forward vector. Depending on the direction sampling");
-            return new MaterialPoint1(this, ray.Travel(distance), Vector3.Zero);
-        }
-
-        public override IDistanceDistribution? DistanceDistribution(IRay ray, ISpectrum spectrum, IBoundaryCollection boundary) {
-            IDistanceDistribution? result = null;
-            foreach (IBoundaryInterval interval in boundary.BoundaryIntervals) {
-                if (interval.Exit.Distance > 0 && interval.Entry.Distance < ray.Length) {
-                    result += new ExponentialDistanceDistribution(Math.Max(0, interval.Entry.Distance), Math.Min(ray.Length, interval.Exit.Distance), Density, this);
-                }
+        public override IDistanceDistribution? DistanceDistribution(IRay ray, ISpectrum spectrum, IShapeInterval interval) {
+            if (interval.Exit > 0 && interval.Entry < ray.Length) {
+                return new ExponentialDistanceDistribution(Math.Max(0, interval.Entry), Math.Min(ray.Length, interval.Exit), Density, this);
+            } else {
+                return null;
             }
-            return result;
+        }
+
+        public override Position3 GetPosition(IRay ray, IShapeInterval interval, Position1 distance) {
+            return ray.Travel(distance);
+        }
+
+        public override IRay CreateRay(Position3 position, Normal3 normal, Normal3 direction) {
+            return new Ray(position, direction);
         }
     }
 }

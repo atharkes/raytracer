@@ -58,6 +58,11 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics {
             throw new NotImplementedException();
         }
 
+
+        public override Position2 UVPosition(Position3 position) {
+            throw new NotImplementedException();
+        }
+
         /// <summary> Check whether a <paramref name="position"/> is on the surface of the <see cref="AxisAlignedBox"/> </summary>
         /// <param name="position">The position to check</param>
         /// <param name="epsilon">The epsilon to specify the precision</param>
@@ -84,6 +89,11 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics {
             }
             return InwardNormals ? -normal : normal;
         }
+
+        /// <summary> Get the outwards direction for a specified <paramref name="position"/> </summary>
+        /// <param name="position">The position to get the outwards direction from</param>
+        /// <returns>The outwards direction at the specified <paramref name="position"/></returns>
+        public override Normal3 OutwardsDirection(Position3 position) => SurfaceNormal(position);
 
         /// <summary> Intersect the <see cref="AxisAlignedBox"/> by a <paramref name="ray"/>.
         /// Using Amy Williams's "An Efficient and Robust Ray–Box Intersection" Algorithm </summary>

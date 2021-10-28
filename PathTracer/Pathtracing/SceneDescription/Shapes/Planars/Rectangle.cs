@@ -83,6 +83,14 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Planars {
             throw new NotImplementedException();
         }
 
+        /// <summary> Get the UV-position for a specified <paramref name="position"/> </summary>
+        /// <param name="position">The surface position for which to get the UV-position</param>
+        /// <returns>The UV-position for the <paramref name="position"/></returns>
+        public override Position2 UVPosition(Position3 position) {
+            Direction3 relativePosition = position - BottomRight;
+            return new Position2(IDirection3.Dot(LeftToRight, relativePosition), IDirection3.Dot(BottomToTop, relativePosition));
+        }
+
         public Position3 SurfacePosition(Position2 uvPosition) {
             return BottomLeft + LeftToRight * uvPosition.X + BottomToTop * uvPosition.Y;
         }
@@ -98,9 +106,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Planars {
         /// <summary> Get the normal of the <see cref="Rectangle"/> </summary>
         /// <param name="surfacePoint">The surface point to get the normal for</param>
         /// <returns>The normal of the <see cref="Rectangle"/></returns>
-        public override Normal3 SurfaceNormal(Position3 surfacePoint) {
-            return Normal;
-        }
+        public override Normal3 SurfaceNormal(Position3 surfacePoint) => Normal;
 
         /// <summary> Intersect the <see cref="Rectangle"/> with a <paramref name="ray"/> </summary>
         /// <param name="ray">The <see cref="IRay"/> to intersect the <see cref="Rectangle"/> with</param>

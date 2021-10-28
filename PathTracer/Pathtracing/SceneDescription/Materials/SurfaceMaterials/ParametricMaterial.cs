@@ -1,12 +1,15 @@
-﻿using OpenTK.Mathematics;
+﻿using PathTracer.Geometry.Normals;
+using PathTracer.Geometry.Positions;
+using PathTracer.Pathtracing.Distributions.Direction;
+using PathTracer.Pathtracing.Spectra;
 using PathTracer.Utilities;
 using System;
 
 namespace PathTracer.Pathtracing.SceneDescription.Materials.SurfaceMaterials {
     /// <summary> A material class for primitives in the scene </summary>
-    public class ParametricMaterial : Material {
+    public class ParametricMaterial : SurfaceMaterial {
         /// <summary> The color of the primitive </summary>
-        public Vector3 Color { get; set; } = Vector3.One;
+        public ISpectrum Color { get => Albedo; set => Albedo = value; }
         /// <summary> How specular this primitive is. A specular object reflects light like a mirror. </summary>
         public float Specularity { get; set; } = 0f;
         /// <summary> How dielectric this primitive is. A dielectric object both passes light and reflects it like water or glass. </summary>
@@ -28,9 +31,11 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials.SurfaceMaterials {
         public float EmittingStrength { get; set; } = 0f;
 
         /// <summary> The light this material is emitting </summary>
-        public Vector3 EmittingLight => Color * EmittingStrength;
+        public ISpectrum EmittingLight => Color * EmittingStrength;
         /// <summary> Whether this material is emitting light </summary>
-        public bool Emitting => EmittingStrength > 0f;
+        public override bool IsEmitting => EmittingStrength > 0f;
+        /// <summary> This material is not sensing light </summary>
+        public override bool IsSensing => false;
 
         /// <summary> Create a new material </summary>
         /// <param name="color">The color of the material</param>
@@ -39,8 +44,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials.SurfaceMaterials {
         /// <param name="refractionIndex">The refraction index of the material if it is a dielectric. This is typically a value between 1 and 3.</param>
         /// <param name="glossyness">The glossyness of the material</param>
         /// <param name="glossSpecularity">The gloss specularity of the material</param>
-        public ParametricMaterial(Vector3? color = null, float specularity = 0, float dielectric = 0, float refractionIndex = 1, float glossyness = 0, float glossSpecularity = 0) {
-            Color = color ?? Vector3.One;
+        public ParametricMaterial(ISpectrum color, float specularity = 0, float dielectric = 0, float refractionIndex = 1, float glossyness = 0, float glossSpecularity = 0) : base(color) {
             Specularity = specularity;
             Dielectric = dielectric;
             RefractionIndex = refractionIndex;
@@ -51,7 +55,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials.SurfaceMaterials {
         /// <summary> Create an emitting material </summary>
         /// <param name="color">The color of the material and the light</param>
         /// <param name="emittingStrength">The emitting strength of the light</param>
-        public ParametricMaterial(float emittingStrength, Vector3 color) {
+        public ParametricMaterial(float emittingStrength, ISpectrum color) : base(color) {
             EmittingStrength = emittingStrength;
             Color = color;
         }
@@ -66,7 +70,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials.SurfaceMaterials {
         /// <returns>A random material that doesn't emit light</returns>
         public static ParametricMaterial RandomNonEmitter() {
             Random r = Utils.DetRandom;
-            Vector3 color = Utils.DetRandom.Vector();
+            ISpectrum color = new RGBSpectrum(Utils.DetRandom.Vector());
             float specularity = r.NextDouble() < 0.3f ? (float)r.NextDouble() : 0;
             float dielectric = r.NextDouble() < 0.1f ? (float)r.NextDouble() : 0;
             float refractionIndex = (float)r.NextDouble() * 2f + 1f;
@@ -78,28 +82,33 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials.SurfaceMaterials {
         /// <summary> Create a random emitting material </summary>
         /// <returns>A random emitting material</returns>
         public static ParametricMaterial RandomEmitter() {
-            return new ParametricMaterial(Utils.DetRandom.Next(1, 50), Utils.DetRandom.Vector());
+            ISpectrum color = new RGBSpectrum(Utils.DetRandom.Vector());
+            return new ParametricMaterial(Utils.DetRandom.Next(1, 50), color);
+        }
+
+        public override IDirectionDistribution? DirectionDistribution(Normal3 incomingDirection, ISpectrum spectrum, Position3 position) {
+            throw new NotImplementedException();
         }
 
         /// <summary> The default material is bright green </summary>
-        public static ParametricMaterial Default => new(new Vector3(0f, float.MaxValue, 0f));
+        public static ParametricMaterial Default => new(new RGBSpectrum(0f, float.MaxValue, 0f));
         /// <summary> Create a diffuse white material </summary>
-        public static ParametricMaterial DiffuseWhite => new(new Vector3(0.8f, 0.8f, 0.8f));
+        public static ParametricMaterial DiffuseWhite => new(new RGBSpectrum(0.8f, 0.8f, 0.8f));
         /// <summary> Create a diffuse green material </summary>
-        public static ParametricMaterial DiffuseGreen => new(new Vector3(0.2f, 0.8f, 0.2f));
+        public static ParametricMaterial DiffuseGreen => new(new RGBSpectrum(0.2f, 0.8f, 0.2f));
         /// <summary> Create a diffuse yellow material </summary>
-        public static ParametricMaterial DiffuseYellow => new(new Vector3(0.8f, 0.8f, 0.2f));
+        public static ParametricMaterial DiffuseYellow => new(new RGBSpectrum(0.8f, 0.8f, 0.2f));
         /// <summary> Create a glossy red material </summary>
-        public static ParametricMaterial GlossyRed => new(new Vector3(0.8f, 0.2f, 0.2f), 0, 0, 1, 0.5f, 15f);
+        public static ParametricMaterial GlossyRed => new(new RGBSpectrum(0.8f, 0.2f, 0.2f), 0, 0, 1, 0.5f, 15f);
         /// <summary> Create a glossy green material </summary>
-        public static ParametricMaterial GlossyGreen => new(new Vector3(0.2f, 0.8f, 0.2f), 0, 0, 1, 0.7f, 50f);
+        public static ParametricMaterial GlossyGreen => new(new RGBSpectrum(0.2f, 0.8f, 0.2f), 0, 0, 1, 0.7f, 50f);
         /// <summary> Create a glossy mirror with a purple hue </summary>
-        public static ParametricMaterial GlossyPurpleMirror => new(new Vector3(0.8f, 0.2f, 0.8f), 0.4f, 0, 1, 0.7f, 50f);
+        public static ParametricMaterial GlossyPurpleMirror => new(new RGBSpectrum(0.8f, 0.2f, 0.8f), 0.4f, 0, 1, 0.7f, 50f);
         /// <summary> Create a mirror material </summary>
-        public static ParametricMaterial Mirror => new(new Vector3(0.9f, 0.9f, 0.9f), 0.97f);
+        public static ParametricMaterial Mirror => new(new RGBSpectrum(0.9f, 0.9f, 0.9f), 0.97f);
         /// <summary> Create a glass material </summary>
-        public static ParametricMaterial Glass => new(new Vector3(0.9f, 0.9f, 0.9f), 0, 0.97f, 1.62f);
-
-        public static ParametricMaterial WhiteLight => new(1f, Vector3.One);
+        public static ParametricMaterial Glass => new(new RGBSpectrum(0.9f, 0.9f, 0.9f), 0, 0.97f, 1.62f);
+        /// <summary> A white light </summary>
+        public static ParametricMaterial WhiteLight => new(1f, ISpectrum.White);
     }
 }

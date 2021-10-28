@@ -1,17 +1,22 @@
-﻿using OpenTK.Mathematics;
+﻿using PathTracer.Geometry.Vectors;
 
 namespace PathTracer.Pathtracing.Spectra {
     /// <summary> A spectrum of electromagnetic radiation that can contain different wavelengths  </summary>
     public interface ISpectrum {
-        /// <summary> An <see cref="ISpectrum"/> that represents no light </summary>
-        static ISpectrum Black => new RGBSpectrum(Vector3.Zero);
         /// <summary> The minimum wavelength of visible light </summary>
         const float MinimumWavelength = 4e-7f;
         /// <summary> The maximum wavelength of visible light </summary>
         const float MaximumWavelength = 7e-7f;
 
+        /// <summary> The <see cref="ISpectrum"/> that represents no light </summary>
+        static ISpectrum Black => new RGBSpectrum(Vector3.Zero);
+        /// <summary> The <see cref="ISpectrum"/> that represents light of all wavelengths </summary>
+        static ISpectrum White => new RGBSpectrum(Vector3.One);
+
         /// <summary> Whether the <see cref="ISpectrum"/> is black </summary>
-        bool IsBlack { get; }
+        bool IsBlack => this == Black;
+        /// <summary> Whether the <see cref="ISpectrum"/> is white </summary>
+        bool IsWhite => this == White;
 
         /// <summary> Convert the <see cref="ISpectrum"/> to an rgb integer </summary>
         /// <returns>An RGB integer</returns>

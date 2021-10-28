@@ -20,7 +20,9 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes {
 
         public override bool OnSurface(Position3 position, float epsilon = 0.001F) => OriginalShape.OnSurface(position, epsilon);
         public override Position3 SurfacePosition(Random random) => OriginalShape.SurfacePosition(random);
+        public override Position2 UVPosition(Position3 position) => OriginalShape.UVPosition(position);
         public override Normal3 SurfaceNormal(Position3 position) => OriginalShape.SurfaceNormal(position);
+        public override Normal3 OutwardsDirection(Position3 position) => OriginalShape.OutwardsDirection(position);
         public override IEnumerable<Position1> IntersectDistances(IRay ray) => OriginalShape.IntersectDistances(ray);
     }
 }

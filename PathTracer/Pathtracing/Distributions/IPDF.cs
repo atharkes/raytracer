@@ -18,7 +18,7 @@ namespace PathTracer.Pathtracing.Distributions {
         T Sample(Random random);
 
         /// <summary> Check whether the <see cref="IPDF{T}"/> contains a <paramref name="sample"/> in its domain </summary>
-        /// <param name="sample">The sample to check</param>
+        /// <param name="sample">The <see cref="T"/> to check</param>
         /// <returns>Whether the <paramref name="sample"/> is in the domain of the <see cref="IPDF{T}"/></returns>
         bool Contains(T sample);
 

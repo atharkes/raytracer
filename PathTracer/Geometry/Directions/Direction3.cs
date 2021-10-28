@@ -35,6 +35,7 @@ namespace PathTracer.Geometry.Directions {
         public static implicit operator Direction3(Normal3 normal) => new(normal.Vector);
 
         public static explicit operator Direction3(Position3 position) => new(position.Vector);
+        public static explicit operator Position3(Direction3 position) => new(position.Vector);
 
         public static Direction3 operator +(Direction3 left, Direction3 right) => new(left.Vector + right.Vector);
         public static Direction3 operator -(Direction3 direction) => new(-direction.Vector);
@@ -46,6 +47,7 @@ namespace PathTracer.Geometry.Directions {
         public static Direction3 operator /(Direction3 direction, Position3 scale) => new(direction.Vector / scale.Vector);
 
         public static Direction1 Dot(IDirection3 left, IDirection3 right) => new(Vector3.Dot(left.Vector, right.Vector));
+        public static Direction3 Lerp(IDirection3 a, IDirection3 b, Vector1 blend) => Vector3.Lerp(a.Vector, b.Vector, blend);
 
         public Normal3 Normalized() => new(Vector);
     }

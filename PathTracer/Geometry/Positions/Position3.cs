@@ -29,10 +29,7 @@ namespace PathTracer.Geometry.Positions {
             Vector = new Vector3(x, y, z);
         }
 
-        public override bool Equals(object? obj) => Vector.Equals(obj);
-        public bool Equals(Position3 other) => Vector.Equals(other.Vector);
-        public bool Equals(Position3? other) => Vector.Equals(other?.Vector);
-        public override int GetHashCode() => Vector.GetHashCode();
+        public static implicit operator Position3(Vector3 vector) => new(vector);
 
         public static bool operator ==(Position3 left, Position3 right) => left.Equals(right);
         public static bool operator !=(Position3 left, Position3 right) => !(left == right);
@@ -45,5 +42,10 @@ namespace PathTracer.Geometry.Positions {
         public static Position1 Dot(Position3 position, IDirection3 direction) => new(Vector3.Dot(position.Vector, direction.Vector));
         public static Position3 ComponentMin(Position3 left, Position3 right) => new(Vector3.ComponentMin(left.Vector, right.Vector));
         public static Position3 ComponentMax(Position3 left, Position3 right) => new(Vector3.ComponentMax(left.Vector, right.Vector));
+
+        public override bool Equals(object? obj) => Vector.Equals(obj);
+        public bool Equals(Position3 other) => Vector.Equals(other.Vector);
+        public bool Equals(Position3? other) => Vector.Equals(other?.Vector);
+        public override int GetHashCode() => Vector.GetHashCode();
     }
 }

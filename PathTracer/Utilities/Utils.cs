@@ -1,4 +1,4 @@
-﻿using OpenTK.Mathematics;
+﻿using PathTracer.Geometry.Vectors;
 using PathTracer.Pathtracing.SceneDescription.Shapes;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Planars;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics;
@@ -14,6 +14,24 @@ namespace PathTracer.Utilities {
         public static Random Random => random ??= new Random(Thread.CurrentThread.ManagedThreadId * (int)DateTime.Today.TimeOfDay.Ticks);
         
         [ThreadStatic] static Random? random;
+
+        /// <summary> Get the minimum of two <see cref="IComparable{T}"/> </summary>
+        /// <typeparam name="T">The type of the objects</typeparam>
+        /// <param name="first">The first <see cref="IComparable{T}"/></param>
+        /// <param name="second">The second <see cref="IComparable{T}"/></param>
+        /// <returns>The minimum <see cref="IComparable{T}"/></returns>
+        public static T Min<T>(T first, T second) where T : IComparable<T> {
+            return first.CompareTo(second) <= 0 ? first : second;
+        }
+
+        /// <summary> Get the maximum of two <see cref="IComparable{T}"/> </summary>
+        /// <typeparam name="T">The type of the objects</typeparam>
+        /// <param name="first">The first <see cref="IComparable{T}"/></param>
+        /// <param name="second">The second <see cref="IComparable{T}"/></param>
+        /// <returns>The maximum <see cref="IComparable{T}"/></returns>
+        public static T Max<T>(T first, T second) where T : IComparable<T> {
+            return first.CompareTo(second) >= 0 ? first : second;
+        }
 
         /// <summary> Create a random Vector </summary>
         /// <param name="r">The random to create the vector with</param>
@@ -57,24 +75,6 @@ namespace PathTracer.Utilities {
         /// <returns>A random sphere</returns>
         public static Sphere Sphere(this Random r, float posRange = 0f, float scale = 1f) {
             return new Sphere(r.Vector(posRange), (float)r.NextDouble() * scale);
-        }
-
-        /// <summary> Vector with float minimum values </summary>
-        public static Vector3 MinVector => new Vector3(float.MinValue, float.MinValue, float.MinValue);
-        /// <summary> Vector with float maximum values </summary>
-        public static Vector3 MaxVector => new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
-
-        /// <summary> Get the bounds of a set of points </summary>
-        /// <param name="points">The points to compute the bounds for</param>
-        /// <returns>The bounds of the set of points</returns>
-        public static Vector3[] GetBounds(Vector3[] points) {
-            Vector3 min = MaxVector;
-            Vector3 max = MinVector;
-            foreach (Vector3 point in points) {
-                min = Vector3.ComponentMin(min, point);
-                max = Vector3.ComponentMax(max, point);
-            }
-            return new Vector3[] { min, max };
         }
 
         /// <summary> Get a color scale for a value from black to green to yellow to red </summary>

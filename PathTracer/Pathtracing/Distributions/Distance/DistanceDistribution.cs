@@ -6,162 +6,152 @@ using System;
 
 namespace PathTracer.Pathtracing.Distributions.Distance {
     public abstract class DistanceDistribution : IDistanceDistribution {
-        public abstract bool SingleSolution { get; }
-        public abstract double DomainStart { get; }
-        public abstract double DomainEnd { get; }
-        public double DomainSize => DomainEnd - DomainStart;
-        public abstract bool Leaf { get; }
+        public abstract Position1 Minimum { get; }
+        public abstract Position1 Maximum { get; }
+        public double DomainSize => Maximum - Minimum;
 
-        public bool Contains(Position1 sample) => !(IsBefore(sample) || IsAfter(sample));
-        public bool IsBefore(Position1 sample) => DomainEnd < sample;
-        public bool IsAfter(Position1 sample) => DomainStart > sample;
+        public bool Contains(Position1 sample) => (this as ICDF<Position1>).Contains(sample);
+        public bool Before(Position1 sample) => (this as ICDF<Position1>).Before(sample);
+        public bool After(Position1 sample) => (this as ICDF<Position1>).After(sample);
 
         public abstract Position1 Sample(Random random);
         public abstract double Probability(Position1 sample);
         public abstract double CumulativeDistribution(Position1 sample);
 
-        public abstract PMF<IMaterial> GetMaterials(Position1 distance);
-        public abstract PMF<IShapeInterval> GetShapeIntervals(Position1 distance, IMaterial material);
+        public abstract WeightedPMF<IMaterial>? GetMaterials(Position1 sample);
+        public abstract WeightedPMF<IShapeInterval>? GetShapeIntervals(Position1 sample, IMaterial material);
     }
 
-    public class SumDistanceDistribution : DistanceDistribution, ISumDistanceCDF<IPosition> {
-        public override bool SingleSolution => Left.SingleSolution && Right.SingleSolution;
-        public override double DomainStart => Math.Min(Left.DomainStart, Right.DomainStart);
-        public override double DomainEnd => Math.Max(Left.DomainEnd, Right.DomainEnd);
-        public override bool Leaf => false;
+    public class RecursiveDistanceDistribution : DistanceDistribution, IRecursiveCDF<Position1> {
+        public override Position1 Minimum => (this as IRecursiveCDF<Position1>).Minimum;
+        public override Position1 Maximum => (this as IRecursiveCDF<Position1>).Maximum;
         public IDistanceDistribution Left { get; }
         public IDistanceDistribution Right { get; }
 
-        ICDF<double> IRecursiveCDF<double>.Left => Left;
-        ICDF<double> IRecursiveCDF<double>.Right => Right;
+        ICDF<Position1> IRecursiveCDF<Position1>.Left => Left;
+        ICDF<Position1> IRecursiveCDF<Position1>.Right => Right;
 
-        public SumDistanceDistribution(IDistanceDistribution left, IDistanceDistribution right) {
+        public RecursiveDistanceDistribution(IDistanceDistribution left, IDistanceDistribution right) {
             Left = left;
             Right = right;
         }
 
-        public override Position1 Sample(Random random) => Math.Min(Left.Sample(random), Right.Sample(random));
-        public override double Probability(double sample) => (this as IRecursiveCDF<double>).Probability(sample);
-        public override double CumulativeDistribution(double sample) => IsAfter(sample) ? 0 : (this as IRecursiveCDF<double>).CumulativeDistribution(sample);
+        public override Position1 Sample(Random random) => (this as IRecursiveCDF<Position1>).Sample(random);
+        public override double Probability(Position1 sample) => (this as IRecursiveCDF<Position1>).Probability(sample);
+        public override double CumulativeDistribution(Position1 sample) => (this as IRecursiveCDF<Position1>).CumulativeDistribution(sample);
 
-        public override bool Contains(IDistanceMaterial sample) => Left.Contains(sample) || Right.Contains(sample);
-
-        public override IDistanceMaterial Sample(Random random) {
-            IDistanceMaterial left = (Left as IPDF<IDistanceMaterial>).Sample(random);
-            IDistanceMaterial right = (Right as IPDF<IDistanceMaterial>).Sample(random);
-            return left.Distance < right.Distance ? left : right;
+        public override WeightedPMF<IMaterial>? GetMaterials(Position1 sample) {
+            var left = Left.GetMaterials(sample);
+            var right = Right.GetMaterials(sample);
+            if (left is null) {
+                return right;
+            } else if (right is null) {
+                return left;
+            } else {
+                double probabilityLeft = (1 - Right.CumulativeDistribution(sample)) * Left.Probability(sample);
+                double probabilityRight = (1 - Left.CumulativeDistribution(sample)) * Right.Probability(sample);
+                return new WeightedPMF<IMaterial>((left, probabilityLeft), (right, probabilityRight));
+            }
         }
 
-        public override double Probability(IDistanceMaterial sample) {
-            return (this as IRecursiveCDF<IDistanceMaterial>).Probability(sample);
-        }
-
-        public override double CumulativeDistribution(IDistanceMaterial sample) {
-            return IsAfter(sample.Distance) ? 0 : (this as IRecursiveCDF<IDistanceMaterial>).CumulativeDistribution(sample);
+        public override WeightedPMF<IShapeInterval>? GetShapeIntervals(Position1 sample, IMaterial material) {
+            var left = Left.GetShapeIntervals(sample, material);
+            var right = Right.GetShapeIntervals(sample, material);
+            if (left is null) {
+                return right;
+            } else if (right is null) {
+                return left;
+            } else {
+                double probabilityLeft = (1 - Right.CumulativeDistribution(sample)) * Left.Probability(sample);
+                double probabilityRight = (1 - Left.CumulativeDistribution(sample)) * Right.Probability(sample);
+                return new WeightedPMF<IShapeInterval>((left, probabilityLeft), (right, probabilityRight));
+            }
         }
     }
 
     public class SingleDistanceDistribution : DistanceDistribution {
-        public override bool SingleSolution => true;
-        public override double DomainStart => DistanceMaterial.Distance;
-        public override double DomainEnd => DistanceMaterial.Distance;
-        public IDistanceMaterial DistanceMaterial { get; }
+        public override Position1 Minimum => Distance;
+        public override Position1 Maximum => Distance;
+        public Position1 Distance { get; }
+        public IMaterial Material { get; }
+        public IShapeInterval Interval { get; }
 
-        public override bool Leaf => throw new NotImplementedException();
-
-        public SingleDistanceDistribution(IDistanceMaterial distanceMaterial) {
-            DistanceMaterial = distanceMaterial;
+        public SingleDistanceDistribution(Position1 distance, IMaterial material, IShapeInterval interval) {
+            Distance = distance;
+            Material = material;
+            Interval = interval;
         }
 
-        public override double SampleDistance(Random random) {
-            return DistanceMaterial.Distance;
+        public override Position1 Sample(Random random) {
+            return Distance;
         }
 
-        public override double Probability(double sample) {
-            return sample == DistanceMaterial.Distance ? 1 : 0;
+        public override double Probability(Position1 sample) {
+            return sample == Distance ? 1 : 0;
         }
 
-        public override double CumulativeDistribution(double sample) {
-            return sample < DistanceMaterial.Distance ? 0 : 1;
+        public override double CumulativeDistribution(Position1 sample) {
+            return sample < Distance ? 0 : 1;
         }
 
-        public override bool Contains(IDistanceMaterial sample) {
-            return sample == DistanceMaterial;
+        public override WeightedPMF<IMaterial>? GetMaterials(Position1 sample) {
+            return sample == Distance ? new WeightedPMF<IMaterial>((Material, 1)) : null;
         }
 
-        public override IDistanceMaterial Sample(Random random) {
-            return DistanceMaterial;
-        }
-
-        public override double Probability(IDistanceMaterial sample) {
-            return sample == DistanceMaterial ? 1 : 0;
-        }
-
-        public override double CumulativeDistribution(IDistanceMaterial sample) {
-            return sample.Material != DistanceMaterial.Material || sample.Distance < DistanceMaterial.Distance ? 0 : 1;
+        public override WeightedPMF<IShapeInterval>? GetShapeIntervals(Position1 sample, IMaterial material) {
+            return sample == Distance && material == Material ? new WeightedPMF<IShapeInterval>((Interval, 1)) : null;
         }
     }
 
     public class ExponentialDistanceDistribution : DistanceDistribution {
-        public override bool SingleSolution => false;
-        public override double DomainStart { get; }
-        public override double DomainEnd { get; }
+        public override Position1 Minimum { get; }
+        public override Position1 Maximum { get; }
         public Exponential Distribution { get; }
         public IMaterial Material { get; }
+        public IShapeInterval Interval { get; }
 
-        public override bool Leaf => throw new NotImplementedException();
-
-        public ExponentialDistanceDistribution(double start, double end, double rate, IMaterial material) {
+        public ExponentialDistanceDistribution(Position1 start, Position1 end, double rate, IMaterial material, IShapeInterval interval) {
             Distribution = new Exponential(rate);
-            DomainStart = start;
-            DomainEnd = end;
+            Minimum = start;
+            Maximum = end;
             Material = material;
+            Interval = interval;
         }
 
-        public override double SampleDistance(Random random) {
-            double distance = DomainStart + Distribution.InverseCumulativeDistribution(random.NextDouble());
-            if (distance > DomainEnd) {
-                distance = double.PositiveInfinity;
-            }
-            return distance;
+        public override Position1 Sample(Random random) {
+            Position1 distance = Minimum + (float)Distribution.InverseCumulativeDistribution(random.NextDouble());
+            return distance <= Maximum ? distance : Position1.PositiveInfinity;
+
         }
 
-        public override double Probability(double sample) {
-            if (DomainStart < sample && sample < DomainEnd) {
-                return Distribution.Density(sample - DomainStart);
-            } else if (double.IsPositiveInfinity(sample)) {
-                return 1 - Distribution.CumulativeDistribution(DomainEnd - DomainStart);
+        public override double Probability(Position1 sample) {
+            if (Minimum <= sample && sample <= Maximum) {
+                return Distribution.Density(sample - Minimum);
+            } else if (sample == Position1.PositiveInfinity) {
+                return 1 - Distribution.CumulativeDistribution(Maximum - Minimum);
             } else {
                 return 0;
             }
         }
 
-        public override double CumulativeDistribution(double distance) {
-            if (distance < DomainStart) {
+        public override double CumulativeDistribution(Position1 distance) {
+            if (distance < Minimum) {
                 return 0;
-            } else if (distance < DomainEnd) {
-                return Distribution.CumulativeDistribution(distance - DomainStart);
+            } else if (distance < Maximum) {
+                return Distribution.CumulativeDistribution(distance - Minimum);
             } else if (distance < double.PositiveInfinity) {
-                return Distribution.CumulativeDistribution(DomainEnd - DomainStart);
+                return Distribution.CumulativeDistribution(Maximum - Minimum);
             } else {
                 return 1;
             }
         }
 
-        public override bool Contains(IDistanceMaterial sample) {
-            return Material == sample.Material && Contains(sample.Distance);
+        public override WeightedPMF<IMaterial>? GetMaterials(Position1 sample) {
+            return Contains(sample) ? new WeightedPMF<IMaterial>((Material, 1)) : null;
         }
 
-        public override IDistanceMaterial Sample(Random random) {
-            return new DistanceMaterial(SampleDistance(random), Material); 
-        }
-
-        public override double Probability(IDistanceMaterial sample) {
-            return sample.Material == Material ? Probability(sample.Distance) : 0;
-        }
-
-        public override double CumulativeDistribution(IDistanceMaterial sample) {
-            return sample.Material == Material ? CumulativeDistribution(sample.Distance) : 0;
+        public override WeightedPMF<IShapeInterval>? GetShapeIntervals(Position1 sample, IMaterial material) {
+            return Contains(sample) && material == Material ? new WeightedPMF<IShapeInterval>((Interval, 1)) : null;
         }
     }
 }

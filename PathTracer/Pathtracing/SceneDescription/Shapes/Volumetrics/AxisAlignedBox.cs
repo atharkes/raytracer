@@ -106,14 +106,14 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics {
             Position1 tymin = (Bounds[ray.Sign.Y].Y - ray.Origin.Y) * ray.InvDirection.Y;
             Position1 tymax = (Bounds[1 - ray.Sign.Y].Y - ray.Origin.Y) * ray.InvDirection.Y;
             if ((tmin > tymax) || (tmax < tymin)) yield break;
-            tmin = Position1.ComponentMax(tmin, tymin);
-            tmax = Position1.ComponentMin(tmax, tymax);
+            tmin = Position1.Max(tmin, tymin);
+            tmax = Position1.Min(tmax, tymax);
 
             Position1 tzmin = (Bounds[ray.Sign.Z].Z - ray.Origin.Z) * ray.InvDirection.Z;
             Position1 tzmax = (Bounds[1 - ray.Sign.Z].Z - ray.Origin.Z) * ray.InvDirection.Z;
             if ((tmin > tzmax) || (tmax < tzmin)) yield break;
-            yield return Position1.ComponentMax(tmin, tzmin);
-            yield return Position1.ComponentMin(tmax, tzmax);
+            yield return Position1.Max(tmin, tzmin);
+            yield return Position1.Min(tmax, tzmax);
         }
 
         /// <summary> Clip the <see cref="AxisAlignedBox"/> by a <paramref name="plane"/> </summary>
@@ -124,17 +124,17 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics {
             Position3 maxCorner = MaxCorner;
 
             if (plane.Normal == Normal3.UnitX) {
-                minCorner = new(Position1.ComponentMax(MinCorner.X, plane.Position.X), MinCorner.Y, MinCorner.Z);
+                minCorner = new(Position1.Max(MinCorner.X, plane.Position.X), MinCorner.Y, MinCorner.Z);
             } else if (plane.Normal == -Normal3.UnitX) {
-                maxCorner = new(Position1.ComponentMin(MinCorner.X, plane.Position.X), MaxCorner.Y, MaxCorner.Z);
+                maxCorner = new(Position1.Min(MinCorner.X, plane.Position.X), MaxCorner.Y, MaxCorner.Z);
             } else if (plane.Normal == Normal3.UnitY) {
-                minCorner = new(MinCorner.X, Position1.ComponentMax(MinCorner.Y, plane.Position.Y), MinCorner.Z);
+                minCorner = new(MinCorner.X, Position1.Max(MinCorner.Y, plane.Position.Y), MinCorner.Z);
             } else if (plane.Normal == -Normal3.UnitY) {
-                maxCorner = new(MaxCorner.X, Position1.ComponentMin(MaxCorner.Y, plane.Position.Y), MaxCorner.Z);
+                maxCorner = new(MaxCorner.X, Position1.Min(MaxCorner.Y, plane.Position.Y), MaxCorner.Z);
             } else if (plane.Normal == Normal3.UnitZ) {
-                minCorner = new(MinCorner.X, MinCorner.Y, Position1.ComponentMax(MinCorner.Z, plane.Position.Z));
+                minCorner = new(MinCorner.X, MinCorner.Y, Position1.Max(MinCorner.Z, plane.Position.Z));
             } else if (plane.Normal == -Normal3.UnitZ) {
-                maxCorner = new(MaxCorner.X, MaxCorner.Y, Position1.ComponentMin(MaxCorner.Z, plane.Position.Z));
+                maxCorner = new(MaxCorner.X, MaxCorner.Y, Position1.Min(MaxCorner.Z, plane.Position.Z));
             }
             if (minCorner == MinCorner && maxCorner == MaxCorner) {
                 yield return this;

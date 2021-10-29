@@ -20,12 +20,6 @@ namespace PathTracer.Geometry.Positions {
             Vector = value;
         }
 
-        public override bool Equals(object? obj) => Vector.Equals(obj);
-        public bool Equals(Position1 other) => Vector.Equals(other.Vector);
-        public bool Equals(Position1? other) => Vector.Equals(other?.Vector);
-        public override int GetHashCode() => Vector.GetHashCode();
-        public int CompareTo(Position1 other) => Vector.CompareTo(other.Vector);
-
         public static implicit operator Position1(float value) => new(value);
         public static implicit operator float(Position1 value) => value.Vector.Value;
         public static implicit operator Position1(Vector1 vector) => new(vector);
@@ -45,7 +39,13 @@ namespace PathTracer.Geometry.Positions {
         public static Position1 operator +(Position1 position, Direction1 direction) => new(position.Vector + direction.Vector);
 
         public static Position1 Dot(Position1 position, IDirection1 direction) => new(Vector1.Dot(position.Vector, direction.Vector));
-        public static Position1 ComponentMin(Position1 left, Position1 right) => new(Vector1.ComponentMin(left.Vector, right.Vector));
-        public static Position1 ComponentMax(Position1 left, Position1 right) => new(Vector1.ComponentMax(left.Vector, right.Vector));
+        public static Position1 Min(Position1 left, Position1 right) => new(Vector1.ComponentMin(left.Vector, right.Vector));
+        public static Position1 Max(Position1 left, Position1 right) => new(Vector1.ComponentMax(left.Vector, right.Vector));
+
+        public override bool Equals(object? obj) => Vector.Equals(obj);
+        public bool Equals(Position1 other) => Vector.Equals(other.Vector);
+        public bool Equals(Position1? other) => Vector.Equals(other?.Vector);
+        public override int GetHashCode() => Vector.GetHashCode();
+        public int CompareTo(Position1 other) => Vector.CompareTo(other.Vector);
     }
 }

@@ -21,7 +21,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials {
         public abstract Position3 GetPosition(IRay ray, IShapeInterval interval, Position1 distance);
         public abstract IPDF<Normal3> GetOrientationDistribution(IRay ray, IShape shape, Position3 position);
 
-        public abstract IDirectionDistribution? DirectionDistribution(Normal3 incomingDirection, ISpectrum spectrum, Position3 position);
+        public abstract IDirectionDistribution? DirectionDistribution(Normal3 incomingDirection, Position3 position, ISpectrum spectrum);
         public abstract IRay CreateRay(Position3 position, Normal3 normal, Normal3 direction);
     }
 }

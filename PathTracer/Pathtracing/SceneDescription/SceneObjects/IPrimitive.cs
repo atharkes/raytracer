@@ -36,7 +36,7 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects {
         Position3 IMaterial.GetPosition(IRay ray, IShapeInterval interval, Position1 distance) => Material.GetPosition(ray, interval, distance);
         IPDF<Normal3> IMaterial.GetOrientationDistribution(IRay ray, IShape shape, Position3 position) => Material.GetOrientationDistribution(ray, shape, position);
         
-        IDirectionDistribution? IMaterial.DirectionDistribution(Normal3 incomingDirection, ISpectrum spectrum, Position3 position) => Material.DirectionDistribution(incomingDirection, spectrum, position);
+        IDirectionDistribution? IMaterial.DirectionDistribution(Normal3 incomingDirection, Position3 position, ISpectrum spectrum) => Material.DirectionDistribution(incomingDirection, position, spectrum);
         IRay IMaterial.CreateRay(Position3 position, Normal3 normal, Normal3 direction) => Material.CreateRay(position, normal, direction);
         #endregion
     }

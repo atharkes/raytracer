@@ -1,10 +1,16 @@
-﻿using OpenTK.Mathematics;
+﻿using PathTracer.Geometry.Directions;
+using PathTracer.Geometry.Normals;
+using PathTracer.Geometry.Positions;
+using PathTracer.Pathtracing.Distributions;
+using PathTracer.Pathtracing.Distributions.Boundaries;
+using PathTracer.Pathtracing.Distributions.Direction;
 using PathTracer.Pathtracing.Distributions.Distance;
 using PathTracer.Pathtracing.Rays;
+using PathTracer.Pathtracing.SceneDescription;
 using PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates;
+using PathTracer.Pathtracing.Spectra;
 using PathTracer.Utilities;
 using System;
-using System.Collections.Generic;
 
 namespace PathTracer.Pathtracing.Integrators {
     public class BackwardsSampler : Integrator {
@@ -14,23 +20,22 @@ namespace PathTracer.Pathtracing.Integrators {
         public override int SampleCount { get; } = 0;
 
         public override void Integrate(IScene scene, TimeSpan integrationTime) {
-            int rayCount = ;
+            int rayCount = 100;
             Action[] tasks = new Action[Program.Threadpool.MultithreadingTaskCount];
-            float size = rayCount / Program.Threadpool.MultithreadingTaskCount;
             for (int i = 0; i < Program.Threadpool.MultithreadingTaskCount; i++) {
-                int lowerbound = (int)(i * size);
-                int higherbound = (int)((i + 1) * size);
-                tasks[i] = () => TraceRays(scene, lowerbound, higherbound);
+                tasks[i] = () => TraceRays(scene, rayCount);
             }
             Program.Threadpool.DoTasks(tasks);
             Program.Threadpool.WaitTillDone();
         }
 
-        void TraceRays(IScene scene, int from, int to) {
-            ICollection<CameraRay> rays = scene.Camera.GetCameraRays(to - from, Utils.Random);
-            foreach (CameraRay ray in rays) {
-                Vector3 pixelColor = Sample(scene, ray);
-                ray.Film.AddSample(pixelColor, ray.BVHTraversals, ray.Intersection);
+        void TraceRays(IScene scene, int count) {
+            for (int i = 0; i < count; i++) {
+                Position2 position = new((float)Utils.Random.NextDouble(), (float)Utils.Random.NextDouble());
+                Direction2 direction = new((float)Utils.Random.NextDouble(), (float)Utils.Random.NextDouble());
+                CameraRay ray = scene.Camera.GetCameraRay(position, direction);
+                ISpectrum light = Sample(scene, ray, ISpectrum.White, 0);
+                scene.Camera.Film.RegisterSample();
             }
         }
 
@@ -38,26 +43,39 @@ namespace PathTracer.Pathtracing.Integrators {
         /// <param name="scene">The <see cref="IScene"/> to sample </param>
         /// <param name="sample">The <see cref="ISample"/> to sample the <paramref name="scene"/> with </param>
         /// <returns>The color found for the <see cref="ISample"/></returns>
-        public Vector3 Sample(IScene scene, ISample sample) {
-            if (sample.RecursionDepth > MaxRecursionDepth) return Vector3.Zero;
+        public ISpectrum Sample(IScene scene, IRay ray, ISpectrum spectrum, int recursionDepth) {
+            if (recursionDepth > MaxRecursionDepth) return ISpectrum.Black;
 
             /// Distance Sampling
-            IDistanceDistribution? distancePDF = scene.Trace(sample.Ray, );
-            if (distancePDF == null) return Vector3.Zero;
-            IDistanceMaterial distanceMaterial = distancePDF.SampleWithMaterial(Utils.Random);
-            sample.Ray.Length = (float)distanceMaterial.Distance;
-            ISurfacePoint surfacePoint = new SurfacePoint();
+            IDistanceDistribution? distances = scene.Trace(ray, spectrum);
+            if (distances is null) return ISpectrum.Black;
+            Position1 distance = distances.Sample(Utils.Random);
+            if (distance == Position1.PositiveInfinity) return ISpectrum.Black;
+
+            IPDF<IMaterial>? materials = distances.GetMaterials(distance);
+            if (materials is null) throw new InvalidOperationException("Distance was sampled but no material was found");
+            IMaterial material = materials.Sample(Utils.Random);
+
+            IPDF<IShapeInterval>? intervals = distances.GetShapeIntervals(distance, material);
+            if (intervals is null) throw new InvalidOperationException("Distance was sampled but no shape interval was found");
+            IShapeInterval interval = intervals.Sample(Utils.Random);
+
+            Position3 position = material.GetPosition(ray, interval, distance);
+            IPDF<Normal3> normals = material.GetOrientationDistribution(ray, interval.Shape, position);
+            Normal3 normal = normals.Sample(Utils.Random);
 
             /// Direction Sampling
-            distanceMaterial.Material.DirectionMediumPDF(sample.Ray.Direction, sample.Color, )
+            IDirectionDistribution? directions = material.DirectionDistribution(ray.Direction, position, spectrum);
+            if (directions is null) return ISpectrum.Black;
+            Direction3 direction = directions.Sample(Utils.Random);
 
             /// Direct Illumination
-            Vector3 outgoingLight = distancePDF.Emittance(sample.Ray);
+            ISpectrum outgoingLight = distances.Emittance(sample.Ray);
             /// Indirect Illumination
-            ISample incSample = distancePDF.BSDF().Sample(sample, Utils.Random);
-            Vector3 incLight = Sample(scene, incSample);
-            Vector3 scatteredLight = incLight * distancePDF.Absorption(incSample.Ray);
-            Vector3 relevantLight = scatteredLight * Vector3.Dot(incSample.Ray.Direction, distancePDF.Normal);
+            Normal3 incSample = distances.BSDF().Sample(sample, Utils.Random);
+            ISpectrum incLight = Sample(scene, incSample);
+            ISpectrum scatteredLight = incLight * distances.Absorption(incSample.Ray);
+            ISpectrum relevantLight = scatteredLight * Vector3.Dot(incSample.Ray.Direction, distances.Normal);
             outgoingLight += relevantLight;
 
             return outgoingLight;

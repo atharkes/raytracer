@@ -86,7 +86,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials.SurfaceMaterials {
             return new ParametricMaterial(Utils.DetRandom.Next(1, 50), color);
         }
 
-        public override IDirectionDistribution? DirectionDistribution(Normal3 incomingDirection, ISpectrum spectrum, Position3 position) {
+        public override IDirectionDistribution? DirectionDistribution(Normal3 incomingDirection, Position3 position, ISpectrum spectrum) {
             throw new NotImplementedException();
         }
 

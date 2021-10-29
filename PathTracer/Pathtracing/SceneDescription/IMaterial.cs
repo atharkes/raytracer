@@ -56,10 +56,10 @@ namespace PathTracer.Pathtracing.SceneDescription {
 
         /// <summary> Get a direction-medium PDF at a <paramref name="position"/> </summary>
         /// <param name="incomingDirection">The incoming direction at the <paramref name="position"/></param>
-        /// <param name="spectrum">The <see cref="ISpectrum"/> of light scattering at the <paramref name="position"/></param>
         /// <param name="position">The <see cref="Position3"/> at which the scattering occurs</param>
+        /// <param name="spectrum">The <see cref="ISpectrum"/> of light scattering at the <paramref name="position"/></param>
         /// <returns>A direction-medium PDF</returns>
-        IDirectionDistribution? DirectionDistribution(Normal3 incomingDirection, ISpectrum spectrum, Position3 position);
+        IDirectionDistribution? DirectionDistribution(Normal3 incomingDirection, Position3 position, ISpectrum spectrum);
 
         /// <summary> Create an outgoing <see cref="IRay"/> from a <paramref name="position3"/> along a specified <paramref name="direction"/> </summary>
         /// <param name="position">The <see cref="Position3"/> from which the <see cref="IRay"/> leaves</param>

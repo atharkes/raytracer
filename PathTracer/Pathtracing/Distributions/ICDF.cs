@@ -2,7 +2,7 @@
 using System;
 
 namespace PathTracer.Pathtracing.Distributions {
-    /// <summary> A cummulative distribution function </summary>
+    /// <summary> A cummulative <see cref="IPDF{T}"/> </summary>
     /// <typeparam name="T">The type of the samples of the <see cref="ICDF{T}"/></typeparam>
     public interface ICDF<T> : IPDF<T> where T : IComparable<T>, IEquatable<T> {
         /// <summary> Whether the <see cref="ICDF{T}"/> has a single solution </summary>
@@ -33,7 +33,7 @@ namespace PathTracer.Pathtracing.Distributions {
         double CumulativeDistribution(T sample);
     }
 
-    /// <summary> A recursive cummulative distribution function </summary>
+    /// <summary> A recursive <see cref="ICDF{T}"/> </summary>
     /// <typeparam name="T">The type of the samples of the <see cref="IRecursiveCDF{T}"/> </typeparam>
     public interface IRecursiveCDF<T> : ICDF<T> where T : IComparable<T>, IEquatable<T> {
         /// <summary> The left <see cref="IRecursiveCDF{T}"/> </summary>

@@ -5,6 +5,8 @@ using PathTracer.Pathtracing.Distributions;
 using PathTracer.Pathtracing.Distributions.Boundaries;
 using PathTracer.Pathtracing.Distributions.Direction;
 using PathTracer.Pathtracing.Distributions.Distance;
+using PathTracer.Pathtracing.Observers;
+using PathTracer.Pathtracing.Observers.Cameras;
 using PathTracer.Pathtracing.Rays;
 using PathTracer.Pathtracing.SceneDescription;
 using PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates;
@@ -13,6 +15,7 @@ using PathTracer.Utilities;
 using System;
 
 namespace PathTracer.Pathtracing.Integrators {
+    /// <summary> An <see cref="Integrator"/> that samples from the <see cref="ICamera"/> </summary>
     public class BackwardsSampler : Integrator {
         /// <summary> The maximum recursion depth for sampling </summary>
         public int MaxRecursionDepth { get; } = 5;
@@ -35,7 +38,8 @@ namespace PathTracer.Pathtracing.Integrators {
                 Direction2 direction = new((float)Utils.Random.NextDouble(), (float)Utils.Random.NextDouble());
                 CameraRay ray = scene.Camera.GetCameraRay(position, direction);
                 ISpectrum light = Sample(scene, ray, ISpectrum.White, 0);
-                scene.Camera.Film.RegisterSample();
+                ISample sample = new Sample() { Position = position, Direction = direction, Light = light, Intersection = ray.Intersection, PrimaryBVHTraversals = ray.BVHTraversals };
+                scene.Camera.Film.RegisterSample(sample);
             }
         }
 
@@ -46,39 +50,47 @@ namespace PathTracer.Pathtracing.Integrators {
         public ISpectrum Sample(IScene scene, IRay ray, ISpectrum spectrum, int recursionDepth) {
             if (recursionDepth > MaxRecursionDepth) return ISpectrum.Black;
 
-            /// Distance Sampling
+            /// Sample Distance
             IDistanceDistribution? distances = scene.Trace(ray, spectrum);
             if (distances is null) return ISpectrum.Black;
             Position1 distance = distances.Sample(Utils.Random);
             if (distance == Position1.PositiveInfinity) return ISpectrum.Black;
+            float distancePdf = (float)distances.Probability(distance);
 
+            /// Sample Material
             IPDF<IMaterial>? materials = distances.GetMaterials(distance);
             if (materials is null) throw new InvalidOperationException("Distance was sampled but no material was found");
             IMaterial material = materials.Sample(Utils.Random);
+            float materialPdf = (float)materials.Probability(material);
 
+            /// Sample Shape Interval
             IPDF<IShapeInterval>? intervals = distances.GetShapeIntervals(distance, material);
             if (intervals is null) throw new InvalidOperationException("Distance was sampled but no shape interval was found");
             IShapeInterval interval = intervals.Sample(Utils.Random);
+            float intervalPdf = (float)intervals.Probability(interval);
 
+            /// Get Intersection Position
             Position3 position = material.GetPosition(ray, interval, distance);
-            IPDF<Normal3> normals = material.GetOrientationDistribution(ray, interval.Shape, position);
-            Normal3 normal = normals.Sample(Utils.Random);
 
-            /// Direction Sampling
+            /// Sample Material Orientation
+            IPDF<Normal3> orientations = material.GetOrientationDistribution(ray, interval.Shape, position);
+            Normal3 orientation = orientations.Sample(Utils.Random);
+            float orientationPdf = (float)orientations.Probability(orientation);
+
+            /// Get Direct Illumination
+            ISpectrum directIllumination = material.Emittance(position, orientation, -ray.Direction);
+
+            /// Sample Direction
             IDirectionDistribution? directions = material.DirectionDistribution(ray.Direction, position, spectrum);
             if (directions is null) return ISpectrum.Black;
-            Direction3 direction = directions.Sample(Utils.Random);
+            Normal3 direction = directions.Sample(Utils.Random);
+            float directionPdf = (float)directions.Probability(direction);
 
-            /// Direct Illumination
-            ISpectrum outgoingLight = distances.Emittance(sample.Ray);
-            /// Indirect Illumination
-            Normal3 incSample = distances.BSDF().Sample(sample, Utils.Random);
-            ISpectrum incLight = Sample(scene, incSample);
-            ISpectrum scatteredLight = incLight * distances.Absorption(incSample.Ray);
-            ISpectrum relevantLight = scatteredLight * Vector3.Dot(incSample.Ray.Direction, distances.Normal);
-            outgoingLight += relevantLight;
+            /// Sample Indirect Illumination
+            ISpectrum indirectIllumination = Sample(scene, new Ray(position, direction), spectrum * material.Albedo, recursionDepth + 1);
 
-            return outgoingLight;
+            /// Light Throughput Calculations (Dot product?)
+            return (indirectIllumination * material.Albedo * directionPdf * orientationPdf + directIllumination) * intervalPdf * materialPdf * distancePdf;
 
             //Vector3 radianceOut;
             //if (surfacePoint.Primitive.Material.Specularity > 0) {

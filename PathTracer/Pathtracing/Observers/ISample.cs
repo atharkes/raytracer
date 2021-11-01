@@ -16,4 +16,12 @@ namespace PathTracer.Pathtracing.Observers {
         /// <summary> Whether the <see cref="ISample"/> intersected anything </summary>
         bool Intersection { get; }
     }
+
+    public struct Sample : ISample {
+        public Position2 Position { get; init; }
+        public Direction2 Direction { get; init; }
+        public ISpectrum Light { get; init; }
+        public int PrimaryBVHTraversals { get; init; }
+        public bool Intersection { get; init; }
+    }
 }

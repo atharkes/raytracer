@@ -17,6 +17,13 @@ namespace PathTracer.Pathtracing.SceneDescription {
         /// <summary> Whether the <see cref="IMaterial"/> is sensing light or not </summary>
         bool IsSensing { get; }
 
+        /// <summary> The emission <see cref="ISpectrum"/> of the <see cref="IMaterial"/> </summary>
+        /// <param name="position">The position to get the emission at</param>
+        /// <param name="orientation">The orientation of the <see cref="IMaterial"/> at the <paramref name="position"/></param>
+        /// <param name="direction">The direction of the emission</param>
+        /// <returns>The emission at the <paramref name="position"/> in the specified <paramref name="direction"/></returns>
+        ISpectrum Emittance(Position3 position, Normal3 orientation, Normal3 direction);
+
         /// <summary> Get a distance-material PDF of a <paramref name="ray"/> </summary>
         /// <param name="ray">The scattering <see cref="IRay"/></param>
         /// <param name="spectrum">The <see cref="ISpectrum"/> of the <paramref name="ray"/></param>

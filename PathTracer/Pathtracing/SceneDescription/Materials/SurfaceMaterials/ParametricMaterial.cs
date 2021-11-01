@@ -88,6 +88,24 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials.SurfaceMaterials {
 
         public override IDirectionDistribution? DirectionDistribution(Normal3 incomingDirection, Position3 position, ISpectrum spectrum) {
             throw new NotImplementedException();
+            //Vector3 radianceOut;
+            //if (surfacePoint.Primitive.Material.Specularity > 0) {
+            //    // Specular
+            //    Vector3 reflectedIn = Sample(intersection.Reflect());
+            //    Vector3 reflectedOut = reflectedIn * intersection.SurfacePoint.Primitive.Material.Color;
+            //    radianceOut = irradianceIn * (1 - intersection.SurfacePoint.Primitive.Material.Specularity) + reflectedOut * surfacePoint.Primitive.Material.Specularity;
+            //} else if (surfacePoint.Primitive.Material.Dielectric > 0) {
+            //    // Dielectric
+            //    float reflected = intersection.Reflectivity();
+            //    float refracted = 1 - reflected;
+            //    Ray? refractedRay = intersection.Refract();
+            //    Vector3 incRefractedLight = refractedRay != null ? Sample(refractedRay) : Vector3.Zero;
+            //    Vector3 incReflectedLight = Sample(intersection.Reflect());
+            //    radianceOut = irradianceIn * (1f - surfacePoint.Primitive.Material.Dielectric) + (incRefractedLight * refracted + incReflectedLight * reflected) * surfacePoint.Primitive.Material.Dielectric * surfacePoint.Primitive.Material.Color;
+            //} else {
+            //    // Diffuse
+            //    radianceOut = irradianceIn;
+            //}
         }
 
         /// <summary> The default material is bright green </summary>

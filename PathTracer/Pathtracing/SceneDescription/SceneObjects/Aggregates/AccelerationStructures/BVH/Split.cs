@@ -12,7 +12,7 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates.Accele
         public IAggregate Right { get; }
 
         /// <summary> The Surface Area Heuristic of the split </summary>
-        public float SurfaceAreaHeuristic => BVH.SurfaceAreaHeuristic(Left.ChildrenCount, Left.SurfaceArea) + BVH.SurfaceAreaHeuristic(Right.ChildrenCount, Right.SurfaceArea);
+        public float SurfaceAreaHeuristic => BVH.SurfaceAreaHeuristic(Left.ItemCount, Left.SurfaceArea) + BVH.SurfaceAreaHeuristic(Right.ItemCount, Right.SurfaceArea);
 
         /// <summary> Create a new split with AABB's </summary>
         /// <param name="left">The left AABB</param>

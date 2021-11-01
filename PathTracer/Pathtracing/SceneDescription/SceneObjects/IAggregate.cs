@@ -1,12 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 
 namespace PathTracer.Pathtracing.SceneDescription.SceneObjects {
     /// <summary> A container <see cref="ISceneObject"/> </summary>
-    public interface IAggregate : ISceneObject {
+    public interface IAggregate : ISceneObject, IEnumerable<ISceneObject> {
         /// <summary> The amount of children of the <see cref="IAggregate"/> </summary>
-        int ChildrenCount { get; }
-        /// <summary> The children of this <see cref="IAggregate"/> </summary>
-        IEnumerable<ISceneObject> Children { get; }
+        int ItemCount { get; }
 
         /// <summary> Add an <paramref name="item"/> to the <see cref="IAggregate"/> </summary>
         /// <param name="item">The <see cref="ISceneObject"/> to add</param>
@@ -20,5 +19,9 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects {
         /// <param name="item">The <see cref="ISceneObject"/> to remove</param>
         /// <returns>Whether the <paramref name="item"/> was found and removed from the <see cref="IAggregate"/></returns>
         bool Remove(ISceneObject item);
+
+        /// <summary> Get the <see cref="IEnumerator"/> of the <see cref="IAggregate"/> </summary>
+        /// <returns>The <see cref="IEnumerator"/></returns>
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }

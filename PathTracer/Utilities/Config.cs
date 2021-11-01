@@ -2,6 +2,7 @@
 using OpenTK.Mathematics;
 using PathTracer.Geometry.Positions;
 using PathTracer.Pathtracing;
+using PathTracer.Pathtracing.Observers;
 using System.IO;
 
 namespace PathTracer.Utilities {

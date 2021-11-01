@@ -1,6 +1,7 @@
 ﻿using PathTracer.Geometry.Directions;
 using PathTracer.Geometry.Normals;
 using PathTracer.Geometry.Positions;
+using PathTracer.Geometry.Vectors;
 using PathTracer.Pathtracing.Distributions;
 using PathTracer.Pathtracing.Distributions.Boundaries;
 using PathTracer.Pathtracing.Distributions.Direction;
@@ -86,30 +87,14 @@ namespace PathTracer.Pathtracing.Integrators {
             Normal3 direction = directions.Sample(Utils.Random);
             float directionPdf = (float)directions.Probability(direction);
 
+            /// Area Conversion
+            float areaConversion = Math.Abs(Vector3.Dot(orientation.Vector, direction.Vector));
+
             /// Sample Indirect Illumination
             ISpectrum indirectIllumination = Sample(scene, new Ray(position, direction), spectrum * material.Albedo, recursionDepth + 1);
 
-            /// Light Throughput Calculations (Dot product?)
-            return (indirectIllumination * material.Albedo * directionPdf * orientationPdf + directIllumination) * intervalPdf * materialPdf * distancePdf;
-
-            //Vector3 radianceOut;
-            //if (surfacePoint.Primitive.Material.Specularity > 0) {
-            //    // Specular
-            //    Vector3 reflectedIn = Sample(intersection.Reflect());
-            //    Vector3 reflectedOut = reflectedIn * intersection.SurfacePoint.Primitive.Material.Color;
-            //    radianceOut = irradianceIn * (1 - intersection.SurfacePoint.Primitive.Material.Specularity) + reflectedOut * surfacePoint.Primitive.Material.Specularity;
-            //} else if (surfacePoint.Primitive.Material.Dielectric > 0) {
-            //    // Dielectric
-            //    float reflected = intersection.Reflectivity();
-            //    float refracted = 1 - reflected;
-            //    Ray? refractedRay = intersection.Refract();
-            //    Vector3 incRefractedLight = refractedRay != null ? Sample(refractedRay) : Vector3.Zero;
-            //    Vector3 incReflectedLight = Sample(intersection.Reflect());
-            //    radianceOut = irradianceIn * (1f - surfacePoint.Primitive.Material.Dielectric) + (incRefractedLight * refracted + incReflectedLight * reflected) * surfacePoint.Primitive.Material.Dielectric * surfacePoint.Primitive.Material.Color;
-            //} else {
-            //    // Diffuse
-            //    radianceOut = irradianceIn;
-            //}
+            /// Light Throughput Calculation (Dot product?)
+            return (indirectIllumination * areaConversion * material.Albedo * directionPdf * orientationPdf + directIllumination) * intervalPdf * materialPdf * distancePdf;
         }
     }
 }

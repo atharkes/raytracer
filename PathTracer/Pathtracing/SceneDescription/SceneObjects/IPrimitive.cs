@@ -5,6 +5,7 @@ using PathTracer.Pathtracing.Distributions.Boundaries;
 using PathTracer.Pathtracing.Distributions.Direction;
 using PathTracer.Pathtracing.Distributions.Distance;
 using PathTracer.Pathtracing.Rays;
+using PathTracer.Pathtracing.SceneDescription.Shapes.Planars;
 using PathTracer.Pathtracing.Spectra;
 using System;
 using System.Collections.Generic;
@@ -29,9 +30,16 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects {
         bool IShape.OnSurface(Position3 position, float epsilon = 0.001F) => Shape.OnSurface(position, epsilon);
         Normal3 IShape.SurfaceNormal(Position3 position) => Shape.SurfaceNormal(position);
         Normal3 IShape.OutwardsDirection(Position3 position) => Shape.OutwardsDirection(position);
+
+        IEnumerable<IShape> IDivisible<IShape>.Clip(AxisAlignedPlane plane) => Shape.Clip(plane);
         #endregion
 
         #region IMaterial
+        ISpectrum IMaterial.Albedo { get => Material.Albedo; set => Material.Albedo = value; }
+        bool IMaterial.IsEmitting => Material.IsEmitting;
+        bool IMaterial.IsSensing => Material.IsSensing;
+        ISpectrum IMaterial.Emittance(Position3 position, Normal3 orientation, Normal3 direction) => Material.Emittance(position, orientation, direction);
+
         IDistanceDistribution? IMaterial.DistanceDistribution(IRay ray, ISpectrum spectrum, IShapeInterval interval) => Material.DistanceDistribution(ray, spectrum, interval);
         Position3 IMaterial.GetPosition(IRay ray, IShapeInterval interval, Position1 distance) => Material.GetPosition(ray, interval, distance);
         IPDF<Normal3> IMaterial.GetOrientationDistribution(IRay ray, IShape shape, Position3 position) => Material.GetOrientationDistribution(ray, shape, position);

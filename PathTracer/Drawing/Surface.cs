@@ -1,6 +1,6 @@
 ﻿using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
-using PathTracer.Pathtracing.SceneDescription.SceneObjects.Cameras.Parts;
+using PathTracer.Pathtracing.Observers;
 using System;
 using System.Drawing;
 using System.Drawing.Imaging;

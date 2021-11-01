@@ -1,14 +1,9 @@
-﻿using PathTracer.Geometry.Normals;
-using PathTracer.Geometry.Positions;
-using PathTracer.Pathtracing.Distributions;
-using PathTracer.Pathtracing.Distributions.Boundaries;
-using PathTracer.Pathtracing.Distributions.Direction;
+﻿using PathTracer.Pathtracing.Distributions.Boundaries;
 using PathTracer.Pathtracing.Distributions.Distance;
 using PathTracer.Pathtracing.Rays;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Planars;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics;
 using PathTracer.Pathtracing.Spectra;
-using System;
 using System.Collections.Generic;
 
 namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Primitives {
@@ -26,11 +21,7 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Primitives {
         /// <summary> The surface area of the <see cref="Primitive"/> </summary>
         public float SurfaceArea => Shape.SurfaceArea;
         /// <summary> The bounding box of the <see cref="Primitive"/> </summary>
-        public virtual AxisAlignedBox BoundingBox => Shape.BoundingBox;
-
-        public bool IsEmitting => throw new NotImplementedException();
-
-        public bool IsSensing => throw new NotImplementedException();
+        public AxisAlignedBox BoundingBox => Shape.BoundingBox;
 
         /// <summary> Create a new <see cref="Primitive"/> with a <paramref name="shape"/> and <paramref name="material"/> </summary>
         /// <param name="shape">The <see cref="SceneDescription.Shape"/> of the <see cref="Primitive"/></param>
@@ -52,10 +43,7 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Primitives {
             return Material.DistanceDistribution(ray, spectrum, boundary);
         }
 
-
-        IEnumerable<IShape> IDivisible<IShape>.Clip(AxisAlignedPlane plane) => Clip(plane);
-
-        public virtual IEnumerable<IPrimitive> Clip(AxisAlignedPlane plane) {
+        public virtual IEnumerable<ISceneObject> Clip(AxisAlignedPlane plane) {
             foreach (IShape shape in Shape.Clip(plane)) {
                 if (shape == Shape) {
                     yield return this;
@@ -64,7 +52,5 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Primitives {
                 }
             }
         }
-
-
     }
 }

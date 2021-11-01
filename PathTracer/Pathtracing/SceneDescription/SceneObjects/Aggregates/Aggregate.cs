@@ -1,7 +1,7 @@
 ﻿using PathTracer.Geometry.Normals;
 using PathTracer.Geometry.Positions;
+using PathTracer.Pathtracing.Distributions.Boundaries;
 using PathTracer.Pathtracing.Distributions.Distance;
-using PathTracer.Pathtracing.Points.Boundaries;
 using PathTracer.Pathtracing.Rays;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Planars;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics;
@@ -14,18 +14,17 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates {
     /// <summary> Simple container <see cref="ISceneObject"/> holding multiple <see cref="ISceneObject"/>s </summary>
     public class Aggregate : IAggregate {
         /// <summary> The amount of children of the <see cref="Aggregate"/> </summary>
-        public int ChildrenCount => Items.Count;
-        /// <summary> The <see cref="ISceneObject"/> children of the <see cref="Aggregate"/> </summary>
-        public IEnumerable<ISceneObject> Children => Items;
+        public int ItemCount => Items.Count;
         /// <summary> Whether any the children of the <see cref="Aggregate"/> encompasses a volume </summary>
-        public bool Volumetric => Children.Any(c => c.Volumetric);
+        public bool Volumetric => Items.Any(c => c.Volumetric);
         /// <summary> The total volume of the children of the  <see cref="Aggregate"/> </summary>
-        public float Volume => Children.Sum(c => c.Volume);
+        public float Volume => Items.Sum(c => c.Volume);
         /// <summary> The total surface area of the children of the <see cref="Aggregate"/> </summary>
-        public float SurfaceArea => Children.Sum(c => c.SurfaceArea);
+        public float SurfaceArea => Items.Sum(c => c.SurfaceArea);
         /// <summary> The bounding box of the <see cref="Aggregate"/> </summary>
         public AxisAlignedBox BoundingBox { get; protected set; } = new(Position3.PositiveInfinity, Position3.NegativeInfinity);
 
+        /// <summary> The <see cref="ISceneObject"/>s in the <see cref="IAggregate"/> </summary>
         protected ICollection<ISceneObject> Items { get; set; } = new HashSet<ISceneObject>();
 
         public ISpectrum Albedo => throw new NotImplementedException();
@@ -37,7 +36,6 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates {
                 Add(item);
             }
         }
-
         public void Add(ISceneObject item) {
             Items.Add(item);
             BoundingBox.MinCorner = Position3.ComponentMin(BoundingBox.MinCorner, item.BoundingBox.MinCorner);
@@ -61,8 +59,10 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates {
             return false;
         }
 
+        public IEnumerator<ISceneObject> GetEnumerator() => Items.GetEnumerator();
+
         public virtual bool Intersects(IRay ray) {
-            return BoundingBox.Intersects(ray) && Children.Any(c => c.Intersects(ray));
+            return BoundingBox.Intersects(ray) && Items.Any(c => c.Intersects(ray));
         }
 
         public virtual IEnumerable<Position1> IntersectDistances(IRay ray) {
@@ -85,8 +85,8 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates {
             return result;
         }
 
-        public IDistanceQuery? Trace(IRay ray, ISpectrum spectrum) {
-            IDistanceQuery? result = null;
+        public IDistanceDistribution? Trace(IRay ray, ISpectrum spectrum) {
+            IDistanceDistribution? result = null;
             foreach (ISceneObject sceneObject in Items) {
                 result += sceneObject.Trace(ray, spectrum);
             }
@@ -97,7 +97,7 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates {
 
         public Position3 SurfacePosition(Random random) {
             if (Items.Count > 0) {
-                return Items.Where(i => !(i is IAggregate a) || a.Children.Any()).ElementAt(random.Next(0, Items.Count)).SurfacePosition(random);
+                return Items.Where(i => i is not Aggregate a || a.Items.Any()).ElementAt(random.Next(0, Items.Count)).SurfacePosition(random);
             } else {
                 throw new InvalidOperationException("Aggregate without children doesn't have any surface to choose a point on.");
             }
@@ -117,6 +117,18 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates {
         IEnumerable<IShape> IDivisible<IShape>.Clip(AxisAlignedPlane plane) => Clip(plane);
 
         public IEnumerable<ISceneObject> Clip(AxisAlignedPlane plane) {
+            throw new NotImplementedException();
+        }
+
+        public Position2 UVPosition(Position3 position) {
+            throw new NotImplementedException();
+        }
+
+        public Normal3 OutwardsDirection(Position3 position) {
+            throw new NotImplementedException();
+        }
+
+        public Position3 IntersectPosition(IRay ray, Position1 distance) {
             throw new NotImplementedException();
         }
     }

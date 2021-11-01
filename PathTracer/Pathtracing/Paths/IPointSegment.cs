@@ -1,4 +1,4 @@
-﻿using OpenTK.Mathematics;
+﻿using PathTracer.Geometry.Vectors;
 using System.Collections.Generic;
 
 namespace PathTracer.Pathtracing.Paths {

@@ -1,15 +1,16 @@
-﻿using OpenTK.Mathematics;
-using OpenTK.Windowing.Common;
+﻿using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using PathTracer.Drawing;
+using PathTracer.Geometry.Positions;
 using PathTracer.Multithreading;
 using PathTracer.Pathtracing;
 using PathTracer.Pathtracing.Integrators;
+using PathTracer.Pathtracing.Observers;
+using PathTracer.Pathtracing.Observers.Cameras;
 using PathTracer.Pathtracing.SceneDescription;
-using PathTracer.Pathtracing.SceneDescription.Materials;
+using PathTracer.Pathtracing.SceneDescription.Materials.SurfaceMaterials;
 using PathTracer.Pathtracing.SceneDescription.SceneObjects;
 using PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates;
-using PathTracer.Pathtracing.SceneDescription.SceneObjects.Cameras;
 using PathTracer.Pathtracing.SceneDescription.SceneObjects.Primitives;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Planars;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics;
@@ -32,7 +33,7 @@ namespace PathTracer {
             WindowBorder = WindowBorder.Resizable
         };
         /// <summary> The <see cref="IObserver"/> viewing the scene </summary>
-        public static readonly IObserver Observer = new Observer(Window.GameWindow, new Camera(Config.Position, Config.Rotation, Config.AspectRatio, Config.FOV)) {
+        public static readonly IObserver Observer = new Observer(Window.GameWindow, new PinholeCamera(Config.Position, Config.Rotation, Config.AspectRatio, Config.FOV)) {
             DrawingMode = Config.DrawingMode,
             DebugInfo = Config.DebugInfo
         };
@@ -63,13 +64,13 @@ namespace PathTracer {
         #region Default Scene Definition
         /// <summary> The primitives in the default scene </summary>
         public static List<ISceneObject> DefaultPrimitives => new() {
-            new Primitive(new AxisAlignedBox(new Vector3(-10, -5, -10), new Vector3(10, 10, 10)) { InwardNormals = true }, Material.WhiteLight),
-            new Primitive(new Sphere(new Vector3(-3, 1, 5), 1), Material.DiffuseGreen),
-            new Primitive(new Sphere(new Vector3(3, 1, 5), 1), Material.GlossyRed),
-            new Primitive(new Sphere(new Vector3(0, 1, 5), 1), Material.Mirror),
-            new Primitive(new Sphere(new Vector3(-1, 1, 2), 0.5f), Material.Glass),
-            new Primitive(new Triangle(new Vector3(-5, 0, 0), new Vector3(5, 0, 0), new Vector3(5, 0, 10), null), Material.GlossyPurpleMirror),
-            new Primitive(new Triangle(new Vector3(-5, 0, 0), new Vector3(5, 0, 10), new Vector3(-5, 0, 10), null), Material.DiffuseYellow),
+            new Primitive(new AxisAlignedBox(new Position3(-10, -5, -10), new Position3(10, 10, 10)) { InwardNormals = true }, ParametricMaterial.WhiteLight),
+            new Primitive(new Sphere(new Position3(-3, 1, 5), 1), ParametricMaterial.DiffuseGreen),
+            new Primitive(new Sphere(new Position3(3, 1, 5), 1), ParametricMaterial.GlossyRed),
+            new Primitive(new Sphere(new Position3(0, 1, 5), 1), ParametricMaterial.Mirror),
+            new Primitive(new Sphere(new Position3(-1, 1, 2), 0.5f), ParametricMaterial.Glass),
+            new Primitive(new Triangle(new Position3(-5, 0, 0), new Position3(5, 0, 0), new Position3(5, 0, 10), null), ParametricMaterial.GlossyPurpleMirror),
+            new Primitive(new Triangle(new Position3(-5, 0, 0), new Position3(5, 0, 10), new Position3(-5, 0, 10), null), ParametricMaterial.DiffuseYellow),
         };
 
         public static List<ISceneObject> DefaultLights => DefaultPrimitives.FindAll(s => (s is IPrimitive p) ? p.Material.IsEmitting : false);

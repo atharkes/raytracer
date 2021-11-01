@@ -1,4 +1,4 @@
-﻿using PathTracer.Spectra;
+﻿using PathTracer.Pathtracing.Spectra;
 
 namespace PathTracer.Pathtracing.SceneDescription.Materials {
     /// <summary> A <see cref="IMaterial"/> that can emit light </summary>

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using PathTracer.Geometry.Positions;
+using System.Collections.Generic;
 
 namespace PathTracer.Pathtracing.Paths {
     /// <summary> An <see cref="IPathSegment"/> for an <see cref="IRay"/> </summary>
@@ -8,11 +9,11 @@ namespace PathTracer.Pathtracing.Paths {
         IPathSegment? IPathSegment.Predecessor => Predecessor;
 
         /// <summary> The distance samples for this <see cref="IRaySegment"/> </summary>
-        IDictionary<double, IPointSegment> Samples { get; }
+        IDictionary<Position1, IPointSegment> Samples { get; }
 
         /// <summary> Add a new distance sample to the <see cref="IRaySegment"/> </summary>
         /// <param name="distance">The distance of the sample</param>
         /// <returns>The <see cref="IPointSegment"/> created for the sample</returns>
-        IPointSegment AddSample(double distance);
+        IPointSegment AddSample(Position1 distance);
     }
 }

@@ -38,8 +38,8 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates {
         }
         public void Add(ISceneObject item) {
             Items.Add(item);
-            BoundingBox.MinCorner = Position3.ComponentMin(BoundingBox.MinCorner, item.BoundingBox.MinCorner);
-            BoundingBox.MaxCorner = Position3.ComponentMax(BoundingBox.MaxCorner, item.BoundingBox.MaxCorner);
+            BoundingBox.MinCorner = Position3.ComponentMax(BoundingBox.MinCorner, item.BoundingBox.MinCorner);
+            BoundingBox.MaxCorner = Position3.ComponentMin(BoundingBox.MaxCorner, item.BoundingBox.MaxCorner);
         }
 
         public void AddRange(IEnumerable<ISceneObject> items) {

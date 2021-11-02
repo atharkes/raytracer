@@ -49,6 +49,7 @@ namespace PathTracer.Geometry.Normals {
         public static Direction3 operator /(Normal3 normal, Position1 position) => (normal as IDirection3) / position;
 
         public static Normal3 Cross(Normal3 left, Normal3 right) => new(Vector3.Cross(left.Vector, right.Vector));
+        public static bool Similar(Normal3 left, Normal3 right) => IDirection3.Similar(left, right);
 
         public override bool Equals(object? obj) => Vector.Equals(obj);
         public bool Equals(Normal3 other) => Vector.Equals(other.Vector);

@@ -1,4 +1,5 @@
-﻿using PathTracer.Geometry.Normals;
+﻿using PathTracer.Geometry.Directions;
+using PathTracer.Geometry.Normals;
 using PathTracer.Geometry.Positions;
 using PathTracer.Pathtracing.Distributions.Direction;
 using PathTracer.Pathtracing.Spectra;
@@ -86,6 +87,15 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials.SurfaceMaterials {
             return new ParametricMaterial(Utils.DetRandom.Next(1, 50), color);
         }
 
+
+        public override ISpectrum Emittance(Position3 position, Normal3 orientation, Normal3 direction) {
+            if (IsEmitting && IDirection3.Opposing(orientation, direction)) {
+                return EmittingLight;
+            } else {
+                return ISpectrum.Black;
+            }
+        }
+
         public override IDirectionDistribution? DirectionDistribution(Normal3 incomingDirection, Position3 position, ISpectrum spectrum) {
             throw new NotImplementedException();
             //Vector3 radianceOut;
@@ -107,6 +117,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials.SurfaceMaterials {
             //    radianceOut = irradianceIn;
             //}
         }
+
 
         /// <summary> The default material is bright green </summary>
         public static ParametricMaterial Default => new(new RGBSpectrum(0f, float.MaxValue, 0f));

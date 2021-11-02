@@ -39,16 +39,9 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates.Accele
         /// <summary> Create an empty BVH node </summary>
         public BVH() : base() { }
 
-        /// <summary> Create a BVH node, splitting into smaller nodes if benificial </summary>
-        /// <param name="primitives">The primitives in the node</param>
-        public BVH(List<ISceneObject> primitives) : base(primitives) {
-            if (primitives.Count == 0) throw new ArgumentException("Don't make an empty BVHNode");
-            TrySplit();
-        }
-
         /// <summary> Create a BVH node, splitting into smaller nodes if beneficial </summary>
-        /// <param name="aggregate">The aabb for the node</param>
-        public BVH(IAggregate aggregate) : base(aggregate.Children) {
+        /// <param name="sceneObjects">The scene objects for the node</param>
+        public BVH(IEnumerable<ISceneObject> sceneObjects) : base(sceneObjects) {
             TrySplit();
         }
 

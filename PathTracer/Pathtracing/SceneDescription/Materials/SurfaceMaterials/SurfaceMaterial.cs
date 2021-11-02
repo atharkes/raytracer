@@ -24,7 +24,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials.SurfaceMaterials {
         public SurfaceMaterial(ISpectrum albedo) : base(albedo) { }
 
         public override IDistanceDistribution? DistanceDistribution(IRay ray, ISpectrum spectrum, IShapeInterval interval) {
-            return new SingleDistanceDistribution(new DistanceMaterial(interval.Entry, this));
+            return new SingleDistanceDistribution(interval.Entry, this, interval);
         }
 
         public override Position3 GetPosition(IRay ray, IShapeInterval interval, Position1 distance) {

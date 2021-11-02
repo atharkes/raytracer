@@ -47,5 +47,6 @@ namespace PathTracer.Geometry.Positions {
         public bool Equals(Position1? other) => Vector.Equals(other?.Vector);
         public override int GetHashCode() => Vector.GetHashCode();
         public int CompareTo(Position1 other) => Vector.CompareTo(other.Vector);
+        public int CompareTo(Position1? other) => Vector.CompareTo(other?.Vector);
     }
 }

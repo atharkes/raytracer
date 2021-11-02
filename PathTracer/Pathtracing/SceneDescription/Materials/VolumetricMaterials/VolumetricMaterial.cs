@@ -16,7 +16,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials.VolumetricMaterials 
 
         public override IDistanceDistribution? DistanceDistribution(IRay ray, ISpectrum spectrum, IShapeInterval interval) {
             if (interval.Exit > 0 && interval.Entry < ray.Length) {
-                return new ExponentialDistanceDistribution(Math.Max(0, interval.Entry), Math.Min(ray.Length, interval.Exit), Density, this);
+                return new ExponentialDistanceDistribution(Math.Max(0, interval.Entry), Math.Min(ray.Length, interval.Exit), Density, this, interval);
             } else {
                 return null;
             }

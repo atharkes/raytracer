@@ -1,7 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using PathTracer.Pathtracing.AccelerationStructures;
-using PathTracer.Pathtracing.AccelerationStructures.BVH;
 using PathTracer.Pathtracing.SceneDescription;
+using PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates.AccelerationStructures.BVH;
 using PathTracer.Utilities;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -9,12 +8,12 @@ using System.Diagnostics;
 namespace UnitTests.Pathtracing.AccelerationStructure.BVH {
     [TestClass]
     public class BVHTreeTest {
-        static BVHTree RandomBVH(int primitiveAmount) {
-            List<Shape> primitives = new List<Shape>(primitiveAmount);
+        static BoundingVolumeHierarchy RandomBVH(int primitiveAmount) {
+            List<ISceneObject> sceneObjects = new(primitiveAmount);
             for (int i = 0; i < primitiveAmount; i++) {
-                primitives.Add(Utils.Random.Primitive(100f, 100f));
+                sceneObjects.Add(Utils.ThreadRandom.Primitive(100f, 100f));
             }
-            return new BVHTree(primitives);
+            return new BoundingVolumeHierarchy(sceneObjects);
         }
 
         [TestMethod]
@@ -26,8 +25,8 @@ namespace UnitTests.Pathtracing.AccelerationStructure.BVH {
         public void NodeCount() {
             const int primitiveCount = 1_000;
             for (int i = 0; i < 10; i++) {
-                BVHTree bvh = RandomBVH(primitiveCount);
-                int nodeCount = CountNodes(bvh.Root);
+                BoundingVolumeHierarchy bvh = RandomBVH(primitiveCount);
+                int nodeCount = CountNodes(bvh);
                 Debug.WriteLine($"Node count in percentage of primitives: {(float)nodeCount / primitiveCount}");
                 Assert.IsTrue(nodeCount <= primitiveCount * 2);
             }

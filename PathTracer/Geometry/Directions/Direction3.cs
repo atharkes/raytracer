@@ -14,9 +14,9 @@ namespace PathTracer.Geometry.Directions {
         /// <summary> The Z-coordinate of the <see cref="IDirection3"/> </summary>
         public Direction1 Z => Vector.Z;
         /// <summary> The length of the <see cref="IDirection3"/> </summary>
-        public Position1 Length => Vector.Length;
+        public Vector1 Length => Vector.Length;
         /// <summary> The squared length of the <see cref="IDirection3"/> </summary>
-        public Position1 LengthSquared => Vector.LengthSquared;
+        public Vector1 LengthSquared => Vector.LengthSquared;
 
         public Direction3(Vector3 vector) {
             Vector = vector;

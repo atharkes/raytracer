@@ -19,7 +19,7 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates {
             Camera = camera;
             Lights = lights;
             Stopwatch timer = Stopwatch.StartNew();
-            Items.Add(new SBVH(primitives));
+            Items.Add(new SpatialBVH(primitives));
             Console.WriteLine(timer.ElapsedMilliseconds + "\t| (S)BVH Building ms");
         }
     }

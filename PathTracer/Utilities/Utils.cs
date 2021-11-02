@@ -1,17 +1,22 @@
-﻿using PathTracer.Geometry.Vectors;
-using PathTracer.Pathtracing.SceneDescription.Shapes;
+﻿using PathTracer.Geometry.Normals;
+using PathTracer.Geometry.Vectors;
+using PathTracer.Pathtracing.SceneDescription;
+using PathTracer.Pathtracing.SceneDescription.Materials.SurfaceMaterials;
+using PathTracer.Pathtracing.SceneDescription.SceneObjects;
+using PathTracer.Pathtracing.SceneDescription.SceneObjects.Primitives;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Planars;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics;
+using PathTracer.Pathtracing.Spectra;
 using System;
 using System.Threading;
 
 namespace PathTracer.Utilities {
     /// <summary> Just some usefull static methods </summary>
     public static class Utils {
-        /// <summary> A deterministic random to generate random scenes which are always the same </summary>
-        public static Random DetRandom { get; } = new Random(0);
-        /// <summary> Random to generate random values </summary>
-        public static Random Random => random ??= new Random(Thread.CurrentThread.ManagedThreadId * (int)DateTime.Today.TimeOfDay.Ticks);
+        /// <summary> A deterministic <see cref="Random"/> to generate random scenes which are always the same </summary>
+        public static Random DeterministicRandom { get; } = new Random(0);
+        /// <summary> The <see cref="Random"/> to use per thread </summary>
+        public static Random ThreadRandom => random ??= new Random(Thread.CurrentThread.ManagedThreadId * (int)DateTime.Today.TimeOfDay.Ticks);
         
         [ThreadStatic] static Random? random;
 
@@ -44,37 +49,72 @@ namespace PathTracer.Utilities {
         /// <summary> Create a random Unit Vector </summary>
         /// <param name="r">The random to create the unit vector with</param>
         /// <returns>A random unit vector</returns>
-        public static Vector3 UnitVector(this Random r) {
+        public static Unit3 UnitVector(this Random r) {
             float a = (float)r.NextDouble();
-            return a < 0.33f ? Vector3.UnitX : (a < 0.66f ? Vector3.UnitY : Vector3.UnitZ);
+            throw new NotImplementedException();
         }
 
-        /// <summary> Create a random Primitive </summary>
-        /// <param name="r">The random to create the primitive with</param>
-        /// <param name="posRange">The range around which the primitive can be</param>
-        /// <param name="scale">The possible scale of the random primitive</param>
+        /// <summary> Create a <paramref name="random"/> <see cref="IPrimitive"/> </summary>
+        /// <param name="random">The random to create the primitive with</param>
         /// <returns>A random primitive</returns>
-        public static Shape Primitive(this Random r, float posRange = 1f, float scale = 1f) {
-            return r.NextDouble() < 0.5f ? r.Sphere(posRange, scale) : r.Triangle(posRange, scale) as Shape;
+        public static IPrimitive Primitive(this Random random, float posRange = 1f, float scale = 1f) {
+            return new Primitive(random.Shape(), random.Material());
         }
 
-        /// <summary> Create a random Triangle </summary>
-        /// <param name="r">The random to create the triangle with</param>
+        /// <summary> Create a <paramref name="random"/> <see cref="IShape"/> </summary>
+        /// <param name="random">The <see cref="Random"/> to create the <see cref="IShape"/> with</param>
+        /// <param name="posRange">The range around which the <see cref="IShape"/> can be</param>
+        /// <param name="scale">The possible scale of the <see cref="IShape"/></param>
+        /// <returns>A <paramref name="random"/> <see cref="IShape"/></returns>
+        public static IShape Shape(this Random random, float posRange = 1f, float scale = 1f) {
+            return random.NextDouble() < 0.5 ? random.CreateSphere(posRange, scale) : random.CreateTriangle(posRange, scale);
+        }
+
+        /// <summary> Create a <paramref name="random"/> <see cref="Triangle"/> </summary>
+        /// <param name="random">The <see cref="Random"/> to create the <see cref="Triangle"/> with</param>
         /// <param name="posRange">The range in which the first point can be</param>
-        /// <param name="scale">The possible scale of the random triangle</param>
-        /// <returns>A random triangle</returns>
-        public static Triangle Triangle(this Random r, float posRange = 1f, float scale = 1f) {
-            Vector3 pos = r.Vector(posRange);
-            return new Triangle(pos, pos + r.Vector(scale), pos + r.Vector(scale));
+        /// <param name="scale">The possible scale of the <see cref="Triangle"/></param>
+        /// <returns>A <paramref name="random"/> <see cref="Triangle"/></returns>
+        public static Triangle CreateTriangle(this Random random, float posRange = 1f, float scale = 1f) {
+            Vector3 pos = random.Vector(posRange);
+            return new Triangle(pos, pos + random.Vector(scale), pos + random.Vector(scale));
         }
 
-        /// <summary> Create a random sphere </summary>
-        /// <param name="r">The random to create the sphere with</param>
-        /// <param name="posRange">The range in which the position of the sphere can be</param>
-        /// <param name="scale">The scale of the random sphere</param>
-        /// <returns>A random sphere</returns>
-        public static Sphere Sphere(this Random r, float posRange = 0f, float scale = 1f) {
-            return new Sphere(r.Vector(posRange), (float)r.NextDouble() * scale);
+        /// <summary> Create a <paramref name="random"/> <see cref="Sphere"/> </summary>
+        /// <param name="random">The <see cref="Random"/> to create the <see cref="Sphere"/> with</param>
+        /// <param name="posRange">The range in which the position of the <see cref="Sphere"/> can be</param>
+        /// <param name="scale">The possible scale of the <see cref="Sphere"/></param>
+        /// <returns>A <paramref name="random"/> <see cref="Sphere"/></returns>
+        public static Sphere CreateSphere(this Random random, float posRange = 0f, float scale = 1f) {
+            return new Sphere(random.Vector(posRange), (float)random.NextDouble() * scale);
+        }
+
+        /// <summary> Create a <paramref name="random"/> <see cref="IMaterial"/> </summary>
+        /// <param name="random">The <see cref="Random"/> to create the <see cref="IMaterial"/></param>
+        /// <returns>A <paramref name="random"/> <see cref="IMaterial"/></returns>
+        public static IMaterial Material(this Random random) {
+            return random.NextDouble() < 0.9995f ? random.RandomNonEmitter() : random.RandomEmitter();
+        }
+
+        /// <summary> Create a <paramref name="random"/> non-emitting <see cref="IMaterial"/> </summary>
+        /// <param name="random">The <see cref="Random"/> to create the non emitter</param>
+        /// <returns>A <paramref name="random"/> non-emitting <see cref="IMaterial"/></returns>
+        public static IMaterial RandomNonEmitter(this Random random) {
+            ISpectrum color = new RGBSpectrum(random.Vector());
+            float specularity = random.NextDouble() < 0.3f ? (float)random.NextDouble() : 0;
+            float dielectric = random.NextDouble() < 0.1f ? (float)random.NextDouble() : 0;
+            float refractionIndex = (float)random.NextDouble() * 2f + 1f;
+            float glossyness = random.NextDouble() < 0.5f ? (float)random.NextDouble() : 0;
+            float glossSpecularity = (float)random.NextDouble() * 10f;
+            return new ParametricMaterial(color, specularity, dielectric, refractionIndex, glossyness, glossSpecularity);
+        }
+
+        /// <summary> Create a random emitting <see cref="IMaterial"/> </summary>
+        /// <param name="random">The <see cref="Random"/> to create the emitter</param>
+        /// <returns>A <paramref name="random"/> emitting <see cref="IMaterial"/></returns>
+        public static IMaterial RandomEmitter(this Random random) {
+            ISpectrum color = new RGBSpectrum(random.Vector());
+            return new ParametricMaterial(random.Next(1, 50), color);
         }
 
         /// <summary> Get a color scale for a value from black to green to yellow to red </summary>

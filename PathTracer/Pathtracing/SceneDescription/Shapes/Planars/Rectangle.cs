@@ -1,16 +1,14 @@
 ﻿using OpenTK.Mathematics;
 using PathTracer.Geometry.Directions;
 using PathTracer.Geometry.Normals;
-using PathTracer.Geometry.Points;
 using PathTracer.Geometry.Positions;
-using PathTracer.Geometry.Vectors;
 using PathTracer.Pathtracing.Rays;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics;
 using System;
 
 namespace PathTracer.Pathtracing.SceneDescription.Shapes.Planars {
     /// <summary> A quad primitive </summary>
-    public class Rectangle : PlanarShape {
+    public struct Rectangle : IPlanarShape {
         /// <summary> The position of the <see cref="Rectangle"/> </summary>
         public Position3 Position { get; set; }
         /// <summary> The size of the <see cref="Rectangle"/> </summary>
@@ -49,11 +47,11 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Planars {
         public float AspectRatio => Width / Height;
 
         /// <summary> The surface area of the <see cref="Rectangle"/> </summary>
-        public override float SurfaceArea => Width * Height;
+        public float SurfaceArea => Width * Height;
         /// <summary> The <see cref="Plane"/> in which the <see cref="Rectangle"/> lies </summary>
-        public override Plane PlaneOfExistence => new(Position, Normal);
+        public Plane PlaneOfExistence => new(Position, Normal);
         /// <summary> The bounding box of the <see cref="Rectangle"/> </summary>
-        public override AxisAlignedBox BoundingBox => new(BottomLeft, BottomRight, TopLeft, TopRight);
+        public AxisAlignedBox BoundingBox => new(BottomLeft, BottomRight, TopLeft, TopRight);
 
         /// <summary> Create a <see cref="Rectangle"/> </summary>
         /// <param name="position">The (center) position of the <see cref="Rectangle"/></param>
@@ -76,42 +74,36 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Planars {
             Rotation = rotation;
         }
 
+        public Position3 SurfacePosition(Position2 uvPosition) => BottomLeft + LeftToRight * uvPosition.X + BottomToTop * uvPosition.Y;
+
         /// <summary> Get a <paramref name="random"/> point on the surface of the <see cref="Rectangle"/> </summary>
         /// <param name="random">The <see cref="Random"/> to decide the position on the surface</param>
         /// <returns>A <paramref name="random"/> point on the surface of the <see cref="Rectangle"/></returns>
-        public override Position3 SurfacePosition(Random random) {
-            throw new NotImplementedException();
-        }
+        public Position3 SurfacePosition(Random random) => throw new NotImplementedException();
 
         /// <summary> Get the UV-position for a specified <paramref name="position"/> </summary>
         /// <param name="position">The surface position for which to get the UV-position</param>
         /// <returns>The UV-position for the <paramref name="position"/></returns>
-        public override Position2 UVPosition(Position3 position) {
+        public Position2 UVPosition(Position3 position) {
             Direction3 relativePosition = position - BottomRight;
             return new Position2(IDirection3.Dot(LeftToRight, relativePosition), IDirection3.Dot(BottomToTop, relativePosition));
-        }
-
-        public Position3 SurfacePosition(Position2 uvPosition) {
-            return BottomLeft + LeftToRight * uvPosition.X + BottomToTop * uvPosition.Y;
         }
 
         /// <summary> Check whether a <paramref name="position"/> is on the surface of the <see cref="Rectangle"/> </summary>
         /// <param name="position">The position to check</param>
         /// <param name="epsilon">The epsilon to specify the precision</param>
         /// <returns>Whether the <paramref name="position"/> is on the surface of the <see cref="Rectangle"/></returns>
-        public override bool OnSurface(Position3 position, float epsilon = 0.001F) {
-            throw new NotImplementedException();
-        }
+        public bool OnSurface(Position3 position, float epsilon = 0.001F) => throw new NotImplementedException();
 
         /// <summary> Get the normal of the <see cref="Rectangle"/> </summary>
         /// <param name="surfacePoint">The surface point to get the normal for</param>
         /// <returns>The normal of the <see cref="Rectangle"/></returns>
-        public override Normal3 SurfaceNormal(Position3 surfacePoint) => Normal;
+        public Normal3 SurfaceNormal(Position3 surfacePoint) => Normal;
 
         /// <summary> Intersect the <see cref="Rectangle"/> with a <paramref name="ray"/> </summary>
         /// <param name="ray">The <see cref="IRay"/> to intersect the <see cref="Rectangle"/> with</param>
         /// <returns>Whether and when the <paramref name="ray"/> intersects the <see cref="Rectangle"/></returns>
-        public override Position1? IntersectDistance(IRay ray) {
+        public Position1? IntersectDistance(IRay ray) {
             Position1? planeDistance = PlaneOfExistence.IntersectDistance(ray);
             if (!planeDistance.HasValue) {
                 return null;

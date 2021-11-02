@@ -1,27 +1,30 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using OpenTK.Mathematics;
-using PathTracer.Pathtracing.SceneDescription.SceneObjects.Primitives;
-using PathTracer.Pathtracing.SceneDescription.Shapes;
+using PathTracer.Pathtracing.SceneDescription;
+using PathTracer.Pathtracing.SceneDescription.SceneObjects;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Planars;
+using PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics;
 using PathTracer.Utilities;
+using System.Collections.Generic;
 
 namespace UnitTests.Pathtracing.SceneObjects {
     [TestClass]
     public class PrimitiveTest {
         [TestMethod]
         public void Constructor() {
-            Shape primitive = Utils.Random.Primitive();
+            Utils.ThreadRandom.Primitive();
         }
 
         [TestMethod]
         public void Clip() {
             for (int i = 0; i < 100; i++) {
-                Shape primitive = Utils.Random.Sphere();
-                Vector3[] bounds = primitive.Bounds;
-                AxisAlignedPlane plane = new AxisAlignedPlane(Utils.Random.UnitVector(), primitive.Position);
-                PrimitiveFragment fragment = primitive.Clip(plane);
-                Vector3[] clipBounds = fragment.Bounds;
-                Assert.IsTrue(bounds[0] != clipBounds[0] || bounds[1] != clipBounds[1]);
+                IPrimitive primitive = Utils.ThreadRandom.Primitive();
+                AxisAlignedBox bounds = primitive.BoundingBox;
+                AxisAlignedPlane plane = new(Utils.ThreadRandom.UnitVector(), primitive.Position);
+                IEnumerable<ISceneObject> fragments = (primitive as IDivisible<ISceneObject>).Clip(plane);
+                foreach (ISceneObject fragment in fragments) {
+                    AxisAlignedBox clipBounds = fragment.BoundingBox;
+                    Assert.IsTrue(bounds != clipBounds);
+                }
             }
         }
     }

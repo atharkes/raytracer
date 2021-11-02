@@ -35,8 +35,8 @@ namespace PathTracer.Pathtracing.Integrators {
 
         void TraceRays(IScene scene, int count) {
             for (int i = 0; i < count; i++) {
-                Position2 position = new((float)Utils.Random.NextDouble(), (float)Utils.Random.NextDouble());
-                Direction2 direction = new((float)Utils.Random.NextDouble(), (float)Utils.Random.NextDouble());
+                Position2 position = new((float)Utils.ThreadRandom.NextDouble(), (float)Utils.ThreadRandom.NextDouble());
+                Direction2 direction = new((float)Utils.ThreadRandom.NextDouble(), (float)Utils.ThreadRandom.NextDouble());
                 CameraRay ray = scene.Camera.GetCameraRay(position, direction);
                 ISpectrum light = Sample(scene, ray, ISpectrum.White, 0);
                 ISample sample = new Sample() { Position = position, Direction = direction, Light = light, Intersection = ray.Intersection, PrimaryBVHTraversals = ray.BVHTraversals };
@@ -54,20 +54,20 @@ namespace PathTracer.Pathtracing.Integrators {
             /// Sample Distance
             IDistanceDistribution? distances = scene.Trace(ray, spectrum);
             if (distances is null) return ISpectrum.Black;
-            Position1 distance = distances.Sample(Utils.Random);
+            Position1 distance = distances.Sample(Utils.ThreadRandom);
             if (distance == Position1.PositiveInfinity) return ISpectrum.Black;
             float distancePdf = (float)distances.Probability(distance);
 
             /// Sample Material
             IPDF<IMaterial>? materials = distances.GetMaterials(distance);
             if (materials is null) throw new InvalidOperationException("Distance was sampled but no material was found");
-            IMaterial material = materials.Sample(Utils.Random);
+            IMaterial material = materials.Sample(Utils.ThreadRandom);
             float materialPdf = (float)materials.Probability(material);
 
             /// Sample Shape Interval
             IPDF<IShapeInterval>? intervals = distances.GetShapeIntervals(distance, material);
             if (intervals is null) throw new InvalidOperationException("Distance was sampled but no shape interval was found");
-            IShapeInterval interval = intervals.Sample(Utils.Random);
+            IShapeInterval interval = intervals.Sample(Utils.ThreadRandom);
             float intervalPdf = (float)intervals.Probability(interval);
 
             /// Get Intersection Position
@@ -75,7 +75,7 @@ namespace PathTracer.Pathtracing.Integrators {
 
             /// Sample Material Orientation
             IPDF<Normal3> orientations = material.GetOrientationDistribution(ray, interval.Shape, position);
-            Normal3 orientation = orientations.Sample(Utils.Random);
+            Normal3 orientation = orientations.Sample(Utils.ThreadRandom);
             float orientationPdf = (float)orientations.Probability(orientation);
 
             /// Get Direct Illumination
@@ -84,8 +84,11 @@ namespace PathTracer.Pathtracing.Integrators {
             /// Sample Direction
             IDirectionDistribution? directions = material.DirectionDistribution(ray.Direction, position, spectrum);
             if (directions is null) return ISpectrum.Black;
-            Normal3 direction = directions.Sample(Utils.Random);
+            Normal3 direction = directions.Sample(Utils.ThreadRandom);
             float directionPdf = (float)directions.Probability(direction);
+
+            /// Get Absorption
+            ISpectrum absorption = material.Albedo;
 
             /// Area Conversion
             float areaConversion = Math.Abs(Vector3.Dot(orientation.Vector, direction.Vector));
@@ -93,8 +96,8 @@ namespace PathTracer.Pathtracing.Integrators {
             /// Sample Indirect Illumination
             ISpectrum indirectIllumination = Sample(scene, new Ray(position, direction), spectrum * material.Albedo, recursionDepth + 1);
 
-            /// Light Throughput Calculation (Dot product?)
-            return (indirectIllumination * areaConversion * material.Albedo * directionPdf * orientationPdf + directIllumination) * intervalPdf * materialPdf * distancePdf;
+            /// Light Throughput Calculation
+            return (indirectIllumination * areaConversion * absorption * directionPdf * orientationPdf + directIllumination) * intervalPdf * materialPdf * distancePdf;
         }
     }
 }

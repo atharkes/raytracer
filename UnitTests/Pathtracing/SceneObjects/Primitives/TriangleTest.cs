@@ -10,9 +10,9 @@ namespace UnitTests.Pathtracing.SceneObjects.Primitives {
     public class TriangleTest {
         [TestMethod]
         public void Constructor() {
-            Vector3 P1 = Utils.Random.Vector();
-            Vector3 P2 = Utils.Random.Vector();
-            Vector3 P3 = Utils.Random.Vector();
+            Vector3 P1 = Utils.ThreadRandom.Vector();
+            Vector3 P2 = Utils.ThreadRandom.Vector();
+            Vector3 P3 = Utils.ThreadRandom.Vector();
             Triangle triangle = new Triangle(P1, P2, P3);
             Assert.AreEqual(P1, triangle.P1);
             Assert.AreEqual(P2, triangle.P2);
@@ -23,7 +23,7 @@ namespace UnitTests.Pathtracing.SceneObjects.Primitives {
         public void GetClippedPoints_NoneClipped() {
             AxisAlignedPlane plane = new AxisAlignedPlane(new Vector3(0, 0, 1), Vector3.Zero);
             for (int i = 0; i < 100; i++) {
-                Triangle triangle = Utils.Random.Triangle(0f, 1f);
+                Triangle triangle = Utils.ThreadRandom.CreateTriangle(0f, 1f);
                 Vector3[] points = triangle.GetClippedPoints(plane);
                 Assert.AreEqual(points.Length, 3);
                 Assert.AreEqual(points[0], triangle.P1);
@@ -72,7 +72,7 @@ namespace UnitTests.Pathtracing.SceneObjects.Primitives {
         public void GetClippedPoints_AllClipped() {
             AxisAlignedPlane plane = new AxisAlignedPlane(new Vector3(0, 0, -1), Vector3.Zero);
             for (int i = 0; i < 100; i++) {
-                Triangle triangle = Utils.Random.Triangle(0f, 1f);
+                Triangle triangle = Utils.ThreadRandom.CreateTriangle(0f, 1f);
                 Vector3[] points = triangle.GetClippedPoints(plane);
                 Assert.AreEqual(points.Length, 0);
             }

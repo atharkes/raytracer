@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using PathTracer.Pathtracing.AccelerationStructures;
-using PathTracer.Pathtracing.AccelerationStructures.BVH;
 using PathTracer.Pathtracing.SceneDescription;
+using PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates.AccelerationStructures.BVH;
+using PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates.AccelerationStructures.SBVH;
 using PathTracer.Utilities;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -9,12 +9,12 @@ using System.Diagnostics;
 namespace UnitTests.Pathtracing.AccelerationStructure.SBVH {
     [TestClass]
     public class SBVHTreeTest {
-        static SBVHTree RandomSBVH(int primitiveAmount) {
-            List<Shape> primitives = new List<Shape>(primitiveAmount);
+        static SpatialBVH RandomSBVH(int primitiveAmount) {
+            List<ISceneObject> sceneObjects = new(primitiveAmount);
             for (int i = 0; i < primitiveAmount; i++) {
-                primitives.Add(Utils.Random.Primitive(100f, 100f));
+                sceneObjects.Add(Utils.ThreadRandom.Primitive(100f, 100f));
             }
-            return new SBVHTree(primitives);
+            return new SpatialBVH(sceneObjects);
         }
 
         [TestMethod]
@@ -26,8 +26,8 @@ namespace UnitTests.Pathtracing.AccelerationStructure.SBVH {
         public void NodeCount() {
             const int primitiveCount = 1_000;
             for (int i = 0; i < 10; i++) {
-                SBVHTree bvh = RandomSBVH(primitiveCount);
-                int nodeCount = CountNodes(bvh.Root);
+                SpatialBVH sbvh = RandomSBVH(primitiveCount);
+                int nodeCount = CountNodes(sbvh);
                 Debug.WriteLine($"Node count in percentage of primitives: {(float)nodeCount / primitiveCount}");
                 Assert.IsTrue(nodeCount <= primitiveCount * 4);
             }

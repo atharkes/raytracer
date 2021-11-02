@@ -11,7 +11,7 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates.Accele
     /// - Refitting (enable animation/movement, adding and removing primitives)
     /// - Top-level BHV's for static and non-static parts
     /// </summary>
-    public class BVH : AccelerationStructure, IBinaryTree {
+    public class BoundingVolumeHierarchy : AccelerationStructure, IBinaryTree {
         /// <summary> The estimated cost of traversing the BVH for the SAH </summary>
         public const float TraversalCost = 1f;
         /// <summary> The estimated cost of intersecting a primitive for the SAH </summary>
@@ -26,10 +26,10 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates.Accele
         public static float SurfaceAreaHeuristic(int itemCount, float surfaceArea) => TraversalCost + IntersectionCost * itemCount * surfaceArea;
 
         /// <summary> The left child node if it has one </summary>
-        public BVH? Left { get; protected set; }
+        public BoundingVolumeHierarchy? Left { get; protected set; }
         IBinaryTree? IBinaryTree.Left => Left;
         /// <summary> The right child node if it has one </summary>
-        public BVH? Right { get; protected set; }
+        public BoundingVolumeHierarchy? Right { get; protected set; }
         IBinaryTree? IBinaryTree.Right => Right;
         /// <summary> Whether this node is a leaf or not </summary>
         public bool Leaf => Left == null || Right == null;
@@ -37,11 +37,11 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates.Accele
         public Normal3 SplitDirection { get; protected set; }
 
         /// <summary> Create an empty BVH node </summary>
-        public BVH() : base() { }
+        public BoundingVolumeHierarchy() : base() { }
 
         /// <summary> Create a BVH node, splitting into smaller nodes if beneficial </summary>
         /// <param name="sceneObjects">The scene objects for the node</param>
-        public BVH(IEnumerable<ISceneObject> sceneObjects) : base(sceneObjects) {
+        public BoundingVolumeHierarchy(IEnumerable<ISceneObject> sceneObjects) : base(sceneObjects) {
             TrySplit();
         }
 
@@ -55,8 +55,8 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates.Accele
         /// <summary> Split this node </summary>
         /// <param name="split">The split to split this node with</param>
         protected virtual void Split(Split split) {
-            Left = new BVH(split.Left);
-            Right = new BVH(split.Right);
+            Left = new BoundingVolumeHierarchy(split.Left);
+            Right = new BoundingVolumeHierarchy(split.Right);
             SplitDirection = split.Direction;
             Items = new HashSet<ISceneObject>() { Left, Right };
         }

@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 namespace PathTracer.Pathtracing.SceneDescription.Shapes.Planars {
     /// <summary> A <see cref="Triangle"/> <see cref="Shape"/> </summary>
-    public class Triangle : PlanarShape {
+    public struct Triangle : IPlanarShape {
         /// <summary> Epsilon used for the Möller–Trumbore triangle intersection </summary>
         public const float IntersectionEpsilon = 0.0000001f;
 
@@ -28,11 +28,11 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Planars {
         public Direction3 P1toP3 => P3 - P1;
 
         /// <summary> The surface area of the <see cref="Triangle"/> </summary>
-        public override float SurfaceArea => Vector3.Cross(P2.Vector - P1.Vector, P3.Vector - P1.Vector).Length * 0.5f;
+        public float SurfaceArea => Vector3.Cross(P2.Vector - P1.Vector, P3.Vector - P1.Vector).Length * 0.5f;
         /// <summary> The <see cref="Plane"/> in which the <see cref="Triangle"/> lies </summary>
-        public override Plane PlaneOfExistence => new(P1, Normal);
+        public Plane PlaneOfExistence => new(P1, Normal);
         /// <summary> The bounding box of the <see cref="Triangle"/> </summary>
-        public override AxisAlignedBox BoundingBox => new(P1, P2, P3);
+        public AxisAlignedBox BoundingBox => new(P1, P2, P3);
 
         /// <summary> Create a new <see cref="Triangle"/></summary>
         /// <param name="p1">The first point of the <see cref="Triangle"/></param>
@@ -44,13 +44,13 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Planars {
             P1 = p1;
             P2 = p2;
             P3 = p3;
-            Normal = normal ?? Normal3.Cross(P1toP2.Normalized(), P1toP3.Normalized());
+            Normal = normal ?? Normal3.Cross((P2 - P1).Normalized(), (P3 - P1).Normalized());
         }
 
         /// <summary> Get a <paramref name="random"/> point on the surface of the <see cref="Triangle"/> </summary>
         /// <param name="random">The <see cref="Random"/> to decide the position on the surface</param>
         /// <returns>A <paramref name="random"/> point on the surface of the <see cref="Triangle"/></returns>
-        public override Position3 SurfacePosition(Random random) {
+        public Position3 SurfacePosition(Random random) {
             float r1 = (float)random.NextDouble();
             float r2 = (float)random.NextDouble();
             if (r1 + r2 > 1) {
@@ -63,28 +63,24 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Planars {
         /// <summary> Get the UV-position for a specified <paramref name="position"/> </summary>
         /// <param name="position">The surface position for which to get the UV-position</param>
         /// <returns>The UV-position for the <paramref name="position"/></returns>
-        public override Position2 UVPosition(Position3 position) {
-            throw new NotImplementedException();
-        }
+        public Position2 UVPosition(Position3 position) => throw new NotImplementedException();
 
         /// <summary> Check whether a <paramref name="position"/> is on the surface of the <see cref="Triangle"/> </summary>
         /// <param name="position">The position to check</param>
         /// <param name="epsilon">The epsilon to specify the precision</param>
         /// <returns>Whether the <paramref name="position"/> is on the surface of the <see cref="Triangle"/></returns>
-        public override bool OnSurface(Position3 position, float epsilon = 0.001F) {
-            throw new NotImplementedException();
-        }
+        public bool OnSurface(Position3 position, float epsilon = 0.001F) => throw new NotImplementedException();
 
         /// <summary> Get the normal of the <see cref="Triangle"/> </summary>
         /// <param name="surfacePoint">The surface point to get the normal for</param>
         /// <returns>The normal of the <see cref="Triangle"/></returns>
-        public override Normal3 SurfaceNormal(Position3 surfacePoint) => Normal;
+        public Normal3 SurfaceNormal(Position3 surfacePoint) => Normal;
 
         /// <summary> Intersect the <see cref="Triangle"/> with a <paramref name="ray"/>.
         /// Using Möller–Trumbore's triangle intersection. </summary>
         /// <param name="ray">The <see cref="IRay"/> to intersect the <see cref="Triangle"/> with</param>
         /// <returns>Whether and when the <paramref name="ray"/> intersects the <see cref="Triangle"/></returns>
-        public override Position1? IntersectDistance(IRay ray) {
+        public Position1? IntersectDistance(IRay ray) {
             // Begin calculating determinant - also used to calculate u parameter
             Vector3 P = Vector3.Cross(ray.Direction.Vector, P1toP3.Vector);
             // If determinant is near zero, ray lies in plane of triangle

@@ -65,12 +65,28 @@ namespace PathTracer.Geometry.Vectors {
         public static Vector1 ComponentMax(Vector1 left, Vector1 right) => Math.Max(left.Value, right.Value);
         public static Vector1 Abs(Vector1 vector) => Math.Abs(vector.Value);
 
+        
         public override bool Equals(object? obj) => Value.Equals(obj);
-        public bool Equals(Vector1 other) => Value.Equals(other.Value);
+        
         public bool Equals(Vector1? other) => Value.Equals(other?.Value);
+        public bool Equals(Vector1 other) => Value.Equals(other.Value);
+        public bool Equals(Vector1 other, Vector1 epsilon) {
+            Vector1 absA = Abs(this);
+            Vector1 absB = Abs(other);
+            Vector1 diff = Abs(this - other);
+            if (Equals(other)) { // shortcut, handles infinities
+                return true;
+            } else if (Equals(Zero) || other.Equals(Zero) || absA + absB < Epsilon) {
+                // a or b is zero or both are extremely close to it
+                // relative error is less meaningful here
+                return diff < (epsilon * Epsilon);
+            } else { // use relative error
+                return diff / (absA + absB) < epsilon;
+            }
+        }
         public override int GetHashCode() => Value.GetHashCode();
-        public int CompareTo(Vector1 other) => Value.CompareTo(other.Value);
         public int CompareTo(Vector1? other) => Value.CompareTo(other?.Value);
+        public int CompareTo(Vector1 other) => Value.CompareTo(other.Value);
 
         public Vector1 Normalized() {
             Debug.Assert(Length != 0);

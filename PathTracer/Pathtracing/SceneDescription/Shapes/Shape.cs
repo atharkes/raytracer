@@ -102,7 +102,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes {
         /// <returns>The clipped <see cref="Shape"/>s</returns>
         public virtual IEnumerable<IShape> Clip(AxisAlignedPlane plane) {
             foreach (AxisAlignedBox clippedAABB in BoundingBox.Clip(plane)) {
-                if (clippedAABB == BoundingBox) {
+                if (clippedAABB.Equals(BoundingBox)) {
                     yield return this;
                 } else {
                     yield return new ClippedShape(this, clippedAABB);

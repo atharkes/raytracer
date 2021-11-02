@@ -38,8 +38,9 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates {
         }
         public void Add(ISceneObject item) {
             Items.Add(item);
-            BoundingBox.MinCorner = Position3.ComponentMax(BoundingBox.MinCorner, item.BoundingBox.MinCorner);
-            BoundingBox.MaxCorner = Position3.ComponentMin(BoundingBox.MaxCorner, item.BoundingBox.MaxCorner);
+            Position3 minCorner = Position3.ComponentMax(BoundingBox.MinCorner, item.BoundingBox.MinCorner);
+            Position3 maxCorner = Position3.ComponentMin(BoundingBox.MaxCorner, item.BoundingBox.MaxCorner);
+            BoundingBox = new(minCorner, maxCorner);
         }
 
         public void AddRange(IEnumerable<ISceneObject> items) {
@@ -62,11 +63,11 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates {
         public IEnumerator<ISceneObject> GetEnumerator() => Items.GetEnumerator();
 
         public virtual bool Intersects(IRay ray) {
-            return BoundingBox.Intersects(ray) && Items.Any(c => c.Intersects(ray));
+            return (BoundingBox as IShape).Intersects(ray) && Items.Any(c => c.Intersects(ray));
         }
 
         public virtual IEnumerable<Position1> IntersectDistances(IRay ray) {
-            if (BoundingBox.Intersects(ray)) {
+            if ((BoundingBox as IShape).Intersects(ray)) {
                 foreach (ISceneObject item in Items) {
                     foreach (Position1 distance in item.IntersectDistances(ray)) {
                         yield return distance;

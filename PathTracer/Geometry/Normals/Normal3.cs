@@ -5,6 +5,11 @@ using System;
 using System.Diagnostics;
 
 namespace PathTracer.Geometry.Normals {
+    /// <summary> The unit vectors </summary>
+    public enum Unit3 {
+        X, Y, Z, MinX, MinY, MinZ
+    }
+
     /// <summary> A 3-dimesional normalized direction vector </summary>
     public struct Normal3 : IDirection3, IEquatable<Normal3> {
         /// <summary> The unit vector in the X direction </summary>
@@ -23,6 +28,18 @@ namespace PathTracer.Geometry.Normals {
         public Direction1 Y => Vector.Y;
         /// <summary> The Z-coordinate of the <see cref="IDirection3"/> </summary>
         public Direction1 Z => Vector.Z;
+
+        public Normal3(Unit3 unit) {
+            Vector = unit switch {
+                Unit3.X => Vector3.UnitX,
+                Unit3.Y => Vector3.UnitY,
+                Unit3.Z => Vector3.UnitZ,
+                Unit3.MinX => -Vector3.UnitX,
+                Unit3.MinY => -Vector3.UnitY,
+                Unit3.MinZ => -Vector3.UnitZ,
+                _ => throw new NotImplementedException("Not a valid unit vector"),
+            };
+        }
 
         public Normal3(Vector3 vector) {
             Debug.Assert(vector.Length != 0, "Normal vector cannot have a length of 0");

@@ -1,6 +1,15 @@
-﻿using PathTracer.Geometry.Normals;
+﻿using PathTracer.Geometry.Directions;
+using PathTracer.Geometry.Normals;
 using PathTracer.Geometry.Positions;
+using PathTracer.Pathtracing.Distributions.Boundaries;
+using PathTracer.Pathtracing.Rays;
+using PathTracer.Pathtracing.SceneDescription.Shapes;
+using PathTracer.Pathtracing.SceneDescription.Shapes.Planars;
+using PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics;
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 
 namespace PathTracer.Pathtracing.SceneDescription {
     /// <summary> An interface that defines a shape </summary>
@@ -47,5 +56,43 @@ namespace PathTracer.Pathtracing.SceneDescription {
         /// <param name="position">The position to get the outwards direction from</param>
         /// <returns>The outwards direction at the specified <paramref name="position"/></returns>
         Normal3 OutwardsDirection(Position3 position);
+
+        /// <summary> Intersect the <see cref="IShape"/> with a <paramref name="ray"/> </summary>
+        /// <param name="ray">The <see cref="IRay"/> to intersect the <see cref="IShape"/></param>
+        /// <returns>The collection of intersections with the <see cref="IShape"/>, if there are any</returns>
+        IBoundaryCollection? IIntersectable.Intersect(IRay ray) {
+            IEnumerable<Position1> distances = IntersectDistances(ray);
+            if (distances.Any()) {
+                SortedSet<IShapeInterval> intervals = new();
+                Queue<Position1> entries = new();
+                foreach (Position1 distance in distances.OrderBy(d => d)) {
+                    Position3 position = IntersectPosition(ray, distance);
+                    bool enters = (SurfaceNormal(position) as IDirection3).SimilarAs(ray.Direction);
+                    if (enters) {
+                        entries.Enqueue(distance);
+                    } else {
+                        Debug.Assert(entries.Count > 0, "Boundary intersection is invalid (More exits than entries). Warning: Geometry might be degenerate.");
+                        intervals.Add(new ShapeInterval(this, entries.Dequeue(), distance));
+                    }
+                }
+                Debug.Assert(entries.Count == 0, "Boundary intersection is invalid (More entries than exits). Warning: Geometry might be degenerate.");
+                return new BoundaryCollection(intervals);
+            } else {
+                return null;
+            }
+        }
+
+        /// <summary> Clip the <see cref="IShape"/> by a <paramref name="plane"/> </summary>
+        /// <param name="plane">The <see cref="AxisAlignedPlane"/> to clip the <see cref="IShape"/> with</param>
+        /// <returns>The clipped <see cref="IShape"/>s</returns>
+        IEnumerable<IShape> IDivisible<IShape>.Clip(AxisAlignedPlane plane) {
+            foreach (AxisAlignedBox clippedAABB in BoundingBox.Clip(plane)) {
+                if (clippedAABB.Equals(BoundingBox)) {
+                    yield return this;
+                } else {
+                    yield return new ClippedShape(this, clippedAABB);
+                }
+            }
+        }
     }
 }

@@ -13,7 +13,7 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates.Accele
     /// - Implement Triangle and/or Polygon clipping to decrease AABB sizes
     /// - Use alpha to reduce memory footprint
     /// </summary>
-    public class SBVH : BVH.BVH {
+    public class SpatialBVH : BoundingVolumeHierarchy {
         /// <summary> Alpha blends between a regular BVH without any duplication (α = 1) and a full SBVH (α = 0). 
         /// A high alpha reduces the memory footprint of the SBVH due to a lower amount of fragments created. </summary>
         public const float Alpha = 0.00001f;
@@ -22,11 +22,11 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates.Accele
 
         /// <summary> Create a SBVH node, splitting into smaller nodes if beneficial </summary>
         /// <param name="primitives">The primitives in the node</param>
-        public SBVH(List<ISceneObject> primitives) : base(primitives) { }
+        public SpatialBVH(List<ISceneObject> primitives) : base(primitives) { }
 
         /// <summary> Create a SBVH node, splitting into smaller nodes if beneficial </summary>
         /// <param name="aggregate">The AABB to add to the node</param>
-        public SBVH(IAggregate aggregate) : base(aggregate) { }
+        public SpatialBVH(IAggregate aggregate) : base(aggregate) { }
 
         /// <summary> The SBVH thinks it can get a better split </summary>
         /// <returns>A better or equal split than the normal BVH would</returns>
@@ -52,8 +52,8 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates.Accele
         /// <summary> Split this node </summary>
         /// <param name="split">The split to split this node with</param>
         protected override void Split(Split split) {
-            Left = new SBVH(split.Left);
-            Right = new SBVH(split.Right);
+            Left = new SpatialBVH(split.Left);
+            Right = new SpatialBVH(split.Right);
             SplitDirection = split.Direction;
             Items = new HashSet<ISceneObject>() { Left, Right };
         }

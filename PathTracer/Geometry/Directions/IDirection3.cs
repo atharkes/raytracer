@@ -30,7 +30,7 @@ namespace PathTracer.Geometry.Directions {
         public static Direction3 operator /(IDirection3 direction, Position3 scale) => direction.Vector / scale.Vector;
 
         public static Vector1 Dot(IDirection3 left, IDirection3 right) => Vector3.Dot(left.Vector, right.Vector);
-        public static bool Similar(IDirection3 left, IDirection3 right) => Dot(left, right) > 0;
+        public static bool Similar(IDirection3 left, IDirection3 right) => Dot(left, right) >= 0;
         public static bool Opposing(IDirection3 left, IDirection3 right) => Dot(left, right) < 0;
         public static Direction3 Abs(IDirection3 direction) => Vector3.Abs(direction.Vector);
 

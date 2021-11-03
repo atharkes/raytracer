@@ -1,6 +1,7 @@
 ﻿using PathTracer.Geometry.Directions;
 using PathTracer.Geometry.Normals;
 using PathTracer.Geometry.Vectors;
+using PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics;
 using System;
 using System.Collections.Generic;
 using System.Linq;

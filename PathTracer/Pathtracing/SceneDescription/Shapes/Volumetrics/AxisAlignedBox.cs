@@ -11,22 +11,18 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics {
     public struct AxisAlignedBox : IVolumetricShape, IEquatable<AxisAlignedBox> {
         /// <summary> The bounds of the <see cref="AxisAlignedBox"/> </summary>
         public Position3[] Bounds { get; }
-        /// <summary> Whether the normals of the <see cref="AxisAlignedBox"/> are pointing inwards or outwards </summary>
-        public bool InwardNormals { get; set; }
-
         /// <summary> The minimum bound of the <see cref="AxisAlignedBox"/> </summary>
-        public Position3 MinCorner { get => Bounds[0]; set => Bounds[0] = value; }
+        public Position3 MinCorner => Bounds[0];
         /// <summary> The maximum bound of the <see cref="AxisAlignedBox"/> </summary>
-        public Position3 MaxCorner { get => Bounds[1]; set => Bounds[1] = value; }
+        public Position3 MaxCorner => Bounds[1];
         /// <summary> The size of the <see cref="AxisAlignedBox"/> </summary>
         public IDirection3 Size => MaxCorner - MinCorner;
         /// <summary> The center of the <see cref="AxisAlignedBox"/> </summary>
         public Position3 Center => MinCorner + Size / 2;
-
-        /// <summary> The volume of the <see cref="AxisAlignedBox"/> </summary>
-        public float Volume => Size.X * Size.Y * Size.Z;
         /// <summary> The surface area of the <see cref="AxisAlignedBox"/> </summary>
         public float SurfaceArea => (Size.X * Size.Y + Size.Y * Size.Z + Size.X * Size.Z) * 2;
+        /// <summary> The volume of the <see cref="AxisAlignedBox"/> </summary>
+        public float Volume => Size.X * Size.Y * Size.Z;
         /// <summary> The bounding box of the <see cref="AxisAlignedBox"/> </summary>
         public AxisAlignedBox BoundingBox => this;
 
@@ -37,7 +33,6 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics {
             Position3 minCorner = Position3.ComponentMin(corner1, corner2);
             Position3 maxCorner = Position3.ComponentMax(corner1, corner2);
             Bounds = new Position3[] { minCorner, maxCorner };
-            InwardNormals = false;
         }
 
         /// <summary> Create an <see cref="AxisAlignedBox"/> that encompasses <paramref name="positions"/> </summary>
@@ -50,7 +45,6 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics {
                 maxCorner = Position3.ComponentMax(maxCorner, position);
             }
             Bounds = new Position3[] { minCorner, maxCorner };
-            InwardNormals = false;
         }
 
         /// <summary> Check whether <paramref name="left"/> equals <paramref name="right"/> </summary>
@@ -95,6 +89,11 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics {
         /// <returns>Whether the <paramref name="position"/> is on the surface of the <see cref="AxisAlignedBox"/></returns>
         public bool OnSurface(Position3 position, float epsilon = 0.001F) => throw new NotImplementedException();
 
+        /// <summary> Get the outwards direction for a specified <paramref name="position"/> </summary>
+        /// <param name="position">The position to get the outwards direction from</param>
+        /// <returns>The outwards direction at the specified <paramref name="position"/></returns>
+        public Normal3 OutwardsDirection(Position3 position) => SurfaceNormal(position);
+
         /// <summary> Get the normal of the <see cref="AxisAlignedBox"/> at a specified <paramref name="position"/> </summary>
         /// <param name="position">The surface position to get the normal for</param>
         /// <returns>The normal at the specified <paramref name="position"/></returns>
@@ -111,18 +110,13 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics {
             } else {
                 normal = direction.Z > 0f ? Normal3.UnitZ : -Normal3.UnitZ;
             }
-            return InwardNormals ? -normal : normal;
+            return normal;
         }
-
-        /// <summary> Get the outwards direction for a specified <paramref name="position"/> </summary>
-        /// <param name="position">The position to get the outwards direction from</param>
-        /// <returns>The outwards direction at the specified <paramref name="position"/></returns>
-        public Normal3 OutwardsDirection(Position3 position) => SurfaceNormal(position);
 
         /// <summary> Intersect the <see cref="AxisAlignedBox"/> by a <paramref name="ray"/>.
         /// Using Amy Williams's "An Efficient and Robust Ray–Box Intersection" Algorithm </summary>
-        /// <param name="ray">The <see cref="Ray"/> to intersect the <see cref="AxisAlignedBox"/> with</param>
-        /// <returns>Whether and when the <see cref="Ray"/> intersects the <see cref="AxisAlignedBox"/></returns>
+        /// <param name="ray">The <see cref="Ray"/> to intersect the <see cref="IAxisAlignedBox"/> with</param>
+        /// <returns>Whether and when the <see cref="Ray"/> intersects the <see cref="IAxisAlignedBox"/></returns>
         public IEnumerable<Position1> IntersectDistances(IRay ray) {
             Position1 tmin = (Bounds[ray.Sign.X].X - ray.Origin.X) * ray.InvDirection.X;
             Position1 tmax = (Bounds[1 - ray.Sign.X].X - ray.Origin.X) * ray.InvDirection.X;

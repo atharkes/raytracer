@@ -8,7 +8,9 @@ using System;
 
 namespace PathTracer.Pathtracing.SceneDescription.Materials.SurfaceMaterials {
     /// <summary> A material class for primitives in the scene </summary>
-    public class ParametricMaterial : SurfaceMaterial {
+    public class ParametricMaterial : ISurfaceMaterial {
+        /// <summary> The color of the <see cref="ParametricMaterial"/> </summary>
+        public ISpectrum Albedo { get; set; }
         /// <summary> How specular this primitive is. A specular object reflects light like a mirror. </summary>
         public float Specularity { get; set; } = 0f;
         /// <summary> How dielectric this primitive is. A dielectric object both passes light and reflects it like water or glass. </summary>
@@ -30,9 +32,9 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials.SurfaceMaterials {
         /// <summary> The light this material is emitting </summary>
         public ISpectrum EmittingLight => Albedo * EmittingStrength;
         /// <summary> Whether this material is emitting light </summary>
-        public override bool IsEmitting => EmittingStrength > 0f;
+        public bool IsEmitting => EmittingStrength > 0f;
         /// <summary> This material is not sensing light </summary>
-        public override bool IsSensing => false;
+        public bool IsSensing => false;
 
         /// <summary> Create a diffuse white material </summary>
         public static ParametricMaterial DiffuseWhite => new(new RGBSpectrum(0.8f, 0.8f, 0.8f));
@@ -60,7 +62,8 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials.SurfaceMaterials {
         /// <param name="refractionIndex">The refraction index of the material if it is a dielectric. This is typically a value between 1 and 3.</param>
         /// <param name="glossyness">The glossyness of the material</param>
         /// <param name="glossSpecularity">The gloss specularity of the material</param>
-        public ParametricMaterial(ISpectrum color, float specularity = 0, float dielectric = 0, float refractionIndex = 1, float glossyness = 0, float glossSpecularity = 0) : base(color) {
+        public ParametricMaterial(ISpectrum color, float specularity = 0, float dielectric = 0, float refractionIndex = 1, float glossyness = 0, float glossSpecularity = 0) {
+            Albedo = color;
             Specularity = specularity;
             Dielectric = dielectric;
             RefractionIndex = refractionIndex;
@@ -71,12 +74,12 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials.SurfaceMaterials {
         /// <summary> Create an emitting material </summary>
         /// <param name="color">The color of the material and the light</param>
         /// <param name="emittingStrength">The emitting strength of the light</param>
-        public ParametricMaterial(float emittingStrength, ISpectrum color) : base(color) {
+        public ParametricMaterial(float emittingStrength, ISpectrum color) {
             EmittingStrength = emittingStrength;
             Albedo = color;
         }
 
-        public override ISpectrum Emittance(Position3 position, Normal3 orientation, Normal3 direction) {
+        public ISpectrum Emittance(Position3 position, Normal3 orientation, Normal3 direction) {
             if (IsEmitting && IDirection3.Opposing(orientation, direction)) {
                 return EmittingLight;
             } else {
@@ -84,8 +87,8 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials.SurfaceMaterials {
             }
         }
 
-        public override IDirectionDistribution? DirectionDistribution(Normal3 incomingDirection, Position3 position, ISpectrum spectrum) {
-            throw new NotImplementedException();
+        public IPDF<Normal3> DirectionDistribution(Normal3 incomingDirection, Position3 position, Normal3 orientation, ISpectrum spectrum) {
+            return new Diffuse(orientation);
             IPDF<Normal3> diffuse, specular;
             //Vector3 radianceOut;
             //if (surfacePoint.Primitive.Material.Specularity > 0) {

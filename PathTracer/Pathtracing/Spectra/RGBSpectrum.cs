@@ -33,6 +33,10 @@ namespace PathTracer.Pathtracing.Spectra {
             return r + g + b;
         }
 
+        /// <summary> Convert the <see cref="RGBSpectrum"/> to a <see cref="string"/> </summary>
+        /// <returns>A <see cref="string"/> representing the <see cref="RGBSpectrum"/></returns>
+        public override string ToString() => rgb.ToString();
+
         /// <summary> Add two <see cref="RGBSpectrum"/> </summary>
         /// <param name="left">The left <see cref="RGBSpectrum"/></param>
         /// <param name="right">The right <see cref="RGBSpectrum"/></param>

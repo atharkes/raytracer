@@ -12,6 +12,7 @@ using PathTracer.Pathtracing.SceneDescription.Materials.SurfaceMaterials;
 using PathTracer.Pathtracing.SceneDescription.SceneObjects;
 using PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates;
 using PathTracer.Pathtracing.SceneDescription.SceneObjects.Primitives;
+using PathTracer.Pathtracing.SceneDescription.Shapes;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Planars;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics;
 using PathTracer.Utilities;
@@ -64,7 +65,7 @@ namespace PathTracer {
         #region Default Scene Definition
         /// <summary> The primitives in the default scene </summary>
         public static List<ISceneObject> DefaultPrimitives => new() {
-            new Primitive(new AxisAlignedBox(new Position3(-10, -5, -10), new Position3(10, 10, 10)) { InwardNormals = true }, ParametricMaterial.WhiteLight),
+            new Primitive(new InfinityPlane(), ParametricMaterial.WhiteLight),
             new Primitive(new Sphere(new Position3(-3, 1, 5), 1), ParametricMaterial.DiffuseGreen),
             new Primitive(new Sphere(new Position3(3, 1, 5), 1), ParametricMaterial.GlossyRed),
             new Primitive(new Sphere(new Position3(0, 1, 5), 1), ParametricMaterial.Mirror),

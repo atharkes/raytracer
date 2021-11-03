@@ -1,5 +1,7 @@
 ﻿using PathTracer.Geometry.Directions;
 using PathTracer.Geometry.Normals;
+using PathTracer.Geometry.Positions;
+using PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics;
 using System;
 
 namespace PathTracer.Pathtracing.Distributions.Direction {
@@ -21,12 +23,8 @@ namespace PathTracer.Pathtracing.Distributions.Direction {
         }
 
         public Normal3 Sample(Random random) {
-            /// Sample on Sphere
-            double z = 1 - 2 * random.NextDouble();
-            double r = Math.Sqrt(Math.Max(0, 1 - z * z));
-            double phi = 2 * Math.PI * random.NextDouble();
-            Normal3 direction = new((float)(r * Math.Cos(phi)), (float)(r * Math.Sin(phi)), (float)z);
-            /// Orient Direction
+            ISphere sphere = new UnitSphere(Position3.Origin);
+            Normal3 direction = ((Direction3)sphere.SurfacePosition(random)).Normalized();
             return IDirection3.Similar(Orientation, direction) ? direction : -direction;
         }
     }

@@ -3,6 +3,7 @@ using PathTracer.Geometry.Normals;
 using PathTracer.Geometry.Vectors;
 using PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates.AccelerationStructures.BVH;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Planars;
+using PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics;
 using System;
 using System.Collections.Generic;
 

@@ -35,7 +35,7 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects {
         #endregion
 
         #region IMaterial
-        ISpectrum IMaterial.Albedo { get => Material.Albedo; set => Material.Albedo = value; }
+        ISpectrum IMaterial.Albedo => Material.Albedo;
         bool IMaterial.IsEmitting => Material.IsEmitting;
         bool IMaterial.IsSensing => Material.IsSensing;
         ISpectrum IMaterial.Emittance(Position3 position, Normal3 orientation, Normal3 direction) => Material.Emittance(position, orientation, direction);
@@ -44,7 +44,7 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects {
         Position3 IMaterial.GetPosition(IRay ray, IShapeInterval interval, Position1 distance) => Material.GetPosition(ray, interval, distance);
         IPDF<Normal3> IMaterial.GetOrientationDistribution(IRay ray, IShape shape, Position3 position) => Material.GetOrientationDistribution(ray, shape, position);
         
-        IDirectionDistribution? IMaterial.DirectionDistribution(Normal3 incomingDirection, Position3 position, ISpectrum spectrum) => Material.DirectionDistribution(incomingDirection, position, spectrum);
+        IPDF<Normal3> IMaterial.DirectionDistribution(Normal3 incomingDirection, Position3 position, Normal3 orientation, ISpectrum spectrum) => Material.DirectionDistribution(incomingDirection, position, orientation, spectrum);
         IRay IMaterial.CreateRay(Position3 position, Normal3 normal, Normal3 direction) => Material.CreateRay(position, normal, direction);
         #endregion
     }

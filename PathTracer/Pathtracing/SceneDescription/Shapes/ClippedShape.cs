@@ -6,23 +6,23 @@ using System;
 using System.Collections.Generic;
 
 namespace PathTracer.Pathtracing.SceneDescription.Shapes {
-    public class ClippedShape : Shape {
+    public class ClippedShape : IShape {
         IShape OriginalShape { get; }
-        public override bool Volumetric => OriginalShape.Volumetric;
-        public override float Volume => OriginalShape.Volume;
-        public override float SurfaceArea => OriginalShape.SurfaceArea;
-        public override AxisAlignedBox BoundingBox { get; }
+        public bool Volumetric => OriginalShape.Volumetric;
+        public float Volume => OriginalShape.Volume;
+        public float SurfaceArea => OriginalShape.SurfaceArea;
+        public AxisAlignedBox BoundingBox { get; }
 
         public ClippedShape(IShape original, AxisAlignedBox clippedBoundingBox) {
             OriginalShape = original;
             BoundingBox = clippedBoundingBox;
         }
 
-        public override bool OnSurface(Position3 position, float epsilon = 0.001F) => OriginalShape.OnSurface(position, epsilon);
-        public override Position3 SurfacePosition(Random random) => OriginalShape.SurfacePosition(random);
-        public override Position2 UVPosition(Position3 position) => OriginalShape.UVPosition(position);
-        public override Normal3 SurfaceNormal(Position3 position) => OriginalShape.SurfaceNormal(position);
-        public override Normal3 OutwardsDirection(Position3 position) => OriginalShape.OutwardsDirection(position);
-        public override IEnumerable<Position1> IntersectDistances(IRay ray) => OriginalShape.IntersectDistances(ray);
+        public bool OnSurface(Position3 position, float epsilon = 0.001F) => OriginalShape.OnSurface(position, epsilon);
+        public Position3 SurfacePosition(Random random) => OriginalShape.SurfacePosition(random);
+        public Position2 UVPosition(Position3 position) => OriginalShape.UVPosition(position);
+        public Normal3 SurfaceNormal(Position3 position) => OriginalShape.SurfaceNormal(position);
+        public Normal3 OutwardsDirection(Position3 position) => OriginalShape.OutwardsDirection(position);
+        public IEnumerable<Position1> IntersectDistances(IRay ray) => OriginalShape.IntersectDistances(ray);
     }
 }

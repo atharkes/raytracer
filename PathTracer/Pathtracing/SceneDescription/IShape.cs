@@ -24,7 +24,10 @@ namespace PathTracer.Pathtracing.SceneDescription {
         /// <summary> Check whether a <paramref name="position"/> is inside the <see cref="IShape"/> </summary>
         /// <param name="position">The position to check</param>
         /// <returns>Whether the <paramref name="position"/> is inside the <see cref="IShape"/></returns>
-        bool Inside(Position3 position);
+        bool Inside(Position3 position) {
+            IRay ray = new Ray(position, new Normal3(1, 0, 0));
+            return Intersect(ray)?.Inside(0) ?? false;
+        }
 
         /// <summary> Check whether a <paramref name="position"/> is outside the <see cref="IShape"/> </summary>
         /// <param name="position">The position to check</param>
@@ -71,11 +74,19 @@ namespace PathTracer.Pathtracing.SceneDescription {
                     if (enters) {
                         entries.Enqueue(distance);
                     } else {
-                        Debug.Assert(entries.Count > 0, "Boundary intersection is invalid (More exits than entries). Warning: Geometry might be degenerate.");
-                        intervals.Add(new ShapeInterval(this, entries.Dequeue(), distance));
+                        if (entries.Count > 0) {
+                            intervals.Add(new ShapeInterval(this, entries.Dequeue(), distance));
+                        } else {
+                            Debug.Write($"Warning: {this} might be degenerate; More exits than entries found.");
+                            intervals.Add(new ShapeInterval(this, Position1.NegativeInfinity, distance));
+                        }
+                        
                     }
                 }
-                Debug.Assert(entries.Count == 0, "Boundary intersection is invalid (More entries than exits). Warning: Geometry might be degenerate.");
+                foreach (Position1 entry in entries) {
+                    Debug.Write($"Warning: {this} might be degenerate; More entries than exits found.");
+                    intervals.Add(new ShapeInterval(this, entry, Position1.PositiveInfinity));
+                }
                 return new BoundaryCollection(intervals);
             } else {
                 return null;

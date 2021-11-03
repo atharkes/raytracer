@@ -5,6 +5,9 @@ using PathTracer.Pathtracing.SceneDescription;
 namespace PathTracer.Pathtracing.Distributions.Distance {
     /// <summary> A 1-dimensional distance distribution </summary>
     public interface IDistanceDistribution : ICDF<Position1> {
+        /// <summary> The domain size of the <see cref="IDistanceDistribution"/> </summary>
+        double IPDF.DomainSize => Maximum - Minimum;
+
         /// <summary> Get the possible <see cref="IMaterial"/>s for a specified <paramref name="sample"/> sample </summary>
         /// <param name="sample">The distance sample</param>
         /// <returns>A <see cref="PMF{T}"/> with the <see cref="IMaterial"/>s</returns>

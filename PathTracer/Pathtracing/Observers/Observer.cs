@@ -46,7 +46,7 @@ namespace PathTracer.Pathtracing.Observers {
         }
 
         void DrawDebugInformation() {
-            Screen.Print($"FPS: {1000 / (int)Renderer.Statistics.FrameTime.LastTick.TotalMilliseconds}", 1, 1);
+            Screen.Print($"FPS: {(int)(1000 / Renderer.Statistics.FrameTime.LastTick.TotalMilliseconds)}", 1, 1);
             Screen.Print($"Light: {Accumulator.AccumulatedLight}", 1, 17);
             Screen.Print($"Frame Time (ms): {(int)Renderer.Statistics.FrameTime.LastTick.TotalMilliseconds}", 1, 33);
             Screen.Print($"Integrator Time (ms): {(int)Renderer.Statistics.IntegratorTime.LastTick.TotalMilliseconds}", 1, 49);

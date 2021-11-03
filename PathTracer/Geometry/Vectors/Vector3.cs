@@ -87,6 +87,7 @@ namespace PathTracer.Geometry.Vectors {
         public bool Equals(Vector3 other) => Value.Equals(other.Value);
         public bool Equals(Vector3? other) => Value.Equals(other?.Value);
         public override int GetHashCode() => Value.GetHashCode();
+        public override string ToString() => Value.ToString();
 
         public Vector3 Normalized() => Value.Normalized();
     }

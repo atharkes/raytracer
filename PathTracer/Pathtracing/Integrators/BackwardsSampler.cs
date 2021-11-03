@@ -4,7 +4,6 @@ using PathTracer.Geometry.Positions;
 using PathTracer.Geometry.Vectors;
 using PathTracer.Pathtracing.Distributions;
 using PathTracer.Pathtracing.Distributions.Boundaries;
-using PathTracer.Pathtracing.Distributions.Direction;
 using PathTracer.Pathtracing.Distributions.Distance;
 using PathTracer.Pathtracing.Observers;
 using PathTracer.Pathtracing.Observers.Cameras;
@@ -25,6 +24,8 @@ namespace PathTracer.Pathtracing.Integrators {
 
         public override void Integrate(IScene scene, TimeSpan integrationTime) {
             int rayCount = 100;
+            TraceRays(scene, rayCount);
+            return;
             Action[] tasks = new Action[Program.Threadpool.MultithreadingTaskCount];
             for (int i = 0; i < Program.Threadpool.MultithreadingTaskCount; i++) {
                 tasks[i] = () => TraceRays(scene, rayCount);
@@ -82,8 +83,7 @@ namespace PathTracer.Pathtracing.Integrators {
             ISpectrum directIllumination = material.Emittance(position, orientation, -ray.Direction);
 
             /// Sample Direction
-            IDirectionDistribution? directions = material.DirectionDistribution(ray.Direction, position, spectrum);
-            if (directions is null) return ISpectrum.Black;
+            IPDF<Normal3> directions = material.DirectionDistribution(ray.Direction, position, orientation, spectrum);
             Normal3 direction = directions.Sample(Utils.ThreadRandom);
             float directionPdf = (float)directions.Probability(direction);
 

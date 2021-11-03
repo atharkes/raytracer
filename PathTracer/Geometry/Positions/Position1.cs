@@ -7,6 +7,10 @@ namespace PathTracer.Geometry.Positions {
     public struct Position1 : IPosition<Vector1>, IComparable<Position1>, IEquatable<Position1> {
         /// <summary> The origin of the 3-dimensional coordinate system </summary>
         public static Position1 Origin => new(Vector1.Zero);
+        /// <summary> The maximum position </summary>
+        public static Position1 MaxValue => new(Vector1.MaxValue);
+        /// <summary> The minimum position </summary>
+        public static Position1 MinValue => new(Vector1.MinValue);
         /// <summary> The position representing negative infinity </summary>
         public static Position1 NegativeInfinity => new(Vector1.NegativeInfinity);
         /// <summary> The position representing positive infinity </summary>

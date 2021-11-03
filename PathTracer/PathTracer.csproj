@@ -32,4 +32,8 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Pathtracing\SceneDescription\Materials\VolumetricMaterials\" />
+  </ItemGroup>
+
 </Project>

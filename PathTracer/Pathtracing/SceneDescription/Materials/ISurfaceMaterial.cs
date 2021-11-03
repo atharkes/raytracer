@@ -25,7 +25,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials {
         /// <param name="interval">The <see cref="IShapeInterval"/> of the <see cref="ISurfaceMaterial"/> along the <paramref name="ray"/></param>
         /// <returns>A distance distribution of the <paramref name="ray"/> through the <see cref="ISurfaceMaterial"/></returns>
         IDistanceDistribution? IMaterial.DistanceDistribution(IRay ray, ISpectrum spectrum, IShapeInterval interval) {
-            return new SingleDistanceDistribution(interval.Entry, this, interval);
+            return interval.Entry < 0 || interval.Entry > ray.Length ? null : new SingleDistanceDistribution(interval.Entry, this, interval);
         }
 
         /// <summary> Get a <see cref="Position3"/> at a specified <paramref name="distance"/> along a <paramref name="ray"/> </summary>

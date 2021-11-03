@@ -38,6 +38,13 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Planars {
             Distance = Position3.Dot(position, normal);
         }
 
+        public static bool operator ==(Plane left, Plane right) => left.Equals(right);
+        public static bool operator !=(Plane left, Plane right) => !(left == right);
+
+        public override int GetHashCode() => HashCode.Combine(Normal.GetHashCode(), Distance.GetHashCode());
+        public override bool Equals(object? obj) => obj is Plane plane && Equals(plane);
+        public bool Equals(Plane other) => Normal.Equals(other.Normal) && Distance.Equals(other.Distance);
+
         /// <summary> Get a <paramref name="random"/> point on the surface of the <see cref="Plane"/> </summary>
         /// <param name="random">The <see cref="Random"/> to decide the position on the surface</param>
         /// <returns>A <paramref name="random"/> point on the surface of the <see cref="Plane"/></returns>

@@ -25,8 +25,12 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Planars {
 
         /// <summary> The vector that goes from the left of the <see cref="Rectangle"/> to the right </summary>
         public Direction3 LeftToRight => Right * Width;
+        /// <summary> The vector that goes from the right of the <see cref="Rectangle"/> to the left </summary>
+        public Direction3 RightToLeft => -Right * Width;
         /// <summary> The vector that goes from the bottom of the <see cref="Rectangle"/> to the top </summary>
         public Direction3 BottomToTop => Up * Height;
+        /// <summary> The vector that goes from the top of the <see cref="Rectangle"/> to the bottom </summary>
+        public Direction3 TopToBottom => -Up * Height;
 
         /// <summary> The center of the <see cref="Rectangle"/> </summary>
         public Position3 Center { get => Position; set => Position = value; }
@@ -74,7 +78,14 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Planars {
             Rotation = rotation;
         }
 
-        public Position3 SurfacePosition(Position2 uvPosition) => BottomLeft + LeftToRight * uvPosition.X + BottomToTop * uvPosition.Y;
+        public static bool operator ==(Rectangle left, Rectangle right) => left.Equals(right);
+        public static bool operator !=(Rectangle left, Rectangle right) => !(left == right);
+
+        public override int GetHashCode() => HashCode.Combine(Position.GetHashCode(), Size.GetHashCode(), Rotation.GetHashCode());
+        public override bool Equals(object? obj) => obj is Rectangle rectangle && Equals(rectangle);
+        public bool Equals(Rectangle other) => Position.Equals(other.Position) && Size.Equals(other.Size) && Rotation.Equals(other.Rotation);
+
+        public Position3 SurfacePosition(Position2 uvPosition) => TopLeft + LeftToRight * uvPosition.X + TopToBottom * uvPosition.Y;
 
         /// <summary> Get a <paramref name="random"/> point on the surface of the <see cref="Rectangle"/> </summary>
         /// <param name="random">The <see cref="Random"/> to decide the position on the surface</param>
@@ -85,8 +96,8 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Planars {
         /// <param name="position">The surface position for which to get the UV-position</param>
         /// <returns>The UV-position for the <paramref name="position"/></returns>
         public Position2 UVPosition(Position3 position) {
-            Direction3 relativePosition = position - BottomRight;
-            return new Position2(IDirection3.Dot(LeftToRight, relativePosition), IDirection3.Dot(BottomToTop, relativePosition));
+            Direction3 relativePosition = position - TopLeft;
+            return new Position2(IDirection3.Dot(LeftToRight, relativePosition), IDirection3.Dot(TopToBottom, relativePosition));
         }
 
         /// <summary> Check whether a <paramref name="position"/> is on the surface of the <see cref="Rectangle"/> </summary>

@@ -52,5 +52,6 @@ namespace PathTracer.Geometry.Positions {
         public override int GetHashCode() => Vector.GetHashCode();
         public int CompareTo(Position1 other) => Vector.CompareTo(other.Vector);
         public int CompareTo(Position1? other) => Vector.CompareTo(other?.Vector);
+        public override string ToString() => Vector.ToString();
     }
 }

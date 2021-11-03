@@ -11,7 +11,7 @@ namespace PathTracer.Multithreading {
         public readonly int ThreadCount;
 
         /// <summary> Amount of cores on this system </summary>
-        public int CoreCount => Environment.ProcessorCount;
+        public static int CoreCount => Environment.ProcessorCount;
 
         readonly Thread[] workerThreads;
         readonly EventWaitHandle[] go;

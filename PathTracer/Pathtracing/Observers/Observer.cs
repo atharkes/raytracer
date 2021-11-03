@@ -1,4 +1,5 @@
 ﻿using OpenTK.Windowing.GraphicsLibraryFramework;
+using PathTracer.Geometry.Directions;
 using PathTracer.Pathtracing.Observers.Accumulators;
 using PathTracer.Pathtracing.Observers.Cameras;
 using PathTracer.Utilities;
@@ -9,7 +10,7 @@ namespace PathTracer.Pathtracing.Observers {
         /// <summary> The virtual <see cref="ICamera"/> object of the <see cref="Observer"/> </summary>
         public ICamera Camera { get; }
         /// <summary> The <see cref="IAccumulator"/> used for storing the samples registered by the <see cref="Observer"/> </summary>
-        public IAccumulator Accumulator { get; }
+        public IAccumulator Accumulator { get; private set; }
         /// <summary> The <see cref="IScreen"/> used for visual output to the <see cref="Observer"/> </summary>
         public IScreen Screen { get; }
 
@@ -23,7 +24,7 @@ namespace PathTracer.Pathtracing.Observers {
         /// <summary> The speed at which the camera moves </summary>
         public float MoveSpeed { get; set; } = 0.1f;
         /// <summary> The sensitivity of turning the camera </summary>
-        public float RotateSensitivity { get; set; } = 5f;
+        public float RotateSensitivity { get; set; } = 0.1f;
         /// <summary> The sensitivity when changing the FOV of the camera </summary>
         public float FOVSensitivity { get; set; } = 0.1f;
 
@@ -34,6 +35,7 @@ namespace PathTracer.Pathtracing.Observers {
             Camera = camera;
             Accumulator = new Accumulator(screen.Width, screen.Height);
             Screen = screen;
+            Screen.OnResize += (_, size) => Accumulator = new Accumulator(size.X, size.Y);
             Camera.OnMoved += (_, _) => Accumulator.Clear();
             Camera.Film.SampleRegistered += (_, sample) => Accumulator.Add(sample);
         }
@@ -53,6 +55,10 @@ namespace PathTracer.Pathtracing.Observers {
             Screen.Print($"Drawing Time (ms): {(int)Renderer.Statistics.DrawingTime.LastTick.TotalMilliseconds}", 1, 65);
             Screen.Print($"OpenTK Time (ms): {(int)Renderer.Statistics.OpenTKTime.LastTick.TotalMilliseconds}", 1, 81);
             Screen.Print($"FOV: {Camera.FOV}", 1, 97);
+            Screen.Print($"Front: {Camera.Front}", 1, 113);
+            Screen.Print($"Up: {Camera.Up}", 1, 129);
+            Screen.Print($"Right: {Camera.Right}", 1, 145);
+            Screen.Print($"Rotation: {Camera.Rotation}", 1, 161);
         }
 
         /// <summary> Handle input for the <see cref="Observer"/> </summary>
@@ -69,10 +75,12 @@ namespace PathTracer.Pathtracing.Observers {
             if (keyboard.IsKeyDown(Keys.D)) Camera.Move(Camera.Right * MoveSpeed);
             if (keyboard.IsKeyPressed(Keys.KeyPadAdd)) Camera.FOV *= 1f + FOVSensitivity;
             if (keyboard.IsKeyPressed(Keys.KeyPadSubtract)) Camera.FOV /= 1f + FOVSensitivity;
-            if (keyboard.IsKeyDown(Keys.Up)) Camera.Rotate(Camera.Left, -RotateSensitivity);
-            if (keyboard.IsKeyDown(Keys.Down)) Camera.Rotate(Camera.Left, RotateSensitivity);
-            if (keyboard.IsKeyDown(Keys.Right)) Camera.Rotate(Camera.Up, -RotateSensitivity);
-            if (keyboard.IsKeyDown(Keys.Left)) Camera.Rotate(Camera.Up, RotateSensitivity);
+            if (keyboard.IsKeyDown(Keys.Up)) Camera.Rotate(IDirection3.DefaultRight, -RotateSensitivity);
+            if (keyboard.IsKeyDown(Keys.Down)) Camera.Rotate(IDirection3.DefaultRight, RotateSensitivity);
+            if (keyboard.IsKeyDown(Keys.Right)) Camera.Rotate(IDirection3.DefaultUp, RotateSensitivity);
+            if (keyboard.IsKeyDown(Keys.Left)) Camera.Rotate(IDirection3.DefaultUp, -RotateSensitivity);
+            if (keyboard.IsKeyDown(Keys.Q)) Camera.Rotate(IDirection3.DefaultFront, RotateSensitivity);
+            if (keyboard.IsKeyDown(Keys.E)) Camera.Rotate(IDirection3.DefaultFront, -RotateSensitivity);
         }
     }
 }

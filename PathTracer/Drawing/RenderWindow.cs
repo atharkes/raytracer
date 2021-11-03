@@ -8,9 +8,9 @@ namespace PathTracer.Drawing {
     /// <summary> The main class derived from an OpenTK gamewindow </summary>
     public class RenderWindow : GameWindow {
         /// <summary> The identifier of the gamewindow </summary>
-        public int GameWindowID { get; }
+        public int GameWindowID { get; private set; }
         /// <summary> The gamewindow </summary>
-        public Surface GameWindow { get; }
+        public Surface GameWindow { get; private set; }
 
         readonly Shader shader;
         int vertexBufferObject;
@@ -81,19 +81,14 @@ namespace PathTracer.Drawing {
         /// <summary> Called upon window resize </summary>
         /// <param name="e">Arguments given</param>
         protected override void OnResize(ResizeEventArgs e) {
+            GameWindow.Size = e.Size;
             GL.Viewport(0, 0, e.Width, e.Height);
             base.OnResize(e);
         }
 
         protected override void OnUpdateFrame(FrameEventArgs args) {
-            if (KeyboardState.IsAnyKeyDown) {
-                HandleInput();
-            }
-            base.OnUpdateFrame(args);
-        }
-
-        void HandleInput() {
             if (KeyboardState.IsKeyDown(Keys.Escape)) Close();
+            base.OnUpdateFrame(args);
         }
 
         /// <summary> Called once per frame; render </summary>
@@ -113,5 +108,12 @@ namespace PathTracer.Drawing {
             SwapBuffers();
             base.OnRenderFrame(e);
         }
+
+        public void Clear(int color = 0) => GameWindow.Clear(color);
+        public void Plot(int x, int y, int color = 16777215) => GameWindow.Plot(x, y, color);
+        public void Plot(int i, int color = 16777215) => GameWindow.Plot(i, color);
+        public void Line(int x1, int y1, int x2, int y2, int color = 16777215) => GameWindow.Line(x1, y1, x2, y2, color);
+        public void Box(int x1, int y1, int x2, int y2, int color = 16777215) => GameWindow.Box(x1, y1, x2, y2, color);
+        public void Print(string text, int x, int y, int color = 16777215) => GameWindow.Print(text, x, y, color);
     }
 }

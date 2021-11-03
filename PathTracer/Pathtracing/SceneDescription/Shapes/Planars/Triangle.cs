@@ -60,6 +60,13 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Planars {
             return P1 + P1toP2 * r1 + P1toP3 * r2;
         }
 
+        public static bool operator ==(Triangle left, Triangle right) => left.Equals(right);
+        public static bool operator !=(Triangle left, Triangle right) => !(left == right);
+
+        public override int GetHashCode() => HashCode.Combine(P1.GetHashCode(), P2.GetHashCode(), P3.GetHashCode(), Normal.GetHashCode());
+        public override bool Equals(object? obj) => obj is Triangle triangle && Equals(triangle);
+        public bool Equals(Triangle other) => P1.Equals(other.P1) && P2.Equals(other.P2) && P3.Equals(other.P3) && Normal.Equals(other.Normal);
+
         /// <summary> Get the UV-position for a specified <paramref name="position"/> </summary>
         /// <param name="position">The surface position for which to get the UV-position</param>
         /// <returns>The UV-position for the <paramref name="position"/></returns>

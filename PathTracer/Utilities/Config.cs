@@ -9,7 +9,7 @@ namespace PathTracer.Utilities {
     /// <summary> A file that holds the configuration of the camera </summary>
     public class Config {
         /// <summary> The size of the game window </summary>
-        [JsonIgnore] public Vector2i WindowSize { get; set; } = new Vector2i(1280, 720);
+        [JsonIgnore] public Vector2i WindowSize { get; set; } = new Vector2i(720, 360);
         /// <summary> The width of the game window </summary>
         public int WindowWidth { get => WindowSize.X; set => WindowSize = new Vector2i(value, WindowSize.Y); }
         /// <summary> The height of the game window </summary>
@@ -27,7 +27,7 @@ namespace PathTracer.Utilities {
         /// <summary> The drawing mode of the observer </summary>
         public DrawingMode DrawingMode { get; set; } = DrawingMode.Light;
         /// <summary> Whether the debug information is being displayed to the observer </summary>
-        public bool DebugInfo { get; set; } = false;
+        public bool DebugInfo { get; set; } = true;
 
         /// <summary> The position of the camera </summary>
         [JsonIgnore] public Position3 Position { get; set; } = new Position3(0, 1, 0);

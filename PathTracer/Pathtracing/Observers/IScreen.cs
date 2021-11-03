@@ -1,4 +1,5 @@
 ﻿using OpenTK.Mathematics;
+using System;
 
 namespace PathTracer.Pathtracing.Observers {
     /// <summary> An interface for a 2d screen used for displaying the 3d scene using raytracing </summary>
@@ -9,6 +10,9 @@ namespace PathTracer.Pathtracing.Observers {
         int Width => Size.X;
         /// <summary> The height of the <see cref="IScreen"/> </summary>
         int Height => Size.Y;
+
+        /// <summary> An event that fires when the <see cref="IScreen"/> is resized </summary>
+        event EventHandler<Vector2i>? OnResize;
 
         /// <summary> Clear the screen </summary>
         /// <param name="color">The color to clear the screen width</param>

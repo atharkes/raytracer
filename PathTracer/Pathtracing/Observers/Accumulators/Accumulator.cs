@@ -16,17 +16,21 @@ namespace PathTracer.Pathtracing.Observers.Accumulators {
             get {
                 ISpectrum averageLight = ISpectrum.Black;
                 foreach (Cavity cavity in cavities) {
-                    averageLight += cavity.AverageLight;
+                    if (!cavity.AverageLight.IsBlack) {
+                        averageLight += cavity.AverageLight;
+                    }
                 }
                 return averageLight;
             }
         }
 
-        Cavity[] cavities;
+        readonly Cavity[] cavities;
 
         /// <summary> Create a new accumulator </summary>
         /// <param name="pixelCount">The amount of cavities in the accumulator</param>
         public Accumulator(int width, int height) {
+            Width = width;
+            Height = height;
             cavities = new Cavity[width * height];
             for (int i = 0; i < cavities.Length; i++) {
                 cavities[i] = new Cavity();

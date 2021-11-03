@@ -64,6 +64,13 @@ namespace PathTracer.Geometry.Vectors {
         public static implicit operator Vector2((Vector1 X, Vector1 Y) tuple) => new(tuple.X, tuple.Y);
         public static implicit operator Vector2(OpenTK.Mathematics.Vector2 value) => new(value);
 
+        public static bool IsFinite(Vector2 f) => Vector1.IsFinite(f.X) && Vector1.IsFinite(f.Y);
+        public static bool IsInfinity(Vector2 f) => Vector1.IsInfinity(f.X) || Vector1.IsInfinity(f.Y);
+        public static bool IsNaN(Vector2 f) => Vector1.IsNaN(f.X) || Vector1.IsNaN(f.Y);
+        public static bool IsNegativeInfinity(Vector2 f) => Vector1.IsNegativeInfinity(f.X) || Vector1.IsNegativeInfinity(f.Y);
+        public static bool IsPositiveInfinity(Vector2 f) => Vector1.IsPositiveInfinity(f.X) || Vector1.IsPositiveInfinity(f.Y);
+        public static bool IsSubnormal(Vector2 f) => Vector1.IsSubnormal(f.X) || Vector1.IsSubnormal(f.Y);
+
         public static bool operator ==(Vector2 left, Vector2 right) => left.Equals(right);
         public static bool operator !=(Vector2 left, Vector2 right) => !(left == right);
 
@@ -86,6 +93,7 @@ namespace PathTracer.Geometry.Vectors {
         public bool Equals(Vector2 other) => Value.Equals(other.Value);
         public bool Equals(Vector2? other) => Value.Equals(other?.Value);
         public override int GetHashCode() => Value.GetHashCode();
+        public override string ToString() => Value.ToString();
 
         public Vector2 Normalized() => Value.Normalized();
     }

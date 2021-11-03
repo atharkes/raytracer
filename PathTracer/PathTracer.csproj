@@ -10,10 +10,13 @@
   <ItemGroup>
     <Compile Remove="Pathtracing\Points\**" />
     <Compile Remove="Pathtracing\ScatteringPoints\**" />
+    <Compile Remove="Pathtracing\SceneDescription\Materials\VolumetricMaterials\**" />
     <EmbeddedResource Remove="Pathtracing\Points\**" />
     <EmbeddedResource Remove="Pathtracing\ScatteringPoints\**" />
+    <EmbeddedResource Remove="Pathtracing\SceneDescription\Materials\VolumetricMaterials\**" />
     <None Remove="Pathtracing\Points\**" />
     <None Remove="Pathtracing\ScatteringPoints\**" />
+    <None Remove="Pathtracing\SceneDescription\Materials\VolumetricMaterials\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -30,10 +33,6 @@
     <None Update="Drawing\shader.vert">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Pathtracing\SceneDescription\Materials\VolumetricMaterials\" />
   </ItemGroup>
 
 </Project>

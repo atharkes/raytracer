@@ -39,7 +39,8 @@ namespace PathTracer.Geometry.Directions {
         int GetHashCode() => Vector.GetHashCode();
 
         bool IDirection<Vector3>.SimilarAs(IDirection<Vector3> other) => SimilarAs(other);
-        bool SimilarAs(IDirection3 other) => Dot(this, other) > IDirection1.Zero;
+        bool Similar(IDirection3 other) => Similar(this, other);
+        bool Opposing(IDirection3 other) => Opposing(this, other);
         Normal3 Normalized() => new(Vector);
     }
 }

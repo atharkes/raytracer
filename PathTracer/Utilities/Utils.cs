@@ -17,7 +17,7 @@ namespace PathTracer.Utilities {
         public static Random DeterministicRandom { get; } = new Random(0);
         /// <summary> The <see cref="Random"/> to use per thread </summary>
         public static Random ThreadRandom => random ??= new Random(Thread.CurrentThread.ManagedThreadId * (int)DateTime.Today.TimeOfDay.Ticks);
-        
+
         [ThreadStatic] static Random? random;
 
         /// <summary> Get the minimum of two <see cref="IComparable{T}"/> </summary>
@@ -38,27 +38,44 @@ namespace PathTracer.Utilities {
             return first.CompareTo(second) >= 0 ? first : second;
         }
 
-        /// <summary> Create a random Vector </summary>
-        /// <param name="r">The random to create the vector with</param>
-        /// <param name="scale">The scale of the vector</param>
-        /// <returns>A random vector with values between 0 and the scale parameter</returns>
-        public static Vector3 Vector(this Random r, float scale = 1f) {
-            return new Vector3((float)r.NextDouble(), (float)r.NextDouble(), (float)r.NextDouble()) * scale;
+        /// <summary> Create a <paramref name="random"/> <see cref="Vector3"/> </summary>
+        /// <param name="random">The <see cref="Random"/> to create the <see cref="Vector3"/> with</param>
+        /// <param name="scale">The scale of the <see cref="Vector3"/></param>
+        /// <returns>A <paramref name="random"/> <see cref="Vector3"/> with values between 0 and the scale parameter</returns>
+        public static Vector3 Vector(this Random random, float scale = 1f) {
+            return new Vector3((float)random.NextDouble(), (float)random.NextDouble(), (float)random.NextDouble()) * scale;
         }
 
-        /// <summary> Create a random Unit Vector </summary>
-        /// <param name="r">The random to create the unit vector with</param>
-        /// <returns>A random unit vector</returns>
-        public static Unit3 UnitVector(this Random r) {
-            float a = (float)r.NextDouble();
-            throw new NotImplementedException();
+        /// <summary> Create a <paramref name="random"/> <see cref="Unit3"/> </summary>
+        /// <param name="random">The <see cref="Random"/> to create the <see cref="Unit3"/> with</param>
+        /// <returns>A <paramref name="random"/> <see cref="Unit3"/></returns>
+        public static Unit3 Unit(this Random random) {
+            float a = (float)random.NextDouble();
+            if (a < 1 / 6) {
+                return Unit3.X;
+            } else if (a < 2 / 6) {
+                return Unit3.Y;
+            } else if (a < 3 / 6) {
+                return Unit3.Z;
+            } else if (a < 4 / 6) {
+                return Unit3.MinX;
+            } else if (a < 5 / 6) {
+                return Unit3.MinY;
+            } else {
+                return Unit3.MinZ;
+            }
         }
+
+        /// <summary> Create a <paramref name="random"/> unit vector</summary>
+        /// <param name="random">The <see cref="Random"/> to create the unit vector with</param>
+        /// <returns>A <paramref name="random"/> unit vector</returns>
+        public static Normal3 UnitVector3(this Random random) => new(random.Unit());
 
         /// <summary> Create a <paramref name="random"/> <see cref="IPrimitive"/> </summary>
-        /// <param name="random">The random to create the primitive with</param>
-        /// <returns>A random primitive</returns>
+        /// <param name="random">The <see cref="Random"/> to create the <see cref="IPrimitive"/> with</param>
+        /// <returns>A <paramref name="random"/> <see cref="IPrimitive"/></returns>
         public static IPrimitive Primitive(this Random random, float posRange = 1f, float scale = 1f) {
-            return new Primitive(random.Shape(), random.Material());
+            return new Primitive(random.Shape(posRange, scale), random.Material());
         }
 
         /// <summary> Create a <paramref name="random"/> <see cref="IShape"/> </summary>

@@ -70,7 +70,7 @@ namespace PathTracer.Pathtracing.SceneDescription {
                 Queue<Position1> entries = new();
                 foreach (Position1 distance in distances.OrderBy(d => d)) {
                     Position3 position = IntersectPosition(ray, distance);
-                    bool enters = (SurfaceNormal(position) as IDirection3).SimilarAs(ray.Direction);
+                    bool enters = (SurfaceNormal(position) as IDirection3).Opposing(ray.Direction);
                     if (enters) {
                         entries.Enqueue(distance);
                     } else {
@@ -80,7 +80,6 @@ namespace PathTracer.Pathtracing.SceneDescription {
                             Debug.Write($"Warning: {this} might be degenerate; More exits than entries found.");
                             intervals.Add(new ShapeInterval(this, Position1.NegativeInfinity, distance));
                         }
-                        
                     }
                 }
                 foreach (Position1 entry in entries) {

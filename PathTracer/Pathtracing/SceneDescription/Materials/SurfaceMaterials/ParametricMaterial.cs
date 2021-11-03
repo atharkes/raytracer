@@ -27,10 +27,12 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials.SurfaceMaterials {
         public float Glossyness { get; set; } = 0f;
         /// <summary> The gloss specularity of the primitive </summary>
         public float GlossSpecularity { get; set; } = 0f;
+        /// <summary> The color of emitting light </summary>
+        public ISpectrum EmittanceColor { get; set; } = ISpectrum.Black;
         /// <summary> How much light this material is emitting (in watt/m^2) </summary>
         public float EmittingStrength { get; set; } = 0f;
         /// <summary> The light this material is emitting </summary>
-        public ISpectrum EmittingLight => Albedo * EmittingStrength;
+        public ISpectrum EmittingLight => EmittanceColor * EmittingStrength;
         /// <summary> Whether this material is emitting light </summary>
         public bool IsEmitting => EmittingStrength > 0f;
         /// <summary> This material is not sensing light </summary>
@@ -76,11 +78,12 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials.SurfaceMaterials {
         /// <param name="emittingStrength">The emitting strength of the light</param>
         public ParametricMaterial(float emittingStrength, ISpectrum color) {
             EmittingStrength = emittingStrength;
-            Albedo = color;
+            EmittanceColor = color;
+            Albedo = ISpectrum.Black;
         }
 
         public ISpectrum Emittance(Position3 position, Normal3 orientation, Normal3 direction) {
-            if (IsEmitting && IDirection3.Opposing(orientation, direction)) {
+            if (IsEmitting && IDirection3.Similar(orientation, direction)) {
                 return EmittingLight;
             } else {
                 return ISpectrum.Black;

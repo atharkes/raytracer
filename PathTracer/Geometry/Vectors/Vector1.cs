@@ -47,6 +47,15 @@ namespace PathTracer.Geometry.Vectors {
         /// <param name="value">The <see cref="Vector1"/> to use for the conversion</param>
         public static implicit operator float(Vector1 value) => value.Value;
 
+        public static bool IsFinite(Vector1 f) => float.IsFinite(f.Value);
+        public static bool IsInfinity(Vector1 f) => float.IsInfinity(f.Value);
+        public static bool IsNaN(Vector1 f) => float.IsNaN(f.Value);
+        public static bool IsNegative(Vector1 f) => float.IsNegative(f.Value);
+        public static bool IsNegativeInfinity(Vector1 f) => float.IsNegativeInfinity(f.Value);
+        public static bool IsNormal(Vector1 f) => float.IsNormal(f.Value);
+        public static bool IsPositiveInfinity(Vector1 f) => float.IsPositiveInfinity(f.Value);
+        public static bool IsSubnormal(Vector1 f) => float.IsSubnormal(f.Value);
+
         public static bool operator ==(Vector1 left, Vector1 right) => left.Equals(right);
         public static bool operator !=(Vector1 left, Vector1 right) => !(left == right);
         public static bool operator <=(Vector1 left, Vector1 right) => left.CompareTo(right) <= 0;
@@ -87,6 +96,7 @@ namespace PathTracer.Geometry.Vectors {
         public override int GetHashCode() => Value.GetHashCode();
         public int CompareTo(Vector1? other) => Value.CompareTo(other?.Value);
         public int CompareTo(Vector1 other) => Value.CompareTo(other.Value);
+        public override string ToString() => Value.ToString();
 
         public Vector1 Normalized() {
             Debug.Assert(Length != 0);

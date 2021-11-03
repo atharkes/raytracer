@@ -61,6 +61,13 @@ namespace PathTracer.Geometry.Vectors {
         public static implicit operator Vector3(OpenTK.Mathematics.Vector3 value) => new(value);
         public static implicit operator OpenTK.Mathematics.Vector3(Vector3 value) => value.Value;
 
+        public static bool IsFinite(Vector3 f) => Vector1.IsFinite(f.X) && Vector1.IsFinite(f.Y) && Vector1.IsFinite(f.Z);
+        public static bool IsInfinity(Vector3 f) => Vector1.IsInfinity(f.X) || Vector1.IsInfinity(f.Y) || Vector1.IsInfinity(f.Z);
+        public static bool IsNaN(Vector3 f) => Vector1.IsNaN(f.X) || Vector1.IsNaN(f.Y) || Vector1.IsNaN(f.Z);
+        public static bool IsNegativeInfinity(Vector3 f) => Vector1.IsNegativeInfinity(f.X) || Vector1.IsNegativeInfinity(f.Y) || Vector1.IsNegativeInfinity(f.Z);
+        public static bool IsPositiveInfinity(Vector3 f) => Vector1.IsPositiveInfinity(f.X) || Vector1.IsPositiveInfinity(f.Y) || Vector1.IsPositiveInfinity(f.Z);
+        public static bool IsSubnormal(Vector3 f) => Vector1.IsSubnormal(f.X) || Vector1.IsSubnormal(f.Y) || Vector1.IsSubnormal(f.Z);
+
         public static bool operator ==(Vector3 left, Vector3 right) => left.Equals(right);
         public static bool operator !=(Vector3 left, Vector3 right) => !(left == right);
 
@@ -72,7 +79,7 @@ namespace PathTracer.Geometry.Vectors {
         public static Vector3 operator *(Vector1 left, Vector3 right) => left.Value * right.Value;
         public static Vector3 operator *(OpenTK.Mathematics.Quaternion left, Vector3 right) => left * right.Value;
         public static Vector3 operator /(Vector3 left, Vector1 right) => left.Value / right.Value;
-        public static Vector3 operator /(Vector1 left, Vector3 right) => new Vector3(left, left, left) / right;
+        public static Vector3 operator /(Vector1 left, Vector3 right) => new(left / right.X, left / right.Y, left / right.Z);
         public static Vector3 operator /(Vector3 left, Vector3 right) => OpenTK.Mathematics.Vector3.Divide(left, right);
 
         public static Vector1 Dot(Vector3 left, Vector3 right) => OpenTK.Mathematics.Vector3.Dot(left, right);

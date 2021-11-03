@@ -1,8 +1,9 @@
 ﻿using PathTracer.Geometry.Vectors;
+using System;
 
 namespace PathTracer.Pathtracing.Spectra {
     /// <summary> A spectrum of electromagnetic radiation that can contain different wavelengths  </summary>
-    public interface ISpectrum {
+    public interface ISpectrum : IEquatable<ISpectrum> {
         /// <summary> The minimum wavelength of visible light </summary>
         const float MinimumWavelength = 4e-7f;
         /// <summary> The maximum wavelength of visible light </summary>
@@ -14,17 +15,26 @@ namespace PathTracer.Pathtracing.Spectra {
         static ISpectrum White => new RGBSpectrum(Vector3.One);
 
         /// <summary> Whether the <see cref="ISpectrum"/> is black </summary>
-        bool IsBlack => this == Black;
+        bool IsBlack => Equals(Black);
         /// <summary> Whether the <see cref="ISpectrum"/> is white </summary>
-        bool IsWhite => this == White;
+        bool IsWhite => Equals(White);
 
-        /// <summary> Convert the <see cref="ISpectrum"/> to an rgb integer </summary>
-        /// <returns>An RGB integer</returns>
+        /// <summary> Convert the <see cref="ISpectrum"/> to an rgb <see cref="int"/> </summary>
+        /// <returns>An RGB <see cref="int"/></returns>
         int ToRGBInt();
 
-        /// <summary> Convert the <see cref="ISpectrum"/> to an rgb vector </summary>
-        /// <returns>An RGB vector</returns>
+        /// <summary> Convert the <see cref="ISpectrum"/> to an rgb <see cref="Vector3"/> </summary>
+        /// <returns>An RGB <see cref="Vector3"/></returns>
         Vector3 ToRGBVector();
+
+        /// <summary> Convert the <see cref="ISpectrum"/> to a <see cref="string"/> </summary>
+        /// <returns>The <see cref="string"/></returns>
+        string ToString();
+
+        /// <summary> Check whether the <see cref="ISpectrum"/> is equal to an <paramref name="other"/> </summary>
+        /// <param name="other">The other <see cref="ISpectrum"/></param>
+        /// <returns>Whether the <see cref="ISpectrum"/> is equal to the <paramref name="other"/></returns>
+        bool IEquatable<ISpectrum>.Equals(ISpectrum? other) => this is RGBSpectrum rgb && rgb.Equals(other);
 
         /// <summary> Add two <see cref="ISpectrum"/> </summary>
         /// <param name="left">The left <see cref="ISpectrum"/></param>

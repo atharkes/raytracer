@@ -59,7 +59,7 @@ namespace PathTracer.Pathtracing.Observers.Cameras {
         /// <summary> Rotate the <see cref="PinholeCamera"/> around a specified <paramref name="axis"/> </summary>
         /// <param name="axis">The axis to rotate around</param>
         /// <param name="degrees">The amount of degrees to rotate</param>
-        public void Rotate(Normal3 axis, float degrees) => SetRotation(Rotation * Quaternion.FromAxisAngle(axis.Vector.Value, degrees).Normalized());
+        public void Rotate(Normal3 axis, float degrees) => SetRotation(Rotation * Quaternion.FromAxisAngle(axis.Vector.Value, degrees));
 
         /// <summary> Set the rotation <see cref="Quaternion"/> of the <see cref="PinholeCamera"/> </summary>
         /// <param name="rotation">The new rotation <see cref="Quaternion"/></param>

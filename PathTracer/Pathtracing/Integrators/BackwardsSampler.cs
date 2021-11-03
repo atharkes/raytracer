@@ -18,17 +18,15 @@ namespace PathTracer.Pathtracing.Integrators {
     /// <summary> An <see cref="Integrator"/> that samples from the <see cref="ICamera"/> </summary>
     public class BackwardsSampler : Integrator {
         /// <summary> The maximum recursion depth for sampling </summary>
-        public int MaxRecursionDepth { get; } = 5;
+        public int MaxRecursionDepth { get; } = 2;
         /// <summary> The amount of evaluated samples </summary>
         public override int SampleCount { get; } = 0;
 
         public override void Integrate(IScene scene, TimeSpan integrationTime) {
-            int rayCount = 100;
-            TraceRays(scene, rayCount);
-            return;
+            int taskSize = 10;
             Action[] tasks = new Action[Program.Threadpool.MultithreadingTaskCount];
             for (int i = 0; i < Program.Threadpool.MultithreadingTaskCount; i++) {
-                tasks[i] = () => TraceRays(scene, rayCount);
+                tasks[i] = () => TraceRays(scene, taskSize);
             }
             Program.Threadpool.DoTasks(tasks);
             Program.Threadpool.WaitTillDone();
@@ -56,7 +54,6 @@ namespace PathTracer.Pathtracing.Integrators {
             IDistanceDistribution? distances = scene.Trace(ray, spectrum);
             if (distances is null) return ISpectrum.Black;
             Position1 distance = distances.Sample(Utils.ThreadRandom);
-            if (distance == Position1.PositiveInfinity) return ISpectrum.Black;
             float distancePdf = (float)distances.Probability(distance);
 
             /// Sample Material
@@ -87,17 +84,17 @@ namespace PathTracer.Pathtracing.Integrators {
             Normal3 direction = directions.Sample(Utils.ThreadRandom);
             float directionPdf = (float)directions.Probability(direction);
 
-            /// Get Absorption
+            /// Compute Throughput
             ISpectrum absorption = material.Albedo;
-
-            /// Area Conversion
             float areaConversion = Math.Abs(Vector3.Dot(orientation.Vector, direction.Vector));
+            ISpectrum throughput = absorption * areaConversion * directionPdf * orientationPdf;
+            if (throughput.IsBlack) return directIllumination;
 
             /// Sample Indirect Illumination
-            ISpectrum indirectIllumination = Sample(scene, new Ray(position, direction), spectrum * material.Albedo, recursionDepth + 1);
+            ISpectrum indirectIllumination = Sample(scene, new Ray(position, direction), throughput, recursionDepth + 1);
 
             /// Light Throughput Calculation
-            return (indirectIllumination * areaConversion * absorption * directionPdf * orientationPdf + directIllumination) * intervalPdf * materialPdf * distancePdf;
+            return (indirectIllumination * throughput + directIllumination) * intervalPdf * materialPdf * distancePdf;
         }
     }
 }

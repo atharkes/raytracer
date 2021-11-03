@@ -25,13 +25,25 @@ namespace PathTracer.Drawing {
         }
 
         /// <summary> The size of the <see cref="Surface"/> </summary>
-        public Vector2i Size { get; }
+        public Vector2i Size {
+            get => size;
+            set {
+                size = value;
+                Pixels = new int[size.X * size.Y];
+                OnResize?.Invoke(this, size);
+            }
+        }
         /// <summary> The width of the <see cref="Surface"/> </summary>
         public int Width => Size.X;
         /// <summary> The height of the <see cref="Surface"/> </summary>
         public int Height => Size.Y;
         /// <summary> The pixel array of the <see cref="Surface"/> </summary>
-        public readonly int[] Pixels;
+        public int[] Pixels;
+
+        /// <summary> The event that fires when the <see cref="Surface"/> is resized </summary>
+        public event EventHandler<Vector2i>? OnResize;
+
+        Vector2i size;
 
         /// <summary> Create a new <see cref="Surface"/> </summary>
         /// <param name="size">The size of the <see cref="Surface"/></param>

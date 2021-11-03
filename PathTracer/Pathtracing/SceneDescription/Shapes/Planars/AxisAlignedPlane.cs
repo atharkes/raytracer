@@ -46,6 +46,22 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Planars {
             BoundingBox = new AxisAlignedBox(normal.Vector * Vector3.NegativeInfinity, normal.Vector * Vector3.PositiveInfinity);
         }
 
+        /// <summary> Create a new <see cref="AxisAlignedPlane"/> using a <paramref name="unit"/> and a <paramref name="distance"/> </summary>
+        /// <param name="position">The position of the <see cref="AxisAlignedPlane"/></param>
+        /// <param name="unit">The normal of the <see cref="AxisAlignedPlane"/></param>
+        public AxisAlignedPlane(Position3 position, Unit3 unit) {
+            Normal3 normal = new(unit);
+            PlaneOfExistence = new Plane(position, normal);
+            BoundingBox = new AxisAlignedBox(normal.Vector * Vector3.NegativeInfinity, normal.Vector * Vector3.PositiveInfinity);
+        }
+
+        public static bool operator ==(AxisAlignedPlane left, AxisAlignedPlane right) => left.Equals(right);
+        public static bool operator !=(AxisAlignedPlane left, AxisAlignedPlane right) => !(left == right);
+
+        public override int GetHashCode() => PlaneOfExistence.GetHashCode();
+        public override bool Equals(object? obj) => obj is AxisAlignedPlane plane && Equals(plane);
+        public bool Equals(AxisAlignedPlane other) => PlaneOfExistence.Equals(other.PlaneOfExistence);
+
         public Position1? IntersectDistance(IRay ray) => PlaneOfExistence.IntersectDistance(ray);
         public bool OnSurface(Position3 position, float epsilon = 0.001F) => PlaneOfExistence.OnSurface(position, epsilon);
         public Position3 SurfacePosition(Random random) => PlaneOfExistence.SurfacePosition(random);

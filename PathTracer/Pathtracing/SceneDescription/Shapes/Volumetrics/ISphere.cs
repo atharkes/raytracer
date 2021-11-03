@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics {
     /// <summary> A sphere </summary>
-    public interface ISphere : IVolumetricShape {
+    public interface ISphere : IVolumetricShape, IEquatable<ISphere> {
         /// <summary> Position of the <see cref="ISphere"/> </summary>
         Position3 Position { get; }
         /// <summary> The radius of the <see cref="ISphere"/> </summary>
@@ -19,6 +19,20 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics {
         float IShape.SurfaceArea => 4f * (float)Math.PI * Radius * Radius;
         /// <summary> The bounding box of the <see cref="ISphere"/> </summary>
         AxisAlignedBox IBoundable.BoundingBox => new(Position - new Direction3(Radius), Position + new Direction3(Radius));
+
+        /// <summary> Convert the <see cref="ISphere"/> into an <see cref="int"/> hashcode </summary>
+        /// <returns>The <see cref="int"/> hashcode of the <see cref="ISphere"/></returns>
+        int GetHashCode() => HashCode.Combine(Position.GetHashCode(), Radius.GetHashCode());
+
+        /// <summary> Check whether the <paramref name="obj"/> is equal to the <see cref="ISphere"/> </summary>
+        /// <param name="obj">The <see cref="object"/></param>
+        /// <returns>Whether the <paramref name="obj"/> is equal to the <see cref="ISphere"/></returns>
+        bool Equals(object? obj) => obj is ISphere sphere && Equals(sphere);
+
+        /// <summary> Check whether the <paramref name="sphere"/> is equal to the <see cref="ISphere"/> </summary>
+        /// <param name="sphere">The other <see cref="ISphere"/></param>
+        /// <returns>Whether the <paramref name="sphere"/> is equal to the <see cref="ISphere"/></returns>
+        bool IEquatable<ISphere>.Equals(ISphere? sphere) => Position.Equals(sphere?.Position) && Radius.Equals(sphere?.Radius);
 
         /// <summary> Get a <paramref name="random"/> point on the surface of the <see cref="ISphere"/> </summary>
         /// <param name="random">The <see cref="Random"/> to decide the position on the surface</param>

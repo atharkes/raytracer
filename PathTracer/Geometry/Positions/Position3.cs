@@ -43,13 +43,15 @@ namespace PathTracer.Geometry.Positions {
         public static Position3 operator +(Position3 position, IDirection3 direction) => new(position.Vector + direction.Vector);
         public static Position3 operator -(Position3 position, IDirection3 direction) => new(position.Vector - direction.Vector);
 
-        public static Position1 Dot(Position3 position, IDirection3 direction) => new(Vector3.Dot(position.Vector, direction.Vector));
-        public static Position3 ComponentMin(Position3 left, Position3 right) => new(Vector3.ComponentMin(left.Vector, right.Vector));
-        public static Position3 ComponentMax(Position3 left, Position3 right) => new(Vector3.ComponentMax(left.Vector, right.Vector));
+        public static Position3 Lerp(Position3 left, Position3 right, Vector1 blend) => Vector3.Lerp(left.Vector, right.Vector, blend);
+        public static Position1 Dot(Position3 position, IDirection3 direction) => Vector3.Dot(position.Vector, direction.Vector);
+        public static Position3 ComponentMin(Position3 left, Position3 right) => Vector3.ComponentMin(left.Vector, right.Vector);
+        public static Position3 ComponentMax(Position3 left, Position3 right) => Vector3.ComponentMax(left.Vector, right.Vector);
 
         public override bool Equals(object? obj) => Vector.Equals(obj);
         public bool Equals(Position3 other) => Vector.Equals(other.Vector);
         public bool Equals(Position3? other) => Vector.Equals(other?.Vector);
         public override int GetHashCode() => Vector.GetHashCode();
+        public override string ToString() => Vector.ToString();
     }
 }

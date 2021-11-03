@@ -6,7 +6,7 @@ namespace PathTracer.Pathtracing.Observers.Accumulators {
     /// <summary> A cavity of the accumulator that catches light </summary>
     public class Cavity {
         /// <summary> The amount of light in the cavity </summary>
-        public ISpectrum Light { get; private set; } = new RGBSpectrum(Vector3.Zero);
+        public ISpectrum Light { get; private set; } = ISpectrum.Black;
         /// <summary> The amount of photons caught by the cavity </summary>
         public int Samples { get; private set; } = 0;
         /// <summary> Amount of times the bvh is traversed by photons in the cavity </summary>
@@ -41,5 +41,7 @@ namespace PathTracer.Pathtracing.Observers.Accumulators {
             Intersections = 0;
             Samples = 0;
         }
+
+        public override string ToString() => AverageLight.ToString();
     }
 }

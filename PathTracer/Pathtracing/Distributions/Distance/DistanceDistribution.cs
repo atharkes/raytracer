@@ -68,7 +68,7 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
         }
 
         public double CumulativeDistribution(Position1 sample) {
-            return sample < Distance ? 0 : 1;
+            return sample >= Distance ? 1 : 0;
         }
 
         public WeightedPMF<IMaterial>? GetMaterials(Position1 sample) {

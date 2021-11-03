@@ -37,5 +37,6 @@ namespace PathTracer.Geometry.Directions {
         public static Direction2 operator /(Direction2 direction, Position2 scale) => direction.Vector / scale.Vector;
 
         public Normal2 Normalized() => new(Vector);
+        public override string ToString() => Vector.ToString();
     }
 }

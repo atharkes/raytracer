@@ -50,5 +50,6 @@ namespace PathTracer.Geometry.Directions {
         public static Direction3 Lerp(IDirection3 a, IDirection3 b, Vector1 blend) => Vector3.Lerp(a.Vector, b.Vector, blend);
 
         public Normal3 Normalized() => new(Vector);
+        public override string ToString() => Vector.ToString();
     }
 }

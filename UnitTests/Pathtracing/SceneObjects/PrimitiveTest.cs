@@ -19,7 +19,7 @@ namespace UnitTests.Pathtracing.SceneObjects {
             for (int i = 0; i < 100; i++) {
                 IPrimitive primitive = Utils.ThreadRandom.Primitive();
                 AxisAlignedBox bounds = primitive.BoundingBox;
-                AxisAlignedPlane plane = new(Utils.ThreadRandom.UnitVector(), primitive.Position);
+                AxisAlignedPlane plane = new(primitive.BoundingBox.Center, Utils.ThreadRandom.Unit());
                 IEnumerable<ISceneObject> fragments = (primitive as IDivisible<ISceneObject>).Clip(plane);
                 foreach (ISceneObject fragment in fragments) {
                     AxisAlignedBox clipBounds = fragment.BoundingBox;

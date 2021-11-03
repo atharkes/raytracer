@@ -63,15 +63,15 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics {
         /// <returns>The hashcode of the <see cref="AxisAlignedBox"/></returns>
         public override int GetHashCode() => Bounds.GetHashCode();
 
-        /// <summary> Check equality with an <paramref name="other"/> <see cref="AxisAlignedBox"/> </summary>
-        /// <param name="other">The <see cref="AxisAlignedBox"/> to check equality with</param>
-        /// <returns>Whether the <paramref name="other"/> is equal to this <see cref="AxisAlignedBox"/></returns>
-        public bool Equals(AxisAlignedBox other) => Bounds.Equals(other.Bounds);
-
         /// <summary> Check equality with an <paramref name="obj"/> </summary>
         /// <param name="obj">The <see cref="object"/> to check equality with</param>
         /// <returns>Whether the object is equal to this <see cref="AxisAlignedBox"/></returns>
         public override bool Equals(object? obj) => obj is not null && obj is AxisAlignedBox box && Equals(box);
+
+        /// <summary> Check equality with an <paramref name="other"/> <see cref="AxisAlignedBox"/> </summary>
+        /// <param name="other">The <see cref="AxisAlignedBox"/> to check equality with</param>
+        /// <returns>Whether the <paramref name="other"/> is equal to this <see cref="AxisAlignedBox"/></returns>
+        public bool Equals(AxisAlignedBox other) => Bounds.Equals(other.Bounds);
 
         /// <summary> Get a <paramref name="random"/> point on the surface of the <see cref="AxisAlignedBox"/> </summary>
         /// <param name="random">The <see cref="Random"/> to decide the position of the point on the surface</param>

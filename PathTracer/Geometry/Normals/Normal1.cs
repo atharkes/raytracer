@@ -26,5 +26,6 @@ namespace PathTracer.Geometry.Normals {
         public bool Equals(Normal1 other) => Vector.Equals(other.Vector);
         public bool Equals(Normal1? other) => Vector.Equals(other?.Vector);
         public override int GetHashCode() => Vector.GetHashCode();
+        public override string ToString() => Vector.ToString();
     }
 }

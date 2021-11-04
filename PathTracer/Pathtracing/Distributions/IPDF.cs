@@ -23,8 +23,13 @@ namespace PathTracer.Pathtracing.Distributions {
         bool Contains(T sample);
 
         /// <summary> Get the probability of a <paramref name="sample"/> in the <see cref="IPDF{T}"/> </summary>
-        /// <param name="sample">The sample to get the probability for</param>
+        /// <param name="sample">The <see cref="T"/> to get the probability for</param>
         /// <returns>The probability of the <paramref name="sample"/></returns>
         double Probability(T sample);
+
+        /// <summary> Get the relative probability of a <paramref name="sample"/> in the <see cref="IPDF{T}"/> </summary>
+        /// <param name="sample">The <see cref="T"/> to get the relative probability for</param>
+        /// <returns>The relative probability of the <paramref name="sample"/></returns>
+        double RelativeProbability(T sample) => Probability(sample) * DomainSize;
     }
 }

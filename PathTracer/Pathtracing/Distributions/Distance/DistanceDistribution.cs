@@ -52,6 +52,7 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
         public Position1 Distance { get; }
         public IMaterial Material { get; }
         public IShapeInterval Interval { get; }
+        double IPDF.DomainSize => 1;
 
         public SingleDistanceDistribution(Position1 distance, IMaterial material, IShapeInterval interval) {
             Distance = distance;
@@ -98,7 +99,6 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
         public Position1 Sample(Random random) {
             Position1 distance = Minimum + (float)Distribution.InverseCumulativeDistribution(random.NextDouble());
             return distance <= Maximum ? distance : Position1.PositiveInfinity;
-
         }
 
         public double Probability(Position1 sample) {

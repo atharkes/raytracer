@@ -72,7 +72,7 @@ namespace PathTracer.Utilities {
             DebugInfo = renderer.Observer.DebugInfo;
             Position = renderer.Observer.Camera.Position;
             Rotation = renderer.Observer.Camera.Rotation;
-            FOV = renderer.Observer.Camera.FOV;
+            FOV = renderer.Observer.Camera.HorizontalFOV;
             /// Write to File
             FileStream.SetLength(0);
             StreamWriter streamWriter = new(FileStream);

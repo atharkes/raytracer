@@ -50,6 +50,6 @@ namespace PathTracer.Pathtracing.Observers {
         /// <param name="x">The x position of the topleft of the text</param>
         /// <param name="y">The y position of the topleft of the text</param>
         /// <param name="color">The color of the text</param>
-        void Print(string text, int x, int y, int color = 0xffffff);
+        void Print(string text, int x, int y, int color = 0xffff00);
     }
 }

@@ -61,7 +61,7 @@ namespace PathTracer.Pathtracing.Distributions {
 
         public bool Contains(T sample) =>  items.Contains(sample);
 
-        public double Probability(T sample) => probabilities[sample] * DomainSize;
+        public double Probability(T sample) => probabilities[sample];
 
         public T Sample(Random random) {
             double sample = random.NextDouble();

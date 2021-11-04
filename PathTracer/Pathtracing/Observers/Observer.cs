@@ -36,6 +36,7 @@ namespace PathTracer.Pathtracing.Observers {
             Accumulator = new Accumulator(screen.Width, screen.Height);
             Screen = screen;
             Screen.OnResize += (_, size) => Accumulator = new Accumulator(size.X, size.Y);
+            Screen.OnResize += (_, size) => Camera.AspectRatio = (float)size.X / size.Y;
             Camera.OnMoved += (_, _) => Accumulator.Clear();
             Camera.Film.SampleRegistered += (_, sample) => Accumulator.Add(sample);
         }
@@ -54,7 +55,7 @@ namespace PathTracer.Pathtracing.Observers {
             Screen.Print($"Integrator Time (ms): {(int)Renderer.Statistics.IntegratorTime.LastTick.TotalMilliseconds}", 1, 49);
             Screen.Print($"Drawing Time (ms): {(int)Renderer.Statistics.DrawingTime.LastTick.TotalMilliseconds}", 1, 65);
             Screen.Print($"OpenTK Time (ms): {(int)Renderer.Statistics.OpenTKTime.LastTick.TotalMilliseconds}", 1, 81);
-            Screen.Print($"FOV: {Camera.FOV}", 1, 97);
+            Screen.Print($"FOV: {Camera.HorizontalFOV}", 1, 97);
             Screen.Print($"Front: {Camera.Front}", 1, 113);
             Screen.Print($"Up: {Camera.Up}", 1, 129);
             Screen.Print($"Right: {Camera.Right}", 1, 145);
@@ -73,8 +74,8 @@ namespace PathTracer.Pathtracing.Observers {
             if (keyboard.IsKeyDown(Keys.A)) Camera.Move(Camera.Left * MoveSpeed);
             if (keyboard.IsKeyDown(Keys.S)) Camera.Move(Camera.Back * MoveSpeed);
             if (keyboard.IsKeyDown(Keys.D)) Camera.Move(Camera.Right * MoveSpeed);
-            if (keyboard.IsKeyPressed(Keys.KeyPadAdd)) Camera.FOV *= 1f + FOVSensitivity;
-            if (keyboard.IsKeyPressed(Keys.KeyPadSubtract)) Camera.FOV /= 1f + FOVSensitivity;
+            if (keyboard.IsKeyPressed(Keys.KeyPadAdd)) Camera.HorizontalFOV *= 1f + FOVSensitivity;
+            if (keyboard.IsKeyPressed(Keys.KeyPadSubtract)) Camera.HorizontalFOV /= 1f + FOVSensitivity;
             if (keyboard.IsKeyDown(Keys.Up)) Camera.Rotate(IDirection3.DefaultRight, -RotateSensitivity);
             if (keyboard.IsKeyDown(Keys.Down)) Camera.Rotate(IDirection3.DefaultRight, RotateSensitivity);
             if (keyboard.IsKeyDown(Keys.Right)) Camera.Rotate(IDirection3.DefaultUp, RotateSensitivity);

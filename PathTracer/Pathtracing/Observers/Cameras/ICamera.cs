@@ -15,8 +15,12 @@ namespace PathTracer.Pathtracing.Observers.Cameras {
         Position3 Position { get; set; }
         /// <summary> The rotation <see cref="Quaternion"/> of the <see cref="ICamera"/> </summary>
         Quaternion Rotation { get; }
-        /// <summary> The (horizontal) field of view of the <see cref="ICamera"/> (in degrees) </summary>
-        float FOV { get; set; }
+        /// <summary> The horizontal field of view angle (in degrees) of the <see cref="ICamera"/> </summary>
+        float HorizontalFOV { get; set; }
+        /// <summary> The aspect ratio of the <see cref="ICamera"/> </summary>
+        float AspectRatio { get; set; }
+        /// <summary> The vertical field of view angle (in degrees) of the <see cref="ICamera"/> </summary>
+        float VerticalFOV => HorizontalFOV / AspectRatio;
 
         /// <summary> The viewing direction of the <see cref="ICamera"/> </summary>
         Normal3 ViewDirection => Front;

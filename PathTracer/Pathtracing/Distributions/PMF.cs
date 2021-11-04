@@ -28,22 +28,16 @@ namespace PathTracer.Pathtracing.Distributions {
         /// <summary> Check whether the <see cref="PMF{T}"/> contains a <paramref name="sample"/> in its domain </summary>
         /// <param name="sample">The <see cref="T"/> to check</param>
         /// <returns>Whether the <paramref name="sample"/> is in the domain of the <see cref="PMF{T}"/></returns>
-        public bool Contains(T sample) {
-            return items.Contains(sample);
-        }
+        public bool Contains(T sample) => items.Contains(sample);
 
         /// <summary> Get the probability of a <paramref name="sample"/> in the <see cref="PMF{T}{T}"/> </summary>
         /// <param name="sample">The <see cref="T"/> to get the probability for</param>
         /// <returns>The probability of the <paramref name="sample"/></returns>
-        public double Probability(T sample) {
-            return 1 / (double)items.Length;
-        }
+        public double Probability(T sample) => 1 / (double)items.Length;
 
         /// <summary> Sample the <see cref="PMF{T}{T}"/> </summary>
         /// <param name="random">The <see cref="Random"/> to use for sampling</param>
         /// <returns>A <paramref name="random"/> <see cref="T"/></returns>
-        public T Sample(Random random) {
-            return items[random.Next(0, items.Length)];
-        }
+        public T Sample(Random random) => items[random.Next(0, items.Length)];
     }
 }

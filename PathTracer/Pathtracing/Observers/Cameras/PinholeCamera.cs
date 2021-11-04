@@ -18,10 +18,12 @@ namespace PathTracer.Pathtracing.Observers.Cameras {
         public Position3 Position { get => position; set => SetPosition(value); }
         /// <summary> The rotation <see cref="Quaternion"/> of the <see cref="PinholeCamera"/> </summary>
         public Quaternion Rotation { get => rotation; set => SetRotation(value); }
-        /// <summary> The field of view of the <see cref="PinholeCamera"/> </summary>
-        public float FOV { get => fov; set => SetFOV(value); }
+        /// <summary> The field of view angle (in degrees) the <see cref="PinholeCamera"/> </summary>
+        public float HorizontalFOV { get => fov; set => SetFOV(value); }
+        /// <summary> The aspect ratio of the <see cref="PinholeCamera"/> </summary>
+        public float AspectRatio { get => aspectRatio; set => SetAspectRatio(value); }
         /// <summary> The viewing direction of the <see cref="PinholeCamera"/> </summary>
-        public Normal3 ViewDirection => Rotation * IDirection3.DefaultFront;
+        public Normal3 ViewDirection => Rotation * IDirection3.DefaultFront;   
 
         /// <summary> The event that fires when the <see cref="Camera"/> moved </summary>
         public event EventHandler<ICamera>? OnMoved;
@@ -29,6 +31,7 @@ namespace PathTracer.Pathtracing.Observers.Cameras {
         Position3 position;
         Quaternion rotation;
         float fov;
+        float aspectRatio;
 
         /// <summary> Create a new camera object </summary>
         /// <param name="position">The position of the <see cref="PinholeCamera"/></param>
@@ -39,6 +42,7 @@ namespace PathTracer.Pathtracing.Observers.Cameras {
             this.position  = position;
             this.rotation = rotation;
             this.fov = fov;
+            this.aspectRatio = aspectRatio;
             Rectangle filmRectangle = new(Position, new Position2(aspectRatio, 1), rotation);
             Film = new Film(filmRectangle);
             OnMoved += Film.PositionFilm;
@@ -68,7 +72,7 @@ namespace PathTracer.Pathtracing.Observers.Cameras {
             OnMoved?.Invoke(this, this);
         }
 
-        /// <summary> Set the view direction of the camera </summary>
+        /// <summary> Set the view direction of the <see cref="PinholeCamera"/> </summary>
         /// <param name="direction">The direction the <see cref="PinholeCamera"/> will view towards</param>
         public void SetViewDirection(Normal3 direction) {
             Normal3 side = Normal3.Cross(direction, IDirection3.DefaultUp);
@@ -78,10 +82,17 @@ namespace PathTracer.Pathtracing.Observers.Cameras {
             SetRotation(Quaternion.FromMatrix(lookAtMatrix));
         }
 
-        /// <summary> Set the field of view of the camera </summary>
-        /// <param name="degrees">The new degrees of the field of view</param>
+        /// <summary> Set the field of view of the <see cref="PinholeCamera"/> </summary>
+        /// <param name="degrees">The new field of view</param>
         public void SetFOV(float degrees) {
             fov = degrees;
+            OnMoved?.Invoke(this, this);
+        }
+
+        /// <summary> Set the aspect ratio of the <see cref="PinholeCamera"/> </summary>
+        /// <param name="aspectRatio">The new aspect ratio</param>
+        public void SetAspectRatio(float aspectRatio) {
+            this.aspectRatio = aspectRatio;
             OnMoved?.Invoke(this, this);
         }
 

@@ -5,9 +5,6 @@ using PathTracer.Pathtracing.SceneDescription;
 namespace PathTracer.Pathtracing.Distributions.Distance {
     /// <summary> A 1-dimensional distance distribution </summary>
     public interface IDistanceDistribution : ICDF<Position1> {
-        /// <summary> The domain size of the <see cref="IDistanceDistribution"/> </summary>
-        double IPDF.DomainSize => Maximum - Minimum;
-
         /// <summary> Get the possible <see cref="IMaterial"/>s for a specified <paramref name="sample"/> sample </summary>
         /// <param name="sample">The distance sample</param>
         /// <returns>A <see cref="PMF{T}"/> with the <see cref="IMaterial"/>s</returns>
@@ -24,7 +21,18 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
         /// <param name="right">The right <see cref="IDistanceDistribution"/></param>
         /// <returns>The combined <see cref="IDistanceDistribution"/></returns>
         public static IDistanceDistribution? operator +(IDistanceDistribution? left, IDistanceDistribution? right) {
-            return left is null ? right : (right is null ? left : new RecursiveDistanceDistribution(left, right));
+            if (left is null) {
+                return right;
+            } else if (right is null) {
+                return left;
+            }
+            IDistanceDistribution first = left.Minimum < right.Minimum ? left : right;
+            IDistanceDistribution last = first == left ? right : left;
+            if (first.CumulativeProbability(last.Minimum) >= 1) {
+                return first;
+            } else {
+                return new RecursiveDistanceDistribution(left, right);
+            }
         }
     }
 }

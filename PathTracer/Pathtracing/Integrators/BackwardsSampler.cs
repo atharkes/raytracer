@@ -54,6 +54,7 @@ namespace PathTracer.Pathtracing.Integrators {
             IDistanceDistribution? distances = scene.Trace(ray, spectrum);
             if (distances is null) return ISpectrum.Black;
             Position1 distance = distances.Sample(Utils.ThreadRandom);
+            if (distance == Position1.PositiveInfinity) return ISpectrum.Black;
             float distanceRelProb = (float)distances.RelativeProbability(distance);
 
             /// Sample Material

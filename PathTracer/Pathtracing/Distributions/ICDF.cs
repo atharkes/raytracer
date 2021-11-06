@@ -1,4 +1,5 @@
-﻿using PathTracer.Utilities;
+﻿using PathTracer.Geometry.Positions;
+using PathTracer.Utilities;
 using System;
 
 namespace PathTracer.Pathtracing.Distributions {
@@ -30,7 +31,7 @@ namespace PathTracer.Pathtracing.Distributions {
         /// <summary> Get the cummulative probability of a <paramref name="sample"/> in the <see cref="ICDF{T}"/> </summary>
         /// <param name="sample">The sample to get the cummulative probability for</param>
         /// <returns>The cummulative probability of the <paramref name="sample"/></returns>
-        double CumulativeDistribution(T sample);
+        double CumulativeProbability(T sample);
     }
 
     /// <summary> A recursive <see cref="ICDF{T}"/> </summary>
@@ -63,11 +64,11 @@ namespace PathTracer.Pathtracing.Distributions {
                 if (pLeft <= 0 && pRight <= 0) {
                     return 0;
                 } else if (pLeft <= 0) {
-                    return (1 - Left.CumulativeDistribution(sample)) * pRight;
+                    return (1 - Left.CumulativeProbability(sample)) * pRight;
                 } else if (pRight <= 0) {
-                    return (1 - Right.CumulativeDistribution(sample)) * pLeft;
+                    return (1 - Right.CumulativeProbability(sample)) * pLeft;
                 } else {
-                    return (1 - Left.CumulativeDistribution(sample)) * pRight + (1 - Right.CumulativeDistribution(sample)) * pLeft;
+                    return (1 - Left.CumulativeProbability(sample)) * pRight + (1 - Right.CumulativeProbability(sample)) * pLeft;
                 }
             }
         }
@@ -75,12 +76,12 @@ namespace PathTracer.Pathtracing.Distributions {
         /// <summary> Get the cummulative probability of a <paramref name="sample"/> in the <see cref="IRecursiveCDF{T}"/> </summary>
         /// <param name="sample">The sample to get the cummulative probability for</param>
         /// <returns>The cummulative probability of the <paramref name="sample"/></returns>
-        double ICDF<T>.CumulativeDistribution(T sample) {
+        double ICDF<T>.CumulativeProbability(T sample) {
             if (After(sample)) {
                 return 0;
             } else {
-                double l = Left.CumulativeDistribution(sample);
-                double r = Right.CumulativeDistribution(sample);
+                double l = Left.CumulativeProbability(sample);
+                double r = Right.CumulativeProbability(sample);
                 return l + r - l * r;
             }
         }

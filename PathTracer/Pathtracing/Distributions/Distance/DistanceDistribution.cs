@@ -1,4 +1,5 @@
 ﻿using MathNet.Numerics.Distributions;
+using PathTracer.Geometry.Directions;
 using PathTracer.Geometry.Positions;
 using PathTracer.Pathtracing.Distributions.Boundaries;
 using PathTracer.Pathtracing.SceneDescription;
@@ -11,8 +12,6 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
 
         ICDF<Position1> IRecursiveCDF<Position1>.Left => Left;
         ICDF<Position1> IRecursiveCDF<Position1>.Right => Right;
-        
-        public double DomainSize => Math.Max(Left.DomainSize, Right.DomainSize);
 
         public RecursiveDistanceDistribution(IDistanceDistribution left, IDistanceDistribution right) {
             Left = left;
@@ -87,12 +86,12 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
         public Exponential Distribution { get; }
         public Position1 ExponentialStart { get; }
         public Position1 ExponentialEnd { get; }
+        public Direction1 ExponentialSize => ExponentialEnd - ExponentialStart;
         public IMaterial Material { get; }
         public IShapeInterval Interval { get; }
         public Position1 Minimum => ExponentialStart;
         public Position1 Maximum => Position1.PositiveInfinity;
-        /// <summary> The domain size is 2; either continuous or discreet. </summary>
-        public double DomainSize => throw new NotImplementedException();
+        public double DomainSize => 2;
 
         public ExponentialDistanceDistribution(Position1 start, Position1 end, double rate, IMaterial material, IShapeInterval interval) {
             Distribution = new Exponential(rate);
@@ -108,10 +107,20 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
         }
 
         public double Probability(Position1 sample) {
-            if (Minimum <= sample && sample <= Maximum) {
-                return Distribution.Density(sample - Minimum);
-            } else if (sample == Position1.PositiveInfinity) {
-                return 1 - Distribution.CumulativeDistribution(Maximum - Minimum);
+            if (sample == Position1.PositiveInfinity) {
+                return 1 - Distribution.CumulativeDistribution(ExponentialSize);
+            } else if (ExponentialStart <= sample && sample <= ExponentialEnd) {
+                return Distribution.Density(sample - ExponentialStart);
+            } else {
+                return 0;
+            }
+        }
+
+        public double RelativeProbability(Position1 sample) {
+            if (sample == Position1.PositiveInfinity) {
+                return Probability(sample) * DomainSize;
+            } else if (ExponentialStart <= sample && sample <= ExponentialEnd) {
+                return Probability(sample) * DomainSize * ExponentialSize;
             } else {
                 return 0;
             }

@@ -31,7 +31,7 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
             if (first.CumulativeProbability(last.Minimum) >= 1) {
                 return first;
             } else {
-                return new RecursiveDistanceDistribution(left, right);
+                return new RecursiveDistanceDistribution(first, last);
             }
         }
     }

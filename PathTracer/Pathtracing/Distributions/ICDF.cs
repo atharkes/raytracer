@@ -1,5 +1,4 @@
-﻿using PathTracer.Geometry.Positions;
-using PathTracer.Utilities;
+﻿using PathTracer.Utilities;
 using System;
 
 namespace PathTracer.Pathtracing.Distributions {
@@ -46,11 +45,20 @@ namespace PathTracer.Pathtracing.Distributions {
         T ICDF<T>.Minimum => Utils.Min(Left.Minimum, Right.Minimum);
         /// <summary> The maximum <see cref="T"/> in the domain of the <see cref="IRecursiveCDF{T}"/> </summary>
         T ICDF<T>.Maximum => Utils.Min(Left.Maximum, Right.Maximum);
+        /// <summary> The size of the domain is 2; left and right </summary>
+        double IPDF.DomainSize => 2;
 
         /// <summary> Sample the <see cref="IRecursiveCDF{T}"/> </summary>
         /// <param name="random">The <see cref="Random"/> to use for sampling</param>
         /// <returns>A <paramref name="random"/> <see cref="T"/></returns>
-        T IPDF<T>.Sample(Random random) => Utils.Min(Left.Sample(random), Right.Sample(random));
+        T IPDF<T>.Sample(Random random) {
+            T left = Left.Sample(random);
+            if (left.CompareTo(Right.Minimum) <= 0) {
+                return left;
+            } else {
+                return Utils.Min(left, Right.Sample(random));
+            }
+        }
 
         /// <summary> Get the probability of a <paramref name="sample"/> in the <see cref="IRecursiveCDF{T}"/> </summary>
         /// <param name="sample">The sample to get the probability for</param>

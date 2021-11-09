@@ -5,7 +5,12 @@ using System.Diagnostics;
 namespace PathTracer.Pathtracing.Spectra {
     /// <summary> A color <see cref="ISpectrum"/> that holds a single value for red, green, and blue </summary>
     public struct RGBSpectrum : ISpectrum, IEquatable<RGBSpectrum> {
-        Vector3 rgb;
+        /// <summary> The <see cref="RGBSpectrum"/> that represents no light </summary>
+        public static readonly RGBSpectrum Black = new(Vector3.Zero);
+        /// <summary> The <see cref="RGBSpectrum"/> that represents light of all wavelengths </summary>
+        public static readonly RGBSpectrum White = new(Vector3.One);
+
+        readonly Vector3 rgb;
 
         /// <summary> Create an <see cref="RGBSpectrum"/> using an <paramref name="rgb"/> vector </summary>
         /// <param name="rgb">The rgb vector that holds the colors</param>

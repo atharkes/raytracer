@@ -4,30 +4,30 @@ namespace PathTracer.Geometry.Vectors {
     /// <summary> A 3-dimensional vector </summary>
     public struct Vector3 : IVector3, IEquatable<Vector3> {
         /// <summary> The smallest <see cref="Vector3"/> greater than 0 </summary>
-        public static Vector3 Epsilon => new(Vector1.Epsilon, Vector1.Epsilon, Vector1.Epsilon);
+        public static readonly Vector3 Epsilon = new(Vector1.Epsilon, Vector1.Epsilon, Vector1.Epsilon);
         /// <summary> The maximum <see cref="Vector3"/> value </summary>
-        public static Vector3 MaxValue => new(Vector1.MaxValue, Vector1.MaxValue, Vector1.MaxValue);
+        public static readonly Vector3 MaxValue = new(Vector1.MaxValue, Vector1.MaxValue, Vector1.MaxValue);
         /// <summary> The minimum <see cref="Vector3"/> value </summary>
-        public static Vector3 MinValue => new(Vector1.MinValue, Vector1.MinValue, Vector1.MinValue);
+        public static readonly Vector3 MinValue = new(Vector1.MinValue, Vector1.MinValue, Vector1.MinValue);
         /// <summary> The <see cref="Vector3"/> representation of NaN </summary>
-        public static Vector3 NaN => new(Vector1.NaN, Vector1.NaN, Vector1.NaN);
+        public static readonly Vector3 NaN = new(Vector1.NaN, Vector1.NaN, Vector1.NaN);
         /// <summary> The <see cref="Vector3"/> representation of negative infinity </summary>
-        public static Vector3 NegativeInfinity => new(Vector1.NegativeInfinity, Vector1.NegativeInfinity, Vector1.NegativeInfinity);
+        public static readonly Vector3 NegativeInfinity = OpenTK.Mathematics.Vector3.NegativeInfinity;
         /// <summary> The <see cref="Vector3"/> representation of positive infinity </summary>
-        public static Vector3 PositiveInfinity => new(Vector1.PositiveInfinity, Vector1.PositiveInfinity, Vector1.PositiveInfinity);
+        public static readonly Vector3 PositiveInfinity = OpenTK.Mathematics.Vector3.PositiveInfinity;
         /// <summary> The <see cref="Vector3"/> with both components 0 </summary>
-        public static Vector3 Zero => new(Vector1.Zero, Vector1.Zero, Vector1.Zero);
+        public static readonly Vector3 Zero = OpenTK.Mathematics.Vector3.Zero;
         /// <summary> The <see cref="Vector3"/> with both components 1 </summary>
-        public static Vector3 One => new(Vector1.One, Vector1.One, Vector1.One);
+        public static readonly Vector3 One = OpenTK.Mathematics.Vector3.One;
         /// <summary> The unit <see cref="Vector3"/> in the X-direction </summary>
-        public static Vector3 UnitX => new(Vector1.One, Vector1.Zero, Vector1.Zero);
+        public static readonly Vector3 UnitX = OpenTK.Mathematics.Vector3.UnitX;
         /// <summary> The unit <see cref="Vector3"/> in the Y-direction </summary>
-        public static Vector3 UnitY => new(Vector1.Zero, Vector1.One, Vector1.Zero);
+        public static readonly Vector3 UnitY = OpenTK.Mathematics.Vector3.UnitY;
         /// <summary> The unit <see cref="Vector3"/> in the Z-direction </summary>
-        public static Vector3 UnitZ => new(Vector1.Zero, Vector1.Zero, Vector1.One);
+        public static readonly Vector3 UnitZ = OpenTK.Mathematics.Vector3.UnitZ;
 
         /// <summary> The value of the <see cref="Vector3"/> </summary>
-        public OpenTK.Mathematics.Vector3 Value { get; }
+        public readonly OpenTK.Mathematics.Vector3 Value;
 
         /// <summary> Get a value at the specified <paramref name="index"/> </summary>
         /// <param name="index">The index to get the value at</param>

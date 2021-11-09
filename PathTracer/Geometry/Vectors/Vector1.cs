@@ -5,24 +5,24 @@ namespace PathTracer.Geometry.Vectors {
     /// <summary> A 1-dimensional vector </summary>
     public struct Vector1 : IVector1, IEquatable<Vector1>, IComparable<Vector1> {
         /// <summary> The smallest <see cref="Vector1"/> greater than 0 </summary>
-        public static Vector1 Epsilon => float.Epsilon;
+        public static readonly Vector1 Epsilon = float.Epsilon;
         /// <summary> The maximum <see cref="Vector1"/> value </summary>
-        public static Vector1 MaxValue => float.MaxValue;
+        public static readonly Vector1 MaxValue = float.MaxValue;
         /// <summary> The minimum <see cref="Vector1"/> value </summary>
-        public static Vector1 MinValue => float.MinValue;
+        public static readonly Vector1 MinValue = float.MinValue;
         /// <summary> The <see cref="Vector1"/> representation of NaN </summary>
-        public static Vector1 NaN => float.NaN;
+        public static readonly Vector1 NaN = float.NaN;
         /// <summary> The <see cref="Vector1"/> representation of negative infinity </summary>
-        public static Vector1 NegativeInfinity => float.NegativeInfinity;
+        public static readonly Vector1 NegativeInfinity = float.NegativeInfinity;
         /// <summary> The <see cref="Vector1"/> representation of positive infinity </summary>
-        public static Vector1 PositiveInfinity => float.PositiveInfinity;
+        public static readonly Vector1 PositiveInfinity = float.PositiveInfinity;
         /// <summary> The <see cref="Vector1"/> representing 0 </summary>
-        public static Vector1 Zero => 0;
+        public static readonly Vector1 Zero = 0;
         /// <summary> The <see cref="Vector1"/> representing 1 </summary>
-        public static Vector1 One => 1;
+        public static readonly Vector1 One = 1;
 
         /// <summary> The <see cref="float"/> value of the <see cref="Vector1"/> </summary>
-        public float Value { get; }
+        public readonly float Value;
 
         /// <summary> The X-component of the <see cref="Vector1"/> </summary>
         public Vector1 X => Value;
@@ -73,7 +73,6 @@ namespace PathTracer.Geometry.Vectors {
         public static Vector1 ComponentMin(Vector1 left, Vector1 right) => Math.Min(left.Value, right.Value);
         public static Vector1 ComponentMax(Vector1 left, Vector1 right) => Math.Max(left.Value, right.Value);
         public static Vector1 Abs(Vector1 vector) => Math.Abs(vector.Value);
-
         
         public override bool Equals(object? obj) => Value.Equals(obj);
         

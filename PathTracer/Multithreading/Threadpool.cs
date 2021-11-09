@@ -6,7 +6,7 @@ namespace PathTracer.Multithreading {
     /// <summary> A threadpool for dividing work between threads </summary>
     public class Threadpool {
         /// <summary> The amount of tasks created for the threadpool </summary>
-        public readonly int MultithreadingTaskCount = 720;
+        public readonly int MultithreadingTaskCount = CoreCount * 50;
         /// <summary> Amount of threads used for the threadpool </summary>
         public readonly int ThreadCount;
 

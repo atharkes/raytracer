@@ -1,5 +1,4 @@
 ﻿using PathTracer.Pathtracing.Spectra;
-using PathTracer.Utilities;
 using System;
 
 namespace PathTracer.Pathtracing.Observers.Accumulators {
@@ -60,10 +59,10 @@ namespace PathTracer.Pathtracing.Observers.Accumulators {
                         tasks[i] = () => { for (int i = lowerbound; i < higherbound; i++) screen.Plot(i, cavities[i].AverageLight.ToRGBInt()); };
                         break;
                     case DrawingMode.BVHNodeTraversals:
-                        tasks[i] = () => { for (int i = lowerbound; i < higherbound; i++) screen.Plot(i, cavities[i].AverageBVHTraversalColor.ToIntColor()); };
+                        tasks[i] = () => { for (int i = lowerbound; i < higherbound; i++) screen.Plot(i, cavities[i].AverageBVHTraversalColor.ToRGBInt()); };
                         break;
                     case DrawingMode.Intersections:
-                        tasks[i] = () => { for (int i = lowerbound; i < higherbound; i++) screen.Plot(i, cavities[i].IntersectionChanceColor.ToIntColor()); };
+                        tasks[i] = () => { for (int i = lowerbound; i < higherbound; i++) screen.Plot(i, cavities[i].IntersectionChanceColor.ToRGBInt()); };
                         break;
                 }
             }

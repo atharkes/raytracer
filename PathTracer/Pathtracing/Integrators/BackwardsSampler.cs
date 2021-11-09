@@ -23,7 +23,7 @@ namespace PathTracer.Pathtracing.Integrators {
         public override int SampleCount { get; } = 0;
 
         public override void Integrate(IScene scene, TimeSpan integrationTime) {
-            int taskSize = 10;
+            int taskSize = 1;
             Action[] tasks = new Action[Program.Threadpool.MultithreadingTaskCount];
             for (int i = 0; i < Program.Threadpool.MultithreadingTaskCount; i++) {
                 tasks[i] = () => TraceRays(scene, taskSize);

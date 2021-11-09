@@ -1,4 +1,4 @@
-﻿using OpenTK.Mathematics;
+﻿using PathTracer.Geometry.Vectors;
 using PathTracer.Pathtracing.Spectra;
 using PathTracer.Utilities;
 
@@ -19,11 +19,11 @@ namespace PathTracer.Pathtracing.Observers.Accumulators {
         /// <summary> Average BVH traversals of photons in the cavity </summary>
         public float AverageBVHTraversals => Samples > 0 ? BVHTraversals / Samples : 0f;
         /// <summary> The green to red color fade for the BVH traversals </summary>
-        public Vector3 AverageBVHTraversalColor => Utils.ColorScaleBlackGreenYellowRed(AverageBVHTraversals, 0, 255);
+        public RGBSpectrum AverageBVHTraversalColor => Utils.ColorScaleBlackGreenYellowRed(AverageBVHTraversals, 0, 255);
         /// <summary> The average chance of intersections per sample </summary>
         public float IntersectionChance => Samples > 0 ? (float)Intersections / Samples : 0f;
         /// <summary> The color for intersection chance </summary>
-        public Vector3 IntersectionChanceColor => Utils.ColorScaleBlackGreenYellowRed(IntersectionChance, 0, 1);
+        public RGBSpectrum IntersectionChanceColor => Utils.ColorScaleBlackGreenYellowRed(IntersectionChance, 0, 1);
 
         /// <summary> Add a sample to the cavity </summary>
         /// <param name="light">The light to add to the cavity</param>

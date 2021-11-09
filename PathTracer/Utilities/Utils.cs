@@ -139,13 +139,13 @@ namespace PathTracer.Utilities {
         /// <param name="min">The minimum value of the scale</param>
         /// <param name="max">The maximum value of the scale</param>
         /// <returns>A color of the color scale</returns>
-        public static Vector3 ColorScaleBlackGreenYellowRed(float value, float min, float max) {
+        public static RGBSpectrum ColorScaleBlackGreenYellowRed(float value, float min, float max) {
             const int transitions = 3;
             float range = max - min;
             float transition1 = range / transitions;
             float green = value < transition1 ? value / transition1 : transitions - value / transition1;
             float red = (value - transition1) / transition1;
-            return new Vector3(red, green, 0);
+            return new RGBSpectrum(red, green, 0);
         }
     }
 }

@@ -1,9 +1,8 @@
 ﻿using PathTracer.Geometry.Normals;
 using PathTracer.Geometry.Positions;
-using PathTracer.Pathtracing.Distributions;
 using PathTracer.Pathtracing.Distributions.Boundaries;
-using PathTracer.Pathtracing.Distributions.Direction;
 using PathTracer.Pathtracing.Distributions.Distance;
+using PathTracer.Pathtracing.Distributions.Probabilities;
 using PathTracer.Pathtracing.Rays;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Planars;
 using PathTracer.Pathtracing.Spectra;
@@ -42,9 +41,9 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects {
 
         IDistanceDistribution? IMaterial.DistanceDistribution(IRay ray, ISpectrum spectrum, IShapeInterval interval) => Material.DistanceDistribution(ray, spectrum, interval);
         Position3 IMaterial.GetPosition(IRay ray, IShapeInterval interval, Position1 distance) => Material.GetPosition(ray, interval, distance);
-        IPDF<Normal3> IMaterial.GetOrientationDistribution(IRay ray, IShape shape, Position3 position) => Material.GetOrientationDistribution(ray, shape, position);
-        
-        IPDF<Normal3> IMaterial.DirectionDistribution(Normal3 incomingDirection, Position3 position, Normal3 orientation, ISpectrum spectrum) => Material.DirectionDistribution(incomingDirection, position, orientation, spectrum);
+        IProbabilityDistribution<Normal3> IMaterial.GetOrientationDistribution(IRay ray, IShape shape, Position3 position) => Material.GetOrientationDistribution(ray, shape, position);
+
+        IProbabilityDistribution<Normal3> IMaterial.DirectionDistribution(Normal3 incomingDirection, Position3 position, Normal3 orientation, ISpectrum spectrum) => Material.DirectionDistribution(incomingDirection, position, orientation, spectrum);
         IRay IMaterial.CreateRay(Position3 position, Normal3 normal, Normal3 direction) => Material.CreateRay(position, normal, direction);
         #endregion
     }

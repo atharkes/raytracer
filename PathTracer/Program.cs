@@ -9,12 +9,14 @@ using PathTracer.Pathtracing.Observers;
 using PathTracer.Pathtracing.Observers.Cameras;
 using PathTracer.Pathtracing.SceneDescription;
 using PathTracer.Pathtracing.SceneDescription.Materials.SurfaceMaterials;
+using PathTracer.Pathtracing.SceneDescription.Materials.VolumetricMaterials;
 using PathTracer.Pathtracing.SceneDescription.SceneObjects;
 using PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates;
 using PathTracer.Pathtracing.SceneDescription.SceneObjects.Primitives;
 using PathTracer.Pathtracing.SceneDescription.Shapes;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Planars;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics;
+using PathTracer.Pathtracing.Spectra;
 using PathTracer.Utilities;
 using System.Collections.Generic;
 
@@ -72,6 +74,7 @@ namespace PathTracer {
             new Primitive(new Sphere(new Position3(-1, 1, 2), 0.5f), ParametricMaterial.Glass),
             new Primitive(new Triangle(new Position3(-5, 0, 0), new Position3(5, 0, 0), new Position3(5, 0, 10), null), ParametricMaterial.GlossyPurpleMirror),
             new Primitive(new Triangle(new Position3(-5, 0, 0), new Position3(5, 0, 10), new Position3(-5, 0, 10), null), ParametricMaterial.DiffuseYellow),
+            new Primitive(new AxisAlignedBox(new Position3(-5, -5, -5), new Position3(5, 5, 5)), new DiffuseVolumetric(new RGBSpectrum(0.3f, 0.3f, 0.3f), 0.00001)),
         };
 
         public static List<ISceneObject> DefaultLights => DefaultPrimitives.FindAll(s => (s is IPrimitive p) ? p.Material.IsEmitting : false);

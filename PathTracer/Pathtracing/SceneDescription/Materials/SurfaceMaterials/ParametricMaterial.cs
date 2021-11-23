@@ -3,8 +3,8 @@ using PathTracer.Geometry.Normals;
 using PathTracer.Geometry.Positions;
 using PathTracer.Pathtracing.Distributions;
 using PathTracer.Pathtracing.Distributions.Direction;
+using PathTracer.Pathtracing.Distributions.Probabilities;
 using PathTracer.Pathtracing.Spectra;
-using System;
 
 namespace PathTracer.Pathtracing.SceneDescription.Materials.SurfaceMaterials {
     /// <summary> A material class for primitives in the scene </summary>
@@ -90,8 +90,8 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials.SurfaceMaterials {
             }
         }
 
-        public IPDF<Normal3> DirectionDistribution(Normal3 incomingDirection, Position3 position, Normal3 orientation, ISpectrum spectrum) {
-            return new Diffuse(orientation);
+        public IProbabilityDistribution<Normal3> DirectionDistribution(Normal3 incomingDirection, Position3 position, Normal3 orientation, ISpectrum spectrum) {
+            return new SurfaceDiffuse(orientation);
             IPDF<Normal3> diffuse, specular;
             //Vector3 radianceOut;
             //if (surfacePoint.Primitive.Material.Specularity > 0) {

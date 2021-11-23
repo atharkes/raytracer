@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
-namespace PathTracer.Pathtracing.Distributions {
+namespace PathTracer.Pathtracing.Distributions.Probabilities {
     /// <summary> A weighted probability mass function (discreet PDF).
     /// Sampling can be improved using Vose's Alias Method to O(1). </summary>
     /// <typeparam name="T">The type of the <see cref="WeightedPMF{T}"/></typeparam>
-    public class WeightedPMF<T> : IPDF<T> where T : notnull {
+    public class WeightedPMF<T> : IPMF<T> where T : notnull {
         public bool SingleSolution => items.Count == 1;
-        public double DomainSize => items.Count;
+        public int DomainSize => items.Count;
 
         readonly double totalWeight;
         readonly HashSet<T> items = new();
@@ -61,7 +61,7 @@ namespace PathTracer.Pathtracing.Distributions {
 
         public bool Contains(T sample) =>  items.Contains(sample);
 
-        public double Probability(T sample) => probabilities[sample];
+        public double ProbabilityMass(T sample) => probabilities[sample];
 
         public T Sample(Random random) {
             double sample = random.NextDouble();

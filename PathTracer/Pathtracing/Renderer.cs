@@ -8,7 +8,7 @@ namespace PathTracer.Pathtracing {
     /// <summary> An <see cref="IRenderer"/> to render an <see cref="IScene"/> given an <see cref="IIntegrator"/> and an <see cref="IObserver"/> </summary>
     public class Renderer : IRenderer {
         /// <summary> The statistics of the <see cref="Renderer"/> </summary>
-        public static Statistics Statistics { get; } = new();
+        public Statistics Statistics { get; } = new();
 
         /// <summary> The <see cref="IScene"/> to render </summary>
         public IScene Scene { get; }
@@ -32,10 +32,26 @@ namespace PathTracer.Pathtracing {
         public void Render(TimeSpan renderTime) {
             Statistics.LogFrameTime();
             Statistics.LogTaskTime(Statistics.OpenTKTime);
-            Integrator.Integrate(Scene, renderTime - Statistics.OpenTKTime.LastTick - Statistics.DrawingTime.LastTick);
+            // Integration
+            TimeSpan integrationTime = renderTime - Statistics.OpenTKTime.LastTick - Statistics.DrawingTime.LastTick;
+            int sampleCount = IntegrationSampleCount(integrationTime);
+            Integrator.Integrate(Scene, sampleCount);
+            Statistics.SampleCount += sampleCount;
+            Statistics.SampleCountLastTick = sampleCount;
             Statistics.LogTaskTime(Statistics.IntegratorTime);
-            Observer.DrawFrame();
+            // Drawing
+            Observer.DrawFrame(Statistics);
             Statistics.LogTaskTime(Statistics.DrawingTime);
+        }
+
+        int IntegrationSampleCount(TimeSpan integrationTime) {
+            int sampleCount = 0;
+            if (Statistics.IntegratorTime.LastTick.Ticks > 0) {
+                TimeSpan previousTime = Statistics.IntegratorTime.LastTick;
+                double sampleCountFactor = 1 + (integrationTime / previousTime - 1) * 0.1;
+                sampleCount = (int)(sampleCountFactor * Statistics.SampleCountLastTick);
+            }
+            return Math.Max(BackwardsSampler.MinimumSampleCount, sampleCount);
         }
     }
 }

@@ -15,7 +15,7 @@ namespace PathTracer.Pathtracing.Observers {
         public IScreen Screen { get; }
 
         /// <summary> The targeted framerate of the raytracer </summary>
-        public int TargetFrameRate { get; set; } = 30;
+        public int TargetFrameRate { get; set; } = 20;
         /// <summary> Whether to draw the amount of BVH traversals instead of normal light </summary>
         public DrawingMode DrawingMode { get; set; } = DrawingMode.Light;
         /// <summary> Whether it is drawing debug information </summary>
@@ -42,24 +42,22 @@ namespace PathTracer.Pathtracing.Observers {
         }
 
         /// <summary> Draw a frame to the screen of the <see cref="IObserver"/> </summary>
-        public void DrawFrame() {
+        public void DrawFrame(Statistics statistics) {
             Screen.Clear();
             Accumulator.DrawImage(Screen, DrawingMode);
-            if (DebugInfo) DrawDebugInformation();
+            if (DebugInfo) DrawDebugInformation(statistics);
         }
 
-        void DrawDebugInformation() {
-            Screen.Print($"FPS: {(int)(1000 / Renderer.Statistics.FrameTime.LastTick.TotalMilliseconds)}", 1, 1);
+        void DrawDebugInformation(Statistics stats) {
+            Screen.Print($"FPS: {(int)(1000 / stats.FrameTime.LastTick.TotalMilliseconds)}", 1, 1);
             Screen.Print($"Light: {Accumulator.AccumulatedLight}", 1, 17);
-            Screen.Print($"Frame Time (ms): {(int)Renderer.Statistics.FrameTime.LastTick.TotalMilliseconds}", 1, 33);
-            Screen.Print($"Integrator Time (ms): {(int)Renderer.Statistics.IntegratorTime.LastTick.TotalMilliseconds}", 1, 49);
-            Screen.Print($"Drawing Time (ms): {(int)Renderer.Statistics.DrawingTime.LastTick.TotalMilliseconds}", 1, 65);
-            Screen.Print($"OpenTK Time (ms): {(int)Renderer.Statistics.OpenTKTime.LastTick.TotalMilliseconds}", 1, 81);
-            Screen.Print($"FOV: {Camera.HorizontalFOV}", 1, 97);
-            Screen.Print($"Front: {Camera.Front}", 1, 113);
-            Screen.Print($"Up: {Camera.Up}", 1, 129);
-            Screen.Print($"Right: {Camera.Right}", 1, 145);
-            Screen.Print($"Rotation: {Camera.Rotation}", 1, 161);
+            Screen.Print($"Samples: {stats.SampleCount}", 1, 33);
+            Screen.Print($"Samples/frame: {stats.SampleCountLastTick}", 1, 49);
+            Screen.Print($"Frame Time (ms): {(int)stats.FrameTime.LastTick.TotalMilliseconds}", 1, 65);
+            Screen.Print($"Integrator Time (ms): {(int)stats.IntegratorTime.LastTick.TotalMilliseconds}", 1, 81);
+            Screen.Print($"Drawing Time (ms): {(int)stats.DrawingTime.LastTick.TotalMilliseconds}", 1, 97);
+            Screen.Print($"OpenTK Time (ms): {(int)stats.OpenTKTime.LastTick.TotalMilliseconds}", 1, 113);
+            Screen.Print($"Horizontal FOV: {Camera.HorizontalFOV}", 1, 129);
         }
 
         /// <summary> Handle input for the <see cref="Observer"/> </summary>

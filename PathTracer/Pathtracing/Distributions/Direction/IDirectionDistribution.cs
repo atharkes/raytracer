@@ -1,5 +1,5 @@
 ﻿using PathTracer.Geometry.Normals;
-using PathTracer.Pathtracing.SceneDescription.Materials;
+using PathTracer.Pathtracing.Distributions.Probabilities;
 using System;
 
 namespace PathTracer.Pathtracing.Distributions.Direction {

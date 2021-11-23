@@ -2,6 +2,7 @@
 using PathTracer.Geometry.Directions;
 using PathTracer.Geometry.Positions;
 using PathTracer.Pathtracing.Distributions.Boundaries;
+using PathTracer.Pathtracing.Distributions.Probabilities;
 using PathTracer.Pathtracing.SceneDescription;
 using System;
 
@@ -26,8 +27,8 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
             } else if (right is null) {
                 return left;
             } else {
-                double probabilityLeft = (1 - Right.CumulativeProbability(sample)) * Left.Probability(sample);
-                double probabilityRight = (1 - Left.CumulativeProbability(sample)) * Right.Probability(sample);
+                double probabilityLeft = (1 - Right.CumulativeProbabilityDensity(sample)) * Left.ProbabilityDensity(sample);
+                double probabilityRight = (1 - Left.CumulativeProbabilityDensity(sample)) * Right.ProbabilityDensity(sample);
                 return new WeightedPMF<IMaterial>((left, probabilityLeft), (right, probabilityRight));
             }
         }
@@ -40,22 +41,23 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
             } else if (right is null) {
                 return left;
             } else {
-                double probabilityLeft = (1 - Right.CumulativeProbability(sample)) * Left.Probability(sample);
-                double probabilityRight = (1 - Left.CumulativeProbability(sample)) * Right.Probability(sample);
+                double probabilityLeft = (1 - Right.CumulativeProbabilityDensity(sample)) * Left.ProbabilityDensity(sample);
+                double probabilityRight = (1 - Left.CumulativeProbabilityDensity(sample)) * Right.ProbabilityDensity(sample);
                 return new WeightedPMF<IShapeInterval>((left, probabilityLeft), (right, probabilityRight));
             }
         }
     }
 
-    public class SingleDistanceDistribution : IDistanceDistribution {
+    public class DeltaDistanceDistribution : IDistanceDistribution {
         public Position1 Distance { get; }
         public IMaterial Material { get; }
         public IShapeInterval Interval { get; }
         public Position1 Minimum => Distance;
         public Position1 Maximum => Distance;
-        public double DomainSize => 1;
+        public double DomainSize => 0;
+        public bool ContainsDelta => true;
 
-        public SingleDistanceDistribution(Position1 distance, IMaterial material, IShapeInterval interval) {
+        public DeltaDistanceDistribution(Position1 distance, IMaterial material, IShapeInterval interval) {
             Distance = distance;
             Material = material;
             Interval = interval;
@@ -65,11 +67,11 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
             return Distance;
         }
 
-        public double Probability(Position1 sample) {
-            return sample == Distance ? 1 : 0;
+        public double ProbabilityDensity(Position1 sample) {
+            return sample == Distance ? double.PositiveInfinity : 0;
         }
 
-        public double CumulativeProbability(Position1 sample) {
+        public double CumulativeProbabilityDensity(Position1 sample) {
             return sample >= Distance ? 1 : 0;
         }
 
@@ -89,9 +91,11 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
         public Direction1 ExponentialSize => ExponentialEnd - ExponentialStart;
         public IMaterial Material { get; }
         public IShapeInterval Interval { get; }
+
         public Position1 Minimum => ExponentialStart;
         public Position1 Maximum => Position1.PositiveInfinity;
-        public double DomainSize => 2;
+        public double DomainSize => ExponentialSize;
+        public bool ContainsDelta => true;
 
         public ExponentialDistanceDistribution(Position1 start, Position1 end, double rate, IMaterial material, IShapeInterval interval) {
             Distribution = new Exponential(rate);
@@ -102,11 +106,11 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
         }
 
         public Position1 Sample(Random random) {
-            Position1 distance = Minimum + (float)Distribution.InverseCumulativeDistribution(random.NextDouble());
-            return distance <= Maximum ? distance : Position1.PositiveInfinity;
+            Position1 distance = ExponentialStart + (float)Distribution.InverseCumulativeDistribution(random.NextDouble());
+            return distance <= ExponentialEnd ? distance : Position1.PositiveInfinity;
         }
 
-        public double Probability(Position1 sample) {
+        public double ProbabilityDensity(Position1 sample) {
             if (sample == Position1.PositiveInfinity) {
                 return 1 - Distribution.CumulativeDistribution(ExponentialSize);
             } else if (ExponentialStart <= sample && sample <= ExponentialEnd) {
@@ -116,23 +120,23 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
             }
         }
 
-        public double RelativeProbability(Position1 sample) {
+        double IProbabilityDistribution<Position1>.RelativeProbability(Position1 sample) {
             if (sample == Position1.PositiveInfinity) {
-                return Probability(sample) * DomainSize;
+                return ProbabilityDensity(sample) * DomainSize;
             } else if (ExponentialStart <= sample && sample <= ExponentialEnd) {
-                return Probability(sample) * DomainSize * ExponentialSize;
+                return ProbabilityDensity(sample) * DomainSize * ExponentialSize;
             } else {
                 return 0;
             }
         }
 
-        public double CumulativeProbability(Position1 distance) {
+        public double CumulativeProbabilityDensity(Position1 distance) {
             if (distance < Minimum) {
                 return 0;
-            } else if (distance < Maximum) {
-                return Distribution.CumulativeDistribution(distance - Minimum);
+            } else if (distance < ExponentialEnd) {
+                return Distribution.CumulativeDistribution(distance - ExponentialStart);
             } else if (distance < double.PositiveInfinity) {
-                return Distribution.CumulativeDistribution(Maximum - Minimum);
+                return Distribution.CumulativeDistribution(ExponentialEnd - ExponentialStart);
             } else {
                 return 1;
             }

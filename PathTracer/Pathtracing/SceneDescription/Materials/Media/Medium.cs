@@ -1,7 +1,6 @@
 ﻿using PathTracer.Geometry.Normals;
 using PathTracer.Geometry.Positions;
-using PathTracer.Pathtracing.Distributions;
-using PathTracer.Pathtracing.Distributions.Direction;
+using PathTracer.Pathtracing.Distributions.Probabilities;
 using PathTracer.Pathtracing.Spectra;
 using System;
 
@@ -27,7 +26,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials.Media {
             return RefractiveIndex.Equals(other?.RefractiveIndex);
         }
 
-        public IPDF<Normal3> DirectionDistribution(Normal3 incomingDirection, Position3 position, Normal3 orientation, ISpectrum spectrum) {
+        public IProbabilityDistribution<Normal3> DirectionDistribution(Normal3 incomingDirection, Position3 position, Normal3 orientation, ISpectrum spectrum) {
             throw new NotImplementedException("Fresnel requires information of other media. Some overarching structure needs to accomodate for the other media.");
         }
 

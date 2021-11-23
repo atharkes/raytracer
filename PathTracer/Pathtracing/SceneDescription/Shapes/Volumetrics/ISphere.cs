@@ -41,7 +41,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics {
             double z = 1 - 2 * random.NextDouble();
             double r = Math.Sqrt(Math.Max(0, 1 - z * z));
             double phi = 2 * Math.PI * random.NextDouble();
-            Direction3 direction = new Normal3((float)(Math.Cos(phi) * r), (float)(Math.Sin(phi) * r), (float)z);
+            Direction3 direction = new Normal3((float)(2 * Math.Cos(phi) * r), (float)(2 * Math.Sin(phi) * r), (float)z);
             return Position + direction * Radius;
         }
 

@@ -1,6 +1,7 @@
 ﻿using OpenTK.Windowing.GraphicsLibraryFramework;
 using PathTracer.Pathtracing.Observers.Accumulators;
 using PathTracer.Pathtracing.Observers.Cameras;
+using PathTracer.Utilities;
 using System;
 
 namespace PathTracer.Pathtracing.Observers {
@@ -37,7 +38,8 @@ namespace PathTracer.Pathtracing.Observers {
         float FOVSensitivity { get; set; }
         
         /// <summary> Draw a frame to the screen of the <see cref="IObserver"/> </summary>
-        void DrawFrame();
+        /// <param name="stats">The statistics of the <see cref="IRenderer"/></param>
+        void DrawFrame(Statistics stats);
 
         /// <summary> Handle input for the <see cref="IObserver"/> </summary>
         /// <param name="keyboard">The <see cref="KeyboardState"/> to handle input from</param>

@@ -1,9 +1,8 @@
 ﻿using PathTracer.Geometry.Normals;
 using PathTracer.Geometry.Positions;
-using PathTracer.Pathtracing.Distributions;
 using PathTracer.Pathtracing.Distributions.Boundaries;
-using PathTracer.Pathtracing.Distributions.Direction;
 using PathTracer.Pathtracing.Distributions.Distance;
+using PathTracer.Pathtracing.Distributions.Probabilities;
 using PathTracer.Pathtracing.Rays;
 using PathTracer.Pathtracing.Spectra;
 
@@ -59,7 +58,7 @@ namespace PathTracer.Pathtracing.SceneDescription {
         /// <param name="shape">The <see cref="IShape"/> in which the <paramref name="position"/> is found</param>
         /// <param name="position">The position at which to get the normal distribution</param>
         /// <returns>A <see cref="IPDF{T}"/> of <see cref="Normal3"/> at the specified <paramref name="position"/></returns>
-        IPDF<Normal3> GetOrientationDistribution(IRay ray, IShape shape, Position3 position);
+        IProbabilityDistribution<Normal3> GetOrientationDistribution(IRay ray, IShape shape, Position3 position);
 
         /// <summary> Get a direction distribution of the <see cref="IMaterial"/> at a <paramref name="position"/> </summary>
         /// <param name="incomingDirection">The incoming direction at the <paramref name="position"/></param>
@@ -67,7 +66,7 @@ namespace PathTracer.Pathtracing.SceneDescription {
         /// <param name="orientation">The orientation of the <see cref="IMaterial"/></param>
         /// <param name="spectrum">The <see cref="ISpectrum"/> of light scattering at the <paramref name="position"/></param>
         /// <returns>A direction-medium PDF</returns>
-        IPDF<Normal3> DirectionDistribution(Normal3 incomingDirection, Position3 position, Normal3 orientation, ISpectrum spectrum);
+        IProbabilityDistribution<Normal3> DirectionDistribution(Normal3 incomingDirection, Position3 position, Normal3 orientation, ISpectrum spectrum);
 
         /// <summary> Create an outgoing <see cref="IRay"/> from a <paramref name="position"/> along a specified <paramref name="direction"/> </summary>
         /// <param name="position">The <see cref="Position3"/> from which the <see cref="IRay"/> leaves</param>

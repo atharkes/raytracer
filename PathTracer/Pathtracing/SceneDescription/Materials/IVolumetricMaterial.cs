@@ -2,6 +2,7 @@
 using PathTracer.Geometry.Positions;
 using PathTracer.Pathtracing.Distributions.Boundaries;
 using PathTracer.Pathtracing.Distributions.Distance;
+using PathTracer.Pathtracing.Distributions.Probabilities;
 using PathTracer.Pathtracing.Rays;
 using PathTracer.Pathtracing.Spectra;
 using System;
@@ -31,6 +32,13 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials {
         /// <param name="distance">The distance along the <paramref name="ray"/></param>
         /// <returns>The <see cref="Position3"/> at the specified <paramref name="distance"/> along the <paramref name="ray"/></returns>
         Position3 IMaterial.GetPosition(IRay ray, IShapeInterval interval, Position1 distance) => ray.Travel(distance);
+
+        /// <summary> Get an <see cref="IPDF{T}"/> of <see cref="Normal3"/> for the specified <paramref name="position"/> </summary>
+        /// <param name="ray">The <see cref="IRay"/> along which the <paramref name="position"/> is found</param>
+        /// <param name="shape">The <see cref="IShape"/> in which the <paramref name="position"/> is found</param>
+        /// <param name="position">The position at which to get the normal distribution</param>
+        /// <returns>A <see cref="IPDF{T}"/> of <see cref="Normal3"/> at the specified <paramref name="position"/></returns>
+        IProbabilityDistribution<Normal3> IMaterial.GetOrientationDistribution(IRay ray, IShape shape, Position3 position) => new UniformPMF<Normal3>(ray.Direction);
 
         /// <summary> Create an outgoing <see cref="IRay"/> from a <paramref name="position"/> along a specified <paramref name="direction"/> </summary>
         /// <param name="position">The <see cref="Position3"/> from which the <see cref="IRay"/> leaves</param>

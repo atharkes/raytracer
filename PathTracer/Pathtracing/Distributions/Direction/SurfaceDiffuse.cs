@@ -5,18 +5,18 @@ using PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics;
 using System;
 
 namespace PathTracer.Pathtracing.Distributions.Direction {
-    public struct Diffuse : IDirectionDistribution {
+    public struct SurfaceDiffuse : IDirectionDistribution {
         public Normal3 Orientation { get; }
-        public bool SingleSolution => false;
+        public bool ContainsDelta => false;
         public double DomainSize => 2 * Math.PI;
 
-        public Diffuse(Normal3 orientation) {
+        public SurfaceDiffuse(Normal3 orientation) {
             Orientation = orientation;
         }
 
         public bool Contains(Normal3 sample) => IDirection3.Similar(Orientation, sample);
 
-        public double Probability(Normal3 sample) => Contains(sample) ? 1 / DomainSize : 0;
+        public double ProbabilityDensity(Normal3 sample) => Contains(sample) ? 1 / DomainSize : 0;
 
         public Normal3 Sample(Random random) {
             ISphere sphere = new UnitSphere(Position3.Origin);

@@ -11,6 +11,10 @@ namespace PathTracer.Utilities {
         public readonly TimeLog IntegratorTime = new();
         /// <summary> A log for the time required by drawing on the screen </summary>
         public readonly TimeLog DrawingTime = new();
+        /// <summary> The total amount of samples traced </summary>
+        public int SampleCount { get; set; }
+        /// <summary> The amount of samples traced last tick </summary>
+        public int SampleCountLastTick { get; set; }
 
         readonly Stopwatch frameTimer = Stopwatch.StartNew();
         readonly Stopwatch taskTimer = Stopwatch.StartNew();

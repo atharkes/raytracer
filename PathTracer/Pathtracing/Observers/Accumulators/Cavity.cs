@@ -1,5 +1,4 @@
-﻿using PathTracer.Geometry.Vectors;
-using PathTracer.Pathtracing.Spectra;
+﻿using PathTracer.Pathtracing.Spectra;
 using PathTracer.Utilities;
 
 namespace PathTracer.Pathtracing.Observers.Accumulators {
@@ -15,7 +14,7 @@ namespace PathTracer.Pathtracing.Observers.Accumulators {
         public int Intersections { get; private set; } = 0;
 
         /// <summary> Average light of the photons in the cavity </summary>
-        public ISpectrum AverageLight => Light.IsBlack || Samples == 0 ? ISpectrum.Black : Light / Samples;
+        public ISpectrum AverageLight => Samples == 0 ? ISpectrum.Black : Light / Samples;
         /// <summary> Average BVH traversals of photons in the cavity </summary>
         public float AverageBVHTraversals => Samples > 0 ? BVHTraversals / Samples : 0f;
         /// <summary> The green to red color fade for the BVH traversals </summary>

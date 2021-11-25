@@ -74,8 +74,7 @@ namespace PathTracer.Geometry.Vectors {
         public static Vector1 ComponentMax(Vector1 left, Vector1 right) => Math.Max(left.Value, right.Value);
         public static Vector1 Abs(Vector1 vector) => Math.Abs(vector.Value);
         
-        public override bool Equals(object? obj) => Value.Equals(obj);
-        
+        public override bool Equals(object? obj) => obj is Vector1 vector && Equals(vector);
         public bool Equals(Vector1? other) => Value.Equals(other?.Value);
         public bool Equals(Vector1 other) => Value.Equals(other.Value);
         public bool Equals(Vector1 other, Vector1 epsilon) {

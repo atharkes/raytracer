@@ -83,7 +83,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials.SurfaceMaterials {
         }
 
         public ISpectrum Emittance(Position3 position, Normal3 orientation, Normal3 direction) {
-            if (IsEmitting && IDirection3.Similar(orientation, direction)) {
+            if (IsEmitting && IDirection3.InClosedHemisphere(orientation, direction)) {
                 return EmittingLight;
             } else {
                 return ISpectrum.Black;
@@ -91,7 +91,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials.SurfaceMaterials {
         }
 
         public IProbabilityDistribution<Normal3> DirectionDistribution(Normal3 incomingDirection, Position3 position, Normal3 orientation, ISpectrum spectrum) {
-            return new SurfaceDiffuse(orientation);
+            return new HemisphericalDiffuse(orientation);
             IPDF<Normal3> diffuse, specular;
             //Vector3 radianceOut;
             //if (surfacePoint.Primitive.Material.Specularity > 0) {

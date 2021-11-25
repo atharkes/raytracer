@@ -5,8 +5,8 @@ using PathTracer.Pathtracing.SceneDescription;
 
 namespace PathTracer.Pathtracing.Distributions.Distance {
     /// <summary>
-    /// A probability distribution of distance.
-    /// The probability at a specified distance is the product of out-scattering since the origin, and the material density.
+    /// A probability distribution of distances.
+    /// The probability at a specified distance is the product of out-scattering since the origin, and the material density at the distance.
     /// </summary>
     public interface IDistanceDistribution : ICDF<Position1> {
         /// <summary> Get the possible <see cref="IMaterial"/>s for a specified <paramref name="sample"/> sample </summary>

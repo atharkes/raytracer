@@ -54,7 +54,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics {
         /// <param name="position">The position to check</param>
         /// <param name="epsilon">The epsilon to specify the precision</param>
         /// <returns>Whether the <paramref name="position"/> is on the surface of the <see cref="ISphere"/></returns>
-        bool IShape.OnSurface(Position3 position, float epsilon = 0.001F) => (position - Position).Length.Equals(Radius, epsilon);
+        bool IShape.OnSurface(Position3 position, float epsilon) => (position - Position).Length.Equals(Radius, epsilon);
 
         /// <summary> Get the normal of the <see cref="Sphere"/> at a specified <paramref name="position"/> </summary>
         /// <param name="position">The surface point to get the normal for</param>

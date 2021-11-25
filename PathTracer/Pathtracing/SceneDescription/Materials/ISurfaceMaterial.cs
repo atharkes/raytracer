@@ -17,7 +17,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials {
         /// Epsilon used to raise the exiting <see cref="IRay"/>s away from the scene object.
         /// Used to avoid the intersection falling behind the scene object due to rounding errors.
         /// </summary>
-        public const float RaiseEpsilon = 0.001f;
+        public const float RaiseEpsilon = 0.0001f;
 
         /// <summary> Get a distance distribution of a <paramref name="ray"/> through the <see cref="ISurfaceMaterial"/> </summary>
         /// <param name="ray">The scattering <see cref="IRay"/></param>
@@ -25,7 +25,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials {
         /// <param name="interval">The <see cref="IShapeInterval"/> of the <see cref="ISurfaceMaterial"/> along the <paramref name="ray"/></param>
         /// <returns>A distance distribution of the <paramref name="ray"/> through the <see cref="ISurfaceMaterial"/></returns>
         IDistanceDistribution? IMaterial.DistanceDistribution(IRay ray, ISpectrum spectrum, IShapeInterval interval) {
-            return interval.Entry < 0 || interval.Entry > ray.Length ? null : new DeltaDistanceDistribution(interval.Entry, this, interval);
+            return interval.Entry < 0 || interval.Entry > ray.Length ? null : new DeltaDistance(interval.Entry, this, interval);
         }
 
         /// <summary> Get a <see cref="Position3"/> at a specified <paramref name="distance"/> along a <paramref name="ray"/> </summary>

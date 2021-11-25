@@ -42,7 +42,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Planars {
         public Position3 TopLeft => Center - LeftToRight * 0.5f + BottomToTop * 0.5f;
         /// <summary> The top right corner of the <see cref="Rectangle"/> </summary>
         public Position3 TopRight => Center + LeftToRight * 0.5f + BottomToTop * 0.5f;
-        
+
         /// <summary> The width of the <see cref="Rectangle"/> </summary>
         public Position1 Width => Size.X;
         /// <summary> The height of the <see cref="Rectangle"/> </summary>
@@ -104,7 +104,16 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Planars {
         /// <param name="position">The position to check</param>
         /// <param name="epsilon">The epsilon to specify the precision</param>
         /// <returns>Whether the <paramref name="position"/> is on the surface of the <see cref="Rectangle"/></returns>
-        public bool OnSurface(Position3 position, float epsilon = 0.001F) => throw new NotImplementedException();
+        public bool OnSurface(Position3 position, float epsilon = 0.001F) {
+            if (PlaneOfExistence.OnSurface(position, epsilon)) {
+                IDirection3 relativeIntersection = position - Position;
+                Position1 u = (Position1)IDirection3.Dot(LeftToRight, relativeIntersection) / LeftToRight.LengthSquared;
+                Position1 v = (Position1)IDirection3.Dot(BottomToTop, relativeIntersection) / BottomToTop.LengthSquared;
+                return -epsilon <= u && u <= 1 + epsilon && -epsilon <= v && v <= 1 + epsilon;
+            } else {
+                return false;
+            }
+        }
 
         /// <summary> Get the normal of the <see cref="Rectangle"/> </summary>
         /// <param name="surfacePoint">The surface point to get the normal for</param>

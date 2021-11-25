@@ -71,13 +71,13 @@ namespace PathTracer {
             new Primitive(new Sphere(new Position3(-3, 1, 5), 1), ParametricMaterial.DiffuseGreen),
             new Primitive(new Sphere(new Position3(3, 1, 5), 1), ParametricMaterial.GlossyRed),
             new Primitive(new Sphere(new Position3(0, 1, 5), 1), ParametricMaterial.Mirror),
-            new Primitive(new Sphere(new Position3(-1, 1, 2), 0.5f), ParametricMaterial.Glass),
+            new Primitive(new Sphere(new Position3(-1, 1, 2), 1), new DiffuseVolumetric(new RGBSpectrum(0.8f, 0.8f, 0.8f), 10)),
             new Primitive(new Triangle(new Position3(-5, 0, 0), new Position3(5, 0, 0), new Position3(5, 0, 10), null), ParametricMaterial.GlossyPurpleMirror),
             new Primitive(new Triangle(new Position3(-5, 0, 0), new Position3(5, 0, 10), new Position3(-5, 0, 10), null), ParametricMaterial.DiffuseYellow),
-            new Primitive(new AxisAlignedBox(new Position3(-5, -5, -5), new Position3(5, 5, 5)), new DiffuseVolumetric(new RGBSpectrum(0.3f, 0.3f, 0.3f), 0.00001)),
+            //new Primitive(new AxisAlignedBox(new Position3(-5, -5, -5), new Position3(5, 5, 5)), ),
         };
 
-        public static List<ISceneObject> DefaultLights => DefaultPrimitives.FindAll(s => (s is IPrimitive p) ? p.Material.IsEmitting : false);
+        public static List<ISceneObject> DefaultLights => DefaultPrimitives.FindAll(s => s is IPrimitive p && p.Material.IsEmitting);
         #endregion
     }
 }

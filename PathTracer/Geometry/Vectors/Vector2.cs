@@ -89,7 +89,7 @@ namespace PathTracer.Geometry.Vectors {
         public static Vector2 ComponentMax(Vector2 left, Vector2 right) => OpenTK.Mathematics.Vector2.ComponentMax(left.Value, right.Value);
         public static Vector2 Abs(Vector2 vector) => new(Vector1.Abs(vector.X), Vector1.Abs(vector.Y));
 
-        public override bool Equals(object? obj) => Value.Equals(obj);
+        public override bool Equals(object? obj) => obj is Vector2 vector && Equals(vector);
         public bool Equals(Vector2 other) => Value.Equals(other.Value);
         public bool Equals(Vector2? other) => Value.Equals(other?.Value);
         public override int GetHashCode() => Value.GetHashCode();

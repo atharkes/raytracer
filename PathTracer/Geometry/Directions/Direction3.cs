@@ -1,9 +1,10 @@
 ﻿using PathTracer.Geometry.Normals;
 using PathTracer.Geometry.Positions;
 using PathTracer.Geometry.Vectors;
+using System;
 
 namespace PathTracer.Geometry.Directions {
-    public struct Direction3 : IDirection3 {
+    public struct Direction3 : IDirection3, IEquatable<Direction3> {
         /// <summary> The <see cref="Vector3"/> value used for this <see cref="IDirection3"/> </summary>
         public Vector3 Vector { get; }
 
@@ -37,6 +38,9 @@ namespace PathTracer.Geometry.Directions {
         public static explicit operator Direction3(Position3 position) => new(position.Vector);
         public static explicit operator Position3(Direction3 position) => new(position.Vector);
 
+        public static bool operator ==(Direction3 left, Direction3 right) => left.Equals(right);
+        public static bool operator !=(Direction3 left, Direction3 right) => !(left == right);
+
         public static Direction3 operator +(Direction3 left, Direction3 right) => new(left.Vector + right.Vector);
         public static Direction3 operator -(Direction3 direction) => new(-direction.Vector);
         public static Direction3 operator -(Direction3 left, Direction3 right) => new(left.Vector - right.Vector);
@@ -49,7 +53,11 @@ namespace PathTracer.Geometry.Directions {
         public static Direction1 Dot(IDirection3 left, IDirection3 right) => new(Vector3.Dot(left.Vector, right.Vector));
         public static Direction3 Lerp(IDirection3 a, IDirection3 b, Vector1 blend) => Vector3.Lerp(a.Vector, b.Vector, blend);
 
-        public Normal3 Normalized() => new(Vector);
+        public override bool Equals(object? obj) => obj is Direction3 direction && Equals(direction);
+        public bool Equals(Direction3 other) => Vector.Equals(other.Vector);
+        public bool Equals(Direction3? other) => Vector.Equals(other?.Vector);
+        public override int GetHashCode() => Vector.GetHashCode();
         public override string ToString() => Vector.ToString();
+        public Normal3 Normalized() => new(Vector);
     }
 }

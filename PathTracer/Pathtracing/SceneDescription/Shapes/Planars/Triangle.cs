@@ -44,7 +44,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Planars {
             P1 = p1;
             P2 = p2;
             P3 = p3;
-            Normal = normal ?? Normal3.Cross((P2 - P1).Normalized(), (P3 - P1).Normalized());
+            Normal = normal ?? Normal3.Perpendicular((P2 - P1).Normalized(), (P3 - P1).Normalized());
         }
 
         /// <summary> Get a <paramref name="random"/> point on the surface of the <see cref="Triangle"/> </summary>
@@ -107,8 +107,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Planars {
             float v = Vector3.Dot(ray.Direction.Vector, Q) * determinantInverted;
             if (v < 0f || u + v > 1f) return null;
 
-            float t = Vector3.Dot(P1toP3.Vector, Q) * determinantInverted;
-            return t;
+            return Vector3.Dot(P1toP3.Vector, Q) * determinantInverted;
         }
 
         /// <summary> Clip the <see cref="Triangle"/> by a <paramref name="plane"/> </summary>

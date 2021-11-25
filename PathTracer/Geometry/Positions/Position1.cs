@@ -6,15 +6,15 @@ using System;
 namespace PathTracer.Geometry.Positions {
     public struct Position1 : IPosition<Vector1>, IComparable<Position1>, IEquatable<Position1> {
         /// <summary> The origin of the 3-dimensional coordinate system </summary>
-        public static Position1 Origin => new(Vector1.Zero);
+        public static readonly Position1 Origin = Vector1.Zero;
         /// <summary> The maximum position </summary>
-        public static Position1 MaxValue => new(Vector1.MaxValue);
+        public static readonly Position1 MaxValue = Vector1.MaxValue;
         /// <summary> The minimum position </summary>
-        public static Position1 MinValue => new(Vector1.MinValue);
+        public static readonly Position1 MinValue = Vector1.MinValue;
         /// <summary> The position representing negative infinity </summary>
-        public static Position1 NegativeInfinity => new(Vector1.NegativeInfinity);
+        public static readonly Position1 NegativeInfinity = Vector1.NegativeInfinity;
         /// <summary> The position representing positive infinity </summary>
-        public static Position1 PositiveInfinity => new(Vector1.PositiveInfinity);
+        public static readonly Position1 PositiveInfinity = Vector1.PositiveInfinity;
 
         public Vector1 Vector { get; }
 
@@ -46,7 +46,7 @@ namespace PathTracer.Geometry.Positions {
         public static Position1 Min(Position1 left, Position1 right) => new(Vector1.ComponentMin(left.Vector, right.Vector));
         public static Position1 Max(Position1 left, Position1 right) => new(Vector1.ComponentMax(left.Vector, right.Vector));
 
-        public override bool Equals(object? obj) => Vector.Equals(obj);
+        public override bool Equals(object? obj) => obj is Position1 position && Equals(position);
         public bool Equals(Position1 other) => Vector.Equals(other.Vector);
         public bool Equals(Position1? other) => Vector.Equals(other?.Vector);
         public override int GetHashCode() => Vector.GetHashCode();

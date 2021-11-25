@@ -23,8 +23,6 @@ namespace PathTracer.Pathtracing.Integrators {
 
         public override void Integrate(IScene scene, int sampleCount) {
             double taskSize = (double)sampleCount / Program.Threadpool.MultithreadingTaskCount;
-            TraceRays(scene, (int)taskSize);
-            return;
             Action[] tasks = new Action[Program.Threadpool.MultithreadingTaskCount];
             for (int i = 0; i < Program.Threadpool.MultithreadingTaskCount; i++) {
                 int lowerbound = (int)(i * taskSize);
@@ -51,31 +49,31 @@ namespace PathTracer.Pathtracing.Integrators {
         /// <param name="sample">The <see cref="ISample"/> to sample the <paramref name="scene"/> with </param>
         /// <returns>The color found for the <see cref="ISample"/></returns>
         public ISpectrum Sample(IScene scene, IRay ray, ISpectrum spectrum, int recursionDepth) {
-            if (recursionDepth >= MaxRecursionDepth) return ISpectrum.Black;
+            if (spectrum.Equals(ISpectrum.Black) || recursionDepth >= MaxRecursionDepth) return ISpectrum.Black;
 
             /// Sample Distance
             IDistanceDistribution? distances = scene.Trace(ray, spectrum);
             if (distances is null) return ISpectrum.Black;
             Position1 distance = distances.Sample(Utils.ThreadRandom);
             if (distance == Position1.PositiveInfinity) return ISpectrum.Black;
-            float distanceImportance = (float)distances.InverseRelativeProbability(distance);
+            //float distanceImportance = (float)distances.InverseRelativeProbability(distance);
 
             /// Sample Material
             IProbabilityDistribution<IMaterial>? materials = distances.GetMaterials(distance);
             if (materials is null) throw new InvalidOperationException("Distance was sampled but no material was found");
             IMaterial material = materials.Sample(Utils.ThreadRandom);
-            float materialImportance = (float)materials.InverseRelativeProbability(material);
+            //float materialImportance = (float)materials.InverseRelativeProbability(material);
 
             /// Sample Shape Interval
             IProbabilityDistribution<IShapeInterval>? intervals = distances.GetShapeIntervals(distance, material);
             if (intervals is null) throw new InvalidOperationException("Distance was sampled but no shape interval was found");
             IShapeInterval interval = intervals.Sample(Utils.ThreadRandom);
-            float shapeIntervalImportance = (float)intervals.InverseRelativeProbability(interval);
+            //float shapeIntervalImportance = (float)intervals.InverseRelativeProbability(interval);
 
             /// Compute Distance Sampling Throughput
-            float distanceSampleImportance = shapeIntervalImportance * materialImportance * distanceImportance;
-            float outScatteringAndDensity = (float)distances.ProbabilityDensity(distance);
-            float distanceSampleThroughput = outScatteringAndDensity * distanceSampleImportance;
+            //float distanceSampleImportance = shapeIntervalImportance * materialImportance * distanceImportance;
+            //float outScatteringAndDensity = (float)distances.ProbabilityDensity(distance);
+            //float distanceSampleThroughput = outScatteringAndDensity * distanceSampleImportance;
 
             /// Get Intersection Position
             Position3 position = material.GetPosition(ray, interval, distance);
@@ -83,7 +81,7 @@ namespace PathTracer.Pathtracing.Integrators {
             /// Sample Material Orientation
             IProbabilityDistribution<Normal3> orientations = material.GetOrientationDistribution(ray, interval.Shape, position);
             Normal3 orientation = orientations.Sample(Utils.ThreadRandom);
-            float orientationImportance = (float)orientations.InverseRelativeProbability(orientation);
+            //float orientationImportance = (float)orientations.InverseRelativeProbability(orientation);
 
             /// Get Direct Illumination
             ISpectrum directIllumination = material.Emittance(position, orientation, -ray.Direction);
@@ -91,19 +89,18 @@ namespace PathTracer.Pathtracing.Integrators {
             /// Sample Direction
             IProbabilityDistribution<Normal3> directions = material.DirectionDistribution(ray.Direction, position, orientation, spectrum);
             Normal3 direction = directions.Sample(Utils.ThreadRandom);
-            float directionImportance = (float)directions.InverseRelativeProbability(direction);
+            //float directionImportance = (float)directions.InverseRelativeProbability(direction);
 
             /// Compute Direction Sampling Throughput
-            float directionSampleImportance = orientationImportance * directionImportance;
+            //float directionSampleImportance = orientationImportance * directionImportance;
             ISpectrum absorption = material.Albedo;
-            ISpectrum directionSampleThroughput = absorption * directionSampleImportance;
-            if (directionSampleThroughput.IsBlack) return directIllumination;
+            //ISpectrum directionSampleThroughput = absorption * directionSampleImportance;
 
             /// Sample Indirect Illumination
-            ISpectrum indirectIllumination = Sample(scene, new Ray(position, direction), directionSampleThroughput, recursionDepth + 1);
+            ISpectrum indirectIllumination = Sample(scene, new Ray(position, direction), spectrum * absorption, recursionDepth + 1);
 
             /// Light Throughput Calculation
-            return (indirectIllumination * directionSampleThroughput + directIllumination) * distanceSampleThroughput;
+            return indirectIllumination * absorption + directIllumination;
         }
     }
 }

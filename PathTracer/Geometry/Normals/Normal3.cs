@@ -13,11 +13,11 @@ namespace PathTracer.Geometry.Normals {
     /// <summary> A 3-dimesional normalized direction vector </summary>
     public struct Normal3 : IDirection3, IEquatable<Normal3> {
         /// <summary> The unit vector in the X direction </summary>
-        public static Normal3 UnitX => new(Vector3.UnitX);
+        public static readonly Normal3 UnitX = new(Unit3.X);
         /// <summary> The unit vector in the Y direction </summary>
-        public static Normal3 UnitY => new(Vector3.UnitY);
+        public static readonly Normal3 UnitY = new(Unit3.Y);
         /// <summary> The unit vector in the Z direction </summary>
-        public static Normal3 UnitZ => new(Vector3.UnitZ);
+        public static readonly Normal3 UnitZ = new(Unit3.Z);
 
         /// <summary> The <see cref="Vector3"/> </summary>
         public Vector3 Vector { get; }
@@ -65,10 +65,18 @@ namespace PathTracer.Geometry.Normals {
         public static Direction3 operator *(Normal3 normal, Position1 position) => (normal as IDirection3) * position;
         public static Direction3 operator /(Normal3 normal, Position1 position) => (normal as IDirection3) / position;
 
-        public static Normal3 Cross(Normal3 left, Normal3 right) => new(Vector3.Cross(left.Vector, right.Vector));
-        public static bool Similar(Normal3 left, Normal3 right) => IDirection3.Similar(left, right);
+        public static Normal3 AnyPerpendicular(Normal3 normal) {
+            if (normal.Equals(UnitX)) {
+                return new Normal3(Vector3.Cross(normal.Vector, UnitY.Vector));
+            } else {
+                return new Normal3(Vector3.Cross(normal.Vector, UnitX.Vector));
+            }
+        }
 
-        public override bool Equals(object? obj) => Vector.Equals(obj);
+        public static Normal3 Perpendicular(Normal3 first, Normal3 second) => new(Vector3.Cross(first.Vector, second.Vector));
+        public static bool Similar(Normal3 left, Normal3 right) => IDirection3.InClosedHemisphere(left, right);
+
+        public override bool Equals(object? obj) => obj is Normal3 normal && Equals(normal);
         public bool Equals(Normal3 other) => Vector.Equals(other.Vector);
         public bool Equals(Normal3? other) => Vector.Equals(other?.Vector);
         public override int GetHashCode() => Vector.GetHashCode();

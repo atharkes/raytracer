@@ -1,16 +1,15 @@
-﻿using PathTracer.Geometry.Directions;
-using PathTracer.Geometry.Normals;
+﻿using PathTracer.Geometry.Normals;
 using PathTracer.Geometry.Positions;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics;
 using System;
 
 namespace PathTracer.Pathtracing.Distributions.Direction {
-    public struct SphericalDiffuse : IDirectionDistribution {
+    public struct SphericalUniform : IDirectionDistribution {
         public Normal3 Orientation { get; }
         public bool ContainsDelta => false;
         public double DomainSize => 4 * Math.PI;
 
-        public SphericalDiffuse(Normal3 orientation) {
+        public SphericalUniform(Normal3 orientation) {
             Orientation = orientation;
         }
 
@@ -20,7 +19,7 @@ namespace PathTracer.Pathtracing.Distributions.Direction {
 
         public Normal3 Sample(Random random) {
             ISphere sphere = new UnitSphere(Position3.Origin);
-            return ((Direction3)sphere.SurfacePosition(random)).Normalized();
+            return new Normal3(sphere.SurfacePosition(random).Vector);
         }
     }
 }

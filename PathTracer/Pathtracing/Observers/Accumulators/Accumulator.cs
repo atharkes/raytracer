@@ -39,8 +39,8 @@ namespace PathTracer.Pathtracing.Observers.Accumulators {
         /// <summary> Add a <paramref name="sample"/> to the <see cref="Accumulator"/> </summary>
         /// <param name="sample">The <see cref="ISample"/> to add</param>
         public void Add(ISample sample) {
-            int x = (int)Math.Floor(sample.Position.X * Width);
-            int y = (int)Math.Floor(sample.Position.Y * Height);
+            int x = (int)(sample.Position.X * Width);
+            int y = (int)(sample.Position.Y * Height);
             cavities[y * Width + x].AddSample(sample.Light, sample.PrimaryBVHTraversals, sample.Intersection);
             SampleCount++;
         }

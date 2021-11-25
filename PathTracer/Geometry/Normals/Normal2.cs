@@ -7,9 +7,9 @@ namespace PathTracer.Geometry.Normals {
     /// <summary> A 2-dimesional normalized direction vector </summary>
     public struct Normal2 : IDirection2, IEquatable<Normal2> {
         /// <summary> The unit vector in the X direction </summary>
-        public static Normal2 UnitX => new(Vector2.UnitX);
+        public static readonly Normal2 UnitX = new(Vector2.UnitX);
         /// <summary> The unit vector in the Y direction </summary>
-        public static Normal2 UnitY => new(Vector2.UnitY);
+        public static readonly Normal2 UnitY = new(Vector2.UnitY);
 
         /// <summary> The <see cref="Vector2"/> </summary>
         public Vector2 Vector { get; }
@@ -29,7 +29,7 @@ namespace PathTracer.Geometry.Normals {
 
         public static Normal2 operator -(Normal2 normal) => new(-normal.Vector);
 
-        public override bool Equals(object? obj) => Vector.Equals(obj);
+        public override bool Equals(object? obj) => obj is Normal2 normal && Vector.Equals(normal);
         public bool Equals(Normal2 other) => Vector.Equals(other.Vector);
         public bool Equals(Normal2? other) => Vector.Equals(other?.Vector);
         public override int GetHashCode() => Vector.GetHashCode();

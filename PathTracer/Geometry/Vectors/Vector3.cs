@@ -90,7 +90,7 @@ namespace PathTracer.Geometry.Vectors {
         public static Vector3 Clamp(Vector3 vector, Vector3 min, Vector3 max) => OpenTK.Mathematics.Vector3.Clamp(vector, min, max);
         public static Vector3 Lerp(Vector3 a, Vector3 b, Vector1 blend) => OpenTK.Mathematics.Vector3.Lerp(a, b, blend);
 
-        public override bool Equals(object? obj) => Value.Equals(obj);
+        public override bool Equals(object? obj) => obj is Vector3 vector && Equals(vector);
         public bool Equals(Vector3 other) => Value.Equals(other.Value);
         public bool Equals(Vector3? other) => Value.Equals(other?.Value);
         public override int GetHashCode() => Value.GetHashCode();

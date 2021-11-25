@@ -1,5 +1,4 @@
-﻿using PathTracer.Geometry.Normals;
-using PathTracer.Geometry.Positions;
+﻿using PathTracer.Geometry.Positions;
 using PathTracer.Geometry.Vectors;
 
 namespace PathTracer.Geometry.Directions {

@@ -45,6 +45,11 @@ namespace PathTracer.Pathtracing.SceneDescription {
         /// <returns>A <paramref name="random"/> point on the surface of the <see cref="IShape"/></returns>
         Position3 SurfacePosition(Random random);
 
+        /// <summary> Get a point on the surface of the <see cref="IShape"/> </summary>
+        /// <param name="uvPosition">The UV-position to get the point on the surface for</param>
+        /// <returns>A point on the surface specified by the <paramref name="uvPosition"/></returns>
+        //Position3 SurfacePosition(Position2 uvPosition);
+
         /// <summary> Get the UV-position for a specified <paramref name="position"/> </summary>
         /// <param name="position">The surface position for which to get the UV-position</param>
         /// <returns>The UV-position for the <paramref name="position"/></returns>

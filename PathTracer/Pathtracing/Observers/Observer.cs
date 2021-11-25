@@ -1,7 +1,9 @@
 ﻿using OpenTK.Windowing.GraphicsLibraryFramework;
 using PathTracer.Geometry.Directions;
+using PathTracer.Geometry.Positions;
 using PathTracer.Pathtracing.Observers.Accumulators;
 using PathTracer.Pathtracing.Observers.Cameras;
+using PathTracer.Pathtracing.Rays;
 using PathTracer.Utilities;
 
 namespace PathTracer.Pathtracing.Observers {
@@ -64,6 +66,11 @@ namespace PathTracer.Pathtracing.Observers {
         /// <param name="keyboard">The <see cref="KeyboardState"/> to handle input from</param>
         /// <param name="mouse">The <see cref="MouseState"/> to handle input from</param>
         public void HandleInput(KeyboardState keyboard, MouseState mouse) {
+            if (mouse.WasButtonDown(MouseButton.Left) && !mouse.IsButtonDown(MouseButton.Left)) {
+                Position2 position = new((float)mouse.X / Screen.Width, (float)mouse.Y / Screen.Height);
+                IRay ray = Camera.GetCameraRay(position, new Direction2(0.5f, 0.5f));
+                Camera.SetViewDirection(ray.Direction);
+            }
             if (keyboard.IsKeyPressed(Keys.F1)) DebugInfo = !DebugInfo;
             if (keyboard.IsKeyPressed(Keys.F2)) DrawingMode = DrawingMode.Next();
             if (keyboard.IsKeyDown(Keys.Space)) Camera.Move(Camera.Up * MoveSpeed);

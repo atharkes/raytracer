@@ -65,6 +65,8 @@ namespace PathTracer.Pathtracing.Observers.Cameras {
         /// <param name="degrees">The amount of degrees to rotate</param>
         public void Rotate(Normal3 axis, float degrees) => SetRotation(Rotation * Quaternion.FromAxisAngle(axis.Vector.Value, degrees));
 
+        public void Rotate(Quaternion quaternion) => SetRotation(Rotation * quaternion);
+
         /// <summary> Set the rotation <see cref="Quaternion"/> of the <see cref="PinholeCamera"/> </summary>
         /// <param name="rotation">The new rotation <see cref="Quaternion"/></param>
         public void SetRotation(Quaternion rotation) {
@@ -75,11 +77,7 @@ namespace PathTracer.Pathtracing.Observers.Cameras {
         /// <summary> Set the view direction of the <see cref="PinholeCamera"/> </summary>
         /// <param name="direction">The direction the <see cref="PinholeCamera"/> will view towards</param>
         public void SetViewDirection(Normal3 direction) {
-            Normal3 side = Normal3.Cross(direction, IDirection3.DefaultUp);
-            Normal3 up = Normal3.Cross(side, direction);
-            Matrix3 lookAtMatrix = new(side.Vector.Value, up.Vector.Value, direction.Vector.Value);
-            lookAtMatrix.Transpose();
-            SetRotation(Quaternion.FromMatrix(lookAtMatrix));
+            Rotate(new Quaternion(Vector3.Cross(ViewDirection.Vector, direction.Vector), Vector3.Dot(ViewDirection.Vector, direction.Vector) + 1).Normalized());
         }
 
         /// <summary> Set the field of view of the <see cref="PinholeCamera"/> </summary>

@@ -14,14 +14,14 @@ namespace PathTracer.Pathtracing.Distributions.Direction {
             Orientation = orientation;
         }
 
-        public bool Contains(Normal3 sample) => IDirection3.InClosedHemisphere(Orientation, sample);
+        public bool Contains(Normal3 sample) => IDirection3.InSameClosedHemisphere(Orientation, sample);
 
         public double ProbabilityDensity(Normal3 sample) => Contains(sample) ? 1 / DomainSize : 0;
 
         public Normal3 Sample(Random random) {
             ISphere sphere = new UnitSphere(Position3.Origin);
             Normal3 direction = ((Direction3)sphere.SurfacePosition(random)).Normalized();
-            return IDirection3.InClosedHemisphere(Orientation, direction) ? direction : -direction;
+            return IDirection3.InSameClosedHemisphere(Orientation, direction) ? direction : -direction;
         }
     }
 }

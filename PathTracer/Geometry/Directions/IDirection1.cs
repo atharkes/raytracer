@@ -6,17 +6,6 @@ using System;
 namespace PathTracer.Geometry.Directions {
     /// <summary> A 1-dimensional direction vector </summary>
     public interface IDirection1 : IDirection<Vector1>, IComparable<IDirection1>, IEquatable<IDirection1> {
-        /// <summary> The default right direction when no rotation is applied </summary>
-        static readonly Normal1 DefaultRight = Normal1.One;
-        /// <summary> The default left direction when no rotation is applied </summary>
-        static readonly Normal1 DefaultLeft = -DefaultRight;
-        /// <summary> The direction vector reprsenting no direction </summary>
-        static readonly Direction1 Zero = Vector1.Zero;
-        /// <summary> The direction vector with 1 in every direction </summary>
-        static readonly Direction1 One = Vector1.One;
-
-        Vector1 X => Vector;
-
         public static bool operator <=(IDirection1 left, IDirection1 right) => left.CompareTo(right) <= 0;
         public static bool operator >=(IDirection1 left, IDirection1 right) => left.CompareTo(right) >= 0;
         public static bool operator <(IDirection1 left, IDirection1 right) => left.CompareTo(right) < 0;
@@ -39,8 +28,7 @@ namespace PathTracer.Geometry.Directions {
         int GetHashCode() => Vector.GetHashCode();
         int IComparable<IDirection1>.CompareTo(IDirection1? other) => Vector.CompareTo(other?.Vector);
 
-        bool IDirection<Vector1>.SimilarAs(IDirection<Vector1> other) => SimilarAs(other);
-        bool SimilarAs(IDirection1 other) => Dot(this, other) > Zero;
+        bool Similar(IDirection1 other) => Dot(this, other) > Direction1.Zero;
         Normal1 Normalized() => new(Vector);
     }
 }

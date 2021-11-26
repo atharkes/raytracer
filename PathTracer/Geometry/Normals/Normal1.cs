@@ -8,6 +8,10 @@ namespace PathTracer.Geometry.Normals {
     public struct Normal1 : IDirection1, IEquatable<Normal1> {
         /// <summary> The one vector </summary>
         public static readonly Normal1 One = new(Vector1.One);
+        /// <summary> The default right direction when no rotation is applied </summary>
+        public static readonly Normal1 DefaultRight = One;
+        /// <summary> The default left direction when no rotation is applied </summary>
+        public static readonly Normal1 DefaultLeft = -DefaultRight;
 
         /// <summary> The <see cref="Vector1"/> </summary>
         public Vector1 Vector { get; }

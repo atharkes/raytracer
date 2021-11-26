@@ -18,6 +18,18 @@ namespace PathTracer.Geometry.Normals {
         public static readonly Normal3 UnitY = new(Unit3.Y);
         /// <summary> The unit vector in the Z direction </summary>
         public static readonly Normal3 UnitZ = new(Unit3.Z);
+        /// <summary> The default right direction when no rotation is applied </summary>
+        public static readonly Normal3 DefaultRight = UnitX;
+        /// <summary> The default left direction when no rotation is applied </summary>
+        public static readonly Normal3 DefaultLeft = -DefaultRight;
+        /// <summary> The default up vector when no rotation is applied </summary>
+        public static readonly Normal3 DefaultUp = UnitY;
+        /// <summary> The default down vector when no rotation is applied </summary>
+        public static readonly Normal3 DefaultDown = -DefaultUp;
+        /// <summary> The default front vector when no rotation is applied </summary>
+        public static readonly Normal3 DefaultFront = UnitZ;
+        /// <summary> The default back vector when no rotation is applied </summary>
+        public static readonly Normal3 DefaultBack = -DefaultFront;
 
         /// <summary> The <see cref="Vector3"/> </summary>
         public Vector3 Vector { get; }
@@ -74,7 +86,7 @@ namespace PathTracer.Geometry.Normals {
         }
 
         public static Normal3 Perpendicular(Normal3 first, Normal3 second) => new(Vector3.Cross(first.Vector, second.Vector));
-        public static bool Similar(Normal3 left, Normal3 right) => IDirection3.InClosedHemisphere(left, right);
+        public static bool Similar(Normal3 left, Normal3 right) => IDirection3.InSameClosedHemisphere(left, right);
 
         public override bool Equals(object? obj) => obj is Normal3 normal && Equals(normal);
         public bool Equals(Normal3 other) => Vector.Equals(other.Vector);

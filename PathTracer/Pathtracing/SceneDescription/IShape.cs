@@ -75,7 +75,7 @@ namespace PathTracer.Pathtracing.SceneDescription {
                 Queue<Position1> entries = new();
                 foreach (Position1 distance in distances.OrderBy(d => d)) {
                     Position3 position = IntersectPosition(ray, distance);
-                    bool enters = (SurfaceNormal(position) as IDirection3).Opposing(ray.Direction);
+                    bool enters = !IDirection3.InSameOpenHemisphere(SurfaceNormal(position), ray.Direction);
                     if (enters) {
                         entries.Enqueue(distance);
                     } else {

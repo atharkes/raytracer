@@ -6,6 +6,11 @@ using System;
 namespace PathTracer.Geometry.Directions {
     /// <summary> A 1-dimensional direction vector </summary>
     public struct Direction1 : IDirection1, IEquatable<Direction1> {
+        /// <summary> The direction vector reprsenting no direction </summary>
+        public static readonly Direction1 Zero = Vector1.Zero;
+        /// <summary> The direction vector with 1 in every direction </summary>
+        public static readonly Direction1 One = Vector1.One;
+
         public Vector1 Vector { get; }
 
         /// <summary> The X-coordinate of the <see cref="IDirection1"/> </summary>

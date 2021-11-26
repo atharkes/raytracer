@@ -10,6 +10,14 @@ namespace PathTracer.Geometry.Normals {
         public static readonly Normal2 UnitX = new(Vector2.UnitX);
         /// <summary> The unit vector in the Y direction </summary>
         public static readonly Normal2 UnitY = new(Vector2.UnitY);
+        /// <summary> The default right direction when no rotation is applied </summary>
+        public static readonly Normal2 DefaultRight = UnitX;
+        /// <summary> The default left direction when no rotation is applied </summary>
+        public static readonly Normal2 DefaultLeft = -DefaultRight;
+        /// <summary> The default up vector when no rotation is applied </summary>
+        public static readonly Normal2 DefaultUp = UnitY;
+        /// <summary> The default down vector when no rotation is applied </summary>
+        public static readonly Normal2 DefaultDown = -DefaultUp;
 
         /// <summary> The <see cref="Vector2"/> </summary>
         public Vector2 Vector { get; }

@@ -26,7 +26,7 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects {
         bool IShape.Inside(Position3 position) => Shape.Inside(position);
         Position3 IShape.SurfacePosition(Random random) => Shape.SurfacePosition(random);
         Position2 IShape.UVPosition(Position3 position) => Shape.UVPosition(position);
-        bool IShape.OnSurface(Position3 position, float epsilon = 0.001F) => Shape.OnSurface(position, epsilon);
+        bool IShape.OnSurface(Position3 position, float epsilon) => Shape.OnSurface(position, epsilon);
         Normal3 IShape.SurfaceNormal(Position3 position) => Shape.SurfaceNormal(position);
         Normal3 IShape.OutwardsDirection(Position3 position) => Shape.OutwardsDirection(position);
 

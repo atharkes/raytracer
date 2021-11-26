@@ -11,10 +11,5 @@ namespace PathTracer.Geometry.Directions {
         Position1 Length => Vector.Length;
         /// <summary> The length squared of the <see cref="IDirection{T}"/> </summary>
         Position1 LengthSquared => Vector.LengthSquared;
-
-        /// <summary> Whether the <see cref="IDirection{T}"/> is similar as the <paramref name="other"/> <see cref="IDirection{T}"/> </summary>
-        /// <param name="other">The other <see cref="IDirection{T}"/></param>
-        /// <returns>Whether the directions are in a similar direction</returns>
-        bool SimilarAs(IDirection<T> other);
     }
 }

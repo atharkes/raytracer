@@ -25,15 +25,15 @@ namespace PathTracer.Pathtracing.Observers.Cameras {
         /// <summary> The viewing direction of the <see cref="ICamera"/> </summary>
         Normal3 ViewDirection => Front;
         /// <summary> The front vector of the <see cref="ICamera"/> </summary>
-        Normal3 Front => Rotation * IDirection3.DefaultFront;
+        Normal3 Front => Rotation * Normal3.DefaultFront;
         /// <summary> The back vector of the <see cref="ICamera"/> </summary>
         Normal3 Back => -Front;
         /// <summary> The up vector of the <see cref="ICamera"/> </summary>
-        Normal3 Up => Rotation * IDirection3.DefaultUp;
+        Normal3 Up => Rotation * Normal3.DefaultUp;
         /// <summary> The down vector of the <see cref="ICamera"/></summary>
         Normal3 Down => -Up;
         /// <summary> The right vector of the <see cref="ICamera"/> </summary>
-        Normal3 Right => Rotation * IDirection3.DefaultRight;
+        Normal3 Right => Rotation * Normal3.DefaultRight;
         /// <summary> The left vector of the <see cref="ICamera"/> </summary>
         Normal3 Left => -Right;
 

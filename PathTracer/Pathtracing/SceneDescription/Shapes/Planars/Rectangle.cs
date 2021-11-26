@@ -17,11 +17,11 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Planars {
         public Quaternion Rotation { get; set; }
 
         /// <summary> The normal vector of the <see cref="Rectangle"/> </summary>
-        public Normal3 Normal => Rotation * IDirection3.DefaultFront;
+        public Normal3 Normal => Rotation * Normal3.DefaultFront;
         /// <summary> The vector going right along the width of the <see cref="Rectangle"/> </summary>
-        public Normal3 Right => Rotation * IDirection3.DefaultRight;
+        public Normal3 Right => Rotation * Normal3.DefaultRight;
         /// <summary> The vector going up along the height of the <see cref="Rectangle"/> </summary>
-        public Normal3 Up => Rotation * IDirection3.DefaultUp;
+        public Normal3 Up => Rotation * Normal3.DefaultUp;
 
         /// <summary> The vector that goes from the left of the <see cref="Rectangle"/> to the right </summary>
         public Direction3 LeftToRight => Right * Width;

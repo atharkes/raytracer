@@ -41,8 +41,12 @@ namespace PathTracer.Pathtracing.Observers.Accumulators {
         public void Add(ISample sample) {
             int x = (int)(sample.Position.X * Width);
             int y = (int)(sample.Position.Y * Height);
-            cavities[y * Width + x].AddSample(sample.Light, sample.PrimaryBVHTraversals, sample.Intersection);
-            SampleCount++;
+            try {
+                cavities[y * Width + x].AddSample(sample.Light, sample.PrimaryBVHTraversals, sample.Intersection);
+                SampleCount++;
+            } catch (IndexOutOfRangeException) {
+                Console.WriteLine($"Exception when adding a sample to the Accumulator. Has the screen be resized?");
+            }
         }
 
         /// <summary> Draws the samples to the <paramref name="screen"/> </summary>

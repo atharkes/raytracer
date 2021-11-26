@@ -1,12 +1,14 @@
 ﻿using OpenTK.Windowing.GraphicsLibraryFramework;
 using PathTracer.Geometry.Directions;
+using PathTracer.Geometry.Normals;
 using PathTracer.Geometry.Positions;
 using PathTracer.Pathtracing.Observers.Accumulators;
 using PathTracer.Pathtracing.Observers.Cameras;
 using PathTracer.Pathtracing.Rays;
 using PathTracer.Utilities;
 
-namespace PathTracer.Pathtracing.Observers {
+namespace PathTracer.Pathtracing.Observers
+{
     /// <summary> An <see cref="IObserver"/> that observes a <see cref="IScene"/> </summary>
     public class Observer : IObserver {
         /// <summary> The virtual <see cref="ICamera"/> object of the <see cref="Observer"/> </summary>
@@ -81,12 +83,12 @@ namespace PathTracer.Pathtracing.Observers {
             if (keyboard.IsKeyDown(Keys.D)) Camera.Move(Camera.Right * MoveSpeed);
             if (keyboard.IsKeyPressed(Keys.KeyPadAdd)) Camera.HorizontalFOV *= 1f + FOVSensitivity;
             if (keyboard.IsKeyPressed(Keys.KeyPadSubtract)) Camera.HorizontalFOV /= 1f + FOVSensitivity;
-            if (keyboard.IsKeyDown(Keys.Up)) Camera.Rotate(IDirection3.DefaultRight, -RotateSensitivity);
-            if (keyboard.IsKeyDown(Keys.Down)) Camera.Rotate(IDirection3.DefaultRight, RotateSensitivity);
-            if (keyboard.IsKeyDown(Keys.Right)) Camera.Rotate(IDirection3.DefaultUp, RotateSensitivity);
-            if (keyboard.IsKeyDown(Keys.Left)) Camera.Rotate(IDirection3.DefaultUp, -RotateSensitivity);
-            if (keyboard.IsKeyDown(Keys.Q)) Camera.Rotate(IDirection3.DefaultFront, RotateSensitivity);
-            if (keyboard.IsKeyDown(Keys.E)) Camera.Rotate(IDirection3.DefaultFront, -RotateSensitivity);
+            if (keyboard.IsKeyDown(Keys.Up)) Camera.Rotate(Normal3.DefaultRight, -RotateSensitivity);
+            if (keyboard.IsKeyDown(Keys.Down)) Camera.Rotate(Normal3.DefaultRight, RotateSensitivity);
+            if (keyboard.IsKeyDown(Keys.Right)) Camera.Rotate(Normal3.DefaultUp, RotateSensitivity);
+            if (keyboard.IsKeyDown(Keys.Left)) Camera.Rotate(Normal3.DefaultUp, -RotateSensitivity);
+            if (keyboard.IsKeyDown(Keys.Q)) Camera.Rotate(Normal3.DefaultFront, RotateSensitivity);
+            if (keyboard.IsKeyDown(Keys.E)) Camera.Rotate(Normal3.DefaultFront, -RotateSensitivity);
         }
     }
 }

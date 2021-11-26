@@ -5,6 +5,11 @@ using System;
 
 namespace PathTracer.Geometry.Directions {
     public struct Direction2 : IDirection2, IEquatable<Direction2> {
+        /// <summary> The direction vector reprsenting no direction </summary>
+        public static readonly Direction2 Zero = Vector2.Zero;
+        /// <summary> The direction vector 1 in all directions </summary>
+        public static readonly Direction2 One = Vector2.One;
+
         public Vector2 Vector { get; }
 
         /// <summary> The X-coordinate of the <see cref="IDirection2"/> </summary>

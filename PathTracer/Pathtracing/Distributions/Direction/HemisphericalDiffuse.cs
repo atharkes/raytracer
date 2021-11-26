@@ -12,7 +12,7 @@ namespace PathTracer.Pathtracing.Distributions.Direction {
             Orientation = orientation;
         }
 
-        public bool Contains(Normal3 sample) => IDirection3.InClosedHemisphere(Orientation, sample);
+        public bool Contains(Normal3 sample) => IDirection3.InSameClosedHemisphere(Orientation, sample);
 
         public double ProbabilityDensity(Normal3 sample) => Math.Abs(IDirection3.Dot(Orientation, sample));
 

@@ -23,7 +23,7 @@ namespace PathTracer.Pathtracing.Observers.Cameras {
         /// <summary> The aspect ratio of the <see cref="PinholeCamera"/> </summary>
         public float AspectRatio { get => aspectRatio; set => SetAspectRatio(value); }
         /// <summary> The viewing direction of the <see cref="PinholeCamera"/> </summary>
-        public Normal3 ViewDirection => Rotation * IDirection3.DefaultFront;   
+        public Normal3 ViewDirection => Rotation * Normal3.DefaultFront;   
 
         /// <summary> The event that fires when the <see cref="Camera"/> moved </summary>
         public event EventHandler<ICamera>? OnMoved;
@@ -65,6 +65,8 @@ namespace PathTracer.Pathtracing.Observers.Cameras {
         /// <param name="degrees">The amount of degrees to rotate</param>
         public void Rotate(Normal3 axis, float degrees) => SetRotation(Rotation * Quaternion.FromAxisAngle(axis.Vector.Value, degrees));
 
+        /// <summary> Rotate the <see cref="PinholeCamera"/> with a <paramref name="quaternion"/> </summary>
+        /// <param name="quaternion">The rotation <see cref="Quaternion"/></param>
         public void Rotate(Quaternion quaternion) => SetRotation(Rotation * quaternion);
 
         /// <summary> Set the rotation <see cref="Quaternion"/> of the <see cref="PinholeCamera"/> </summary>

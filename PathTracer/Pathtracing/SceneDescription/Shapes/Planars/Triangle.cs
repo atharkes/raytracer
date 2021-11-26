@@ -44,7 +44,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Planars {
             P1 = p1;
             P2 = p2;
             P3 = p3;
-            Normal = normal ?? Normal3.Perpendicular((P2 - P1).Normalized(), (P3 - P1).Normalized());
+            Normal = normal ?? new Normal3(Vector3.Cross((P2 - P1).Vector, (P3 - P1).Vector));
         }
 
         /// <summary> Get a <paramref name="random"/> point on the surface of the <see cref="Triangle"/> </summary>

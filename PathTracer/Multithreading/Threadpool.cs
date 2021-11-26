@@ -5,13 +5,15 @@ using System.Threading;
 namespace PathTracer.Multithreading {
     /// <summary> A threadpool for dividing work between threads </summary>
     public class Threadpool {
-        /// <summary> The amount of tasks created for the threadpool </summary>
-        public readonly int MultithreadingTaskCount = CoreCount * 16;
-        /// <summary> Amount of threads used for the threadpool </summary>
-        public readonly int ThreadCount;
-
         /// <summary> Amount of cores on this system </summary>
         public static int CoreCount => Environment.ProcessorCount;
+
+        /// <summary> Amount of threads used for the threadpool </summary>
+        public int ThreadCount { get; set; }
+        /// <summary> Ideal amount of tasks per thread </summary>
+        public int TasksPerThread { get; set; } = 16;
+        /// <summary> The amount of tasks created for the threadpool </summary>
+        public int MultithreadingTaskCount => ThreadCount * TasksPerThread;
 
         readonly Thread[] workerThreads;
         readonly EventWaitHandle[] go;
@@ -34,7 +36,7 @@ namespace PathTracer.Multithreading {
                 go[i] = new EventWaitHandle(false, EventResetMode.AutoReset);
                 doneHandle[i] = new EventWaitHandle(false, EventResetMode.AutoReset);
                 done[i] = true;
-                Thread workerThread = new Thread(() => ThreadMain(threadNumber));
+                Thread workerThread = new(() => ThreadMain(threadNumber));
                 workerThread.Start();
             }
         }

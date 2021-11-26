@@ -1,6 +1,7 @@
 ﻿using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using PathTracer.Drawing;
+using PathTracer.Geometry.Normals;
 using PathTracer.Geometry.Positions;
 using PathTracer.Multithreading;
 using PathTracer.Pathtracing;
@@ -22,8 +23,25 @@ using System.Collections.Generic;
 
 namespace PathTracer {
     public static class Program {
+        #region Default Scene Definition
+        /// <summary> The primitives in the default scene </summary>
+        public static readonly List<ISceneObject> DefaultPrimitives = new() {
+            new Primitive(new InfinityPlane(), ParametricMaterial.WhiteLight),
+            new Primitive(new Sphere(new Position3(-3, 1, 5), 1), ParametricMaterial.DiffuseGreen),
+            new Primitive(new Sphere(new Position3(3, 1, 5), 1), ParametricMaterial.GlossyRed),
+            new Primitive(new Sphere(new Position3(0, 1, 5), 1), ParametricMaterial.Mirror),
+            new Primitive(new Sphere(new Position3(-1, 1, 2), 1), new DiffuseVolumetric(new RGBSpectrum(0.8f, 0.8f, 0.8f), 10)),
+            new Primitive(new Triangle(new Position3(5, 0, 10), new Position3(5, 0, 0), new Position3(-5, 0, 0), null), ParametricMaterial.GlossyPurpleMirror),
+            new Primitive(new Triangle(new Position3(5, 0, 10), new Position3(-5, 0, 0), new Position3(-5, 0, 10), null), ParametricMaterial.DiffuseYellow),
+            new Primitive(new Plane(new Normal3(0, 1, 0), new Position1(-1)), ParametricMaterial.DiffuseWhite),
+            //new Primitive(new AxisAlignedBox(new Position3(-5, -5, -5), new Position3(5, 5, 5)), new DiffuseVolumetric(new RGBSpectrum(0.8f, 0.8f, 0.8f), 1)),
+        };
+
+        public static readonly List<ISceneObject> DefaultLights = DefaultPrimitives.FindAll(s => s is IPrimitive p && p.Material.IsEmitting);
+        #endregion
+
         /// <summary> The threadpool of this application </summary>
-        public static readonly Threadpool Threadpool = new();
+        public static readonly Threadpool Threadpool = new(1);
         /// <summary> The configuration of the renderer </summary>
         public static readonly Config Config = Config.LoadFromFile();
         /// <summary> The window supplied by OpenTK to render to </summary>
@@ -63,21 +81,5 @@ namespace PathTracer {
         static void HandleInput(FrameEventArgs obj) {
             Renderer.Observer.HandleInput(Window.KeyboardState, Window.MouseState);
         }
-
-        #region Default Scene Definition
-        /// <summary> The primitives in the default scene </summary>
-        public static List<ISceneObject> DefaultPrimitives => new() {
-            new Primitive(new InfinityPlane(), ParametricMaterial.WhiteLight),
-            new Primitive(new Sphere(new Position3(-3, 1, 5), 1), ParametricMaterial.DiffuseGreen),
-            new Primitive(new Sphere(new Position3(3, 1, 5), 1), ParametricMaterial.GlossyRed),
-            new Primitive(new Sphere(new Position3(0, 1, 5), 1), ParametricMaterial.Mirror),
-            new Primitive(new Sphere(new Position3(-1, 1, 2), 1), new DiffuseVolumetric(new RGBSpectrum(0.8f, 0.8f, 0.8f), 10)),
-            new Primitive(new Triangle(new Position3(-5, 0, 0), new Position3(5, 0, 0), new Position3(5, 0, 10), null), ParametricMaterial.GlossyPurpleMirror),
-            new Primitive(new Triangle(new Position3(-5, 0, 0), new Position3(5, 0, 10), new Position3(-5, 0, 10), null), ParametricMaterial.DiffuseYellow),
-            //new Primitive(new AxisAlignedBox(new Position3(-5, -5, -5), new Position3(5, 5, 5)), ),
-        };
-
-        public static List<ISceneObject> DefaultLights => DefaultPrimitives.FindAll(s => s is IPrimitive p && p.Material.IsEmitting);
-        #endregion
     }
 }

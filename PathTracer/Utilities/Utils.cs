@@ -16,7 +16,7 @@ namespace PathTracer.Utilities {
         /// <summary> A deterministic <see cref="Random"/> to generate random scenes which are always the same </summary>
         public static Random DeterministicRandom { get; } = new Random(0);
         /// <summary> The <see cref="Random"/> to use per thread </summary>
-        public static Random ThreadRandom => random ??= new Random(Thread.CurrentThread.ManagedThreadId * (int)DateTime.Today.TimeOfDay.Ticks);
+        public static Random ThreadRandom => random ??= new Random(HashCode.Combine(Environment.CurrentManagedThreadId, (int)DateTime.Today.TimeOfDay.Ticks));
 
         [ThreadStatic] static Random? random;
 

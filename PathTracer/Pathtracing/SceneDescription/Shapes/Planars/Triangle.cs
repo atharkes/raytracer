@@ -14,18 +14,18 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Planars {
         public const float IntersectionEpsilon = 0.0000001f;
 
         /// <summary> The first point of the <see cref="Triangle"/> </summary>
-        public Position3 P1 { get; }
+        public readonly Position3 P1;
         /// <summary> The second point of the <see cref="Triangle"/> </summary>
-        public Position3 P2 { get; }
+        public readonly Position3 P2;
         /// <summary> The third point of the <see cref="Triangle"/> </summary>
-        public Position3 P3 { get; }
+        public readonly Position3 P3;
         /// <summary> The normal of the <see cref="Triangle"/> </summary>
-        public Normal3 Normal { get; }
+        public readonly Normal3 Normal;
 
         /// <summary> The direction vector from <see cref="P1"/> to <see cref="P2"/></summary>
-        public Direction3 P1toP2 => P2 - P1;
+        public readonly Direction3 P1toP2;
         /// <summary> The direction vector from <see cref="P1"/> to <see cref="P3"/> </summary>
-        public Direction3 P1toP3 => P3 - P1;
+        public readonly Direction3 P1toP3;
 
         /// <summary> The surface area of the <see cref="Triangle"/> </summary>
         public float SurfaceArea => Vector3.Cross(P2.Vector - P1.Vector, P3.Vector - P1.Vector).Length * 0.5f;
@@ -44,7 +44,9 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Planars {
             P1 = p1;
             P2 = p2;
             P3 = p3;
-            Normal = normal ?? new Normal3(Vector3.Cross((P2 - P1).Vector, (P3 - P1).Vector));
+            P1toP2 = P2 - P1;
+            P1toP3 = P3 - P1;
+            Normal = normal ?? new Normal3(Vector3.Cross(P1toP2.Vector, P1toP3.Vector));
         }
 
         /// <summary> Get a <paramref name="random"/> point on the surface of the <see cref="Triangle"/> </summary>
@@ -92,7 +94,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Planars {
             Vector3 P = Vector3.Cross(ray.Direction.Vector, P1toP3.Vector);
             // If determinant is near zero, ray lies in plane of triangle
             float determinant = Vector3.Dot(P1toP2.Vector, P);
-            if (determinant > -IntersectionEpsilon && determinant < IntersectionEpsilon) return null;
+            if (-IntersectionEpsilon < determinant && determinant < IntersectionEpsilon) return null;
             float determinantInverted = 1f / determinant;
 
             // Calculate distance from P1 to ray origin

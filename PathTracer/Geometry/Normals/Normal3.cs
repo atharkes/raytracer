@@ -31,8 +31,9 @@ namespace PathTracer.Geometry.Normals {
         /// <summary> The default back vector when no rotation is applied </summary>
         public static readonly Normal3 DefaultBack = -DefaultFront;
 
-        /// <summary> The <see cref="Vector3"/> </summary>
-        public Vector3 Vector { get; }
+        Vector3 IDirection<Vector3>.Vector => Vector;
+        /// <summary> The <see cref="Vector3"/> of the <see cref="Normal3"/> </summary>
+        public readonly Vector3 Vector;
 
         /// <summary> The X-coordinate of the <see cref="IDirection3"/> </summary>
         public Direction1 X => Vector.X;

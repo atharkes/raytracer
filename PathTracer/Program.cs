@@ -41,7 +41,7 @@ namespace PathTracer {
         #endregion
 
         /// <summary> The threadpool of this application </summary>
-        public static readonly Threadpool Threadpool = new(1);
+        public static readonly Threadpool Threadpool = new();
         /// <summary> The configuration of the renderer </summary>
         public static readonly Config Config = Config.LoadFromFile();
         /// <summary> The window supplied by OpenTK to render to </summary>

@@ -91,13 +91,16 @@ namespace PathTracer.Pathtracing.Integrators {
             Normal3 direction = directions.Sample(Utils.ThreadRandom);
             //float directionImportance = (float)directions.InverseRelativeProbability(direction);
 
+            /// Get Ray
+            IRay raySample = material.CreateRay(position, orientation, direction);
+
             /// Compute Direction Sampling Throughput
             //float directionSampleImportance = orientationImportance * directionImportance;
             ISpectrum absorption = material.Albedo;
             //ISpectrum directionSampleThroughput = absorption * directionSampleImportance;
 
             /// Sample Indirect Illumination
-            ISpectrum indirectIllumination = Sample(scene, new Ray(position, direction), spectrum * absorption, recursionDepth + 1);
+            ISpectrum indirectIllumination = Sample(scene, raySample, spectrum * absorption, recursionDepth + 1);
 
             /// Light Throughput Calculation
             return indirectIllumination * absorption + directIllumination;

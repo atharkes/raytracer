@@ -4,9 +4,9 @@ using System.Diagnostics;
 using System.Linq;
 
 namespace PathTracer.Pathtracing.Distributions.Probabilities {
-    /// <summary> A weighted probability mass function (discreet PDF).
+    /// <summary> A linear combination of <see cref="IProbabilityDistribution{T}"/>s 
     /// Sampling can be improved using Vose's Alias Method to O(1). </summary>
-    /// <typeparam name="T">The type of the <see cref="WeightedPMF{T}"/></typeparam>
+    /// <typeparam name="T">The type of samples from the <see cref="CombinedProbabilityDistribution{T}"/></typeparam>
     public class CombinedProbabilityDistribution<T> : IProbabilityDistribution<T> where T : notnull {
         public bool SingleSolution => items.Count == 1 && items.First().SingleSolution;
         public bool Discreet => items.Any(i => i.Discreet);

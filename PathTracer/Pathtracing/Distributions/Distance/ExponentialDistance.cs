@@ -70,7 +70,7 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
         }
 
         public WeightedPMF<IShapeInterval>? GetShapeIntervals(Position1 sample, IMaterial material) {
-            return (this as IPDF<Position1>).Contains(sample) && material == Material ? new WeightedPMF<IShapeInterval>((Interval, 1)) : null;
+            return (this as IPDF<Position1>).Contains(sample) && material.Equals(Material) ? new WeightedPMF<IShapeInterval>((Interval, 1)) : null;
         }
     }
 }

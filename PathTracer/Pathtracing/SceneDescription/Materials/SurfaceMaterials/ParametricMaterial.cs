@@ -96,12 +96,6 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials.SurfaceMaterials {
             var diffuse = new HemisphericalDiffuse(orientation);
             var specular = new SpecularReflection(orientation, incomingDirection);
             return new CombinedProbabilityDistribution<Normal3>((diffuse, 1 - Specularity), (specular, Specularity)); 
-            //Vector3 radianceOut;
-            //if (surfacePoint.Primitive.Material.Specularity > 0) {
-            //    // Specular
-            //    Vector3 reflectedIn = Sample(intersection.Reflect());
-            //    Vector3 reflectedOut = reflectedIn * intersection.SurfacePoint.Primitive.Material.Color;
-            //    radianceOut = irradianceIn * (1 - intersection.SurfacePoint.Primitive.Material.Specularity) + reflectedOut * surfacePoint.Primitive.Material.Specularity;
             //} else if (surfacePoint.Primitive.Material.Dielectric > 0) {
             //    // Dielectric
             //    float reflected = intersection.Reflectivity();
@@ -110,10 +104,6 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials.SurfaceMaterials {
             //    Vector3 incRefractedLight = refractedRay != null ? Sample(refractedRay) : Vector3.Zero;
             //    Vector3 incReflectedLight = Sample(intersection.Reflect());
             //    radianceOut = irradianceIn * (1f - surfacePoint.Primitive.Material.Dielectric) + (incRefractedLight * refracted + incReflectedLight * reflected) * surfacePoint.Primitive.Material.Dielectric * surfacePoint.Primitive.Material.Color;
-            //} else {
-            //    // Diffuse
-            //    radianceOut = irradianceIn;
-            //}
         }
     }
 }

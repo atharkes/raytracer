@@ -21,7 +21,6 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes {
         public override bool Equals(object? obj) => obj is InfinityPlane infPlane && Equals(infPlane);
         public bool Equals(InfinityPlane other) => true;
         
-
         public IEnumerable<Position1> IntersectDistances(IRay ray) {
             yield return Position1.MinValue;
             yield return Position1.MaxValue;

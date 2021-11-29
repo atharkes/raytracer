@@ -17,7 +17,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials.VolumetricMaterials 
         }
 
         public IProbabilityDistribution<Normal3> DirectionDistribution(Normal3 incomingDirection, Position3 position, Normal3 orientation, ISpectrum spectrum) {
-            return new SphericalUniform(incomingDirection);
+            return new SphericalUniform(orientation);
         }
 
         public ISpectrum Emittance(Position3 position, Normal3 orientation, Normal3 direction) => ISpectrum.Black;

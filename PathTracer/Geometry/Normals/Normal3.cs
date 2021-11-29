@@ -87,7 +87,9 @@ namespace PathTracer.Geometry.Normals {
         }
 
         public static Normal3 Perpendicular(Normal3 first, Normal3 second) => new(Vector3.Cross(first.Vector, second.Vector));
-        public static bool Similar(Normal3 left, Normal3 right) => IDirection3.InSameClosedHemisphere(left, right);
+        public static Normal3 Reflect(Normal3 direction, Normal3 normal) => new(-direction + normal * 2f * Similarity(direction, normal));
+        public static float Similarity(Normal3 left, Normal3 right) => Vector3.Dot(left.Vector, right.Vector);
+        public static bool Similar(Normal3 left, Normal3 right) => Similarity(left, right) > 0f;
 
         public override bool Equals(object? obj) => obj is Normal3 normal && Equals(normal);
         public bool Equals(Normal3 other) => Vector.Equals(other.Vector);

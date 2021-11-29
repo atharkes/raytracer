@@ -82,7 +82,7 @@ namespace PathTracer.Geometry.Vectors {
         public static Vector3 operator /(Vector1 left, Vector3 right) => new(left / right.X, left / right.Y, left / right.Z);
         public static Vector3 operator /(Vector3 left, Vector3 right) => OpenTK.Mathematics.Vector3.Divide(left, right);
 
-        public static Vector1 Dot(Vector3 left, Vector3 right) => OpenTK.Mathematics.Vector3.Dot(left, right);
+        public static float Dot(Vector3 left, Vector3 right) => OpenTK.Mathematics.Vector3.Dot(left, right);
         public static Vector3 Cross(Vector3 left, Vector3 right) => OpenTK.Mathematics.Vector3.Cross(left, right);
         public static Vector3 ComponentMin(Vector3 left, Vector3 right) => OpenTK.Mathematics.Vector3.ComponentMin(left, right);
         public static Vector3 ComponentMax(Vector3 left, Vector3 right) => OpenTK.Mathematics.Vector3.ComponentMax(left, right);

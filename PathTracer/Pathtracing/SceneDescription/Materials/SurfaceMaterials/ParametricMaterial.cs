@@ -39,7 +39,9 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials.SurfaceMaterials {
         public bool IsSensing => false;
 
         /// <summary> Create a diffuse white material </summary>
-        public static ParametricMaterial DiffuseWhite => new(new RGBSpectrum(0.8f, 0.8f, 0.8f));
+        public static ParametricMaterial DiffuseWhite => new(new RGBSpectrum(0.9f, 0.9f, 0.9f));
+        /// <summary> Create a diffuse white material </summary>
+        public static ParametricMaterial DiffuseGray => new(new RGBSpectrum(0.7f, 0.7f, 0.7f));
         /// <summary> Create a diffuse green material </summary>
         public static ParametricMaterial DiffuseGreen => new(new RGBSpectrum(0.2f, 0.8f, 0.2f));
         /// <summary> Create a diffuse yellow material </summary>
@@ -91,7 +93,9 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials.SurfaceMaterials {
         }
 
         public IProbabilityDistribution<Normal3> DirectionDistribution(Normal3 incomingDirection, Position3 position, Normal3 orientation, ISpectrum spectrum) {
-            return new HemisphericalDiffuse(orientation);
+            var diffuse = new HemisphericalDiffuse(orientation);
+            var specular = new SpecularReflection(orientation, incomingDirection);
+            return new CombinedProbabilityDistribution<Normal3>((diffuse, 1 - Specularity), (specular, Specularity)); 
             //Vector3 radianceOut;
             //if (surfacePoint.Primitive.Material.Specularity > 0) {
             //    // Specular

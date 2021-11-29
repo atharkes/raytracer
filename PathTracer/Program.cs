@@ -30,11 +30,11 @@ namespace PathTracer {
             new Primitive(new Sphere(new Position3(-3, 1, 5), 1), ParametricMaterial.DiffuseGreen),
             new Primitive(new Sphere(new Position3(3, 1, 5), 1), ParametricMaterial.GlossyRed),
             new Primitive(new Sphere(new Position3(0, 1, 5), 1), ParametricMaterial.Mirror),
-            //new Primitive(new Sphere(new Position3(-1, 1, 2), 1), new DiffuseVolumetric(new RGBSpectrum(0.8f, 0.8f, 0.8f), 10)),
+            new Primitive(new Sphere(new Position3(-1, 1, 2), 1), new DiffuseVolumetric(new RGBSpectrum(0.8f, 0.8f, 0.8f), 4)),
             new Primitive(new Triangle(new Position3(5, 0, 10), new Position3(5, 0, 0), new Position3(-5, 0, 0), null), ParametricMaterial.GlossyPurpleMirror),
             new Primitive(new Triangle(new Position3(5, 0, 10), new Position3(-5, 0, 0), new Position3(-5, 0, 10), null), ParametricMaterial.DiffuseYellow),
-            new Primitive(new Plane(new Normal3(0, 1, 0), new Position1(-1)), ParametricMaterial.DiffuseWhite),
-            new Primitive(new AxisAlignedBox(new Position3(-5, 0, 0), new Position3(5, 2, 10)), new DiffuseVolumetric(new RGBSpectrum(0.8f, 0.8f, 0.8f), 0.2)),
+            new Primitive(new Plane(new Normal3(0, 1, 0), new Position1(-1)), ParametricMaterial.DiffuseGray),
+            //new Primitive(new AxisAlignedBox(new Position3(-5, 0, 0), new Position3(5, 2, 10)), new DiffuseVolumetric(new RGBSpectrum(0.8f, 0.8f, 0.8f), 0.2)),
         };
 
         public static readonly List<ISceneObject> DefaultLights = DefaultPrimitives.FindAll(s => s is IPrimitive p && p.Material.IsEmitting);

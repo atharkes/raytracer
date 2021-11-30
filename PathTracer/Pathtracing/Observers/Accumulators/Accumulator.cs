@@ -11,15 +11,13 @@ namespace PathTracer.Pathtracing.Observers.Accumulators {
         /// <summary> The amount of samples accumulated by the <see cref="Accumulator"/> </summary>
         public int SampleCount { get; protected set; }
         /// <summary> The average accumulated light in the <see cref="Accumulator"/> </summary>
-        public ISpectrum AccumulatedLight {
+        public RGBSpectrum AccumulatedRGB {
             get {
-                ISpectrum averageLight = ISpectrum.Black;
+                RGBSpectrum result = RGBSpectrum.Black;
                 foreach (Cavity cavity in cavities) {
-                    if (!cavity.AverageLight.IsBlack) {
-                        averageLight += cavity.AverageLight;
-                    }
+                    result += cavity.RGBColor;
                 }
-                return averageLight;
+                return result;
             }
         }
 
@@ -61,7 +59,7 @@ namespace PathTracer.Pathtracing.Observers.Accumulators {
                 int higherbound = (int)((i + 1) * size);
                 switch (drawingMode) {
                     case DrawingMode.Light:
-                        tasks[i] = () => { for (int i = lowerbound; i < higherbound; i++) screen.Plot(i, cavities[i].AverageLight.ToRGBInt()); };
+                        tasks[i] = () => { for (int i = lowerbound; i < higherbound; i++) screen.Plot(i, cavities[i].RGBColor.ToRGBInt()); };
                         break;
                     case DrawingMode.BVHNodeTraversals:
                         tasks[i] = () => { for (int i = lowerbound; i < higherbound; i++) screen.Plot(i, cavities[i].AverageBVHTraversalColor.ToRGBInt()); };

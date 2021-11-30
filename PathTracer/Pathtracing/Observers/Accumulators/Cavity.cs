@@ -13,8 +13,10 @@ namespace PathTracer.Pathtracing.Observers.Accumulators {
         /// <summary> How many samples have intersected something </summary>
         public int Intersections { get; private set; } = 0;
 
+        /// <summary> The color of the <see cref="Cavity"/> </summary>
+        public RGBSpectrum RGBColor => Samples == 0 ? RGBSpectrum.Black : Light.ToRGBSpectrum() * (1f / Samples);
         /// <summary> Average light of the photons in the cavity </summary>
-        public ISpectrum AverageLight => Samples == 0 ? ISpectrum.Black : Light / Samples;
+        public ISpectrum AverageLight => Samples == 0 ? ISpectrum.Black : Light * (1f / Samples);
         /// <summary> Average BVH traversals of photons in the cavity </summary>
         public float AverageBVHTraversals => Samples > 0 ? BVHTraversals / Samples : 0f;
         /// <summary> The green to red color fade for the BVH traversals </summary>
@@ -41,6 +43,6 @@ namespace PathTracer.Pathtracing.Observers.Accumulators {
             Samples = 0;
         }
 
-        public override string ToString() => AverageLight.ToString();
+        public override string ToString() => Light.ToString();
     }
 }

@@ -19,13 +19,17 @@ namespace PathTracer.Pathtracing.Spectra {
         /// <summary> Whether the <see cref="ISpectrum"/> is white </summary>
         bool IsWhite => Equals(White);
 
-        /// <summary> Convert the <see cref="ISpectrum"/> to an rgb <see cref="int"/> </summary>
-        /// <returns>An RGB <see cref="int"/></returns>
-        int ToRGBInt();
+        /// <summary> Convert the <see cref="ISpectrum"/> to an <see cref="RGBSpectrum"/> </summary>
+        /// <returns>An <see cref="RGBSpectrum"/></returns>
+        RGBSpectrum ToRGBSpectrum();
 
         /// <summary> Convert the <see cref="ISpectrum"/> to an rgb <see cref="Vector3"/> </summary>
         /// <returns>An RGB <see cref="Vector3"/></returns>
         Vector3 ToRGBVector();
+
+        /// <summary> Convert the <see cref="ISpectrum"/> to an rgb <see cref="int"/> </summary>
+        /// <returns>An RGB <see cref="int"/></returns>
+        int ToRGBInt();
 
         /// <summary> Convert the <see cref="ISpectrum"/> to a <see cref="string"/> </summary>
         /// <returns>The <see cref="string"/></returns>
@@ -65,7 +69,7 @@ namespace PathTracer.Pathtracing.Spectra {
         /// <param name="right">The value to multiply with</param>
         /// <returns>The <paramref name="left"/> <see cref="ISpectrum"/> multiplied by the <paramref name="right"/> value</returns>
         public static ISpectrum operator *(ISpectrum left, float right) {
-            return (RGBSpectrum)left * right;
+            return left is RGBSpectrum rgb ? rgb * right : throw new NotImplementedException();
         }
 
         /// <summary> Divide an <see cref="ISpectrum"/> by a value </summary>
@@ -73,7 +77,7 @@ namespace PathTracer.Pathtracing.Spectra {
         /// <param name="right">The value to divide with</param>
         /// <returns>The <paramref name="left"/> <see cref="ISpectrum"/> divided by the <paramref name="right"/> value</returns>
         public static ISpectrum operator /(ISpectrum left, float right) {
-            return (RGBSpectrum)left / right;
+            return left is RGBSpectrum rgb ? rgb / right : throw new NotImplementedException();
         }
     }
 }

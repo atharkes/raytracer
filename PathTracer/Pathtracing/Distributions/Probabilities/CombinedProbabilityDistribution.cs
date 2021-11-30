@@ -7,7 +7,7 @@ namespace PathTracer.Pathtracing.Distributions.Probabilities {
     /// <summary> A linear combination of <see cref="IProbabilityDistribution{T}"/>s 
     /// Sampling can be improved using Vose's Alias Method to O(1). </summary>
     /// <typeparam name="T">The type of samples from the <see cref="CombinedProbabilityDistribution{T}"/></typeparam>
-    public class CombinedProbabilityDistribution<T> : IProbabilityDistribution<T> where T : notnull {
+    public class CombinedProbabilityDistribution<T> : IProbabilityDistribution<T>, IEquatable<CombinedProbabilityDistribution<T>> where T : notnull {
         public bool SingleSolution => items.Count == 1 && items.First().SingleSolution;
         public bool Discreet => items.Any(i => i.Discreet);
         public bool Continuous => items.Any(i => i.Continuous);
@@ -48,7 +48,7 @@ namespace PathTracer.Pathtracing.Distributions.Probabilities {
                 } else {
                     items.Add(distribution);
                     weights.Add(distribution, weight);
-                    probabilities.Add(distribution, weights[distribution] / totalWeight);
+                    probabilities.Add(distribution, weight / totalWeight);
                 }
             }
             double cummulativeProbability = 0;
@@ -73,12 +73,18 @@ namespace PathTracer.Pathtracing.Distributions.Probabilities {
 
         public T Sample(Random random) {
             double sample = random.NextDouble();
-            foreach ((IProbabilityDistribution<T> distribution, double cummulativeProbability) in cummulativeProbabilities) {
-                if (sample < cummulativeProbability) {
+            foreach (IProbabilityDistribution<T> distribution in items) {
+                if (sample < cummulativeProbabilities[distribution]) {
                     return distribution.Sample(random);
                 }
             }
             throw new InvalidOperationException("Probabilities don't add up to 1");
         }
+
+        public override string? ToString() => weights.ToString();
+        public override int GetHashCode() => weights.GetHashCode();
+        public override bool Equals(object? obj) => obj is CombinedProbabilityDistribution<T> cpd && Equals(cpd);
+        public bool Equals(IProbabilityDistribution<T>? other) => other is CombinedProbabilityDistribution<T> cpd && Equals(cpd);
+        public bool Equals(CombinedProbabilityDistribution<T>? other) => other is not null && weights.Equals(other.weights);
     }
 }

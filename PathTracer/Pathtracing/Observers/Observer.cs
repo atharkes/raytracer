@@ -54,7 +54,7 @@ namespace PathTracer.Pathtracing.Observers
 
         void DrawDebugInformation(Statistics stats) {
             Screen.Print($"FPS: {(int)(1000 / stats.FrameTime.LastTick.TotalMilliseconds)}", 1, 1);
-            Screen.Print($"Light: {Accumulator.AccumulatedLight}", 1, 17);
+            Screen.Print($"Light: {Accumulator.AccumulatedRGB}", 1, 17);
             Screen.Print($"Samples: {stats.SampleCount}", 1, 33);
             Screen.Print($"Samples/frame: {stats.SampleCountLastTick}", 1, 49);
             Screen.Print($"Frame Time (ms): {(int)stats.FrameTime.LastTick.TotalMilliseconds}", 1, 65);

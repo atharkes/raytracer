@@ -27,30 +27,34 @@ namespace PathTracer.Pathtracing.Spectra {
             rgb = new Vector3(red, green, blue);
         }
 
+        /// <summary> Convert the <see cref="RGBSpectrum"/> to an <see cref="RGBSpectrum"/> </summary>
+        /// <returns>An <see cref="RGBSpectrum"/></returns>
+        public RGBSpectrum ToRGBSpectrum() => this;
+
         /// <summary> Convert the <see cref="RGBSpectrum"/> to an rgb vector </summary>
         /// <returns>An rgb vector</returns>
         public Vector3 ToRGBVector() => rgb;
 
-        /// <summary> Convert the <see cref="ISpectrum"/> to an rgb integer </summary>
+        /// <summary> Convert the <see cref="RGBSpectrum"/> to an rgb integer </summary>
         /// <returns>An rgb integer</returns>
         public int ToRGBInt() {
             Vector3 color = Vector3.Clamp(rgb, Vector3.Zero, Vector3.One);
-            int r = (int)(color.X * 255) << 16;
-            int g = (int)(color.Y * 255) << 8;
-            int b = (int)(color.Z * 255) << 0;
+            int r = ((int)(color.X.Value * 255f)) << 16;
+            int g = ((int)(color.Y.Value * 255f)) << 8;
+            int b = ((int)(color.Z.Value * 255f)) << 0;
             return r + g + b;
         }
-
-        public static bool operator ==(RGBSpectrum left, RGBSpectrum right) => left.Equals(right);
-        public static bool operator !=(RGBSpectrum left, RGBSpectrum right) => !(left == right);
 
         /// <summary> Convert the <see cref="RGBSpectrum"/> to a <see cref="string"/> </summary>
         /// <returns>A <see cref="string"/> representing the <see cref="RGBSpectrum"/></returns>
         public override string ToString() => rgb.ToString();
         public override int GetHashCode() => rgb.GetHashCode();
-        public override bool Equals(object? obj) => obj is RGBSpectrum s && Equals(s);
-        public bool Equals(ISpectrum? other) => other is RGBSpectrum s && Equals(s);
+        public override bool Equals(object? obj) => obj is RGBSpectrum rgb && Equals(rgb);
+        public bool Equals(ISpectrum? other) => other is RGBSpectrum rgb && Equals(rgb);
         public bool Equals(RGBSpectrum other) => rgb.Equals(other.rgb);
+
+        public static bool operator ==(RGBSpectrum left, RGBSpectrum right) => left.Equals(right);
+        public static bool operator !=(RGBSpectrum left, RGBSpectrum right) => !(left == right);
 
         /// <summary> Add two <see cref="RGBSpectrum"/> </summary>
         /// <param name="left">The left <see cref="RGBSpectrum"/></param>

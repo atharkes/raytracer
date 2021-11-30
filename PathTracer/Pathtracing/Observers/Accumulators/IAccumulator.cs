@@ -4,7 +4,7 @@ namespace PathTracer.Pathtracing.Observers.Accumulators {
     /// <summary> The part of the <see cref="ICamera"/> that accumulates the light samples </summary>
     public interface IAccumulator {
         /// <summary> The average accumulated light in the <see cref="IAccumulator"/> </summary>
-        ISpectrum AccumulatedLight { get; }
+        RGBSpectrum AccumulatedRGB { get; }
         /// <summary> The amount of samples in the <see cref="IAccumulator"/> </summary>
         int SampleCount { get; }
 

@@ -41,8 +41,9 @@ namespace PathTracer.Pathtracing.Observers.Accumulators {
         public void Add(ISample sample) {
             int x = (int)(sample.Position.X * Width);
             int y = (int)(sample.Position.Y * Height);
+            int index = y * Width + x;
             try {
-                cavities[y * Width + x].AddSample(sample.Light, sample.PrimaryBVHTraversals, sample.Intersection);
+                cavities[index].AddSample(sample.Light, sample.PrimaryBVHTraversals, sample.Intersection);
                 SampleCount++;
             } catch (IndexOutOfRangeException) {
                 Console.WriteLine($"Exception when adding a sample to the Accumulator. Has the screen be resized?");
@@ -54,7 +55,7 @@ namespace PathTracer.Pathtracing.Observers.Accumulators {
         /// <param name="drawingMode">The <see cref="DrawingMode"/></param>
         public void DrawImage(IScreen screen, DrawingMode drawingMode) {
             Action[] tasks = new Action[Program.Threadpool.MultithreadingTaskCount];
-            float size = cavities.Length / tasks.Length;
+            float size = (float)cavities.Length / tasks.Length;
             for (int i = 0; i < tasks.Length; i++) {
                 int lowerbound = (int)(i * size);
                 int higherbound = (int)((i + 1) * size);

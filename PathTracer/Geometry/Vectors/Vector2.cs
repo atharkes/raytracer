@@ -28,13 +28,13 @@ namespace PathTracer.Geometry.Vectors {
         public readonly OpenTK.Mathematics.Vector2 Value;
 
         /// <summary> The X-component of the <see cref="Vector2"/> </summary>
-        public Vector1 X => Value.X;
+        public float X => Value.X;
         /// <summary> The Y-component of the <see cref="Vector2"/> </summary>
-        public Vector1 Y => Value.Y;
+        public float Y => Value.Y;
         /// <summary> The length of the <see cref="Vector2"/> </summary>
-        public Vector1 Length => Value.Length;
+        public float Length => Value.Length;
         /// <summary> The squared length of the <see cref="Vector2"/> </summary>
-        public Vector1 LengthSquared => Value.LengthSquared;
+        public float LengthSquared => Value.LengthSquared;
 
         /// <summary> Create a <see cref="Vector2"/> using an <paramref name="x"/> and <paramref name="y"/> </summary>
         /// <param name="x">The X-component of the <see cref="Vector2"/></param>
@@ -94,6 +94,7 @@ namespace PathTracer.Geometry.Vectors {
         public bool Equals(Vector2? other) => Value.Equals(other?.Value);
         public override int GetHashCode() => Value.GetHashCode();
         public override string ToString() => Value.ToString();
+        public string ToString(string? format) => $"({X.ToString(format)}, {Y.ToString(format)})";
 
         public Vector2 Normalized() => Value.Normalized();
     }

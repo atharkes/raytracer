@@ -26,8 +26,12 @@ namespace PathTracer.Utilities {
 
         /// <summary> The drawing mode of the observer </summary>
         public DrawingMode DrawingMode { get; set; } = DrawingMode.Light;
-        /// <summary> Whether the debug information is being displayed to the observer </summary>
-        public bool DebugInfo { get; set; } = true;
+        /// <summary> Which debug information is being displayed to the observer </summary>
+        public DebugOutput DebugInfo { get; set; } = DebugOutput.None;
+        /// <summary> The color of the debug output </summary>
+        public int DebugColor { get; set; } = 0xffffff;
+        /// <summary> Whether the camera is locked </summary>
+        public bool CameraLock { get; set; } = false;
 
         /// <summary> The position of the camera </summary>
         [JsonIgnore] public Position3 Position { get; set; } = new Position3(0, 1, 0);
@@ -70,6 +74,8 @@ namespace PathTracer.Utilities {
             // Window Position is currently not accessible
             DrawingMode = renderer.Observer.DrawingMode;
             DebugInfo = renderer.Observer.DebugInfo;
+            DebugColor = renderer.Observer.DebugColor;
+            CameraLock = renderer.Observer.CameraLock; 
             Position = renderer.Observer.Camera.Position;
             Rotation = renderer.Observer.Camera.Rotation;
             FOV = renderer.Observer.Camera.HorizontalFOV;

@@ -1,7 +1,7 @@
-﻿using OpenTK.Mathematics;
-using PathTracer.Geometry.Directions;
+﻿using PathTracer.Geometry.Directions;
 using PathTracer.Geometry.Normals;
 using PathTracer.Geometry.Positions;
+using PathTracer.Geometry.Vectors;
 using PathTracer.Pathtracing.Observers.Cameras.Parts;
 using PathTracer.Pathtracing.Rays;
 using System;
@@ -14,13 +14,15 @@ namespace PathTracer.Pathtracing.Observers.Cameras {
         /// <summary> The position of the <see cref="ICamera"/> </summary>
         Position3 Position { get; set; }
         /// <summary> The rotation <see cref="Quaternion"/> of the <see cref="ICamera"/> </summary>
-        Quaternion Rotation { get; }
+        OpenTK.Mathematics.Quaternion Rotation { get; }
         /// <summary> The horizontal field of view angle (in degrees) of the <see cref="ICamera"/> </summary>
         float HorizontalFOV { get; set; }
         /// <summary> The aspect ratio of the <see cref="ICamera"/> </summary>
         float AspectRatio { get; set; }
         /// <summary> The vertical field of view angle (in degrees) of the <see cref="ICamera"/> </summary>
         float VerticalFOV => HorizontalFOV / AspectRatio;
+        /// <summary> The field of view angles of the <see cref="ICamera"/> </summary>
+        Vector2 FieldOfViewAngles => new(HorizontalFOV, VerticalFOV);
 
         /// <summary> The viewing direction of the <see cref="ICamera"/> </summary>
         Normal3 ViewDirection => Front;

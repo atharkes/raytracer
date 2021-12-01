@@ -25,11 +25,11 @@ namespace PathTracer.Geometry.Vectors {
         public readonly float Value;
 
         /// <summary> The X-component of the <see cref="Vector1"/> </summary>
-        public Vector1 X => Value;
+        public float X => Value;
         /// <summary> The length of the <see cref="Vector1"/> </summary>
-        public Vector1 Length => Value;
+        public float Length => Value;
         /// <summary> The squared length of the <see cref="Vector1"/> </summary>
-        public Vector1 LengthSquared => Value * Value;
+        public float LengthSquared => Value * Value;
 
         /// <summary> Create a <see cref="Vector1"/></summary>
         /// <param name="value">The floating point value of the <see cref="Vector1"/></param>
@@ -95,6 +95,7 @@ namespace PathTracer.Geometry.Vectors {
         public int CompareTo(Vector1? other) => Value.CompareTo(other?.Value);
         public int CompareTo(Vector1 other) => Value.CompareTo(other.Value);
         public override string ToString() => Value.ToString();
+        public string ToString(string? format) => Value.ToString(format);
 
         public Vector1 Normalized() {
             Debug.Assert(Length != 0);

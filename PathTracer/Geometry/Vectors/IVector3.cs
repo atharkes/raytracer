@@ -8,13 +8,10 @@ namespace PathTracer.Geometry.Vectors {
     /// <summary> A 3-dimensional vector </summary>
     public interface IVector3 : IVector {
         /// <summary> The X-component of the <see cref="IVector3"/> </summary>
-        Vector1 X { get; }
+        float X { get; }
         /// <summary> The Y-component of the <see cref="IVector3"/> </summary>
-        Vector1 Y { get; }
+        float Y { get; }
         /// <summary> The Z-component of the <see cref="IVector3"/> </summary>
-        Vector1 Z { get; }
-
-        IVector IVector.Normalized() => Normalized();
-        new Vector3 Normalized();
+        float Z { get; }
     }
 }

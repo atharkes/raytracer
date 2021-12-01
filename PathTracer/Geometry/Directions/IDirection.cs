@@ -11,5 +11,14 @@ namespace PathTracer.Geometry.Directions {
         Position1 Length => Vector.Length;
         /// <summary> The length squared of the <see cref="IDirection{T}"/> </summary>
         Position1 LengthSquared => Vector.LengthSquared;
+
+        /// <summary> Convert the <see cref="IDirection{T}"/> to a <see cref="string"/> </summary>
+        /// <returns>A <see cref="string"/> representing the <see cref="IDirection{T}"/></returns>
+        string ToString() => Vector.ToString();
+
+        /// <summary>Convert the <see cref="IDirection{T}"/> to a <see cref="string"/> using a <paramref name="format"/> </summary>
+        /// <param name="format">The format to use</param>
+        /// <returns>A <see cref="string"/> representing the <see cref="IDirection{T}"/></returns>
+        string ToString(string? format) => Vector.ToString(format);
     }
 }

@@ -39,15 +39,14 @@ namespace PathTracer.Pathtracing.Spectra {
         /// <returns>An rgb integer</returns>
         public int ToRGBInt() {
             Vector3 color = Vector3.Clamp(rgb, Vector3.Zero, Vector3.One);
-            int r = ((int)(color.X.Value * 255f)) << 16;
-            int g = ((int)(color.Y.Value * 255f)) << 8;
-            int b = ((int)(color.Z.Value * 255f)) << 0;
+            int r = ((int)(color.X * 255f)) << 16;
+            int g = ((int)(color.Y * 255f)) << 8;
+            int b = ((int)(color.Z * 255f)) << 0;
             return r + g + b;
         }
 
-        /// <summary> Convert the <see cref="RGBSpectrum"/> to a <see cref="string"/> </summary>
-        /// <returns>A <see cref="string"/> representing the <see cref="RGBSpectrum"/></returns>
         public override string ToString() => rgb.ToString();
+        public string ToString(string? format) => rgb.ToString(format);
         public override int GetHashCode() => rgb.GetHashCode();
         public override bool Equals(object? obj) => obj is RGBSpectrum rgb && Equals(rgb);
         public bool Equals(ISpectrum? other) => other is RGBSpectrum rgb && Equals(rgb);

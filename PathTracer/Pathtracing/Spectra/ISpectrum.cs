@@ -35,6 +35,11 @@ namespace PathTracer.Pathtracing.Spectra {
         /// <returns>The <see cref="string"/></returns>
         string ToString();
 
+        /// <summary> Convert the <see cref="ISpectrum"/> to a <see cref="string"/> using a <paramref name="format"/> </summary>
+        /// <param name="format">The format of the <see cref="string"/></param>
+        /// <returns>The <see cref="string"/> representing the <see cref="ISpectrum"/></returns>
+        string ToString(string? format);
+
         /// <summary> Check whether the <see cref="ISpectrum"/> is equal to an <paramref name="other"/> </summary>
         /// <param name="other">The other <see cref="ISpectrum"/></param>
         /// <returns>Whether the <see cref="ISpectrum"/> is equal to the <paramref name="other"/></returns>

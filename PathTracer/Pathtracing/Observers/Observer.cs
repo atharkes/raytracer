@@ -2,13 +2,13 @@
 using PathTracer.Geometry.Directions;
 using PathTracer.Geometry.Normals;
 using PathTracer.Geometry.Positions;
+using PathTracer.Geometry.Vectors;
 using PathTracer.Pathtracing.Observers.Accumulators;
 using PathTracer.Pathtracing.Observers.Cameras;
 using PathTracer.Pathtracing.Rays;
 using PathTracer.Utilities;
 
-namespace PathTracer.Pathtracing.Observers
-{
+namespace PathTracer.Pathtracing.Observers {
     /// <summary> An <see cref="IObserver"/> that observes a <see cref="IScene"/> </summary>
     public class Observer : IObserver {
         /// <summary> The virtual <see cref="ICamera"/> object of the <see cref="Observer"/> </summary>
@@ -21,9 +21,15 @@ namespace PathTracer.Pathtracing.Observers
         /// <summary> The targeted framerate of the raytracer </summary>
         public int TargetFrameRate { get; set; } = 20;
         /// <summary> Whether to draw the amount of BVH traversals instead of normal light </summary>
-        public DrawingMode DrawingMode { get; set; } = DrawingMode.Light;
+        public DrawingMode DrawingMode { get; set; }
         /// <summary> Whether it is drawing debug information </summary>
-        public bool DebugInfo { get; set; } = false;
+        public DebugOutput DebugInfo { get; set; }
+        /// <summary> The color of the debug output </summary>
+        public int DebugColor { get; set; } = 0xffffff;
+        /// <summary> The debug format for floating point output </summary>
+        public string Format { get; set; } = "0.00";
+        /// <summary> Whether the camera is locked in place </summary>
+        public bool CameraLock { get; set; }
 
         /// <summary> The speed at which the camera moves </summary>
         public float MoveSpeed { get; set; } = 0.1f;
@@ -49,46 +55,70 @@ namespace PathTracer.Pathtracing.Observers
         public void DrawFrame(Statistics statistics) {
             Screen.Clear();
             Accumulator.DrawImage(Screen, DrawingMode);
-            if (DebugInfo) DrawDebugInformation(statistics);
+            DrawDebugInformation(statistics);
         }
 
         void DrawDebugInformation(Statistics stats) {
-            Screen.Print($"FPS: {(int)(1000 / stats.FrameTime.LastTick.TotalMilliseconds)}", 1, 1);
-            Screen.Print($"Light: {Accumulator.AccumulatedRGB}", 1, 17);
-            Screen.Print($"Samples: {stats.SampleCount}", 1, 33);
-            Screen.Print($"Samples/frame: {stats.SampleCountLastTick}", 1, 49);
-            Screen.Print($"Frame Time (ms): {(int)stats.FrameTime.LastTick.TotalMilliseconds}", 1, 65);
-            Screen.Print($"Integrator Time (ms): {(int)stats.IntegratorTime.LastTick.TotalMilliseconds}", 1, 81);
-            Screen.Print($"Drawing Time (ms): {(int)stats.DrawingTime.LastTick.TotalMilliseconds}", 1, 97);
-            Screen.Print($"OpenTK Time (ms): {(int)stats.OpenTKTime.LastTick.TotalMilliseconds}", 1, 113);
-            Screen.Print($"Horizontal FOV: {Camera.HorizontalFOV}", 1, 129);
+            switch (DebugInfo) {
+                case DebugOutput.None:
+                    break;
+                case DebugOutput.FrameTimes:
+                    Screen.Print($"Frame Times", 1, 1, DebugColor);
+                    Screen.Print($"FPS: {(1000f / stats.FrameTime.LastTick.TotalMilliseconds).ToString(Format)}", 1, 17, DebugColor);
+                    Screen.Print($"FPS (target): {TargetFrameRate}", 1, 33, DebugColor);
+                    Screen.Print($"Samples/frame: {stats.SampleCountLastTick}", 1, 49, DebugColor);
+                    Screen.Print($"Frametime (ms): {stats.FrameTime.LastTick.TotalMilliseconds.ToString(Format)}", 1, 65, DebugColor);
+                    Screen.Print($"Integrator time (ms): {stats.IntegratorTime.LastTick.TotalMilliseconds.ToString(Format)}", 1, 81, DebugColor);
+                    Screen.Print($"Drawing time (ms): {stats.DrawingTime.LastTick.TotalMilliseconds.ToString(Format)}", 1, 97, DebugColor);
+                    Screen.Print($"OpenTK time (ms): {stats.OpenTKTime.LastTick.TotalMilliseconds.ToString(Format)}", 1, 113, DebugColor);
+                    break;
+                case DebugOutput.Configuration:
+                    Screen.Print($"Camera Configuration", 1, 1, DebugColor);
+                    Screen.Print($"Lock (L): {CameraLock}", 1, 17, DebugColor);
+                    Screen.Print($"Position: {Camera.Position.ToString(Format)}", 1, 33, DebugColor);
+                    Screen.Print($"View direction: {Camera.ViewDirection.ToString(Format)}", 1, 49, DebugColor);
+                    Screen.Print($"Rotation: {Camera.Rotation}", 1, 65, DebugColor);
+                    Screen.Print($"FOV: {Camera.FieldOfViewAngles.ToString(Format)}", 1, 81, DebugColor);
+                    Screen.Print($"Aspect ratio: {Camera.AspectRatio.ToString(Format)}", 1, 97, DebugColor);
+                    Screen.Print($"Screen size: {Screen.Size}", 1, 113, DebugColor);
+                    break;
+                case DebugOutput.Validation:
+                    Screen.Print($"Validation", 1, 1, DebugColor);
+                    Screen.Print($"Light: {Accumulator.AccumulatedRGB.ToString(Format)}", 1, 17, DebugColor);
+                    Screen.Print($"Samples: {stats.SampleCount}", 1, 33, DebugColor);
+                    break;
+            }
         }
 
         /// <summary> Handle input for the <see cref="Observer"/> </summary>
         /// <param name="keyboard">The <see cref="KeyboardState"/> to handle input from</param>
         /// <param name="mouse">The <see cref="MouseState"/> to handle input from</param>
         public void HandleInput(KeyboardState keyboard, MouseState mouse) {
-            if (mouse.WasButtonDown(MouseButton.Left) && !mouse.IsButtonDown(MouseButton.Left)) {
-                Position2 position = new((float)mouse.X / Screen.Width, (float)mouse.Y / Screen.Height);
-                IRay ray = Camera.GetCameraRay(position, new Direction2(0.5f, 0.5f));
-                Camera.SetViewDirection(ray.Direction);
+            if (keyboard.IsKeyPressed(Keys.F1)) DrawingMode = DrawingMode.Next();
+            if (keyboard.IsKeyPressed(Keys.F2)) DebugInfo = DebugInfo.Next();
+            if (keyboard.IsKeyPressed(Keys.F3)) DebugColor = 0xffffff - DebugColor;
+            if (keyboard.IsKeyPressed(Keys.L)) CameraLock = !CameraLock;
+            if (!CameraLock) {
+                if (mouse.WasButtonDown(MouseButton.Left) && !mouse.IsButtonDown(MouseButton.Left)) {
+                    Vector2 position = new((float)mouse.X / Screen.Width, (float)mouse.Y / Screen.Height);
+                    IRay ray = Camera.GetCameraRay(position, position);
+                    Camera.SetViewDirection(ray.Direction);
+                }
+                if (keyboard.IsKeyDown(Keys.Space)) Camera.Move(Camera.Up * MoveSpeed);
+                if (keyboard.IsKeyDown(Keys.LeftShift)) Camera.Move(Camera.Down * MoveSpeed);
+                if (keyboard.IsKeyDown(Keys.W)) Camera.Move(Camera.Front * MoveSpeed);
+                if (keyboard.IsKeyDown(Keys.A)) Camera.Move(Camera.Left * MoveSpeed);
+                if (keyboard.IsKeyDown(Keys.S)) Camera.Move(Camera.Back * MoveSpeed);
+                if (keyboard.IsKeyDown(Keys.D)) Camera.Move(Camera.Right * MoveSpeed);
+                if (keyboard.IsKeyPressed(Keys.KeyPadAdd)) Camera.HorizontalFOV *= 1f + FOVSensitivity;
+                if (keyboard.IsKeyPressed(Keys.KeyPadSubtract)) Camera.HorizontalFOV /= 1f + FOVSensitivity;
+                if (keyboard.IsKeyDown(Keys.Up)) Camera.Rotate(Normal3.DefaultRight, -RotateSensitivity);
+                if (keyboard.IsKeyDown(Keys.Down)) Camera.Rotate(Normal3.DefaultRight, RotateSensitivity);
+                if (keyboard.IsKeyDown(Keys.Right)) Camera.Rotate(Normal3.DefaultUp, RotateSensitivity);
+                if (keyboard.IsKeyDown(Keys.Left)) Camera.Rotate(Normal3.DefaultUp, -RotateSensitivity);
+                if (keyboard.IsKeyDown(Keys.Q)) Camera.Rotate(Normal3.DefaultFront, RotateSensitivity);
+                if (keyboard.IsKeyDown(Keys.E)) Camera.Rotate(Normal3.DefaultFront, -RotateSensitivity);
             }
-            if (keyboard.IsKeyPressed(Keys.F1)) DebugInfo = !DebugInfo;
-            if (keyboard.IsKeyPressed(Keys.F2)) DrawingMode = DrawingMode.Next();
-            if (keyboard.IsKeyDown(Keys.Space)) Camera.Move(Camera.Up * MoveSpeed);
-            if (keyboard.IsKeyDown(Keys.LeftShift)) Camera.Move(Camera.Down * MoveSpeed);
-            if (keyboard.IsKeyDown(Keys.W)) Camera.Move(Camera.Front * MoveSpeed);
-            if (keyboard.IsKeyDown(Keys.A)) Camera.Move(Camera.Left * MoveSpeed);
-            if (keyboard.IsKeyDown(Keys.S)) Camera.Move(Camera.Back * MoveSpeed);
-            if (keyboard.IsKeyDown(Keys.D)) Camera.Move(Camera.Right * MoveSpeed);
-            if (keyboard.IsKeyPressed(Keys.KeyPadAdd)) Camera.HorizontalFOV *= 1f + FOVSensitivity;
-            if (keyboard.IsKeyPressed(Keys.KeyPadSubtract)) Camera.HorizontalFOV /= 1f + FOVSensitivity;
-            if (keyboard.IsKeyDown(Keys.Up)) Camera.Rotate(Normal3.DefaultRight, -RotateSensitivity);
-            if (keyboard.IsKeyDown(Keys.Down)) Camera.Rotate(Normal3.DefaultRight, RotateSensitivity);
-            if (keyboard.IsKeyDown(Keys.Right)) Camera.Rotate(Normal3.DefaultUp, RotateSensitivity);
-            if (keyboard.IsKeyDown(Keys.Left)) Camera.Rotate(Normal3.DefaultUp, -RotateSensitivity);
-            if (keyboard.IsKeyDown(Keys.Q)) Camera.Rotate(Normal3.DefaultFront, RotateSensitivity);
-            if (keyboard.IsKeyDown(Keys.E)) Camera.Rotate(Normal3.DefaultFront, -RotateSensitivity);
         }
     }
 }

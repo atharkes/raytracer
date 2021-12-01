@@ -12,6 +12,14 @@ namespace PathTracer.Pathtracing.Observers {
         Intersections,
     }
 
+    /// <summary> The different debug outputs </summary>
+    public enum DebugOutput {
+        None,
+        FrameTimes,
+        Configuration,
+        Validation,
+    }
+
     /// <summary> An observer of a <see cref="IScene"/> </summary>
     public interface IObserver {
         /// <summary> The virtual <see cref="ICamera"/> object of the <see cref="IObserver"/> </summary>
@@ -27,14 +35,18 @@ namespace PathTracer.Pathtracing.Observers {
         TimeSpan TargetFrameTime => new(0, 0, 0, 0, 1000 / TargetFrameRate);
         /// <summary> The <see cref="DrawingMode"/> of the <see cref="IObserver"/> </summary>
         DrawingMode DrawingMode { get; set; }
-        /// <summary> Whether the debug info is being drawn for the <see cref="IObserver"/> </summary>
-        bool DebugInfo { get; set; }
+        /// <summary> Which debug information is being shown to the <see cref="IObserver"/> </summary>
+        DebugOutput DebugInfo { get; set; }
+        /// <summary> The color of the debug output </summary>
+        int DebugColor { get; set; }
 
-        /// <summary> The move speed of the camera of the <see cref="IObserver"/> </summary>
+        /// <summary> Whether the <see cref="ICamera"/> is locked in place </summary>
+        bool CameraLock { get; set; }
+        /// <summary> The move speed of the <see cref="ICamera"/> of the <see cref="IObserver"/> </summary>
         float MoveSpeed { get; set; }
-        /// <summary> The sensitivity of turning the camera of the <see cref="IObserver"/> </summary>
+        /// <summary> The sensitivity of turning the <see cref="ICamera"/> of the <see cref="IObserver"/> </summary>
         float RotateSensitivity { get; set; }
-        /// <summary> The sensitivity when changing the FOV of the camera of the <see cref="IObserver"/> </summary>
+        /// <summary> The sensitivity when changing the FOV of the <see cref="ICamera"/> of the <see cref="IObserver"/> </summary>
         float FOVSensitivity { get; set; }
         
         /// <summary> Draw a frame to the screen of the <see cref="IObserver"/> </summary>

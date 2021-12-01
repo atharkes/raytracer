@@ -63,6 +63,7 @@ namespace PathTracer.Geometry.Directions {
         public bool Equals(Direction3? other) => Vector.Equals(other?.Vector);
         public override int GetHashCode() => Vector.GetHashCode();
         public override string ToString() => Vector.ToString();
+        public string ToString(string? format) => Vector.ToString(format);
         public Normal3 Normalized() => new(Vector);
     }
 }

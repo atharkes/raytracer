@@ -49,5 +49,6 @@ namespace PathTracer.Geometry.Positions {
         public bool Equals(Position2? other) => Vector.Equals(other?.Vector);
         public override int GetHashCode() => Vector.GetHashCode();
         public override string ToString() => Vector.ToString();
+        public string ToString(string? format) => Vector.ToString(format);
     }
 }

@@ -34,15 +34,15 @@ namespace PathTracer.Geometry.Vectors {
         /// <returns>The value at the specified <paramref name="index"/></returns>
         public Vector1 this[int index] => Value[index];
         /// <summary> The X-component of the <see cref="Vector3"/> </summary>
-        public Vector1 X => Value.X;
+        public float X => Value.X;
         /// <summary> The Y-component of the <see cref="Vector3"/> </summary>
-        public Vector1 Y => Value.Y;
+        public float Y => Value.Y;
         /// <summary> The Z-component of the <see cref="Vector3"/> </summary>
-        public Vector1 Z => Value.Z;
+        public float Z => Value.Z;
         /// <summary> The length of the <see cref="Vector3"/> </summary>
-        public Vector1 Length => Value.Length;
+        public float Length => Value.Length;
         /// <summary> The squared length of the <see cref="Vector3"/> </summary>
-        public Vector1 LengthSquared => Value.LengthSquared;
+        public float LengthSquared => Value.LengthSquared;
 
         public Vector3(float x, float y, float z) {
             Value = new OpenTK.Mathematics.Vector3(x, y, z);
@@ -95,6 +95,7 @@ namespace PathTracer.Geometry.Vectors {
         public bool Equals(Vector3? other) => Value.Equals(other?.Value);
         public override int GetHashCode() => Value.GetHashCode();
         public override string ToString() => Value.ToString();
+        public string ToString(string? format) => $"({X.ToString(format)}, {Y.ToString(format)}, {Z.ToString(format)})";
 
         public Vector3 Normalized() => Value.Normalized();
     }

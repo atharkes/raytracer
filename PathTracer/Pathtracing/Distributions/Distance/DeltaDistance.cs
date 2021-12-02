@@ -2,6 +2,7 @@
 using PathTracer.Pathtracing.Distributions.Boundaries;
 using PathTracer.Pathtracing.Distributions.Probabilities;
 using PathTracer.Pathtracing.SceneDescription;
+using PathTracer.Utilities;
 using System;
 
 namespace PathTracer.Pathtracing.Distributions.Distance {
@@ -11,7 +12,7 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
         public IShapeInterval Interval { get; }
         public Position1 Minimum => Distance;
         public Position1 Maximum => Distance;
-        public double DomainSize => 0;
+        public double DomainSize => Distance.Vector.Value - Distance.Vector.Value.Previous();
         public bool ContainsDelta => true;
 
         public DeltaDistance(Position1 distance, IMaterial material, IShapeInterval interval) {
@@ -25,7 +26,7 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
         }
 
         public double ProbabilityDensity(Position1 sample) {
-            return sample == Distance ? double.MaxValue : 0;
+            return sample == Distance ? 1 / DomainSize : 0;
         }
 
         public double CumulativeProbabilityDensity(Position1 sample) {

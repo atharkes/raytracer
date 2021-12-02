@@ -95,7 +95,8 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials.SurfaceMaterials {
         public IProbabilityDistribution<Normal3> DirectionDistribution(Normal3 incomingDirection, Position3 position, Normal3 orientation, ISpectrum spectrum) {
             var diffuse = new HemisphericalDiffuse(orientation);
             var specular = new SpecularReflection(orientation, incomingDirection);
-            return new CombinedProbabilityDistribution<Normal3>((diffuse, 1 - Specularity), (specular, Specularity)); 
+            return new CombinedProbabilityDistribution<Normal3>((diffuse, 1 - Specularity), (specular, Specularity));
+
             //} else if (surfacePoint.Primitive.Material.Dielectric > 0) {
             //    // Dielectric
             //    float reflected = intersection.Reflectivity();

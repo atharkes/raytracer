@@ -30,7 +30,7 @@ namespace PathTracer {
             new Primitive(new Sphere(new Position3(-3, 1, 5), 1), ParametricMaterial.DiffuseGreen),
             new Primitive(new Sphere(new Position3(3, 1, 5), 1), ParametricMaterial.GlossyRed),
             new Primitive(new Sphere(new Position3(0, 1, 5), 1), ParametricMaterial.Mirror),
-            new Primitive(new Sphere(new Position3(-1, 1, 2), 1), new DiffuseVolumetric(new RGBSpectrum(0.8f, 0.8f, 0.8f), 4)),
+            new Primitive(new Sphere(new Position3(-1, 1, 2), 1), new DiffuseVolumetric(new RGBSpectrum(0.8f, 0.8f, 0.8f), 2)),
             new Primitive(new Triangle(new Position3(5, 0, 10), new Position3(5, 0, 0), new Position3(-5, 0, 0), null), ParametricMaterial.GlossyPurpleMirror),
             new Primitive(new Triangle(new Position3(5, 0, 10), new Position3(-5, 0, 0), new Position3(-5, 0, 10), null), ParametricMaterial.DiffuseYellow),
             new Primitive(new Plane(new Normal3(0, 1, 0), new Position1(-1)), ParametricMaterial.DiffuseGray),
@@ -56,7 +56,9 @@ namespace PathTracer {
         /// <summary> The <see cref="IObserver"/> viewing the scene </summary>
         public static readonly IObserver Observer = new Observer(Window.GameWindow, new PinholeCamera(Config.Position, Config.Rotation, Config.AspectRatio, Config.FOV)) {
             DrawingMode = Config.DrawingMode,
-            DebugInfo = Config.DebugInfo
+            DebugInfo = Config.DebugInfo,
+            DebugColor = Config.DebugColor,
+            CameraLock = Config.CameraLock,
         };
         /// <summary> The <see cref="IIntegrator"/> to integrate the scene </summary>
         public static readonly IIntegrator Integrator = new BackwardsSampler();
@@ -71,6 +73,7 @@ namespace PathTracer {
             Window.UpdateFrame += HandleInput;
             Window.RenderFrame += UpdateRenderer;
             Window.Run();
+            Window.Dispose();
             Config.SaveToFile(Renderer);
         }
 

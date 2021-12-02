@@ -5,7 +5,7 @@ using PathTracer.Pathtracing.Distributions.Distance;
 using PathTracer.Pathtracing.Distributions.Probabilities;
 using PathTracer.Pathtracing.Rays;
 using PathTracer.Pathtracing.Spectra;
-using System.Diagnostics;
+using PathTracer.Utilities;
 
 namespace PathTracer.Pathtracing.SceneDescription.Materials {
     /// <summary>
@@ -17,10 +17,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials {
         /// Epsilon used to raise the exiting <see cref="IRay"/>s away from the scene object.
         /// Used to avoid the intersection falling behind the scene object due to rounding errors.
         /// </summary>
-        public const float RaiseEpsilon = 0.0001f;
-
-        public const float SubSurfaceDepth = 0.0001f;
-
+        public const float RaiseEpsilon = 0.000001f;
 
         /// <summary> Get a distance distribution of a <paramref name="ray"/> through the <see cref="ISurfaceMaterial"/> </summary>
         /// <param name="ray">The scattering <see cref="IRay"/></param>
@@ -28,7 +25,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials {
         /// <param name="interval">The <see cref="IShapeInterval"/> of the <see cref="ISurfaceMaterial"/> along the <paramref name="ray"/></param>
         /// <returns>A distance distribution of the <paramref name="ray"/> through the <see cref="ISurfaceMaterial"/></returns>
         IDistanceDistribution? IMaterial.DistanceDistribution(IRay ray, ISpectrum spectrum, IShapeInterval interval) {
-            return interval.Entry < 0 || interval.Entry > ray.Length ? null : new UniformDistance(interval.Entry * (1 - SubSurfaceDepth), interval.Entry, this, interval);
+            return interval.Entry < 0 || interval.Entry > ray.Length ? null : new UniformDistance(((float)interval.Entry).Previous(), interval.Entry, this, interval);
         }
 
         /// <summary> Get a <see cref="Position3"/> at a specified <paramref name="distance"/> along a <paramref name="ray"/> </summary>
@@ -37,7 +34,6 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials {
         /// <param name="distance">The distance along the <paramref name="ray"/></param>
         /// <returns>The <see cref="Position3"/> at the specified <paramref name="distance"/> along the <paramref name="ray"/></returns>
         Position3 IMaterial.GetPosition(IRay ray, IShapeInterval interval, Position1 distance) {
-            //Debug.Assert(interval.Entry == distance);
             return interval.Shape.IntersectPosition(ray, distance);
         }
 

@@ -20,7 +20,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials {
         /// <returns>A distance distribution of the <paramref name="ray"/> through the <see cref="IVolumetricMaterial"/></returns>
         IDistanceDistribution? IMaterial.DistanceDistribution(IRay ray, ISpectrum spectrum, IShapeInterval interval) {
             if (interval.Exit > 0 && interval.Entry < ray.Length) {
-                return new ExponentialDistance(Math.Max(0, interval.Entry), Math.Min(ray.Length, interval.Exit), Density, this, interval);
+                return new ExponentialInterval(Math.Max(0, interval.Entry), Math.Min(ray.Length, interval.Exit), Density, this, interval);
             } else {
                 return null;
             }

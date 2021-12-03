@@ -5,7 +5,7 @@ using PathTracer.Pathtracing.SceneDescription;
 using System;
 
 namespace PathTracer.Pathtracing.Distributions.Distance {
-    public struct UniformDistance : IDistanceDistribution {
+    public struct UniformInterval : IDistanceDistribution {
         public IMaterial Material { get; }
         public IShapeInterval Interval { get; }
         public Position1 Minimum { get; }
@@ -13,7 +13,7 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
         public double DomainSize => Maximum - Minimum;
         public bool ContainsDelta => true;
 
-        public UniformDistance(Position1 start, Position1 end, IMaterial material, IShapeInterval interval) {
+        public UniformInterval(Position1 start, Position1 end, IMaterial material, IShapeInterval interval) {
             Minimum = start;
             Maximum = end;
             Material = material;
@@ -46,12 +46,12 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
             return (this as IPDF<Position1>).Contains(sample) && material.Equals(Material) ? new WeightedPMF<IShapeInterval>((Interval, 1)) : null;
         }
 
-        public override bool Equals(object? obj) => obj is UniformDistance ud && Equals(ud);
-        public bool Equals(IProbabilityDistribution<Position1>? other) => other is UniformDistance ud && Equals(ud);
-        public bool Equals(UniformDistance other) => Minimum.Equals(other.Minimum) && Maximum.Equals(other.Maximum) && Material.Equals(other.Material) && Interval.Equals(other.Interval);
+        public override bool Equals(object? obj) => obj is UniformInterval ud && Equals(ud);
+        public bool Equals(IProbabilityDistribution<Position1>? other) => other is UniformInterval ud && Equals(ud);
+        public bool Equals(UniformInterval other) => Minimum.Equals(other.Minimum) && Maximum.Equals(other.Maximum) && Material.Equals(other.Material) && Interval.Equals(other.Interval);
         public override int GetHashCode() => HashCode.Combine(963929819, Minimum, Maximum, Material, Interval);
 
-        public static bool operator ==(UniformDistance left, UniformDistance right) => left.Equals(right);
-        public static bool operator !=(UniformDistance left, UniformDistance right) => !(left == right);
+        public static bool operator ==(UniformInterval left, UniformInterval right) => left.Equals(right);
+        public static bool operator !=(UniformInterval left, UniformInterval right) => !(left == right);
     }
 }

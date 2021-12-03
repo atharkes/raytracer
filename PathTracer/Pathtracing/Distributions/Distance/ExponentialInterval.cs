@@ -7,7 +7,7 @@ using PathTracer.Pathtracing.SceneDescription;
 using System;
 
 namespace PathTracer.Pathtracing.Distributions.Distance {
-    public struct ExponentialDistance : IDistanceDistribution, IEquatable<ExponentialDistance> {
+    public struct ExponentialInterval : IDistanceDistribution, IEquatable<ExponentialInterval> {
         public double Density { get; }
         public Exponential Distribution { get; }
         public Position1 Entry { get; }
@@ -21,7 +21,7 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
         public double DomainSize => ExponentialSize;
         public bool ContainsDelta => true;
 
-        public ExponentialDistance(Position1 start, Position1 end, double density, IMaterial material, IShapeInterval interval) {
+        public ExponentialInterval(Position1 start, Position1 end, double density, IMaterial material, IShapeInterval interval) {
             Density = density;
             Distribution = new Exponential(density);
             Entry = start;
@@ -75,12 +75,12 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
             return (this as IPDF<Position1>).Contains(sample) && material.Equals(Material) ? new WeightedPMF<IShapeInterval>((Interval, 1)) : null;
         }
 
-        public override bool Equals(object? obj) => obj is ExponentialDistance ed && Equals(ed);
-        public bool Equals(IProbabilityDistribution<Position1>? other) => other is ExponentialDistance ed && Equals(ed);
-        public bool Equals(ExponentialDistance other) => Density.Equals(other.Density) && Entry.Equals(other.Entry) && Exit.Equals(other.Exit) && Material.Equals(other.Material) && Interval.Equals(other.Interval);
+        public override bool Equals(object? obj) => obj is ExponentialInterval ed && Equals(ed);
+        public bool Equals(IProbabilityDistribution<Position1>? other) => other is ExponentialInterval ed && Equals(ed);
+        public bool Equals(ExponentialInterval other) => Density.Equals(other.Density) && Entry.Equals(other.Entry) && Exit.Equals(other.Exit) && Material.Equals(other.Material) && Interval.Equals(other.Interval);
         public override int GetHashCode() => HashCode.Combine(973102703, Density, Entry, Exit, Material, Interval);
 
-        public static bool operator ==(ExponentialDistance left, ExponentialDistance right) => left.Equals(right);
-        public static bool operator !=(ExponentialDistance left, ExponentialDistance right) => !(left == right);
+        public static bool operator ==(ExponentialInterval left, ExponentialInterval right) => left.Equals(right);
+        public static bool operator !=(ExponentialInterval left, ExponentialInterval right) => !(left == right);
     }
 }

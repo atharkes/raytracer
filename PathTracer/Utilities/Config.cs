@@ -63,7 +63,7 @@ namespace PathTracer.Utilities {
         /// <summary> The filestream to the config file </summary>
         public static readonly FileStream FileStream = File.Open(FilePath, FileMode.OpenOrCreate);
         /// <summary> The settings of the json serializer </summary>
-        public static readonly JsonSerializerSettings Settings = new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore, Formatting = Formatting.Indented };
+        public static readonly JsonSerializerSettings Settings = new() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore, Formatting = Formatting.Indented };
         /// <summary> The json serializer </summary>
         public static readonly JsonSerializer JsonSerializer = JsonSerializer.Create(Settings);
 

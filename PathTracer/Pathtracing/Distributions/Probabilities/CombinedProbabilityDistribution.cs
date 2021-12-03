@@ -80,11 +80,14 @@ namespace PathTracer.Pathtracing.Distributions.Probabilities {
             }
             throw new InvalidOperationException("Probabilities don't add up to 1");
         }
-
-        public override string? ToString() => weights.ToString();
-        public override int GetHashCode() => weights.GetHashCode();
+        
         public override bool Equals(object? obj) => obj is CombinedProbabilityDistribution<T> cpd && Equals(cpd);
         public bool Equals(IProbabilityDistribution<T>? other) => other is CombinedProbabilityDistribution<T> cpd && Equals(cpd);
         public bool Equals(CombinedProbabilityDistribution<T>? other) => other is not null && weights.Equals(other.weights);
+        public override int GetHashCode() => HashCode.Combine(825595819, weights);
+        public override string? ToString() => weights.ToString();
+
+        public static bool operator ==(CombinedProbabilityDistribution<T> left, CombinedProbabilityDistribution<T> right) => left.Equals(right);
+        public static bool operator !=(CombinedProbabilityDistribution<T> left, CombinedProbabilityDistribution<T> right) => !(left == right);
     }
 }

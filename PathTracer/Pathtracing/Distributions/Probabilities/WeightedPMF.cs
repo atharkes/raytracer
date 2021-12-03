@@ -7,7 +7,7 @@ namespace PathTracer.Pathtracing.Distributions.Probabilities {
     /// <summary> A weighted probability mass function (discreet PDF).
     /// Sampling can be improved using Vose's Alias Method to O(1). </summary>
     /// <typeparam name="T">The type of the <see cref="WeightedPMF{T}"/></typeparam>
-    public class WeightedPMF<T> : IPMF<T> where T : notnull {
+    public class WeightedPMF<T> : IPMF<T>, IEquatable<WeightedPMF<T>> where T : notnull {
         public bool SingleSolution => items.Count == 1;
         public int DomainSize => items.Count;
 
@@ -74,5 +74,13 @@ namespace PathTracer.Pathtracing.Distributions.Probabilities {
             }
             throw new InvalidOperationException("Probabilities don't add up to 1");
         }
+
+        public override bool Equals(object? obj) => obj is WeightedPMF<T> wpmf && Equals(wpmf);
+        public bool Equals(IProbabilityDistribution<T>? other) => other is WeightedPMF<T> wpmf && Equals(wpmf);
+        public bool Equals(WeightedPMF<T>? other) => other is not null && weights.Equals(other.weights);
+        public override int GetHashCode() => HashCode.Combine(571118491, weights);
+
+        public static bool operator ==(WeightedPMF<T> left, WeightedPMF<T> right) => left.Equals(right);
+        public static bool operator !=(WeightedPMF<T> left, WeightedPMF<T> right) => !(left == right);
     }
 }

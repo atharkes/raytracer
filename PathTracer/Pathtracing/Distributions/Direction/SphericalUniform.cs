@@ -1,10 +1,11 @@
 ﻿using PathTracer.Geometry.Normals;
 using PathTracer.Geometry.Positions;
+using PathTracer.Pathtracing.Distributions.Probabilities;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics;
 using System;
 
 namespace PathTracer.Pathtracing.Distributions.Direction {
-    public struct SphericalUniform : IDirectionDistribution {
+    public struct SphericalUniform : IDirectionDistribution, IEquatable<SphericalUniform> {
         public Normal3 Orientation { get; }
         public bool ContainsDelta => false;
         public double DomainSize => 4 * Math.PI;
@@ -21,5 +22,13 @@ namespace PathTracer.Pathtracing.Distributions.Direction {
             ISphere sphere = new UnitSphere(Position3.Origin);
             return new Normal3(sphere.SurfacePosition(random).Vector);
         }
+
+        public override bool Equals(object? obj) => obj is SphericalUniform su && Equals(su);
+        public bool Equals(IProbabilityDistribution<Normal3>? other) => other is SphericalUniform su && Equals(su);
+        public bool Equals(SphericalUniform other) => Orientation.Equals(other.Orientation);
+        public override int GetHashCode() => HashCode.Combine(303068573, Orientation);
+
+        public static bool operator ==(SphericalUniform left, SphericalUniform right) => left.Equals(right);
+        public static bool operator !=(SphericalUniform left, SphericalUniform right) => !(left == right);
     }
 }

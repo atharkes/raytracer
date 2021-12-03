@@ -39,5 +39,13 @@ namespace PathTracer.Pathtracing.Distributions.Probabilities {
         /// <param name="random">The <see cref="Random"/> to use for sampling</param>
         /// <returns>A <paramref name="random"/> <see cref="T"/></returns>
         public T Sample(Random random) => items[random.Next(0, items.Length)];
+
+        public override bool Equals(object? obj) => obj is UniformPMF<T> wpmf && Equals(wpmf);
+        public bool Equals(IProbabilityDistribution<T>? other) => other is UniformPMF<T> wpmf && Equals(wpmf);
+        public bool Equals(UniformPMF<T>? other) => other is not null && items.Equals(other.items);
+        public override int GetHashCode() => HashCode.Combine(571118491, items);
+
+        public static bool operator ==(UniformPMF<T> left, UniformPMF<T> right) => left.Equals(right);
+        public static bool operator !=(UniformPMF<T> left, UniformPMF<T> right) => !(left == right);
     }
 }

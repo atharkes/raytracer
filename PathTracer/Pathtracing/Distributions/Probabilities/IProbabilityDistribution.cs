@@ -15,7 +15,7 @@ namespace PathTracer.Pathtracing.Distributions.Probabilities {
 
     /// <summary> A typed <see cref="IProbabilityDistribution"/> </summary>
     /// <typeparam name="T">The type of samples in the <see cref="IProbabilityDistribution{T}"/></typeparam>
-    public interface IProbabilityDistribution<T> : IProbabilityDistribution {
+    public interface IProbabilityDistribution<T> : IProbabilityDistribution, IEquatable<IProbabilityDistribution<T>> {
         /// <summary> Sample the <see cref="IProbabilityDistribution{T}"/> </summary>
         /// <param name="random">The <see cref="Random"/> to use for sampling</param>
         /// <returns>A <paramref name="random"/> <see cref="T"/></returns>

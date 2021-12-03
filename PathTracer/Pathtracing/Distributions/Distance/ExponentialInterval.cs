@@ -18,7 +18,7 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
 
         public Position1 Minimum => Entry;
         public Position1 Maximum => Position1.PositiveInfinity;
-        public double DomainSize => ExponentialSize;
+        public double DomainSize => throw new NotImplementedException("Domains is partly continuous and partly discreet");
         public bool ContainsDelta => true;
 
         public ExponentialInterval(Position1 start, Position1 end, double density, IMaterial material, IShapeInterval interval) {
@@ -47,9 +47,9 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
 
         double IProbabilityDistribution<Position1>.RelativeProbability(Position1 sample) {
             if (sample == Position1.PositiveInfinity) {
-                return ProbabilityDensity(sample) * DomainSize;
+                return ProbabilityDensity(sample) * 2;
             } else if (Entry <= sample && sample <= Exit) {
-                return ProbabilityDensity(sample) * DomainSize * ExponentialSize;
+                return ProbabilityDensity(sample) * 2 * ExponentialSize;
             } else {
                 return 0;
             }

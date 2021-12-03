@@ -70,7 +70,7 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
         }
     }
 
-    public class RecursiveDistanceDistribution : IDistanceDistribution, IRecursiveDistanceDistribution, IEquatable<RecursiveDistanceDistribution> {
+    public class RecursiveDistanceDistribution : IRecursiveDistanceDistribution, IEquatable<RecursiveDistanceDistribution> {
         public IDistanceDistribution Left { get; }
         public IDistanceDistribution Right { get; }
 

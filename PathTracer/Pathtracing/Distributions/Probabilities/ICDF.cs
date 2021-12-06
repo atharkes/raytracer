@@ -11,11 +11,6 @@ namespace PathTracer.Pathtracing.Distributions.Probabilities {
         /// <summary> The maximum <see cref="T"/> in the domain of the <see cref="ICDF{T}"/> </summary>
         T Maximum { get; }
 
-        /// <summary> Check whether the <see cref="ICDF{T}"/> contains the <paramref name="sample"/> </summary>
-        /// <param name="sample">The sample to check</param>
-        /// <returns>Whether the <see cref="ICDF{T}"/> contains the <paramref name="sample"/></returns>
-        bool IProbabilityDistribution<T>.Contains(T sample) => !(Before(sample) || After(sample));
-
         /// <summary> Check whether the <see cref="ICDF{T}"/> is entirely before the <paramref name="sample"/> </summary>
         /// <param name="sample">The sample to check</param>
         /// <returns>Whether the <see cref="ICDF{T}"/> is entirely before the <paramref name="sample"/></returns>

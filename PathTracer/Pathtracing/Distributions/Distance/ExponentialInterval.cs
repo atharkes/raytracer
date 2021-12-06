@@ -67,13 +67,15 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
             }
         }
 
-        public WeightedPMF<IMaterial>? GetMaterials(Position1 sample) {
-            return (this as IPDF<Position1>).Contains(sample) ? new WeightedPMF<IMaterial>((Material, 1)) : null;
-        }
+        public bool Contains(Position1 sample) => (Entry <= sample && sample <= Exit) || sample.Equals(Position1.PositiveInfinity);
 
-        public WeightedPMF<IShapeInterval>? GetShapeIntervals(Position1 sample, IMaterial material) {
-            return (this as IPDF<Position1>).Contains(sample) && material.Equals(Material) ? new WeightedPMF<IShapeInterval>((Interval, 1)) : null;
-        }
+        public bool Contains(IMaterial material) => material.Equals(Material);
+
+        public bool Contains(IShapeInterval interval) => interval.Equals(Interval);
+
+        public WeightedPMF<IMaterial> GetMaterials(Position1 sample) => new((Material, 1));
+
+        public WeightedPMF<IShapeInterval> GetShapeIntervals(Position1 sample, IMaterial material) => new((Interval, 1));
 
         public override bool Equals(object? obj) => obj is ExponentialInterval ed && Equals(ed);
         public bool Equals(IProbabilityDistribution<Position1>? other) => other is ExponentialInterval ed && Equals(ed);

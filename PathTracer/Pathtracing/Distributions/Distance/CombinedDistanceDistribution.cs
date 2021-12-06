@@ -5,6 +5,7 @@ using PathTracer.Pathtracing.SceneDescription;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace PathTracer.Pathtracing.Distributions.Distance {
@@ -14,10 +15,18 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
         public bool ContainsDelta => distributions.Any(d => d.ContainsDelta);
         public double DomainSize => throw new NotImplementedException("Union of intervals is not implemented");
 
-        SortedSet<IDistanceDistribution> distributions;
+        readonly SortedSet<IDistanceDistribution> distributions;
 
         public CombinedDistanceDistribution(params IDistanceDistribution[] distributions) {
-            this.distributions = new(distributions, Comparer<IDistanceDistribution>.Create((a, b) => a.Minimum.CompareTo(b.Minimum)));
+            List<IDistanceDistribution> simpleDistributions = new();
+            foreach(IDistanceDistribution distribution in distributions) {
+                if (distribution is CombinedDistanceDistribution cdd) {
+                    simpleDistributions.AddRange(cdd.distributions);
+                } else {
+                    simpleDistributions.Add(distribution);
+                }
+            }
+            this.distributions = new(simpleDistributions, Comparer<IDistanceDistribution>.Create((a, b) => a.Minimum.CompareTo(b.Minimum)));
         }
 
         public double ProbabilityDensity(Position1 sample) {
@@ -42,7 +51,7 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
         }
 
         public Position1 Sample(Random random) {
-            Position1 smallestSample = Position1.MaxValue;
+            Position1 smallestSample = Position1.PositiveInfinity;
             foreach (var d in distributions) {
                 if (d.Minimum > smallestSample) {
                     break;
@@ -56,32 +65,50 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
             return smallestSample;
         }
 
-        public WeightedPMF<IMaterial>? GetMaterials(Position1 sample) {
+        public bool Contains(Position1 sample) => distributions.Any(d => d.Contains(sample));
+
+        public bool Contains(IMaterial material) => distributions.Any(d => d.Contains(material));
+
+        public bool Contains(IShapeInterval interval) => distributions.Any(d => d.Contains(interval));
+
+        public WeightedPMF<IMaterial> GetMaterials(Position1 sample) {
+            Debug.Assert(Contains(sample));
             List<(WeightedPMF<IMaterial>, double)> pmfs = new();
             double cdf = CumulativeProbabilityDensity(sample);
             var contains = distributions.Where(d => d.Contains(sample));
-            foreach (var d in contains) {
-                WeightedPMF<IMaterial>? pmf = d.GetMaterials(sample);
-                double localCdf = d.CumulativeProbabilityDensity(sample);
-                double beforeCdf = (localCdf - cdf) / (localCdf - 1);
-                double probabilityDensity = d.Probability(sample) * beforeCdf;
-                pmfs.Add()
-            }
-            var left = Left.GetMaterials(sample);
-            var right = Right.GetMaterials(sample);
-            if (left is null) {
-                return right;
-            } else if (right is null) {
-                return left;
+            if (contains.Count() == 1) {
+                return contains.First().GetMaterials(sample);
             } else {
-                double probabilityLeft = (1 - Right.CumulativeProbabilityDensity(sample)) * Left.ProbabilityDensity(sample);
-                double probabilityRight = (1 - Left.CumulativeProbabilityDensity(sample)) * Right.ProbabilityDensity(sample);
-                return new WeightedPMF<IMaterial>((left, probabilityLeft), (right, probabilityRight));
+                foreach (var distribution in contains) {
+                    WeightedPMF<IMaterial> pmf = distribution.GetMaterials(sample);
+                    double localCdf = distribution.CumulativeProbabilityDensity(sample);
+                    if (localCdf == 1) return pmf;
+                    double beforeCdf = (localCdf - cdf) / (localCdf - 1);
+                    double probabilityDensity = distribution.Probability(sample) * (1 - beforeCdf);
+                    pmfs.Add((pmf, probabilityDensity));
+                }
+                return new WeightedPMF<IMaterial>(pmfs.ToArray());
             }
         }
 
-        public WeightedPMF<IShapeInterval>? GetShapeIntervals(Position1 sample, IMaterial material) {
-            throw new NotImplementedException();
+        public WeightedPMF<IShapeInterval> GetShapeIntervals(Position1 sample, IMaterial material) {
+            Debug.Assert(Contains(sample));
+            List<(WeightedPMF<IShapeInterval>, double)> pmfs = new();
+            double cdf = CumulativeProbabilityDensity(sample);
+            var contains = distributions.Where(d => d.Contains(sample));
+            if (contains.Count() == 1) {
+                return contains.First().GetShapeIntervals(sample, material);
+            } else {
+                foreach (var d in contains) {
+                    WeightedPMF<IShapeInterval> pmf = d.GetShapeIntervals(sample, material);
+                    double localCdf = d.CumulativeProbabilityDensity(sample);
+                    if (localCdf == 1) return pmf;
+                    double beforeCdf = (localCdf - cdf) / (localCdf - 1);
+                    double probabilityDensity = d.Probability(sample) * (1 - beforeCdf);
+                    pmfs.Add((pmf, probabilityDensity));
+                }
+                return new WeightedPMF<IShapeInterval>(pmfs.ToArray());
+            }
         }
 
         public override bool Equals(object? obj) => obj is CombinedDistanceDistribution cdd && Equals(cdd);

@@ -59,13 +59,13 @@ namespace PathTracer.Pathtracing.Integrators {
             //float distanceImportance = (float)distances.InverseRelativeProbability(distance);
 
             /// Sample Material
-            IProbabilityDistribution<IMaterial>? materials = distances.GetMaterials(distance);
+            IProbabilityDistribution<IMaterial>? materials = distances.TryGetMaterials(distance);
             if (materials is null) throw new InvalidOperationException("Distance was sampled but no material was found");
             IMaterial material = materials.Sample(Utils.ThreadRandom);
             //float materialImportance = (float)materials.InverseRelativeProbability(material);
 
             /// Sample Shape Interval
-            IProbabilityDistribution<IShapeInterval>? intervals = distances.GetShapeIntervals(distance, material);
+            IProbabilityDistribution<IShapeInterval>? intervals = distances.TryGetShapeIntervals(distance, material);
             if (intervals is null) throw new InvalidOperationException("Distance was sampled but no shape interval was found");
             IShapeInterval interval = intervals.Sample(Utils.ThreadRandom);
             //float shapeIntervalImportance = (float)intervals.InverseRelativeProbability(interval);

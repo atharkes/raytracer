@@ -38,18 +38,22 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
             }
         }
 
-        public WeightedPMF<IMaterial>? GetMaterials(Position1 sample) {
-            return (this as IPDF<Position1>).Contains(sample) ? new WeightedPMF<IMaterial>((Material, 1)) : null;
-        }
+        public bool Contains(Position1 sample) => Minimum <= sample && sample <= Maximum;
 
-        public WeightedPMF<IShapeInterval>? GetShapeIntervals(Position1 sample, IMaterial material) {
-            return (this as IPDF<Position1>).Contains(sample) && material.Equals(Material) ? new WeightedPMF<IShapeInterval>((Interval, 1)) : null;
-        }
+        public bool Contains(IMaterial material) => material.Equals(Material);
+
+        public bool Contains(IShapeInterval interval) => interval.Equals(Interval);
+
+        public WeightedPMF<IMaterial> GetMaterials(Position1 sample) => new((Material, 1));
+
+        public WeightedPMF<IShapeInterval> GetShapeIntervals(Position1 sample, IMaterial material) => new ((Interval, 1));
 
         public override bool Equals(object? obj) => obj is UniformInterval ud && Equals(ud);
         public bool Equals(IProbabilityDistribution<Position1>? other) => other is UniformInterval ud && Equals(ud);
         public bool Equals(UniformInterval other) => Minimum.Equals(other.Minimum) && Maximum.Equals(other.Maximum) && Material.Equals(other.Material) && Interval.Equals(other.Interval);
         public override int GetHashCode() => HashCode.Combine(963929819, Minimum, Maximum, Material, Interval);
+
+
 
         public static bool operator ==(UniformInterval left, UniformInterval right) => left.Equals(right);
         public static bool operator !=(UniformInterval left, UniformInterval right) => !(left == right);

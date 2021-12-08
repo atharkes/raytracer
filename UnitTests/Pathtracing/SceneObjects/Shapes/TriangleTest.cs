@@ -3,6 +3,7 @@ using PathTracer.Geometry.Normals;
 using PathTracer.Geometry.Positions;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Planars;
 using PathTracer.Utilities;
+using PathTracer.Utilities.Extensions;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -35,9 +36,9 @@ namespace UnitTests.Pathtracing.SceneObjects.Shapes {
 
         [TestMethod]
         public void GetClippedPoints_OneClipped() {
-            Position3 P1 = new Position3(1, 0, 1);
-            Position3 P2 = new Position3(0, 0, 1);
-            Position3 P3 = new Position3(0, 0, -1);
+            Position3 P1 = new(1, 0, 1);
+            Position3 P2 = new(0, 0, 1);
+            Position3 P3 = new(0, 0, -1);
             Triangle triangle = new(P1, P2, P3);
             AxisAlignedPlane plane = new(Unit3.MinZ, 0);
             Position3[] points = triangle.GetClippedPoints(plane).ToArray();

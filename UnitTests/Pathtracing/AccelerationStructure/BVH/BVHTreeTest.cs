@@ -2,6 +2,7 @@
 using PathTracer.Pathtracing.SceneDescription;
 using PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates.AccelerationStructures.BVH;
 using PathTracer.Utilities;
+using PathTracer.Utilities.Extensions;
 using System.Collections.Generic;
 using System.Diagnostics;
 

@@ -5,7 +5,7 @@ using PathTracer.Pathtracing.Distributions.Distance;
 using PathTracer.Pathtracing.Distributions.Probabilities;
 using PathTracer.Pathtracing.Rays;
 using PathTracer.Pathtracing.Spectra;
-using PathTracer.Utilities;
+using PathTracer.Utilities.Extensions;
 
 namespace PathTracer.Pathtracing.SceneDescription.Materials {
     /// <summary>

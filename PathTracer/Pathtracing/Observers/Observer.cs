@@ -1,12 +1,11 @@
 ﻿using OpenTK.Windowing.GraphicsLibraryFramework;
-using PathTracer.Geometry.Directions;
 using PathTracer.Geometry.Normals;
-using PathTracer.Geometry.Positions;
 using PathTracer.Geometry.Vectors;
 using PathTracer.Pathtracing.Observers.Accumulators;
 using PathTracer.Pathtracing.Observers.Cameras;
 using PathTracer.Pathtracing.Rays;
 using PathTracer.Utilities;
+using PathTracer.Utilities.Extensions;
 
 namespace PathTracer.Pathtracing.Observers {
     /// <summary> An <see cref="IObserver"/> that observes a <see cref="IScene"/> </summary>

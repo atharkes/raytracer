@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PathTracer.Pathtracing.Spectra;
 using PathTracer.Utilities;
+using PathTracer.Utilities.Extensions;
 
 namespace UnitTests.Pathtracing.Spectra {
     [TestClass]

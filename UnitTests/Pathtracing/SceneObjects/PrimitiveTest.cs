@@ -4,6 +4,7 @@ using PathTracer.Pathtracing.SceneDescription.SceneObjects;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Planars;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics;
 using PathTracer.Utilities;
+using PathTracer.Utilities.Extensions;
 using System.Collections.Generic;
 
 namespace UnitTests.Pathtracing.SceneObjects {

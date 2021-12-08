@@ -2,9 +2,8 @@
 using PathTracer.Pathtracing.Distributions.Boundaries;
 using PathTracer.Pathtracing.Distributions.Probabilities;
 using PathTracer.Pathtracing.SceneDescription;
-using PathTracer.Utilities;
+using PathTracer.Utilities.Extensions;
 using System;
-using System.Diagnostics;
 
 namespace PathTracer.Pathtracing.Distributions.Distance {
     public struct DeltaDistance : IDistanceDistribution, IEquatable<DeltaDistance> {
@@ -42,8 +41,6 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
         public bool Equals(IProbabilityDistribution<Position1>? other) => other is DeltaDistance dd && Equals(dd);
         public bool Equals(DeltaDistance other) => Distance.Equals(other.Distance) && Material.Equals(other.Material) && Interval.Equals(other.Interval);
         public override int GetHashCode() => HashCode.Combine(818834969, Distance, Material, Interval);
-
-
 
         public static bool operator ==(DeltaDistance left, DeltaDistance right) => left.Equals(right);
         public static bool operator !=(DeltaDistance left, DeltaDistance right) => !(left == right);

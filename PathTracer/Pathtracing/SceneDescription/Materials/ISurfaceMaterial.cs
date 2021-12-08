@@ -25,7 +25,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials {
         /// <param name="interval">The <see cref="IShapeInterval"/> of the <see cref="ISurfaceMaterial"/> along the <paramref name="ray"/></param>
         /// <returns>A distance distribution of the <paramref name="ray"/> through the <see cref="ISurfaceMaterial"/></returns>
         IDistanceDistribution? IMaterial.DistanceDistribution(IRay ray, ISpectrum spectrum, IShapeInterval interval) {
-            return interval.Entry < 0 || interval.Entry > ray.Length ? null : new UniformInterval(((float)interval.Entry).Previous(), interval.Entry, this, interval);
+            return interval.Entry < 0 || interval.Entry > ray.Length ? null : new UniformInterval(((float)interval.Entry).Decrement(64), interval.Entry, this, interval);
         }
 
         /// <summary> Get a <see cref="Position3"/> at a specified <paramref name="distance"/> along a <paramref name="ray"/> </summary>
@@ -49,6 +49,6 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials {
         /// <param name="orientation">The <see cref="ISurfaceMaterial"/>s orientation at the specified <paramref name="position"/></param>
         /// <param name="direction">The outgoing direction of the <see cref="IRay"/></param>
         /// <returns>An <see cref="IRay"/> from the <paramref name="position"/> with the specified <paramref name="direction"/></returns>
-        IRay IMaterial.CreateRay(Position3 position, Normal3 orientation, Normal3 direction) => new Ray(position + orientation * RaiseEpsilon, direction);
+        IRay IMaterial.CreateRay(Position3 position, Normal3 orientation, Normal3 direction) => new Ray(position, direction);
     }
 }

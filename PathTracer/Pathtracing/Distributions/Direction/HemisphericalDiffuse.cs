@@ -18,11 +18,13 @@ namespace PathTracer.Pathtracing.Distributions.Direction {
         public double ProbabilityDensity(Normal3 sample) => Math.Abs(IDirection3.Dot(Orientation, sample));
 
         public Normal3 Sample(Random random) {
+            /// Get Point uniformly on Disc
             double angle = random.NextDouble() * 2 * Math.PI;
             double r = random.NextDouble() + random.NextDouble();
             r = r < 1 ? r : 2 - r;
             double u = r * Math.Cos(angle);
             double v = r * Math.Sin(angle);
+            /// Raise Disc point to Hemisphere
             double w = Math.Sqrt(1 - u * u - v * v);
             Normal3 uDirection = Normal3.AnyPerpendicular(Orientation);
             Normal3 vDirection = Normal3.Perpendicular(Orientation, uDirection);

@@ -65,6 +65,11 @@ namespace PathTracer.Utilities.Extensions {
         /// <returns>A <paramref name="random"/> unit vector</returns>
         public static Normal3 UnitVector3(this Random random) => new(random.Unit());
 
+        /// <summary> Create a <paramref name="random"/> normalized vector </summary>
+        /// <param name="random">The <see cref="Random"/> to create the vector with</param>
+        /// <returns>A <paramref name="random"/> normalized vector</returns>
+        public static Normal3 Normal3(this Random random) => new(random.Vector());
+
         /// <summary> Create a <paramref name="random"/> <see cref="IPrimitive"/> </summary>
         /// <param name="random">The <see cref="Random"/> to create the <see cref="IPrimitive"/> with</param>
         /// <returns>A <paramref name="random"/> <see cref="IPrimitive"/></returns>
@@ -113,11 +118,10 @@ namespace PathTracer.Utilities.Extensions {
         public static IMaterial RandomNonEmitter(this Random random) {
             ISpectrum color = new RGBSpectrum(random.Vector());
             float specularity = random.NextDouble() < 0.3f ? (float)random.NextDouble() : 0;
-            float dielectric = random.NextDouble() < 0.1f ? (float)random.NextDouble() : 0;
-            float refractionIndex = (float)random.NextDouble() * 2f + 1f;
-            float glossyness = random.NextDouble() < 0.5f ? (float)random.NextDouble() : 0;
-            float glossSpecularity = (float)random.NextDouble() * 10f;
-            return new ParametricMaterial(color, specularity, dielectric, refractionIndex, glossyness, glossSpecularity);
+            float roughness = random.NextDouble() < 0.5f ? (float)random.NextDouble() : 0;
+            //float dielectric = random.NextDouble() < 0.1f ? (float)random.NextDouble() : 0;
+            //float refractionIndex = (float)random.NextDouble() * 2f + 1f;
+            return new ParametricMaterial(color, specularity, roughness);
         }
 
         /// <summary> Create a random emitting <see cref="IMaterial"/> </summary>

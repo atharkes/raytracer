@@ -1,6 +1,7 @@
 ﻿using PathTracer.Geometry.Normals;
 using PathTracer.Geometry.Positions;
 using PathTracer.Pathtracing.Distributions.Boundaries;
+using PathTracer.Pathtracing.Distributions.Direction;
 using PathTracer.Pathtracing.Distributions.Distance;
 using PathTracer.Pathtracing.Distributions.Probabilities;
 using PathTracer.Pathtracing.Rays;
@@ -18,6 +19,9 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials {
         /// Used to avoid the intersection falling behind the scene object due to rounding errors.
         /// </summary>
         public const float RaiseEpsilon = 0.000001f;
+
+        /// <summary> The rougness of the <see cref="ISurfaceMaterial"/> </summary>
+        public double Roughness { get; }
 
         /// <summary> Get a distance distribution of a <paramref name="ray"/> through the <see cref="ISurfaceMaterial"/> </summary>
         /// <param name="ray">The scattering <see cref="IRay"/></param>
@@ -42,7 +46,14 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials {
         /// <param name="shape">The <see cref="IShape"/> in which the <paramref name="position"/> is found</param>
         /// <param name="position">The position at which to get the normal distribution</param>
         /// <returns>A <see cref="IPDF{T}"/> of <see cref="Normal3"/> at the specified <paramref name="position"/></returns>
-        IProbabilityDistribution<Normal3> IMaterial.GetOrientationDistribution(IRay ray, IShape shape, Position3 position) => new UniformPMF<Normal3>(shape.OutwardsDirection(position));
+        IProbabilityDistribution<Normal3> IMaterial.GetOrientationDistribution(IRay ray, IShape shape, Position3 position) {
+            Normal3 shapeOrientation = shape.OutwardsDirection(position);
+            if (Roughness == 0f) {
+                return new UniformPMF<Normal3>(shapeOrientation);
+            } else {
+                return new SurfaceSGGX(shapeOrientation, (float)Roughness, -ray.Direction);
+            }
+        }
 
         /// <summary> Create an outgoing <see cref="IRay"/> from a <paramref name="position"/> along a specified <paramref name="direction"/> </summary>
         /// <param name="position">The <see cref="Position3"/> from which the <see cref="IRay"/> leaves</param>

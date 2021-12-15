@@ -1,7 +1,6 @@
 ﻿using PathTracer.Geometry.Directions;
 using PathTracer.Geometry.Normals;
 using PathTracer.Geometry.Positions;
-using PathTracer.Pathtracing.Distributions;
 using PathTracer.Pathtracing.Distributions.Direction;
 using PathTracer.Pathtracing.Distributions.Probabilities;
 using PathTracer.Pathtracing.Spectra;
@@ -11,22 +10,14 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials.SurfaceMaterials {
     public class ParametricMaterial : ISurfaceMaterial {
         /// <summary> The color of the <see cref="ParametricMaterial"/> </summary>
         public ISpectrum Albedo { get; set; }
-        /// <summary> How specular this primitive is. A specular object reflects light like a mirror. </summary>
-        public float Specularity { get; set; } = 0f;
+        /// <summary> How large the specular part of the <see cref="ParametricMaterial"/> is </summary>
+        public double Specularity { get; set; } = 0;
+        /// <summary> How rough the surface of the <see cref="ParametricMaterial"/> is </summary>
+        public double Roughness { get; set; } = 0;
         /// <summary> How dielectric this primitive is. A dielectric object both passes light and reflects it like water or glass. </summary>
-        public float Dielectric { get; set; } = 0f;
-        /// <summary> The refraction index of this primitive if it is a dielectric. This is typically a value between 1 and 3.
-        /// <para> Vacuum 1 </para>
-        /// <para> Gases at 0 °C: Air 1.000293, Helium 1.000036, Hydrogen 1.000132, Carbon dioxide 1.00045 </para>
-        /// <para> Liquids at 20 °C: Water 1.333, Ethanol 1.36, Olive oil 1.47 </para>
-        /// <para> Solids: Ice 1.31, Fused silica(quartz) 1.46, Plexiglas 1.49, Window glass 1.52, 
-        /// Flint glass 1.62, Sapphire 1.77, Cubic zirconia 2.15, Diamond 2.42, Moissanite 2.65 </para>
-        /// </summary>
-        public float RefractionIndex { get; set; } = 1f;
-        /// <summary> The glossyness of the primitive </summary>
-        public float Glossyness { get; set; } = 0f;
-        /// <summary> The gloss specularity of the primitive </summary>
-        public float GlossSpecularity { get; set; } = 0f;
+        public double Dielectric { get; set; } = 0;
+        
+
         /// <summary> The color of emitting light </summary>
         public ISpectrum EmittanceColor { get; set; } = ISpectrum.Black;
         /// <summary> How much light this material is emitting (in watt/m^2) </summary>
@@ -34,7 +25,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials.SurfaceMaterials {
         /// <summary> The light this material is emitting </summary>
         public ISpectrum EmittingLight => EmittanceColor * EmittingStrength;
         /// <summary> Whether this material is emitting light </summary>
-        public bool IsEmitting => EmittingStrength > 0f;
+        public bool IsEmitting => EmittingStrength > 0;
         /// <summary> This material is not sensing light </summary>
         public bool IsSensing => false;
 
@@ -47,32 +38,26 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials.SurfaceMaterials {
         /// <summary> Create a diffuse yellow material </summary>
         public static ParametricMaterial DiffuseYellow => new(new RGBSpectrum(0.8f, 0.8f, 0.2f));
         /// <summary> Create a glossy red material </summary>
-        public static ParametricMaterial GlossyRed => new(new RGBSpectrum(0.8f, 0.2f, 0.2f), 0, 0, 1, 0.5f, 15f);
+        public static ParametricMaterial GlossyRed => new(new RGBSpectrum(0.8f, 0.2f, 0.2f), 1f, 0.2f);
         /// <summary> Create a glossy green material </summary>
-        public static ParametricMaterial GlossyGreen => new(new RGBSpectrum(0.2f, 0.8f, 0.2f), 0, 0, 1, 0.7f, 50f);
+        public static ParametricMaterial GlossyGreen => new(new RGBSpectrum(0.2f, 0.8f, 0.2f), 1f, 0.2f);
         /// <summary> Create a glossy mirror with a purple hue </summary>
-        public static ParametricMaterial GlossyPurpleMirror => new(new RGBSpectrum(0.8f, 0.2f, 0.8f), 0.4f, 0, 1, 0.7f, 50f);
+        public static ParametricMaterial PurpleHalfMirror => new(new RGBSpectrum(0.8f, 0.2f, 0.8f), 0.5f, 0.1f);
         /// <summary> Create a mirror material </summary>
-        public static ParametricMaterial Mirror => new(new RGBSpectrum(0.9f, 0.9f, 0.9f), 0.97f);
-        /// <summary> Create a glass material </summary>
-        public static ParametricMaterial Glass => new(new RGBSpectrum(0.9f, 0.9f, 0.9f), 0, 0.97f, 1.62f);
+        public static ParametricMaterial Mirror => new(new RGBSpectrum(0.9f, 0.9f, 0.9f), 1f, 0.03f);
+        /// <summary> Create a rough mirror material </summary>
+        public static ParametricMaterial RoughMirror => new(new RGBSpectrum(0.9f, 0.9f, 0.9f), 1f, 0.2f);
         /// <summary> A white light </summary>
         public static ParametricMaterial WhiteLight => new(1f, ISpectrum.White);
 
         /// <summary> Create a new material </summary>
         /// <param name="color">The color of the material</param>
-        /// <param name="specularity">How specular the material is. A specular object reflects light like a mirror.</param>
-        /// <param name="dielectric">How dielectric the material is. A dielectric object both passes light and reflects it like water or glass.</param>
-        /// <param name="refractionIndex">The refraction index of the material if it is a dielectric. This is typically a value between 1 and 3.</param>
-        /// <param name="glossyness">The glossyness of the material</param>
-        /// <param name="glossSpecularity">The gloss specularity of the material</param>
-        public ParametricMaterial(ISpectrum color, float specularity = 0, float dielectric = 0, float refractionIndex = 1, float glossyness = 0, float glossSpecularity = 0) {
+        /// <param name="specularity">The percentage of sepcular microfacets compared to diffuse</param>
+        /// <param name="roughness">How rough the surface is</param>
+        public ParametricMaterial(ISpectrum color, double specularity = 0, double roughness = 0) {
             Albedo = color;
             Specularity = specularity;
-            Dielectric = dielectric;
-            RefractionIndex = refractionIndex;
-            Glossyness = glossyness;
-            GlossSpecularity = glossSpecularity;
+            Roughness = roughness;
         }
 
         /// <summary> Create an emitting material </summary>

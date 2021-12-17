@@ -4,7 +4,7 @@ using System.Threading;
 
 namespace PathTracer.Multithreading {
     /// <summary> A threadpool for dividing work between threads </summary>
-    public class Threadpool {
+    public class Threadpool : IDisposable {
         /// <summary> Amount of cores on this system </summary>
         public static int CoreCount => Environment.ProcessorCount;
 
@@ -21,6 +21,8 @@ namespace PathTracer.Multithreading {
         readonly bool[] done;
         int remaining;
         Action[]? tasks;
+        bool active = true;
+        bool disposed = false;
 
         /// <summary> Create a new threadpool </summary>
         /// <param name="threadCount">Amount of threads used for the threadpool</param>
@@ -69,7 +71,7 @@ namespace PathTracer.Multithreading {
         /// <summary> Main method for the worker threads </summary>
         /// <param name="threadID">The identifier of the thread</param>
         void ThreadMain(int threadID) {
-            while (true) {
+            while (active) {
                 // Wait for the Go Signal
                 go[threadID].WaitOne();
                 // Lock to Core
@@ -85,6 +87,28 @@ namespace PathTracer.Multithreading {
                 done[threadID] = true;
                 doneHandle[threadID].Set();
             }
+        }
+
+        /// <summary> Dispose the <see cref="ThreadPool"/> </summary>
+        /// <param name="disposing">Whether to recursivly dispose managed resources</param>
+        protected virtual void Dispose(bool disposing) {
+            if (!disposed) {
+                active = false;
+                tasks = null;
+                foreach (EventWaitHandle waitHandle in go) waitHandle.Set();
+                disposed = true;
+            }
+        }
+
+        /// <summary> Dispose the <see cref="ThreadPool"/> </summary>
+        public void Dispose() {
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary> Deconstruct the <see cref="ThreadPool"/> </summary>
+        ~Threadpool() {
+            Dispose(disposing: false);
         }
     }
 }

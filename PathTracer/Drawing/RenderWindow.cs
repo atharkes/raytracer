@@ -8,9 +8,9 @@ namespace PathTracer.Drawing {
     /// <summary> The main class derived from an OpenTK gamewindow </summary>
     public class RenderWindow : GameWindow {
         /// <summary> The identifier of the gamewindow </summary>
-        public int GameWindowID { get; private set; }
+        public int GameWindowID { get; }
         /// <summary> The gamewindow </summary>
-        public Surface GameWindow { get; private set; }
+        public Surface GameWindow { get; }
 
         readonly Shader shader;
         int vertexBufferObject;
@@ -25,7 +25,7 @@ namespace PathTracer.Drawing {
             -1.0f,  1.0f, 0.0f, 0.0f, 0.0f,
         };
         /// <summary> The indices of the vertices of the texture </summary>
-        readonly uint[] indices = { 
+        readonly uint[] indices = {
             0, 1, 3,
             1, 2, 3
         };
@@ -44,38 +44,25 @@ namespace PathTracer.Drawing {
             elementBufferObject = GL.GenBuffer();
             vertexArrayObject = GL.GenVertexArray();
             // ..:: Initialization code (done once (unless your object frequently changes)) :: ..
-            // 1. bind Vertex Array Object
+            // Bind Vertex Array Object
             GL.BindVertexArray(vertexArrayObject);
-            // 2. copy our vertices array in a buffer for OpenGL to use
+            // Copy our vertices array in a buffer for OpenGL to use
             GL.BindBuffer(BufferTarget.ArrayBuffer, vertexBufferObject);
             GL.BufferData(BufferTarget.ArrayBuffer, vertices.Length * sizeof(float), vertices, BufferUsageHint.StaticDraw);
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, elementBufferObject);
             GL.BufferData(BufferTarget.ElementArrayBuffer, indices.Length * sizeof(uint), indices, BufferUsageHint.StaticDraw);
-            // 3. then set our vertex attributes pointers
+            // Then set our vertex attributes pointers
             int aPositionLocation = shader.GetAttribLocation("aPosition");
             GL.VertexAttribPointer(aPositionLocation, 3, VertexAttribPointerType.Float, false, 5 * sizeof(float), 3 * sizeof(float) * aPositionLocation);
             GL.EnableVertexAttribArray(aPositionLocation);
             int texCoordLocation = shader.GetAttribLocation("aTexCoord");
             GL.VertexAttribPointer(texCoordLocation, 2, VertexAttribPointerType.Float, false, 5 * sizeof(float), 3 * sizeof(float) * texCoordLocation);
             GL.EnableVertexAttribArray(texCoordLocation);
-            
+
             GL.Enable(EnableCap.Texture2D);
             GL.Disable(EnableCap.DepthTest);
             GL.Hint(HintTarget.PerspectiveCorrectionHint, HintMode.Nicest);
             base.OnLoad();
-        }
-
-        /// <summary> Called upon app close </summary>
-        /// <param name="e">Arguments given</param>
-        protected override void OnUnload() {
-            shader.Dispose();
-            int texture = GameWindowID;
-            GL.DeleteTextures(1, ref texture);
-            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
-            GL.DeleteBuffer(vertexBufferObject);
-            GL.DeleteBuffer(elementBufferObject);
-            GL.DeleteVertexArray(vertexArrayObject);
-            base.OnUnload();
         }
 
         /// <summary> Called upon window resize </summary>
@@ -92,8 +79,8 @@ namespace PathTracer.Drawing {
         }
 
         /// <summary> Called once per frame; render </summary>
-        /// <param name="e">Arguments given</param>
-        protected override void OnRenderFrame(FrameEventArgs e) {
+        /// <param name="args">Arguments given</param>
+        protected override void OnRenderFrame(FrameEventArgs args) {
             /// Clear Screen
             GL.Clear(ClearBufferMask.ColorBufferBit);
             /// Bind Texture
@@ -106,14 +93,20 @@ namespace PathTracer.Drawing {
             GL.DrawElements(PrimitiveType.Triangles, indices.Length, DrawElementsType.UnsignedInt, 0);
             /// Done Drawing
             SwapBuffers();
-            base.OnRenderFrame(e);
+            base.OnRenderFrame(args);
         }
 
-        public void Clear(int color = 0) => GameWindow.Clear(color);
-        public void Plot(int x, int y, int color = 16777215) => GameWindow.Plot(x, y, color);
-        public void Plot(int i, int color = 16777215) => GameWindow.Plot(i, color);
-        public void Line(int x1, int y1, int x2, int y2, int color = 16777215) => GameWindow.Line(x1, y1, x2, y2, color);
-        public void Box(int x1, int y1, int x2, int y2, int color = 16777215) => GameWindow.Box(x1, y1, x2, y2, color);
-        public void Print(string text, int x, int y, int color = 16777215) => GameWindow.Print(text, x, y, color);
+        /// <summary> Dispose the <see cref="RenderWindow"/> </summary>
+        /// <param name="disposing">Whether to recursivly dispose managed resources</param>
+        protected override void Dispose(bool disposing) {
+            shader.Dispose();
+            int texture = GameWindowID;
+            GL.DeleteTextures(1, ref texture);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+            GL.DeleteBuffer(vertexBufferObject);
+            GL.DeleteBuffer(elementBufferObject);
+            GL.DeleteVertexArray(vertexArrayObject);
+            base.Dispose(disposing);
+        }
     }
 }

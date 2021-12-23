@@ -1,4 +1,5 @@
 ﻿using OpenTK.Windowing.Common;
+﻿using OpenTK.Mathematics;
 using OpenTK.Windowing.Desktop;
 using PathTracer.Drawing;
 using PathTracer.Geometry.Normals;
@@ -19,6 +20,7 @@ using PathTracer.Pathtracing.SceneDescription.Shapes.Planars;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics;
 using PathTracer.Pathtracing.Spectra;
 using PathTracer.Utilities;
+using System;
 using System.Collections.Generic;
 
 namespace PathTracer {
@@ -71,6 +73,12 @@ namespace PathTracer {
         /// <summary> Entry point of the application </summary>
         /// <param name="args">Arguments given</param>
         public static void Main() {
+            /// Compute Blender Rotation Quaternion
+            var blenderRotation = new Quaternion(-Config.Rotation.X, -Config.Rotation.Z, -Config.Rotation.Y, Config.Rotation.W);
+            var blenderFrontCompensation = new Quaternion(0.707107f, 0f, 0f, 0.707107f);
+            Console.WriteLine($"Blender Rotation Quaternion | {blenderRotation * blenderFrontCompensation}");
+
+            /// Start Renderer
             Window.UpdateFrame += HandleInput;
             Window.RenderFrame += UpdateRenderer;
             Window.Run();

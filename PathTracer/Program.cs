@@ -48,14 +48,18 @@ namespace PathTracer {
         /// <summary> The configuration of the renderer </summary>
         public static readonly Config Config = Config.LoadFromFile();
         /// <summary> The window supplied by OpenTK to render to </summary>
-        public static readonly RenderWindow Window = new(GameWindowSettings.Default, NativeWindowSettings.Default) {
-            RenderFrequency = 0,
-            UpdateFrequency = 0,
-            Location = Config.WindowPosition,
-            Size = Config.WindowSize,
-            Title = "C# .NET 5 OpenTK Pathtracer",
-            WindowBorder = WindowBorder.Resizable
-        };
+        public static readonly RenderWindow Window = new(
+            new GameWindowSettings() {
+                UpdateFrequency = 0,
+                RenderFrequency = 0,
+                IsMultiThreaded = false,
+            }, 
+            new NativeWindowSettings() {
+                Location = Config.WindowPosition,
+                Size = Config.WindowSize,
+                Title = "C# .NET 5 OpenTK Pathtracer",
+                WindowBorder = WindowBorder.Resizable,
+            });
         /// <summary> The <see cref="IObserver"/> viewing the scene </summary>
         public static readonly IObserver Observer = new Observer(Window.GameWindow, new PinholeCamera(Config.Position, Config.Rotation, Config.AspectRatio, Config.FOV)) {
             DrawingMode = Config.DrawingMode,
@@ -83,6 +87,7 @@ namespace PathTracer {
             Window.RenderFrame += UpdateRenderer;
             Window.Run();
             Window.Dispose();
+            Threadpool.Dispose();
             Config.SaveToFile(Renderer);
         }
 

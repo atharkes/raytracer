@@ -11,7 +11,7 @@ namespace PathTracer.Pathtracing.Distributions.Direction {
         public Normal3 IncomingDirection { get; }
 
         public bool ContainsDelta => Roughness.Equals(0d);
-        public double DomainSize => Roughness.Equals(0d) ? 0d : 2 * Math.PI;
+        public double DomainSize => Roughness.Equals(0d) ? 0d : 4 * Math.PI;
 
         public SurfaceSGGX(Normal3 orientation, float roughness, Normal3 incomingDirection) {
             Orientation = orientation;
@@ -77,7 +77,7 @@ namespace PathTracer.Pathtracing.Distributions.Direction {
             float Ski = wk.X * wi.X * Sxx + wk.Y * wi.Y * Syy + wk.Z * wi.Z * Szz + (wk.X * wi.Y + wk.Y * wi.X) * Sxy + (wk.X * wi.Z + wk.Z * wi.X) * Sxz + (wk.Y * wi.Z + wk.Z * wi.Y) * Syz;
             float Sji = wj.X * wi.X * Sxx + wj.Y * wi.Y * Syy + wj.Z * wi.Z * Szz + (wj.X * wi.Y + wj.Y * wi.X) * Sxy + (wj.X * wi.Z + wj.Z * wi.X) * Sxz + (wj.Y * wi.Z + wj.Z * wi.Y) * Syz;
 
-            // compute normal
+            // Compute normal
             float sqrtDetSkji = (float)Math.Sqrt(Math.Abs(Skk * Sjj * Sii - Skj * Skj * Sii - Ski * Ski * Sjj - Sji * Sji * Skk + 2.0f * Skj * Ski * Sji));
             float inv_sqrtS_ii = 1.0f / (float)Math.Sqrt(Sii);
             float tmp = (float)Math.Sqrt(Sjj * Sii - Sji * Sji);

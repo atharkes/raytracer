@@ -1,6 +1,7 @@
 ﻿using PathTracer.Geometry.Normals;
 using PathTracer.Geometry.Positions;
 using PathTracer.Pathtracing.Distributions.Boundaries;
+using PathTracer.Pathtracing.Distributions.Direction;
 using PathTracer.Pathtracing.Distributions.Distance;
 using PathTracer.Pathtracing.Distributions.Probabilities;
 using PathTracer.Pathtracing.Rays;
@@ -40,7 +41,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials {
         /// <returns>A <see cref="IPDF{T}"/> of <see cref="Normal3"/> at the specified <paramref name="position"/></returns>
         IProbabilityDistribution<Normal3> IMaterial.GetOrientationDistribution(IRay ray, IShape shape, Position3 position) {
             Normal3 shapeOrientation = shape.OutwardsDirection(position);
-            return new UniformPMF<Normal3>(shapeOrientation);
+            return new SurfaceGGX(shapeOrientation, 0.2f, ray.Direction);
         }
 
         /// <summary> Create an outgoing <see cref="IRay"/> from a <paramref name="position"/> along a specified <paramref name="direction"/> </summary>

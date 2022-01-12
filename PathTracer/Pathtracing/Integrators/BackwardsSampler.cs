@@ -19,7 +19,7 @@ namespace PathTracer.Pathtracing.Integrators {
         /// <summary> The minimum amount of samples per integration cycle of the <see cref="BackwardsSampler"/> </summary>
         public static readonly int MinimumSampleCount = Program.Threadpool.MultithreadingTaskCount * 10;
         /// <summary> The maximum recursion depth for sampling </summary>
-        public const int MaxRecursionDepth = 4;
+        public const int MaxRecursionDepth = 6;
 
         public override void Integrate(IScene scene, int sampleCount) {
             double taskSize = (double)sampleCount / Program.Threadpool.MultithreadingTaskCount;

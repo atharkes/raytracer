@@ -42,7 +42,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials.SurfaceMaterials {
         /// <summary> Create a glossy green material </summary>
         public static ParametricMaterial GlossyGreen => new(new RGBSpectrum(0.2f, 0.8f, 0.2f), 1f, 0.2f);
         /// <summary> Create a glossy mirror with a purple hue </summary>
-        public static ParametricMaterial PurpleHalfMirror => new(new RGBSpectrum(0.8f, 0.2f, 0.8f), 0.5f, 0.1f);
+        public static ParametricMaterial PurpleHalfMirror => new(new RGBSpectrum(0.8f, 0.2f, 0.8f), 0.5f, 0f);
         /// <summary> Create a mirror material </summary>
         public static ParametricMaterial Mirror => new(new RGBSpectrum(0.9f, 0.9f, 0.9f), 1f, 0.03f);
         /// <summary> Create a rough mirror material </summary>

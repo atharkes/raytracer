@@ -33,7 +33,7 @@ namespace PathTracer {
             new Primitive(new Sphere(new Position3(3, 1, 5), 1), ParametricMaterial.GlossyRed),
             new Primitive(new Sphere(new Position3(0, 1, 5), 1), ParametricMaterial.RoughMirror),
             new Primitive(new Sphere(new Position3(0, 1, 8), 1), ParametricMaterial.Mirror),
-            new Primitive(new Sphere(new Position3(-1, 1, 2), 1), new DiffuseVolumetric(new RGBSpectrum(0.8f, 0.8f, 0.8f), 2)),
+            new Primitive(new Sphere(new Position3(-1, 1, 2), 1), new DiffuseVolumetric(new RGBSpectrum(0.8f, 0.8f, 0.8f), 2f)),
             new Primitive(new Triangle(new Position3(5, 0, 10), new Position3(5, 0, 0), new Position3(-5, 0, 0), null), ParametricMaterial.PurpleHalfMirror),
             new Primitive(new Triangle(new Position3(5, 0, 10), new Position3(-5, 0, 0), new Position3(-5, 0, 10), null), ParametricMaterial.DiffuseYellow),
             new Primitive(new Plane(new Normal3(0, 1, 0), new Position1(-1)), ParametricMaterial.DiffuseGray),

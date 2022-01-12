@@ -7,10 +7,10 @@ using PathTracer.Pathtracing.Spectra;
 using System;
 
 namespace PathTracer.Pathtracing.SceneDescription.Materials.Profiles.Density {
-    public class Volumetric : IDensityProfile {
+    public class Uniform : IDensityProfile {
         float Density { get; }
 
-        public Volumetric(float density) {
+        public Uniform(float density) {
             Density = density;
         }
 

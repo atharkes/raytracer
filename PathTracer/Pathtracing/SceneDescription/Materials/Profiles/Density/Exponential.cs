@@ -8,7 +8,7 @@ using PathTracer.Utilities.Extensions;
 using System;
 
 namespace PathTracer.Pathtracing.SceneDescription.Materials.Profiles.Density {
-    internal class RaisedSurface : IDensityProfile {
+    internal class Exponential : IDensityProfile {
         public IRay CreateRay(Position3 position, Normal3 orientation, Normal3 direction) {
             return new Ray(position, direction);
         }

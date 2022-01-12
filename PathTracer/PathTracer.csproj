@@ -26,7 +26,6 @@
   <ItemGroup>
     <Folder Include="Pathtracing\SceneDescription\Materials\Profiles\Absorption\" />
     <Folder Include="Pathtracing\SceneDescription\Materials\Profiles\Emittance\" />
-    <Folder Include="Pathtracing\SceneDescription\Materials\Profiles\Scattering\" />
   </ItemGroup>
 
 </Project>

@@ -7,7 +7,7 @@ using PathTracer.Pathtracing.Spectra;
 using System;
 
 namespace PathTracer.Pathtracing.SceneDescription.Materials.Profiles.Density {
-    public class DeltaSurface : IDensityProfile {
+    public class Delta : IDensityProfile {
         /// <summary>
         /// Epsilon used to raise the exiting <see cref="IRay"/>s away from the scene object.
         /// Used to avoid the intersection falling behind the scene object due to rounding errors.

@@ -4,8 +4,8 @@ using PathTracer.Pathtracing.Distributions.Probabilities;
 using System;
 
 namespace PathTracer.Pathtracing.Distributions.Direction {
-    /// <summary> A surface GGX distribution for visible normals </summary>
-    public struct SurfaceGGX : IDirectionDistribution, IEquatable<SurfaceGGX> {
+    /// <summary> Used for the surface GGX distribution for visible normals </summary>
+    public struct SurfaceHalfEllipsoid : IDirectionDistribution, IEquatable<SurfaceHalfEllipsoid> {
         public Normal3 Orientation { get; }
         public float Roughness { get; }
         public Normal3 IncomingDirection { get; }
@@ -13,7 +13,7 @@ namespace PathTracer.Pathtracing.Distributions.Direction {
         public bool ContainsDelta => Roughness.Equals(0d);
         public double DomainSize => Roughness.Equals(0d) ? 0d : 2 * Math.PI;
 
-        public SurfaceGGX(Normal3 orientation, float roughness, Normal3 incomingDirection) {
+        public SurfaceHalfEllipsoid(Normal3 orientation, float roughness, Normal3 incomingDirection) {
             Orientation = orientation;
             Roughness = roughness;
             IncomingDirection = incomingDirection;
@@ -38,17 +38,17 @@ namespace PathTracer.Pathtracing.Distributions.Direction {
             return sample;
         }
 
-        public override bool Equals(object? obj) => obj is SurfaceGGX sggx && Equals(sggx);
-        public bool Equals(IProbabilityDistribution<Normal3>? other) => other is SurfaceGGX sggx && Equals(sggx);
-        public bool Equals(SurfaceGGX other) => Orientation.Equals(other.Orientation) && Roughness.Equals(other.Roughness) && IncomingDirection.Equals(other.IncomingDirection);
+        public override bool Equals(object? obj) => obj is SurfaceHalfEllipsoid sggx && Equals(sggx);
+        public bool Equals(IProbabilityDistribution<Normal3>? other) => other is SurfaceHalfEllipsoid sggx && Equals(sggx);
+        public bool Equals(SurfaceHalfEllipsoid other) => Orientation.Equals(other.Orientation) && Roughness.Equals(other.Roughness) && IncomingDirection.Equals(other.IncomingDirection);
         public override int GetHashCode() => HashCode.Combine(395397523, Orientation, Roughness, IncomingDirection);
 
-        public static bool operator ==(SurfaceGGX left, SurfaceGGX right) => left.Equals(right);
-        public static bool operator !=(SurfaceGGX left, SurfaceGGX right) => !(left == right);
+        public static bool operator ==(SurfaceHalfEllipsoid left, SurfaceHalfEllipsoid right) => left.Equals(right);
+        public static bool operator !=(SurfaceHalfEllipsoid left, SurfaceHalfEllipsoid right) => !(left == right);
 
         Vector3 SampleVNDF(float r1, float r2) {
             var rotation = new OpenTK.Mathematics.Quaternion(Vector3.Cross(Orientation.Vector, Vector3.UnitZ), Vector3.Dot(Orientation.Vector, Vector3.UnitZ) + 1).Normalized();
-            Vector3 Ve = rotation * IncomingDirection.Vector; 
+            Vector3 Ve = rotation * -IncomingDirection.Vector; 
 
             // Section 3.2: transforming the view direction to the hemisphere configuration
             Vector3 Vh = new Vector3(Roughness * Ve.X, Roughness * Ve.Y, Ve.Z).Normalized();

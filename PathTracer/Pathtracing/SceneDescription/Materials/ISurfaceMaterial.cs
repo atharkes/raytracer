@@ -51,7 +51,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials {
             if (Roughness == 0f) {
                 return new UniformPMF<Normal3>(shapeOrientation);
             } else {
-                return new SurfaceSGGX(shapeOrientation, (float)Roughness, -ray.Direction);
+                return new SurfaceEllipsoid(shapeOrientation, (float)Roughness, -ray.Direction);
             }
         }
 

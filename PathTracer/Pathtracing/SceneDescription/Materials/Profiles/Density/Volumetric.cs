@@ -20,7 +20,8 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials.Profiles.Density {
 
         public IDistanceDistribution? GetDistances(IRay ray, ISpectrum spectrum, IShapeInterval interval) {
             if (interval.Exit > 0 && interval.Entry < ray.Length) {
-                return new ExponentialInterval(Math.Max(0, interval.Entry), Math.Min(ray.Length, interval.Exit), Density, this, interval);
+                throw new NotImplementedException("Reference to material has to be handled in the material");
+                //return new ExponentialInterval(Math.Max(0, interval.Entry), Math.Min(ray.Length, interval.Exit), Density, this, interval);
             } else {
                 return null;
             }

@@ -12,7 +12,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials {
         public IDensityProfile DensityProfile { get; }
         public IAbsorptionProfile AbsorptionProfile { get; }
         public IOrientationProfile OrientationProfile { get; }
-        public IScatteringProfile ScatteringProfile { get; }
+        public IReflectionProfile ScatteringProfile { get; }
         public IEmittanceProfile EmittanceProfile { get; }
 
         public ISpectrum Albedo => AbsorptionProfile.Albedo;
@@ -22,7 +22,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials {
         public ProfiledMaterial(IDensityProfile densityProfile,
                                 IAbsorptionProfile absorptionProfile,
                                 IOrientationProfile orientationProfile,
-                                IScatteringProfile scatteringProfile,
+                                IReflectionProfile scatteringProfile,
                                 IEmittanceProfile emittanceProfile) {
             DensityProfile = densityProfile;
             AbsorptionProfile = absorptionProfile;

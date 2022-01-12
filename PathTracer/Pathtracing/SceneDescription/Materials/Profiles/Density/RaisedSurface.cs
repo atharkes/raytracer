@@ -5,6 +5,7 @@ using PathTracer.Pathtracing.Distributions.Distance;
 using PathTracer.Pathtracing.Rays;
 using PathTracer.Pathtracing.Spectra;
 using PathTracer.Utilities.Extensions;
+using System;
 
 namespace PathTracer.Pathtracing.SceneDescription.Materials.Profiles.Density {
     internal class RaisedSurface : IDensityProfile {
@@ -13,7 +14,8 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials.Profiles.Density {
         }
 
         public IDistanceDistribution GetDistances(IRay ray, ISpectrum spectrum, IShapeInterval interval) {
-            return ray.WithinBounds(interval.Entry) ? new UniformInterval(((float)interval.Entry).Decrement(64), interval.Entry, this, interval) : null;
+            throw new NotImplementedException("Reference to material has to be handled in the material");
+            //return ray.WithinBounds(interval.Entry) ? new UniformInterval(((float)interval.Entry).Decrement(64), interval.Entry, this, interval) : null;
         }
 
         public Position3 GetPosition(IRay ray, IShapeInterval interval, Position1 distance) {

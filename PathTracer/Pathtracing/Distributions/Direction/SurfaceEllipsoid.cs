@@ -4,8 +4,8 @@ using PathTracer.Pathtracing.Distributions.Probabilities;
 using System;
 
 namespace PathTracer.Pathtracing.Distributions.Direction {
-    /// <summary> A symmetric surface GGX distribution for visible normals </summary>
-    public struct SurfaceSGGX : IDirectionDistribution, IEquatable<SurfaceSGGX> {
+    /// <summary> Used for the symmetric surface GGX distribution for visible normals </summary>
+    public struct SurfaceEllipsoid : IDirectionDistribution, IEquatable<SurfaceEllipsoid> {
         public Normal3 Orientation { get; }
         public float Roughness { get; }
         public Normal3 IncomingDirection { get; }
@@ -13,7 +13,7 @@ namespace PathTracer.Pathtracing.Distributions.Direction {
         public bool ContainsDelta => Roughness.Equals(0d);
         public double DomainSize => Roughness.Equals(0d) ? 0d : 4 * Math.PI;
 
-        public SurfaceSGGX(Normal3 orientation, float roughness, Normal3 incomingDirection) {
+        public SurfaceEllipsoid(Normal3 orientation, float roughness, Normal3 incomingDirection) {
             Orientation = orientation;
             Roughness = roughness;
             IncomingDirection = incomingDirection;
@@ -31,13 +31,13 @@ namespace PathTracer.Pathtracing.Distributions.Direction {
             return new Normal3(SampleVNDF(random.NextSingle(), random.NextSingle()));
         }
 
-        public override bool Equals(object? obj) => obj is SurfaceSGGX ssggx && Equals(ssggx);
-        public bool Equals(IProbabilityDistribution<Normal3>? other) => other is SurfaceSGGX ssggx && Equals(ssggx);
-        public bool Equals(SurfaceSGGX other) => Orientation.Equals(other.Orientation) && Roughness.Equals(other.Roughness) && IncomingDirection.Equals(other.IncomingDirection);
+        public override bool Equals(object? obj) => obj is SurfaceEllipsoid ssggx && Equals(ssggx);
+        public bool Equals(IProbabilityDistribution<Normal3>? other) => other is SurfaceEllipsoid ssggx && Equals(ssggx);
+        public bool Equals(SurfaceEllipsoid other) => Orientation.Equals(other.Orientation) && Roughness.Equals(other.Roughness) && IncomingDirection.Equals(other.IncomingDirection);
         public override int GetHashCode() => HashCode.Combine(579526993, Orientation, Roughness, IncomingDirection);
 
-        public static bool operator ==(SurfaceSGGX left, SurfaceSGGX right) => left.Equals(right);
-        public static bool operator !=(SurfaceSGGX left, SurfaceSGGX right) => !(left == right);
+        public static bool operator ==(SurfaceEllipsoid left, SurfaceEllipsoid right) => left.Equals(right);
+        public static bool operator !=(SurfaceEllipsoid left, SurfaceEllipsoid right) => !(left == right);
 
         Vector3 SampleVNDF(float r1, float r2) {
             // Compute S for surface-like SGGX
@@ -57,7 +57,7 @@ namespace PathTracer.Pathtracing.Distributions.Direction {
             float w = (float)Math.Sqrt(1.0f - u * u - v * v);
 
             // Build orthonormal basis
-            Vector3 wi = IncomingDirection.Vector;
+            Vector3 wi = -IncomingDirection.Vector;
             Vector3 wk, wj;
             if (wi.Z < -0.9999999f) {
                 wk = new Vector3(0.0f, -1.0f, 0.0f);

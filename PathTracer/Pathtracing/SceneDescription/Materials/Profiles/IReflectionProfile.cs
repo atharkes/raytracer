@@ -5,7 +5,7 @@ using PathTracer.Pathtracing.Spectra;
 
 namespace PathTracer.Pathtracing.SceneDescription.Materials.Profiles {
     /// <summary> The scattering profile of an <see cref="IMaterial"/> </summary>
-    public interface IScatteringProfile {
+    public interface IReflectionProfile {
         /// <summary> Get the distribution of outgoing directions at the specified <paramref name="position"/> </summary>
         /// <param name="incomingDirection">The incoming direction at the <paramref name="position"/></param>
         /// <param name="position">The <see cref="Position3"/> at which the scattering occurs</param>

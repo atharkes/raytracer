@@ -35,9 +35,6 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects {
 
         #region IMaterial
         ISpectrum IMaterial.Albedo => Material.Albedo;
-        bool IMaterial.IsEmitting => Material.IsEmitting;
-        bool IMaterial.IsSensing => Material.IsSensing;
-        ISpectrum IMaterial.Emittance(Position3 position, Normal3 orientation, Normal3 direction) => Material.Emittance(position, orientation, direction);
 
         IDistanceDistribution? IMaterial.DistanceDistribution(IRay ray, ISpectrum spectrum, IShapeInterval interval) => Material.DistanceDistribution(ray, spectrum, interval);
         Position3 IMaterial.GetPosition(IRay ray, IShapeInterval interval, Position1 distance) => Material.GetPosition(ray, interval, distance);

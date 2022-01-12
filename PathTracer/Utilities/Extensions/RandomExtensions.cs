@@ -129,7 +129,7 @@ namespace PathTracer.Utilities.Extensions {
         /// <returns>A <paramref name="random"/> emitting <see cref="IMaterial"/></returns>
         public static IMaterial RandomEmitter(this Random random) {
             ISpectrum color = new RGBSpectrum(random.Vector());
-            return new ParametricMaterial(random.Next(1, 50), color);
+            return new SurfaceEmitter(color, random.Next(1, 50));
         }
     }
 }

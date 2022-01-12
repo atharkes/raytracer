@@ -9,14 +9,11 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials.SurfaceMaterials {
     /// <summary> A material class for primitives in the scene </summary>
     public class ParametricMaterial : ISurfaceMaterial {
         /// <summary> The color of the <see cref="ParametricMaterial"/> </summary>
-        public ISpectrum Albedo { get; set; }
+        public ISpectrum Albedo { get; set; } = RGBSpectrum.White;
         /// <summary> How large the specular part of the <see cref="ParametricMaterial"/> is </summary>
-        public double Specularity { get; set; } = 0;
+        public float Specularity { get; set; } = 0;
         /// <summary> How rough the surface of the <see cref="ParametricMaterial"/> is </summary>
-        public double Roughness { get; set; } = 0;
-        /// <summary> How dielectric this primitive is. A dielectric object both passes light and reflects it like water or glass. </summary>
-        public double Dielectric { get; set; } = 0;
-        
+        public float Roughness { get; set; } = 0;
 
         /// <summary> The color of emitting light </summary>
         public ISpectrum EmittanceColor { get; set; } = ISpectrum.Black;
@@ -38,7 +35,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials.SurfaceMaterials {
         /// <summary> Create a diffuse yellow material </summary>
         public static ParametricMaterial DiffuseYellow => new(new RGBSpectrum(0.8f, 0.8f, 0.2f));
         /// <summary> Create a glossy red material </summary>
-        public static ParametricMaterial GlossyRed => new(new RGBSpectrum(0.8f, 0.2f, 0.2f), 1f, 0.2f);
+        public static ParametricMaterial GlossyRed => new(new RGBSpectrum(0.8f, 0.2f, 0.2f), 1f, 0.1f);
         /// <summary> Create a glossy green material </summary>
         public static ParametricMaterial GlossyGreen => new(new RGBSpectrum(0.2f, 0.8f, 0.2f), 1f, 0.2f);
         /// <summary> Create a glossy mirror with a purple hue </summary>
@@ -48,13 +45,13 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials.SurfaceMaterials {
         /// <summary> Create a rough mirror material </summary>
         public static ParametricMaterial RoughMirror => new(new RGBSpectrum(0.9f, 0.9f, 0.9f), 1f, 0.2f);
         /// <summary> A white light </summary>
-        public static ParametricMaterial WhiteLight => new(1f, ISpectrum.White);
+        public static SurfaceEmitter WhiteLight => new(RGBSpectrum.White, 1f);
 
         /// <summary> Create a new material </summary>
         /// <param name="color">The color of the material</param>
         /// <param name="specularity">The percentage of sepcular microfacets compared to diffuse</param>
         /// <param name="roughness">How rough the surface is</param>
-        public ParametricMaterial(ISpectrum color, double specularity = 0, double roughness = 0) {
+        public ParametricMaterial(ISpectrum color, float specularity = 0, float roughness = 0) {
             Albedo = color;
             Specularity = specularity;
             Roughness = roughness;
@@ -81,15 +78,6 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials.SurfaceMaterials {
             var diffuse = new HemisphericalDiffuse(orientation);
             var specular = new SpecularReflection(orientation, incomingDirection);
             return new CombinedProbabilityDistribution<Normal3>((diffuse, 1 - Specularity), (specular, Specularity));
-
-            //} else if (surfacePoint.Primitive.Material.Dielectric > 0) {
-            //    // Dielectric
-            //    float reflected = intersection.Reflectivity();
-            //    float refracted = 1 - reflected;
-            //    Ray? refractedRay = intersection.Refract();
-            //    Vector3 incRefractedLight = refractedRay != null ? Sample(refractedRay) : Vector3.Zero;
-            //    Vector3 incReflectedLight = Sample(intersection.Reflect());
-            //    radianceOut = irradianceIn * (1f - surfacePoint.Primitive.Material.Dielectric) + (incRefractedLight * refracted + incReflectedLight * reflected) * surfacePoint.Primitive.Material.Dielectric * surfacePoint.Primitive.Material.Color;
         }
     }
 }

@@ -11,17 +11,6 @@ namespace PathTracer.Pathtracing.SceneDescription {
     public interface IMaterial {
         /// <summary> The color <see cref="ISpectrum"/> of the <see cref="IMaterial"/> </summary>
         ISpectrum Albedo { get; }
-        /// <summary> Whether the <see cref="IMaterial"/> is emitting light or not </summary>
-        bool IsEmitting { get; }
-        /// <summary> Whether the <see cref="IMaterial"/> is sensing light or not </summary>
-        bool IsSensing { get; }
-
-        /// <summary> The emission <see cref="ISpectrum"/> of the <see cref="IMaterial"/> </summary>
-        /// <param name="position">The position to get the emission at</param>
-        /// <param name="orientation">The orientation of the <see cref="IMaterial"/> at the <paramref name="position"/></param>
-        /// <param name="direction">The direction of the emission</param>
-        /// <returns>The emission at the <paramref name="position"/> in the specified <paramref name="direction"/></returns>
-        ISpectrum Emittance(Position3 position, Normal3 orientation, Normal3 direction);
 
         /// <summary> Get a distance distribution of a <paramref name="ray"/> through the <see cref="IMaterial"/> </summary>
         /// <param name="ray">The scattering <see cref="IRay"/></param>
@@ -58,7 +47,7 @@ namespace PathTracer.Pathtracing.SceneDescription {
         /// <param name="shape">The <see cref="IShape"/> in which the <paramref name="position"/> is found</param>
         /// <param name="position">The position at which to get the normal distribution</param>
         /// <returns>A <see cref="IPDF{T}"/> of <see cref="Normal3"/> at the specified <paramref name="position"/></returns>
-        IProbabilityDistribution<Normal3> GetOrientationDistribution(IRay ray, IShape shape, Position3 position);
+        IProbabilityDistribution<Normal3>? GetOrientationDistribution(IRay ray, IShape shape, Position3 position);
 
         /// <summary> Get a direction distribution of the <see cref="IMaterial"/> at a <paramref name="position"/> </summary>
         /// <param name="incomingDirection">The incoming direction at the <paramref name="position"/></param>

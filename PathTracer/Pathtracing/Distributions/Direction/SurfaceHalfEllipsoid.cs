@@ -28,14 +28,7 @@ namespace PathTracer.Pathtracing.Distributions.Direction {
         }
 
         public Normal3 Sample(Random random) {
-            if (Normal3.Similarity(Orientation, IncomingDirection) < -0.999f) {
-                return Normal3.Perpendicular(Orientation, IncomingDirection);
-            }
-            Normal3 sample = new(SampleVNDF(random.NextSingle(), random.NextSingle()));
-            while (!Normal3.Similar(sample, Orientation)) {
-                sample = new(SampleVNDF(random.NextSingle(), random.NextSingle()));
-            }
-            return sample;
+            return new(SampleVNDF(random.NextSingle(), random.NextSingle()));
         }
 
         public override bool Equals(object? obj) => obj is SurfaceHalfEllipsoid sggx && Equals(sggx);

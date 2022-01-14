@@ -15,22 +15,6 @@ namespace PathTracer.Pathtracing.SceneDescription {
         /// <summary> Get a distance distribution of a <paramref name="ray"/> through the <see cref="IMaterial"/> </summary>
         /// <param name="ray">The scattering <see cref="IRay"/></param>
         /// <param name="spectrum">The <see cref="ISpectrum"/> of the <paramref name="ray"/></param>
-        /// <param name="boundary">The <see cref="IBoundary"/>s of the <see cref="IMaterial"/> along the <paramref name="ray"/></param>
-        /// <returns>A distance distribution of the <paramref name="ray"/> through the <see cref="IMaterial"/></returns>
-        IDistanceDistribution? DistanceDistribution(IRay ray, ISpectrum spectrum, IBoundaryCollection boundary) {
-            IDistanceDistribution? result = null;
-            foreach (ShapeInterval interval in boundary) {
-                IDistanceDistribution? distanceDistribution = DistanceDistribution(ray, spectrum, interval);
-                if (distanceDistribution is not null) {
-                    result += distanceDistribution;
-                }
-            }
-            return result;
-        }
-
-        /// <summary> Get a distance distribution of a <paramref name="ray"/> through the <see cref="IMaterial"/> </summary>
-        /// <param name="ray">The scattering <see cref="IRay"/></param>
-        /// <param name="spectrum">The <see cref="ISpectrum"/> of the <paramref name="ray"/></param>
         /// <param name="interval">The <see cref="IShapeInterval"/> of the <see cref="IMaterial"/> along the <paramref name="ray"/></param>
         /// <returns>A distance distribution of the <paramref name="ray"/> through the <see cref="IMaterial"/></returns>
         IDistanceDistribution? DistanceDistribution(IRay ray, ISpectrum spectrum, IShapeInterval interval);

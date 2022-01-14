@@ -18,7 +18,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials.Profiles.Density {
             return new Ray(position, direction);
         }
 
-        public IDistanceDistribution? GetDistances(IRay ray, ISpectrum spectrum, IShapeInterval interval) {
+        public IDistanceDistribution? GetDistances(IRay ray, ISpectrum spectrum, IInterval interval) {
             if (interval.Exit > 0 && interval.Entry < ray.Length) {
                 throw new NotImplementedException("Reference to material has to be handled in the material");
                 //return new ExponentialInterval(Math.Max(0, interval.Entry), Math.Min(ray.Length, interval.Exit), Density, this, interval);
@@ -27,8 +27,8 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials.Profiles.Density {
             }
         }
 
-        public Position3 GetPosition(IRay ray, IShapeInterval interval, Position1 distance) {
-            return interval.Shape.IntersectPosition(ray, distance);
+        public Position3 GetPosition(IRay ray, Position1 distance, IShape shape) {
+            return ray.Travel(distance);
         }
     }
 }

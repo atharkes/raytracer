@@ -31,11 +31,17 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials {
             EmittanceProfile = emittanceProfile;
         }
 
+        public IDistanceDistribution? DistanceDistribution(IRay ray, ISpectrum spectrum, IShapeInterval interval) {
+            // Get Hit distance distribution from Density Profile
+            var distances = DensityProfile.GetDistances(ray, spectrum, interval);
+            // Add relevant information (material and shape)
+            return distances;
+        }
+
         public ISpectrum Emittance(Position3 position, Normal3 orientation, Normal3 direction) => EmittanceProfile.GetEmittance(position, orientation, direction);
-        public IDistanceDistribution? DistanceDistribution(IRay ray, ISpectrum spectrum, IShapeInterval interval) => DensityProfile.GetDistances(ray, spectrum, interval);
-        public Position3 GetPosition(IRay ray, IShapeInterval interval, Position1 distance) => DensityProfile.GetPosition(ray, interval, distance);
+        public Position3 GetPosition(IRay ray, IShapeInterval interval, Position1 distance) => DensityProfile.GetPosition(ray, distance, interval.Shape);
         public IRay CreateRay(Position3 position, Normal3 orientation, Normal3 direction) => DensityProfile.CreateRay(position, orientation, direction);
-        public IProbabilityDistribution<Normal3> GetOrientationDistribution(IRay ray, IShape shape, Position3 position) => OrientationProfile.GetOrientations(ray, shape, position);
+        public IProbabilityDistribution<Normal3> GetOrientationDistribution(IRay ray, IShape shape, Position3 position) => OrientationProfile.GetOrientations(position, ray.Direction, shape);
         public IProbabilityDistribution<Normal3> DirectionDistribution(Normal3 incomingDirection, Position3 position, Normal3 orientation, ISpectrum spectrum) => ScatteringProfile.GetDirections(incomingDirection, position, orientation, spectrum);
     }
 }

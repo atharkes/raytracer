@@ -40,7 +40,19 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Primitives {
             if (boundary is null) {
                 return null;
             }
-            return Material.DistanceDistribution(ray, spectrum, boundary);
+            // Note: Intervals are processed individually here.
+            // If different types of behaviours are required
+            // (Like only using the first entry and last exit)
+            // the conversion from intervals to distance distributions
+            // has to be moved to, and specified by the material itself.
+            IDistanceDistribution? result = null;
+            foreach (ShapeInterval interval in boundary) {
+                IDistanceDistribution? distanceDistribution = Material.DistanceDistribution(ray, spectrum, interval);
+                if (distanceDistribution is not null) {
+                    result += distanceDistribution;
+                }
+            }
+            return result;
         }
 
         public virtual IEnumerable<ISceneObject> Clip(AxisAlignedPlane plane) {

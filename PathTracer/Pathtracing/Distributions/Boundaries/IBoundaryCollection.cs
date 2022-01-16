@@ -33,15 +33,11 @@ namespace PathTracer.Pathtracing.Distributions.Boundaries {
 
         /// <summary> Get the <see cref="IEnumerator{T}"/> of the <see cref="IBoundaryCollection"/> </summary>
         /// <returns>The <see cref="IEnumerator{T}"/> of the <see cref="IBoundaryCollection"/></returns>
-        new IEnumerator<IShapeInterval> GetEnumerator() => BoundaryIntervals.GetEnumerator();
-
-        /// <summary> Get the <see cref="IEnumerator{T}"/> of the <see cref="IBoundaryCollection"/> </summary>
-        /// <returns>The <see cref="IEnumerator{T}"/> of the <see cref="IBoundaryCollection"/></returns>
-        IEnumerator<IShapeInterval> IEnumerable<IShapeInterval>.GetEnumerator() => GetEnumerator();
+        IEnumerator<IShapeInterval> IEnumerable<IShapeInterval>.GetEnumerator() => BoundaryIntervals.GetEnumerator();
 
         /// <summary> Get the <see cref="IEnumerator"/> of the <see cref="IBoundaryCollection"/> </summary>
         /// <returns>The <see cref="IEnumerator"/> of the <see cref="IBoundaryCollection"/></returns>
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => BoundaryIntervals.GetEnumerator();
 
         /// <summary> Add another <see cref="IBoundaryCollection"/> to this <see cref="IBoundaryCollection"/> </summary>
         /// <param name="other">The other <see cref="IBoundaryCollection"/></param>
@@ -50,11 +46,11 @@ namespace PathTracer.Pathtracing.Distributions.Boundaries {
         /// <summary> Check whether the specified <paramref name="distance"/> falls inside the <see cref="IBoundaryCollection"/> </summary>
         /// <param name="distance">the specified distance to check for</param>
         /// <returns>Whether the specified <paramref name="distance"/> falls inside the <see cref="IBoundaryCollection"/></returns>
-        bool Inside(double distance) => BoundaryIntervals.Any(i => i.Includes(distance));
+        bool Inside(float distance) => BoundaryIntervals.Any(i => i.Includes(distance));
 
         /// <summary> Check whether the specified <paramref name="distance"/> falls outside the <see cref="IBoundaryCollection"/> </summary>
         /// <param name="distance">the specified distance to check for</param>
         /// <returns>Whether the specified <paramref name="distance"/> falls outside the <see cref="IBoundaryCollection"/></returns>
-        bool Outside(double distance) => !Inside(distance);
+        bool Outside(float distance) => !Inside(distance);
     }
 }

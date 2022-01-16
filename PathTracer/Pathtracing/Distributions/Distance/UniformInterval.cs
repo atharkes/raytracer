@@ -6,18 +6,20 @@ using System;
 
 namespace PathTracer.Pathtracing.Distributions.Distance {
     public struct UniformInterval : IDistanceDistribution {
-        public IMaterial Material { get; }
-        public IShapeInterval Interval { get; }
-        public Position1 Minimum { get; }
-        public Position1 Maximum { get; }
+        public IInterval Interval { get; }
+
+        public Position1 Minimum => Interval.Entry;
+        public Position1 Maximum => Interval.Exit;
         public double DomainSize => Maximum - Minimum;
         public bool ContainsDelta => true;
 
-        public UniformInterval(Position1 start, Position1 end, IMaterial material, IShapeInterval interval) {
-            Minimum = start;
-            Maximum = end;
-            Material = material;
+        readonly IMaterial material;
+        readonly IShapeInterval shapeInterval;
+
+        public UniformInterval(IInterval interval, IMaterial material, IShapeInterval shapeInterval) {
             Interval = interval;
+            this.material = material;
+            this.shapeInterval = shapeInterval;
         }
 
         public Position1 Sample(Random random) {
@@ -40,18 +42,18 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
 
         public bool Contains(Position1 sample) => Minimum <= sample && sample <= Maximum;
 
-        public bool Contains(IMaterial material) => material.Equals(Material);
+        public bool Contains(IMaterial material) => material.Equals(this.material);
 
-        public bool Contains(IShapeInterval interval) => interval.Equals(Interval);
+        public bool Contains(IShapeInterval interval) => interval.Equals(shapeInterval);
 
-        public WeightedPMF<IMaterial> GetMaterials(Position1 sample) => new((Material, 1));
+        public WeightedPMF<IMaterial> GetMaterials(Position1 sample) => new((material, 1));
 
-        public WeightedPMF<IShapeInterval> GetShapeIntervals(Position1 sample, IMaterial material) => new ((Interval, 1));
+        public WeightedPMF<IShapeInterval> GetShapeIntervals(Position1 sample, IMaterial material) => new((shapeInterval, 1));
 
         public override bool Equals(object? obj) => obj is UniformInterval ud && Equals(ud);
         public bool Equals(IProbabilityDistribution<Position1>? other) => other is UniformInterval ud && Equals(ud);
-        public bool Equals(UniformInterval other) => Minimum.Equals(other.Minimum) && Maximum.Equals(other.Maximum) && Material.Equals(other.Material) && Interval.Equals(other.Interval);
-        public override int GetHashCode() => HashCode.Combine(963929819, Minimum, Maximum, Material, Interval);
+        public bool Equals(UniformInterval other) => Minimum.Equals(other.Minimum) && Maximum.Equals(other.Maximum) && material.Equals(other.material) && shapeInterval.Equals(other.shapeInterval);
+        public override int GetHashCode() => HashCode.Combine(963929819, Minimum, Maximum, material, shapeInterval);
 
 
 

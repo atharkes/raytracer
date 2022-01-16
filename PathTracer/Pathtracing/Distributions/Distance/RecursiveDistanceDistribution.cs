@@ -13,6 +13,9 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
         /// <summary> The right <see cref="IDistanceDistribution"/> </summary>
         public IDistanceDistribution Right { get; }
 
+        /// <summary> The interval the <see cref="RecursiveDistanceDistribution"/> covers </summary>
+        public IInterval Interval { get; }
+
         /// <summary> The minimum <see cref="Position1"/> in the domain of the <see cref="IRecursiveDistanceDistribution{T}"/> </summary>
         public Position1 Minimum => Utils.Min(Left.Minimum, Right.Minimum);
         /// <summary> The maximum <see cref="Position1"/> in the domain of the <see cref="IRecursiveDistanceDistribution{T}"/> </summary>

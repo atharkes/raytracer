@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace PathTracer.Pathtracing.Distributions.Boundaries {
     /// <summary> A collection of <see cref="IInterval"/>s </summary>
-    public interface IIntervalCollection : IInterval, ICollection<IInterval>, IEnumerable<IInterval> {
+    public interface IIntervalCollection : IInterval, ICollection<IInterval> {
         /// <summary> The <see cref="IInterval"/>s in the <see cref="IIntervalCollection"/> </summary>
         ICollection<IInterval> Intervals { get; }
 

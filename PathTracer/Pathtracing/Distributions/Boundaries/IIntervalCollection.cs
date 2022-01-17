@@ -9,14 +9,13 @@ namespace PathTracer.Pathtracing.Distributions.Boundaries {
     public interface IIntervalCollection : IInterval, ICollection<IInterval> {
         /// <summary> The <see cref="IInterval"/>s in the <see cref="IIntervalCollection"/> </summary>
         ICollection<IInterval> Intervals { get; }
+        /// <summary> The covered area by the <see cref="IIntervalCollection"/> </summary>
+        float CoveredArea => throw new NotImplementedException("Necessary when perfect importance sampling is not possible.");
 
         /// <summary> The first entry of the <see cref="IIntervalCollection"/> </summary>
         Position1 IInterval<Position1>.Entry => Intervals.Min(i => i.Entry);
         /// <summary> The alst exit of the <see cref="IIntervalCollection"/> </summary>
         Position1 IInterval<Position1>.Exit => Intervals.Max(i => i.Exit);
-        /// <summary> The covered area by the <see cref="IIntervalCollection"/> </summary>
-        float CoveredArea => throw new NotImplementedException("Necessary when perfect importance sampling is not possible.");
-
         /// <summary> Whether the <see cref="IIntervalCollection"/> is volumetric </summary>
         bool IInterval<Position1>.Volumetric => Intervals.Any(i => i.Volumetric);
         /// <summary> Whether the <see cref="IIntervalCollection"/> is planar </summary>

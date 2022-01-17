@@ -3,6 +3,7 @@
 namespace PathTracer.Pathtracing.Distributions.Boundaries {
     /// <summary> A collection of <see cref="IInterval"/>s </summary>
     public class IntervalCollection : IIntervalCollection {
+        /// <summary> The <see cref="ICollection{T}"/> of <see cref="IInterval"/>s </summary>
         public ICollection<IInterval> Intervals => intervals;
         
         readonly SortedSet<IInterval> intervals;

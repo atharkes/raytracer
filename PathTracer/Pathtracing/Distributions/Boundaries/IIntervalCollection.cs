@@ -1,5 +1,4 @@
 ﻿using PathTracer.Geometry.Positions;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,8 +8,11 @@ namespace PathTracer.Pathtracing.Distributions.Boundaries {
     public interface IIntervalCollection : IInterval, ICollection<IInterval> {
         /// <summary> The <see cref="IInterval"/>s in the <see cref="IIntervalCollection"/> </summary>
         ICollection<IInterval> Intervals { get; }
-        /// <summary> The covered area by the <see cref="IIntervalCollection"/> </summary>
-        float CoveredArea => throw new NotImplementedException("Necessary when perfect importance sampling is not possible.");
+
+        /// <summary> The amount of items in the <see cref="IIntervalCollection"/> </summary>
+        int ICollection<IInterval>.Count => Intervals.Count;
+        /// <summary> Whether the <see cref="IIntervalCollection"/> is Read-Only </summary>
+        bool ICollection<IInterval>.IsReadOnly => Intervals.IsReadOnly;
 
         /// <summary> The first entry of the <see cref="IIntervalCollection"/> </summary>
         Position1 IInterval<Position1>.Entry => Intervals.Min(i => i.Entry);
@@ -20,11 +22,29 @@ namespace PathTracer.Pathtracing.Distributions.Boundaries {
         bool IInterval<Position1>.Volumetric => Intervals.Any(i => i.Volumetric);
         /// <summary> Whether the <see cref="IIntervalCollection"/> is planar </summary>
         bool IInterval<Position1>.Planar => Intervals.All(i => i.Planar);
-
-        /// <summary> The amount of items in the <see cref="IIntervalCollection"/> </summary>
-        int ICollection<IInterval>.Count => Intervals.Count;
-        /// <summary> Whether the <see cref="IIntervalCollection"/> is Read-Only </summary>
-        bool ICollection<IInterval>.IsReadOnly => Intervals.IsReadOnly;
+        /// <summary> The area covered by the <see cref="IIntervalCollection"/> </summary>
+        float IInterval.CoveredArea {
+            get {
+                List<(float position, int change)> changes = new(Count * 2);
+                foreach (IInterval interval in Intervals) {
+                    changes.Add((interval.Entry, +1));
+                    changes.Add((interval.Exit, -1));
+                }
+                var orderedChanges = changes.OrderBy(c => c.position).ThenBy(c => c.change);
+                int inside = 0;
+                float previous = 0;
+                float area = 0;
+                foreach ((float position, int change) in orderedChanges) {
+                    float current = position;
+                    if (inside > 0) {
+                        area += current - previous;
+                    }
+                    inside += change;
+                    previous = current;
+                }
+                return area;
+            }
+        }
 
         /// <summary> Add two <see cref="IBoundaryCollection"/>s together </summary>
         /// <param name="left">The left <see cref="IBoundaryCollection"/></param>

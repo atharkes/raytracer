@@ -14,14 +14,13 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials.Profiles.Density {
             Density = density;
         }
 
-        public IRay CreateRay(Position3 position, Normal3 orientation, Normal3 direction) {
+        public IRay GetRay(Position3 position, Normal3 orientation, Normal3 direction) {
             return new Ray(position, direction);
         }
 
         public IDistanceDistribution? GetDistances(IRay ray, ISpectrum spectrum, IInterval interval) {
             if (interval.Exit > 0 && interval.Entry < ray.Length) {
-                throw new NotImplementedException("Reference to material has to be handled in the material");
-                //return new ExponentialInterval(Math.Max(0, interval.Entry), Math.Min(ray.Length, interval.Exit), Density, this, interval);
+                return new ExponentialInterval(new Interval(Math.Max(0, interval.Entry), Math.Min(ray.Length, interval.Exit)), Density);
             } else {
                 return null;
             }

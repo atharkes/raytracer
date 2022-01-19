@@ -6,13 +6,9 @@ using System;
 
 namespace PathTracer.Pathtracing.Distributions.Direction {
     public struct SphericalUniform : IDirectionDistribution, IEquatable<SphericalUniform> {
-        public Normal3 Orientation { get; }
+        public Normal3 Orientation => Normal3.UnitY;
         public bool ContainsDelta => false;
         public double DomainSize => 4 * Math.PI;
-
-        public SphericalUniform(Normal3 orientation) {
-            Orientation = orientation;
-        }
 
         public bool Contains(Normal3 sample) => true;
 
@@ -25,8 +21,8 @@ namespace PathTracer.Pathtracing.Distributions.Direction {
 
         public override bool Equals(object? obj) => obj is SphericalUniform su && Equals(su);
         public bool Equals(IProbabilityDistribution<Normal3>? other) => other is SphericalUniform su && Equals(su);
-        public bool Equals(SphericalUniform other) => Orientation.Equals(other.Orientation);
-        public override int GetHashCode() => HashCode.Combine(303068573, Orientation);
+        public bool Equals(SphericalUniform other) => true;
+        public override int GetHashCode() => HashCode.Combine(303068573);
 
         public static bool operator ==(SphericalUniform left, SphericalUniform right) => left.Equals(right);
         public static bool operator !=(SphericalUniform left, SphericalUniform right) => !(left == right);

@@ -3,11 +3,15 @@ using PathTracer.Geometry.Positions;
 using PathTracer.Pathtracing.Distributions.Boundaries;
 using PathTracer.Pathtracing.Distributions.Distance;
 using PathTracer.Pathtracing.Rays;
+using PathTracer.Pathtracing.SceneDescription.Materials.Profiles.Density;
 using PathTracer.Pathtracing.Spectra;
 
 namespace PathTracer.Pathtracing.SceneDescription.Materials.Profiles {
     /// <summary> The density profile of an <see cref="IMaterial"/> </summary>
     public interface IDensityProfile {
+        public static readonly IDensityProfile Surface = new Delta();
+        public static IDensityProfile Volumetric(float density) => new Uniform(density);
+
         /// <summary> Get the <see cref="IDistanceDistribution"/> along the specified <paramref name="ray"/> </summary>
         /// <param name="ray">The <see cref="IRay"/> through the <see cref="IDensityProfile"/></param>
         /// <param name="spectrum">The <see cref="ISpectrum"/> of the <paramref name="ray"/></param>
@@ -27,6 +31,6 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials.Profiles {
         /// <param name="orientation">The <see cref="IMaterial"/>s orientation at the specified <paramref name="position"/></param>
         /// <param name="direction">The outgoing direction of the <see cref="IRay"/></param>
         /// <returns>An <see cref="IRay"/> from the <paramref name="position"/> with the specified <paramref name="direction"/></returns>
-        IRay CreateRay(Position3 position, Normal3 orientation, Normal3 direction);
+        IRay GetRay(Position3 position, Normal3 orientation, Normal3 direction);
     }
 }

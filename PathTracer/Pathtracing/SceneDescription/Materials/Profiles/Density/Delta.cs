@@ -4,7 +4,6 @@ using PathTracer.Pathtracing.Distributions.Boundaries;
 using PathTracer.Pathtracing.Distributions.Distance;
 using PathTracer.Pathtracing.Rays;
 using PathTracer.Pathtracing.Spectra;
-using System;
 
 namespace PathTracer.Pathtracing.SceneDescription.Materials.Profiles.Density {
     public class Delta : IDensityProfile {
@@ -14,13 +13,12 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials.Profiles.Density {
         /// </summary>
         public const float RaiseEpsilon = 0.00001f;
 
-        public IRay CreateRay(Position3 position, Normal3 orientation, Normal3 direction) {
+        public IRay GetRay(Position3 position, Normal3 orientation, Normal3 direction) {
             return new Ray(position + orientation * RaiseEpsilon, direction);
         }
 
         public IDistanceDistribution? GetDistances(IRay ray, ISpectrum spectrum, IInterval interval) {
-            throw new NotImplementedException("Reference to material has to be handled in the material");
-            //return ray.WithinBounds(interval.Entry) ? new DeltaDistance(interval.Entry, this, interval) : null;
+            return ray.WithinBounds(interval.Entry) ? new DeltaDistance(interval.Entry) : null;
         }
 
         public Position3 GetPosition(IRay ray, Position1 distance, IShape shape) {

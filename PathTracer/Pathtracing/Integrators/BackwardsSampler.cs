@@ -1,15 +1,11 @@
 ﻿using PathTracer.Geometry.Directions;
 using PathTracer.Geometry.Normals;
 using PathTracer.Geometry.Positions;
-using PathTracer.Pathtracing.Distributions.Boundaries;
-using PathTracer.Pathtracing.Distributions.Distance;
 using PathTracer.Pathtracing.Distributions.DistanceQuery;
 using PathTracer.Pathtracing.Distributions.Probabilities;
 using PathTracer.Pathtracing.Observers;
 using PathTracer.Pathtracing.Observers.Cameras;
 using PathTracer.Pathtracing.Rays;
-using PathTracer.Pathtracing.SceneDescription;
-using PathTracer.Pathtracing.SceneDescription.Materials.SurfaceMaterials;
 using PathTracer.Pathtracing.SceneDescription.SceneObjects;
 using PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates;
 using PathTracer.Pathtracing.Spectra;
@@ -80,36 +76,38 @@ namespace PathTracer.Pathtracing.Integrators {
             IPrimitive primitive = primitives.Sample(Utils.ThreadRandom);
 
             /// Get Intersection Position
-            Position3 position = primitive.Material.GetPosition(ray, interval, distance);
+            Position3 position = primitive.Material.DensityProfile.GetPosition(ray, distance, primitive.Shape);
 
             /// Sample Material Orientation
-            IProbabilityDistribution<Normal3>? orientations = primitive.Material.GetOrientationDistribution(ray, primitive.Shape, position);
+            IProbabilityDistribution<Normal3>? orientations = primitive.Material.OrientationProfile.GetOrientations(position, ray.Direction, primitive.Shape);
             if (orientations is null) return ISpectrum.Black;
             Normal3 orientation = orientations.Sample(Utils.ThreadRandom);
 
             /// Get Direct Illumination
             ISpectrum directIllumination = RGBSpectrum.Black;
-            if (primitive.Material is ISurfaceEmitter emitter) {
-                directIllumination = emitter.Emittance(position, orientation, -ray.Direction);
+            if (primitive.Material.EmittanceProfile.IsEmitting) {
+                directIllumination = primitive.Material.EmittanceProfile.GetEmittance(position, orientation, -ray.Direction);
             }
 
             /// Get Indirect Illumination
-            ISpectrum albedo = primitive.Material.Albedo;
             ISpectrum indirectIllumination = RGBSpectrum.Black;
-            if (!albedo.IsBlack) {
+            if (!primitive.Material.AbsorptionProfile.IsBlackBody) {
                 /// Sample Direction
-                IProbabilityDistribution<Normal3> directions = primitive.Material.DirectionDistribution(ray.Direction, position, orientation, spectrum);
+                IProbabilityDistribution<Normal3> directions = primitive.Material.ReflectionProfile.GetDirections(ray.Direction, position, orientation, spectrum);
                 Normal3 direction = directions.Sample(Utils.ThreadRandom);
 
+                /// Get Albedo
+                ISpectrum albedo = primitive.Material.AbsorptionProfile.GetAlbedo(position, orientation, -direction);
+
                 /// Get Ray
-                IRay raySample = primitive.Material.CreateRay(position, orientation, direction);
+                IRay raySample = primitive.Material.DensityProfile.GetRay(position, orientation, direction);
 
                 /// Sample Indirect Illumination
-                indirectIllumination = Sample(scene, raySample, spectrum * albedo, recursionDepth + 1);
+                indirectIllumination = albedo * Sample(scene, raySample, spectrum * albedo, recursionDepth + 1);
             }
 
             /// Light Throughput Calculation
-            return (indirectIllumination * albedo + directIllumination) * throughput;
+            return (directIllumination + indirectIllumination) * throughput;
         }
     }
 }

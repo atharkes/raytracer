@@ -3,12 +3,14 @@ using PathTracer.Geometry.Normals;
 using PathTracer.Geometry.Positions;
 using PathTracer.Pathtracing.Distributions.Boundaries;
 using PathTracer.Pathtracing.Distributions.Distance;
+using PathTracer.Pathtracing.Distributions.DistanceQuery;
 using PathTracer.Pathtracing.Distributions.Probabilities;
 using PathTracer.Pathtracing.Observers;
 using PathTracer.Pathtracing.Observers.Cameras;
 using PathTracer.Pathtracing.Rays;
 using PathTracer.Pathtracing.SceneDescription;
 using PathTracer.Pathtracing.SceneDescription.Materials.SurfaceMaterials;
+using PathTracer.Pathtracing.SceneDescription.SceneObjects;
 using PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates;
 using PathTracer.Pathtracing.Spectra;
 using PathTracer.Utilities;
@@ -67,45 +69,40 @@ namespace PathTracer.Pathtracing.Integrators {
             }
 
             /// Sample Distance
-            IDistanceDistribution? distances = scene.Trace(ray, spectrum);
-            if (distances is null) return ISpectrum.Black;
-            Position1 distance = distances.Sample(Utils.ThreadRandom);
+            IDistanceQuery? distanceQuery = scene.Trace(ray, spectrum);
+            if (distanceQuery is null) return ISpectrum.Black;
+            Position1 distance = distanceQuery.DistanceDistribution.Sample(Utils.ThreadRandom);
             if (distance == Position1.PositiveInfinity) return ISpectrum.Black;
 
-            /// Sample Material
-            IProbabilityDistribution<IMaterial>? materials = distances.TryGetMaterials(distance);
-            if (materials is null) throw new InvalidOperationException("Distance was sampled but no material was found");
-            IMaterial material = materials.Sample(Utils.ThreadRandom);
-
-            /// Sample Shape Interval
-            IProbabilityDistribution<IShapeInterval>? intervals = distances.TryGetShapeIntervals(distance, material);
-            if (intervals is null) throw new InvalidOperationException("Distance was sampled but no shape interval was found");
-            IShapeInterval interval = intervals.Sample(Utils.ThreadRandom);
+            /// Sample Primitive
+            IProbabilityDistribution<IPrimitive>? primitives = distanceQuery.TryGetPrimitives(distance);
+            if (primitives is null) throw new InvalidOperationException("Distance was sampled but no primitive was found");
+            IPrimitive primitive = primitives.Sample(Utils.ThreadRandom);
 
             /// Get Intersection Position
-            Position3 position = material.GetPosition(ray, interval, distance);
+            Position3 position = primitive.Material.GetPosition(ray, interval, distance);
 
             /// Sample Material Orientation
-            IProbabilityDistribution<Normal3>? orientations = material.GetOrientationDistribution(ray, interval.Shape, position);
+            IProbabilityDistribution<Normal3>? orientations = primitive.Material.GetOrientationDistribution(ray, primitive.Shape, position);
             if (orientations is null) return ISpectrum.Black;
             Normal3 orientation = orientations.Sample(Utils.ThreadRandom);
 
             /// Get Direct Illumination
             ISpectrum directIllumination = RGBSpectrum.Black;
-            if (material is ISurfaceEmitter emitter) {
+            if (primitive.Material is ISurfaceEmitter emitter) {
                 directIllumination = emitter.Emittance(position, orientation, -ray.Direction);
             }
 
             /// Get Indirect Illumination
-            ISpectrum albedo = material.Albedo;
+            ISpectrum albedo = primitive.Material.Albedo;
             ISpectrum indirectIllumination = RGBSpectrum.Black;
             if (!albedo.IsBlack) {
                 /// Sample Direction
-                IProbabilityDistribution<Normal3> directions = material.DirectionDistribution(ray.Direction, position, orientation, spectrum);
+                IProbabilityDistribution<Normal3> directions = primitive.Material.DirectionDistribution(ray.Direction, position, orientation, spectrum);
                 Normal3 direction = directions.Sample(Utils.ThreadRandom);
 
                 /// Get Ray
-                IRay raySample = material.CreateRay(position, orientation, direction);
+                IRay raySample = primitive.Material.CreateRay(position, orientation, direction);
 
                 /// Sample Indirect Illumination
                 indirectIllumination = Sample(scene, raySample, spectrum * albedo, recursionDepth + 1);

@@ -23,9 +23,4 @@
     </None>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Pathtracing\SceneDescription\Materials\Profiles\Absorption\" />
-    <Folder Include="Pathtracing\SceneDescription\Materials\Profiles\Emittance\" />
-  </ItemGroup>
-
 </Project>

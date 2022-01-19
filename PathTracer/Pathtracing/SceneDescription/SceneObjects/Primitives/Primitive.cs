@@ -1,5 +1,6 @@
 ﻿using PathTracer.Pathtracing.Distributions.Boundaries;
 using PathTracer.Pathtracing.Distributions.Distance;
+using PathTracer.Pathtracing.Distributions.DistanceQuery;
 using PathTracer.Pathtracing.Rays;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Planars;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics;
@@ -35,7 +36,7 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Primitives {
         /// <param name="ray">The <see cref="IRay"/> to intersect the <see cref="Primitive"/> with</param>
         /// <param name="spectrum">The <see cref="ISpectrum"/> of the <paramref name="ray"/></param>
         /// <returns>The distance and material pdfs</returns>
-        public IDistanceDistribution? Trace(IRay ray, ISpectrum spectrum) {
+        public IDistanceQuery? Trace(IRay ray, ISpectrum spectrum) {
             IBoundaryCollection? boundary = Shape.Intersect(ray);
             if (boundary is null) {
                 return null;
@@ -47,12 +48,12 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Primitives {
             // has to be moved to, and specified by the material itself.
             IDistanceDistribution? result = null;
             foreach (ShapeInterval interval in boundary) {
-                IDistanceDistribution? distanceDistribution = Material.DistanceDistribution(ray, spectrum, interval);
+                IDistanceDistribution? distanceDistribution = Material.DensityProfile.GetDistances(ray, spectrum, interval);
                 if (distanceDistribution is not null) {
                     result += distanceDistribution;
                 }
             }
-            return result;
+            return result is not null ? new DistanceQuery(result, this) : null;
         }
 
         public virtual IEnumerable<ISceneObject> Clip(AxisAlignedPlane plane) {

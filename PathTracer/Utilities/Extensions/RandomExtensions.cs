@@ -1,7 +1,6 @@
 ﻿using PathTracer.Geometry.Normals;
 using PathTracer.Geometry.Vectors;
 using PathTracer.Pathtracing.SceneDescription;
-using PathTracer.Pathtracing.SceneDescription.Materials.SurfaceMaterials;
 using PathTracer.Pathtracing.SceneDescription.SceneObjects;
 using PathTracer.Pathtracing.SceneDescription.SceneObjects.Primitives;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Planars;
@@ -116,20 +115,20 @@ namespace PathTracer.Utilities.Extensions {
         /// <param name="random">The <see cref="Random"/> to create the non emitter</param>
         /// <returns>A <paramref name="random"/> non-emitting <see cref="IMaterial"/></returns>
         public static IMaterial RandomNonEmitter(this Random random) {
-            ISpectrum color = new RGBSpectrum(random.Vector());
+            RGBSpectrum color = new(random.Vector());
             float specularity = random.NextDouble() < 0.3f ? (float)random.NextDouble() : 0;
             float roughness = random.NextDouble() < 0.5f ? (float)random.NextDouble() : 0;
             //float dielectric = random.NextDouble() < 0.1f ? (float)random.NextDouble() : 0;
             //float refractionIndex = (float)random.NextDouble() * 2f + 1f;
-            return new ParametricMaterial(color, specularity, roughness);
+            return Pathtracing.SceneDescription.Materials.Material.RoughSpecularDiffuseBlend(color, specularity, roughness);
         }
 
         /// <summary> Create a random emitting <see cref="IMaterial"/> </summary>
         /// <param name="random">The <see cref="Random"/> to create the emitter</param>
         /// <returns>A <paramref name="random"/> emitting <see cref="IMaterial"/></returns>
         public static IMaterial RandomEmitter(this Random random) {
-            ISpectrum color = new RGBSpectrum(random.Vector());
-            return new SurfaceEmitter(color, random.Next(1, 50));
+            RGBSpectrum color = new(random.Vector());
+            return Pathtracing.SceneDescription.Materials.Material.Emitter(color);
         }
     }
 }

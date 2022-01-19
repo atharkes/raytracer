@@ -75,8 +75,8 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates.Accele
                 SpatialBin right = new(clipPlaneCreator, binSize * i, binEnd);
                 // Populate Split
                 foreach (ISceneObject primitive in Items) {
-                    int binID1 = (int)(k1 * (axis(primitive.BoundingBox.MinCorner.Vector) - axis(BoundingBox.MinCorner.Vector)));
-                    int binID2 = (int)(k1 * (axis(primitive.BoundingBox.MaxCorner.Vector) - axis(BoundingBox.MinCorner.Vector)));
+                    int binID1 = (int)(k1 * (axis(primitive.Shape.BoundingBox.MinCorner.Vector) - axis(BoundingBox.MinCorner.Vector)));
+                    int binID2 = (int)(k1 * (axis(primitive.Shape.BoundingBox.MaxCorner.Vector) - axis(BoundingBox.MinCorner.Vector)));
                     if (binID1 < i && binID2 < i) left.Aggregate.Add(primitive);
                     else if (binID1 > i && binID2 > i) right.Aggregate.Add(primitive);
                     else {

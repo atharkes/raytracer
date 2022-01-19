@@ -53,6 +53,14 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials {
                        IEmittanceProfile.None);
         }
 
+        public static Material RoughSpecularDiffuseBlend(RGBSpectrum albedo, float specularity, float roughness) {
+            return new(IDensityProfile.Surface,
+                       IAbsorptionProfile.Uniform(albedo),
+                       IOrientationProfile.SurfaceGGX(roughness),
+                       IReflectionProfile.Blend((IReflectionProfile.Diffuse, 1f - specularity), (IReflectionProfile.Specular, specularity)),
+                       IEmittanceProfile.None);
+        }
+
         public static Material Glossy(RGBSpectrum albedo, float roughness) {
             return new(IDensityProfile.Surface,
                        IAbsorptionProfile.Uniform(albedo),

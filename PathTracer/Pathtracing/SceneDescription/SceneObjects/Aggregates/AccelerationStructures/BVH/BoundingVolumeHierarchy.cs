@@ -78,9 +78,9 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates.Accele
         /// <returns>The best split for every axis</returns>
         Split? BestSweepSplit() {
             List<Split?> splits = new() {
-                BestLinearSplitAfterSort(Normal3.UnitX, p => p.BoundingBox.Center.X),
-                BestLinearSplitAfterSort(Normal3.UnitY, p => p.BoundingBox.Center.Y),
-                BestLinearSplitAfterSort(Normal3.UnitZ, p => p.BoundingBox.Center.Z)
+                BestLinearSplitAfterSort(Normal3.UnitX, p => p.Shape.BoundingBox.Center.X),
+                BestLinearSplitAfterSort(Normal3.UnitY, p => p.Shape.BoundingBox.Center.Y),
+                BestLinearSplitAfterSort(Normal3.UnitZ, p => p.Shape.BoundingBox.Center.Z)
             };
             splits.RemoveAll(s => s == null);
             return splits.OrderBy(s => s?.SurfaceAreaHeuristic).FirstOrDefault();
@@ -123,7 +123,7 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates.Accele
                 Aggregate right = new();
                 // Populate Split
                 foreach (ISceneObject primitive in Items) {
-                    int binID = (int)(k1 * (axis(primitive.BoundingBox.Center.Vector) - axis(BoundingBox.MinCorner.Vector)));
+                    int binID = (int)(k1 * (axis(primitive.Shape.BoundingBox.Center.Vector) - axis(BoundingBox.MinCorner.Vector)));
                     if (binID < i) left.Add(primitive);
                     else right.Add(primitive);
                 }

@@ -58,14 +58,19 @@ namespace PathTracer.Pathtracing.Distributions.Boundaries {
         /// <param name="other">The other <see cref="IInterval"/></param>
         /// <returns>Whether the <paramref name="other"/> is the same</returns>
         bool IEquatable<IInterval>.Equals(IInterval? other) {
-            return Entry.Equals(other?.Entry) && Exit.Equals(other?.Exit);
+            return other is not null && Entry.Equals(other.Entry) && Exit.Equals(other.Exit);
         }
 
         /// <summary> Compare the <see cref="IInterval"/> to an <paramref name="other"/>"/> </summary>
         /// <param name="other">The other <see cref="IInterval"/></param>
         /// <returns>A comparison between the two <see cref="IInterval"/>s</returns>
         int IComparable<IInterval>.CompareTo(IInterval? other) {
-            return (Entry.CompareTo(other?.Entry) == 0) ? Exit.CompareTo(other?.Exit) : Entry.CompareTo(other?.Entry);
+            if (other is null) {
+                return 1;
+            } else {
+                int entryComparsion = Entry.CompareTo(other.Entry);
+                return entryComparsion != 0 ? entryComparsion : Exit.CompareTo(other.Exit);
+            }
         }
     }
 }

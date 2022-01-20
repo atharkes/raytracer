@@ -85,10 +85,26 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials {
                        IEmittanceProfile.None);
         }
 
+        public static Material DiffuseParticleCloud(RGBSpectrum albedo, float density, float roughness) {
+            return new(IDensityProfile.Volumetric(density),
+                       IAbsorptionProfile.Uniform(albedo),
+                       IOrientationProfile.SurfaceSGGX(roughness),
+                       IReflectionProfile.Diffuse,
+                       IEmittanceProfile.None);
+        }
+
         public static Material SpecularParticleCloud(RGBSpectrum albedo, float density) {
             return new(IDensityProfile.Volumetric(density),
                        IAbsorptionProfile.Uniform(albedo),
                        IOrientationProfile.Uniform,
+                       IReflectionProfile.Specular,
+                       IEmittanceProfile.None);
+        }
+
+        public static Material SpecularParticleCloud(RGBSpectrum albedo, float density, float roughness) {
+            return new(IDensityProfile.Volumetric(density),
+                       IAbsorptionProfile.Uniform(albedo),
+                       IOrientationProfile.SurfaceSGGX(roughness),
                        IReflectionProfile.Specular,
                        IEmittanceProfile.None);
         }

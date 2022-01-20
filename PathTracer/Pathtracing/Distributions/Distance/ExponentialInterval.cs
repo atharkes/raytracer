@@ -23,34 +23,16 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
         }
 
         public double ProbabilityDensity(Position1 sample) {
-            if (sample == Position1.PositiveInfinity) {
-                return 1 - distribution.CumulativeDistribution(Domain.CoveredArea);
-            } else if (Domain.Includes(sample)) {
-                return distribution.Density(sample - Domain.Entry);
-            } else {
-                return 0;
-            }
+            return Domain.Includes(sample) ? distribution.Density(sample - Domain.Entry) : 0;
         }
 
-        double IProbabilityDistribution<Position1>.RelativeProbability(Position1 sample) {
-            if (sample == Position1.PositiveInfinity) {
-                return ProbabilityDensity(sample) * 2;
-            } else if (Domain.Includes(sample)) {
-                return ProbabilityDensity(sample) * 2 * Domain.CoveredArea;
-            } else {
-                return 0;
-            }
-        }
-
-        public double CumulativeProbabilityDensity(Position1 distance) {
+        public double CumulativeProbability(Position1 distance) {
             if (distance < Domain.Entry) {
                 return 0;
             } else if (distance < Domain.Exit) {
                 return distribution.CumulativeDistribution(distance - Domain.Entry);
-            } else if (distance < double.PositiveInfinity) {
-                return distribution.CumulativeDistribution(Domain.CoveredArea);
             } else {
-                return 1;
+                return distribution.CumulativeDistribution(Domain.CoveredArea);
             }
         }
 

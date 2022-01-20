@@ -37,7 +37,7 @@ namespace PathTracer.Pathtracing.Distributions.DistanceQuery {
             }
             IDistanceQuery first = left.DistanceDistribution.Domain.Entry < right.DistanceDistribution.Domain.Entry ? left : right;
             IDistanceQuery last = first == left ? right : left;
-            if (first.DistanceDistribution.CumulativeProbabilityDensity(last.DistanceDistribution.Domain.Entry) >= 1) {
+            if (first.DistanceDistribution.CumulativeProbability(last.DistanceDistribution.Domain.Entry) >= 1) {
                 return first;
             } else {
                 return new CombinedDistanceQuery(first, last);

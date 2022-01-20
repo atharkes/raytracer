@@ -19,7 +19,7 @@ namespace PathTracer.Pathtracing.Distributions.Probabilities {
 
         public WeightedPMF(params (T Item, double Weight)[] pairs) {
             totalWeight = pairs.Sum(i => i.Weight);
-            Debug.Assert(double.IsNormal(totalWeight));
+            Debug.Assert(totalWeight > 0 && double.IsFinite(totalWeight));
             for (int i = 0; i< pairs.Length; i++) {
                 (T item, double weight) = pairs[i];
                 if (items.Contains(item)) {
@@ -41,7 +41,7 @@ namespace PathTracer.Pathtracing.Distributions.Probabilities {
 
         public WeightedPMF(params (WeightedPMF<T> PMF, double Weight)[] weightedPmfs) {
             totalWeight = weightedPmfs.Sum(p => p.PMF.totalWeight * p.Weight);
-            Debug.Assert(double.IsNormal(totalWeight));
+            Debug.Assert(totalWeight > 0 && double.IsFinite(totalWeight));
             foreach ((WeightedPMF<T> pmf, double pmfWeight) in weightedPmfs) {
                 foreach ((T item, double weight) in pmf.weights) {
                     if (items.Contains(item)) {

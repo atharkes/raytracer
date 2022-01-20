@@ -9,7 +9,7 @@ using PathTracer.Pathtracing.Spectra;
 namespace PathTracer.Pathtracing.SceneDescription.Materials.Profiles {
     /// <summary> The density profile of an <see cref="IMaterial"/> </summary>
     public interface IDensityProfile {
-        public static readonly IDensityProfile Surface = new Delta();
+        public static readonly IDensityProfile Surface = new Exponential();
         public static IDensityProfile Volumetric(float density) => new Uniform(density);
 
         /// <summary> Get the <see cref="IDistanceDistribution"/> along the specified <paramref name="ray"/> </summary>

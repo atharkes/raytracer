@@ -27,23 +27,23 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
 
         public double ProbabilityDensity(Position1 sample) {
             double probabilityDensity = 0;
-            double cdf = CumulativeProbabilityDensity(sample);
-            var contains = distributions.TakeWhile(d => !d.Before(sample));
+            double cdf = CumulativeProbability(sample);
+            var contains = distributions.TakeWhile(d => d.Domain.Entry <= sample);
             foreach (var d in contains) {
-                double localCdf = d.CumulativeProbabilityDensity(sample);
+                double localCdf = d.CumulativeProbability(sample);
                 double beforeCdf = (localCdf - cdf) / (localCdf - 1);
                 probabilityDensity += d.Probability(sample) * beforeCdf;
             }
             return probabilityDensity;
         }
 
-        public double CumulativeProbabilityDensity(Position1 sample) {
-            var relevant = distributions.TakeWhile(d => !d.Before(sample));
-            double inverseCdf = 1;
+        public double CumulativeProbability(Position1 sample) {
+            var relevant = distributions.TakeWhile(d => d.Domain.Entry <= sample);
+            double inverseCdf = 1d;
             foreach (var d in relevant) {
-                inverseCdf *= (1 - d.CumulativeProbabilityDensity(sample));
+                inverseCdf *= (1d - d.CumulativeProbability(sample));
             }
-            return 1 - inverseCdf;
+            return 1d - inverseCdf;
         }
 
         public Position1 Sample(Random random) {
@@ -60,8 +60,6 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
             }
             return smallestSample;
         }
-
-        public bool Contains(Position1 sample) => distributions.Any(d => d.Contains(sample));
 
         public override bool Equals(object? obj) => obj is CombinedDistanceDistribution cdd && Equals(cdd);
         public bool Equals(IProbabilityDistribution<Position1>? other) => other is CombinedDistanceDistribution cdd && Equals(cdd);

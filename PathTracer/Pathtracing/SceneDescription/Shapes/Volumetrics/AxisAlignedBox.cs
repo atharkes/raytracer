@@ -5,6 +5,7 @@ using PathTracer.Pathtracing.Rays;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Planars;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics {
     /// <summary> An axis aligned box primitive </summary>
@@ -46,6 +47,10 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics {
             }
             Bounds = new Position3[] { minCorner, maxCorner };
         }
+
+        /// <summary> Create an <see cref="AxisAlignedBox"/> from <paramref name="boxes"/> </summary>
+        /// <param name="boxes">The <see cref="AxisAlignedBox"/>s to create an <see cref="AxisAlignedBox"/> for</param>
+        public AxisAlignedBox(params AxisAlignedBox[] boxes) : this(boxes.SelectMany(b => b.Bounds).ToArray()) { } 
 
         /// <summary> Check whether <paramref name="left"/> equals <paramref name="right"/> </summary>
         /// <param name="left">The left <see cref="AxisAlignedBox"/></param>

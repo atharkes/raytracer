@@ -1,21 +1,19 @@
-﻿using PathTracer.Geometry.Positions;
-using PathTracer.Pathtracing.Distributions.DistanceQuery;
+﻿using PathTracer.Pathtracing.Distributions.DistanceQuery;
 using PathTracer.Pathtracing.Rays;
+using PathTracer.Pathtracing.SceneDescription.Shapes;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Planars;
-using PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics;
 using PathTracer.Pathtracing.Spectra;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates {
     /// <summary> Simple container <see cref="ISceneObject"/> holding multiple <see cref="ISceneObject"/>s </summary>
     public class Aggregate : IAggregate {
-        /// <summary> The bounding box of the <see cref="Aggregate"/> </summary>
-        public AxisAlignedBox BoundingBox { get; protected set; } = new(Position3.PositiveInfinity, Position3.NegativeInfinity);
         /// <summary> The amount of children of the <see cref="Aggregate"/> </summary>
         public int ItemCount => Items.Count;
         /// <summary> The <see cref="IShape"/> of the items in this <see cref="Aggregate"/> </summary>
-        public IShape Shape => throw new NotImplementedException();
+        public IShape Shape => new Union(Items.Select(i => i.Shape).ToArray());
 
         /// <summary> The <see cref="ISceneObject"/>s in the <see cref="IAggregate"/> </summary>
         protected ICollection<ISceneObject> Items { get; set; } = new HashSet<ISceneObject>();
@@ -23,17 +21,10 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates {
         public Aggregate() { }
 
         public Aggregate(IEnumerable<ISceneObject> items) {
-            foreach (ISceneObject item in items) {
-                Add(item);
-            }
+            AddRange(items);
         }
 
-        public void Add(ISceneObject item) {
-            Items.Add(item);
-            Position3 minCorner = Position3.ComponentMax(BoundingBox.MinCorner, item.Shape.BoundingBox.MinCorner);
-            Position3 maxCorner = Position3.ComponentMin(BoundingBox.MaxCorner, item.Shape.BoundingBox.MaxCorner);
-            BoundingBox = new(minCorner, maxCorner);
-        }
+        public void Add(ISceneObject item) => Items.Add(item);
 
         public void AddRange(IEnumerable<ISceneObject> items) {
             foreach (ISceneObject item in items) {
@@ -41,16 +32,7 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates {
             }
         }
 
-        public bool Remove(ISceneObject item) {
-            if (Items.Contains(item)) {
-                var temp = Items;
-                temp.Remove(item);
-                Items = new HashSet<ISceneObject>(temp.Count);
-                AddRange(temp);
-                return true;
-            }
-            return false;
-        }
+        public bool Remove(ISceneObject item) => Items.Remove(item);
 
         public IEnumerator<ISceneObject> GetEnumerator() => Items.GetEnumerator();
 
@@ -63,7 +45,7 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates {
         }
 
         public IEnumerable<ISceneObject> Clip(AxisAlignedPlane plane) {
-            throw new NotImplementedException();
+            throw new NotImplementedException("Split items and clip items on the border");
         }
     }
 }

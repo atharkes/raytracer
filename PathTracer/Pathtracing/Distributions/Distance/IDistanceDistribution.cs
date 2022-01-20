@@ -27,7 +27,7 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
             } 
             IDistanceDistribution first = left.Domain.Entry < right.Domain.Entry ? left : right;
             IDistanceDistribution last = first == left ? right : left;
-            if (first.CumulativeProbabilityDensity(last.Domain.Entry) >= 1) {
+            if (first.CumulativeProbability(last.Domain.Entry) >= 1) {
                 return first;
             } else {
                 return new CombinedDistanceDistribution(first, last);

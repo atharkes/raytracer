@@ -17,19 +17,9 @@ namespace PathTracer.Pathtracing.Distributions.Probabilities {
         /// <returns>Whether the <paramref name="sample"/> is in the domain of the <see cref="ICDF{T}"/></returns>
         bool IProbabilityDistribution<T>.Contains(T sample) => Domain.Includes(sample);
 
-        /// <summary> Check whether the <see cref="ICDF{T}"/> is entirely before the <paramref name="sample"/> </summary>
-        /// <param name="sample">The sample to check</param>
-        /// <returns>Whether the <see cref="ICDF{T}"/> is entirely before the <paramref name="sample"/></returns>
-        bool Before(T sample) => Domain.Exit.CompareTo(sample) < 0;
-
-        /// <summary> Check whether the <see cref="ICDF{T}"/> is entirely after the <paramref name="sample"/> </summary>
-        /// <param name="sample">The sample to check</param>
-        /// <returns>Whether the <see cref="ICDF{T}"/> is entirely after the <paramref name="sample"/></returns>
-        bool After(T sample) => Domain.Entry.CompareTo(sample) > 0;
-
         /// <summary> Get the cummulative probability of a <paramref name="sample"/> in the <see cref="ICDF{T}"/> </summary>
         /// <param name="sample">The sample to get the cummulative probability for</param>
         /// <returns>The cummulative probability of the <paramref name="sample"/></returns>
-        double CumulativeProbabilityDensity(T sample);
+        double CumulativeProbability(T sample);
     }
 }

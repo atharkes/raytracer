@@ -13,7 +13,7 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
         public IDistanceDistribution Right { get; }
 
         /// <summary> The interval the <see cref="RecursiveDistanceDistribution"/> covers </summary>
-        IInterval IDistanceDistribution.Domain => new IntervalCollection(Left.Domain, Right.Domain);
+        public IInterval Domain => new IntervalCollection(Left.Domain, Right.Domain);
         /// <summary> Whether the <see cref="IRecursiveDistanceDistribution{T}"/> contains a delta distribution </summary>
         bool IPDF.ContainsDelta => Left.ContainsDelta || Right.ContainsDelta;
 
@@ -46,11 +46,11 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
                 if (pLeft <= 0 && pRight <= 0) {
                     return 0;
                 } else if (pLeft <= 0) {
-                    return (1 - Left.CumulativeProbabilityDensity(sample)) * pRight;
+                    return (1 - Left.CumulativeProbability(sample)) * pRight;
                 } else if (pRight <= 0) {
-                    return (1 - Right.CumulativeProbabilityDensity(sample)) * pLeft;
+                    return (1 - Right.CumulativeProbability(sample)) * pLeft;
                 } else {
-                    return (1 - Left.CumulativeProbabilityDensity(sample)) * pRight + (1 - Right.CumulativeProbabilityDensity(sample)) * pLeft;
+                    return (1 - Left.CumulativeProbability(sample)) * pRight + (1 - Right.CumulativeProbability(sample)) * pLeft;
                 }
             }
         }
@@ -58,12 +58,12 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
         /// <summary> Get the cummulative probability of a <paramref name="sample"/> in the <see cref="RecursiveDistanceDistribution"/> </summary>
         /// <param name="sample">The sample to get the cummulative probability for</param>
         /// <returns>The cummulative probability of the <paramref name="sample"/></returns>
-        public double CumulativeProbabilityDensity(Position1 sample) {
-            if ((this as ICDF<Position1>).After(sample)) {
+        public double CumulativeProbability(Position1 sample) {
+            if (sample < Domain.Entry) {
                 return 0;
             } else {
-                double l = Left.CumulativeProbabilityDensity(sample);
-                double r = Right.CumulativeProbabilityDensity(sample);
+                double l = Left.CumulativeProbability(sample);
+                double r = Right.CumulativeProbability(sample);
                 return l + r - l * r;
             }
         }

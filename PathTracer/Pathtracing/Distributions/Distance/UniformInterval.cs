@@ -1,59 +1,32 @@
 ﻿using PathTracer.Geometry.Positions;
 using PathTracer.Pathtracing.Distributions.Boundaries;
 using PathTracer.Pathtracing.Distributions.Probabilities;
-using PathTracer.Pathtracing.SceneDescription;
 using System;
 
 namespace PathTracer.Pathtracing.Distributions.Distance {
     public struct UniformInterval : IDistanceDistribution {
-        public IMaterial Material { get; }
-        public IShapeInterval Interval { get; }
-        public Position1 Minimum { get; }
-        public Position1 Maximum { get; }
-        public double DomainSize => Maximum - Minimum;
-        public bool ContainsDelta => true;
+        public IInterval Domain { get; }
 
-        public UniformInterval(Position1 start, Position1 end, IMaterial material, IShapeInterval interval) {
-            Minimum = start;
-            Maximum = end;
-            Material = material;
-            Interval = interval;
+        public UniformInterval(IInterval interval) {
+            Domain = interval;
         }
 
         public Position1 Sample(Random random) {
-            return Minimum + (float)(random.NextDouble() * DomainSize);
+            return Domain.Entry + (float)(random.NextDouble() * Domain.CoveredArea);
         }
 
         public double ProbabilityDensity(Position1 sample) {
-            return 1 / DomainSize;
+            return 1d / Domain.CoveredArea;
         }
 
-        public double CumulativeProbabilityDensity(Position1 sample) {
-            if (sample < Minimum) {
-                return 0;
-            } else if (sample < Maximum) {
-                return (sample - Minimum) / DomainSize;
-            } else {
-                return 1;
-            }
+        public double CumulativeProbability(Position1 sample) {
+            return Math.Min(Math.Max(0d, sample - Domain.Entry), Domain.CoveredArea) / Domain.CoveredArea;
         }
-
-        public bool Contains(Position1 sample) => Minimum <= sample && sample <= Maximum;
-
-        public bool Contains(IMaterial material) => material.Equals(Material);
-
-        public bool Contains(IShapeInterval interval) => interval.Equals(Interval);
-
-        public WeightedPMF<IMaterial> GetMaterials(Position1 sample) => new((Material, 1));
-
-        public WeightedPMF<IShapeInterval> GetShapeIntervals(Position1 sample, IMaterial material) => new ((Interval, 1));
 
         public override bool Equals(object? obj) => obj is UniformInterval ud && Equals(ud);
         public bool Equals(IProbabilityDistribution<Position1>? other) => other is UniformInterval ud && Equals(ud);
-        public bool Equals(UniformInterval other) => Minimum.Equals(other.Minimum) && Maximum.Equals(other.Maximum) && Material.Equals(other.Material) && Interval.Equals(other.Interval);
-        public override int GetHashCode() => HashCode.Combine(963929819, Minimum, Maximum, Material, Interval);
-
-
+        public bool Equals(UniformInterval other) => Domain.Equals(other.Domain);
+        public override int GetHashCode() => HashCode.Combine(963929819, Domain);
 
         public static bool operator ==(UniformInterval left, UniformInterval right) => left.Equals(right);
         public static bool operator !=(UniformInterval left, UniformInterval right) => !(left == right);

@@ -65,7 +65,7 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates.Accele
         /// <returns>The best split for this BVH node</returns>
         protected virtual Split? GetSplit() {
             if (Bin && Items.Count > BinAmount) {
-                IDirection3 size = BoundingBox.Size;
+                IDirection3 size = Shape.BoundingBox.Size;
                 if (size.X > size.Y && size.X > size.Z) return BestBinSplit(Normal3.UnitX, v => v.X);
                 else if (size.Y > size.Z) return BestBinSplit(Normal3.UnitY, v => v.Y);
                 else return BestBinSplit(Normal3.UnitZ, v => v.Z);
@@ -78,9 +78,9 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates.Accele
         /// <returns>The best split for every axis</returns>
         Split? BestSweepSplit() {
             List<Split?> splits = new() {
-                BestLinearSplitAfterSort(Normal3.UnitX, p => p.BoundingBox.Center.X),
-                BestLinearSplitAfterSort(Normal3.UnitY, p => p.BoundingBox.Center.Y),
-                BestLinearSplitAfterSort(Normal3.UnitZ, p => p.BoundingBox.Center.Z)
+                BestLinearSplitAfterSort(Normal3.UnitX, p => p.Shape.BoundingBox.Center.X),
+                BestLinearSplitAfterSort(Normal3.UnitY, p => p.Shape.BoundingBox.Center.Y),
+                BestLinearSplitAfterSort(Normal3.UnitZ, p => p.Shape.BoundingBox.Center.Z)
             };
             splits.RemoveAll(s => s == null);
             return splits.OrderBy(s => s?.SurfaceAreaHeuristic).FirstOrDefault();
@@ -93,7 +93,7 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates.Accele
             List<ISceneObject> orderedPrimitives = Items.OrderBy(axisSortingFunc).ToList();
             Split? split = new(sortDirection, new Aggregate(), new Aggregate(orderedPrimitives));
             ISceneObject? bestSplitPrimitive = null;
-            float bestSplitCost = SurfaceAreaHeuristic(Items.Count, BoundingBox.SurfaceArea);
+            float bestSplitCost = SurfaceAreaHeuristic(Items.Count, Shape.BoundingBox.SurfaceArea);
             foreach (ISceneObject primitive in orderedPrimitives) {
                 split.Left.Add(primitive);
                 split.Right.Remove(primitive);
@@ -115,15 +115,15 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates.Accele
         /// <param name="axis">The axis selector</param>
         /// <returns>The best binning split in the specified direction</returns>
         Split? BestBinSplit(Normal3 binningDirection, Func<Vector3, float> axis) {
-            float k1 = BinAmount * BinningEpsilon / axis(BoundingBox.Size.Vector);
-            float bestSplitCost = SurfaceAreaHeuristic(Items.Count, BoundingBox.SurfaceArea);
+            float k1 = BinAmount * BinningEpsilon / axis(Shape.BoundingBox.Size.Vector);
+            float bestSplitCost = SurfaceAreaHeuristic(Items.Count, Shape.BoundingBox.SurfaceArea);
             Split? bestSplit = null;
             for (int i = 1; i < BinAmount; i++) {
                 Aggregate left = new();
                 Aggregate right = new();
                 // Populate Split
                 foreach (ISceneObject primitive in Items) {
-                    int binID = (int)(k1 * (axis(primitive.BoundingBox.Center.Vector) - axis(BoundingBox.MinCorner.Vector)));
+                    int binID = (int)(k1 * (axis(primitive.Shape.BoundingBox.Center.Vector) - axis(Shape.BoundingBox.MinCorner.Vector)));
                     if (binID < i) left.Add(primitive);
                     else right.Add(primitive);
                 }

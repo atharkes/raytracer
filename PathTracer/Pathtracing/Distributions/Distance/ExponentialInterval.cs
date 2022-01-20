@@ -1,86 +1,45 @@
 ﻿using MathNet.Numerics.Distributions;
-using PathTracer.Geometry.Directions;
 using PathTracer.Geometry.Positions;
 using PathTracer.Pathtracing.Distributions.Boundaries;
 using PathTracer.Pathtracing.Distributions.Probabilities;
-using PathTracer.Pathtracing.SceneDescription;
 using System;
 
 namespace PathTracer.Pathtracing.Distributions.Distance {
     public struct ExponentialInterval : IDistanceDistribution, IEquatable<ExponentialInterval> {
+        public IInterval Domain { get; }
         public double Density { get; }
-        public Exponential Distribution { get; }
-        public Position1 Entry { get; }
-        public Position1 Exit { get; }
-        public Direction1 ExponentialSize => Exit - Entry;
-        public IMaterial Material { get; }
-        public IShapeInterval Interval { get; }
 
-        public Position1 Minimum => Entry;
-        public Position1 Maximum => Position1.PositiveInfinity;
-        public double DomainSize => throw new NotImplementedException("Domains is partly continuous and partly discreet");
-        public bool ContainsDelta => true;
+        readonly Exponential distribution;
 
-        public ExponentialInterval(Position1 start, Position1 end, double density, IMaterial material, IShapeInterval interval) {
+        public ExponentialInterval(IInterval interval, double density) {
+            Domain = interval;
             Density = density;
-            Distribution = new Exponential(density);
-            Entry = start;
-            Exit = end;
-            Material = material;
-            Interval = interval;
+            distribution = new Exponential(density);
         }
 
         public Position1 Sample(Random random) {
-            Position1 distance = Entry + (float)Distribution.InverseCumulativeDistribution(random.NextDouble());
-            return distance <= Exit ? distance : Position1.PositiveInfinity;
+            Position1 distance = Domain.Entry + (float)distribution.InverseCumulativeDistribution(random.NextDouble());
+            return distance <= Domain.Exit ? distance : Position1.PositiveInfinity;
         }
 
         public double ProbabilityDensity(Position1 sample) {
-            if (sample == Position1.PositiveInfinity) {
-                return 1 - Distribution.CumulativeDistribution(DomainSize);
-            } else if (Entry <= sample && sample <= Exit) {
-                return Distribution.Density(sample - Entry);
-            } else {
-                return 0;
-            }
+            return Domain.Includes(sample) ? distribution.Density(sample - Domain.Entry) : 0;
         }
 
-        double IProbabilityDistribution<Position1>.RelativeProbability(Position1 sample) {
-            if (sample == Position1.PositiveInfinity) {
-                return ProbabilityDensity(sample) * 2;
-            } else if (Entry <= sample && sample <= Exit) {
-                return ProbabilityDensity(sample) * 2 * ExponentialSize;
-            } else {
+        public double CumulativeProbability(Position1 distance) {
+            if (distance < Domain.Entry) {
                 return 0;
+            } else if (distance < Domain.Exit) {
+                return distribution.CumulativeDistribution(distance - Domain.Entry);
+            } else {
+                return distribution.CumulativeDistribution(Domain.CoveredArea);
             }
         }
-
-        public double CumulativeProbabilityDensity(Position1 distance) {
-            if (distance < Minimum) {
-                return 0;
-            } else if (distance < Exit) {
-                return Distribution.CumulativeDistribution(distance - Entry);
-            } else if (distance < double.PositiveInfinity) {
-                return Distribution.CumulativeDistribution(Exit - Entry);
-            } else {
-                return 1;
-            }
-        }
-
-        public bool Contains(Position1 sample) => (Entry <= sample && sample <= Exit) || sample.Equals(Position1.PositiveInfinity);
-
-        public bool Contains(IMaterial material) => material.Equals(Material);
-
-        public bool Contains(IShapeInterval interval) => interval.Equals(Interval);
-
-        public WeightedPMF<IMaterial> GetMaterials(Position1 sample) => new((Material, 1));
-
-        public WeightedPMF<IShapeInterval> GetShapeIntervals(Position1 sample, IMaterial material) => new((Interval, 1));
 
         public override bool Equals(object? obj) => obj is ExponentialInterval ed && Equals(ed);
         public bool Equals(IProbabilityDistribution<Position1>? other) => other is ExponentialInterval ed && Equals(ed);
-        public bool Equals(ExponentialInterval other) => Density.Equals(other.Density) && Entry.Equals(other.Entry) && Exit.Equals(other.Exit) && Material.Equals(other.Material) && Interval.Equals(other.Interval);
-        public override int GetHashCode() => HashCode.Combine(973102703, Density, Entry, Exit, Material, Interval);
+        public bool Equals(ExponentialInterval other) => Domain.Equals(other.Domain) && Density.Equals(other.Density);
+        public override int GetHashCode() => HashCode.Combine(973102703, Domain, Density);
 
         public static bool operator ==(ExponentialInterval left, ExponentialInterval right) => left.Equals(right);
         public static bool operator !=(ExponentialInterval left, ExponentialInterval right) => !(left == right);

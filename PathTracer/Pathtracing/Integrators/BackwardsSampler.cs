@@ -1,13 +1,12 @@
 ﻿using PathTracer.Geometry.Directions;
 using PathTracer.Geometry.Normals;
 using PathTracer.Geometry.Positions;
-using PathTracer.Pathtracing.Distributions.Boundaries;
-using PathTracer.Pathtracing.Distributions.Distance;
+using PathTracer.Pathtracing.Distributions.DistanceQuery;
 using PathTracer.Pathtracing.Distributions.Probabilities;
 using PathTracer.Pathtracing.Observers;
 using PathTracer.Pathtracing.Observers.Cameras;
 using PathTracer.Pathtracing.Rays;
-using PathTracer.Pathtracing.SceneDescription;
+using PathTracer.Pathtracing.SceneDescription.SceneObjects;
 using PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates;
 using PathTracer.Pathtracing.Spectra;
 using PathTracer.Utilities;
@@ -19,7 +18,9 @@ namespace PathTracer.Pathtracing.Integrators {
         /// <summary> The minimum amount of samples per integration cycle of the <see cref="BackwardsSampler"/> </summary>
         public static readonly int MinimumSampleCount = Program.Threadpool.MultithreadingTaskCount * 10;
         /// <summary> The maximum recursion depth for sampling </summary>
-        public const int MaxRecursionDepth = 4;
+        public const int GauranteedRecursionDepth = 6;
+        /// <summary> The chance of russian roulette when the gauranteed recursion depth is exceeded </summary>
+        public const float RussianRouletteChance = 0.5f;
 
         public override void Integrate(IScene scene, int sampleCount) {
             double taskSize = (double)sampleCount / Program.Threadpool.MultithreadingTaskCount;
@@ -46,64 +47,67 @@ namespace PathTracer.Pathtracing.Integrators {
 
         /// <summary> Sample the <paramref name="scene"/> with a <paramref name="sample"/> returning a color found </summary>
         /// <param name="scene">The <see cref="IScene"/> to sample </param>
-        /// <param name="sample">The <see cref="ISample"/> to sample the <paramref name="scene"/> with </param>
+        /// <param name="ray">The <see cref="Ir4"/> to trace through the <paramref name="scene"/> </param>
+        /// <param name="spectrum">The throughput <see cref="ISpectrum"/></param>
+        /// <param name="recursionDepth">The depth of recursion</param>
         /// <returns>The color found for the <see cref="ISample"/></returns>
         public ISpectrum Sample(IScene scene, IRay ray, ISpectrum spectrum, int recursionDepth) {
-            if (spectrum.Equals(ISpectrum.Black) || recursionDepth >= MaxRecursionDepth) return ISpectrum.Black;
+            if (spectrum.Equals(ISpectrum.Black)) return ISpectrum.Black;
+
+            /// Russian Roulette
+            float throughput = 1f;
+            if (recursionDepth >= GauranteedRecursionDepth) {
+                if (Utils.ThreadRandom.NextSingle() < RussianRouletteChance) {
+                    return ISpectrum.Black;
+                } else {
+                    throughput = 1f / RussianRouletteChance;
+                }
+            }
 
             /// Sample Distance
-            IDistanceDistribution? distances = scene.Trace(ray, spectrum);
-            if (distances is null) return ISpectrum.Black;
-            Position1 distance = distances.Sample(Utils.ThreadRandom);
+            IDistanceQuery? distanceQuery = scene.Trace(ray, spectrum);
+            if (distanceQuery is null) return ISpectrum.Black;
+            Position1 distance = distanceQuery.DistanceDistribution.Sample(Utils.ThreadRandom);
             if (distance == Position1.PositiveInfinity) return ISpectrum.Black;
-            //float distanceImportance = (float)distances.InverseRelativeProbability(distance);
 
-            /// Sample Material
-            IProbabilityDistribution<IMaterial>? materials = distances.TryGetMaterials(distance);
-            if (materials is null) throw new InvalidOperationException("Distance was sampled but no material was found");
-            IMaterial material = materials.Sample(Utils.ThreadRandom);
-            //float materialImportance = (float)materials.InverseRelativeProbability(material);
-
-            /// Sample Shape Interval
-            IProbabilityDistribution<IShapeInterval>? intervals = distances.TryGetShapeIntervals(distance, material);
-            if (intervals is null) throw new InvalidOperationException("Distance was sampled but no shape interval was found");
-            IShapeInterval interval = intervals.Sample(Utils.ThreadRandom);
-            //float shapeIntervalImportance = (float)intervals.InverseRelativeProbability(interval);
-
-            /// Compute Distance Sampling Throughput
-            //float distanceSampleImportance = shapeIntervalImportance * materialImportance * distanceImportance;
-            //float outScatteringAndDensity = (float)distances.ProbabilityDensity(distance);
-            //float distanceSampleThroughput = outScatteringAndDensity * distanceSampleImportance;
+            /// Sample Primitive
+            IProbabilityDistribution<IPrimitive>? primitives = distanceQuery.TryGetPrimitives(distance);
+            if (primitives is null) throw new InvalidOperationException("Distance was sampled but no primitive was found");
+            IPrimitive primitive = primitives.Sample(Utils.ThreadRandom);
 
             /// Get Intersection Position
-            Position3 position = material.GetPosition(ray, interval, distance);
+            Position3 position = primitive.Material.DensityProfile.GetPosition(ray, distance, primitive.Shape);
 
             /// Sample Material Orientation
-            IProbabilityDistribution<Normal3> orientations = material.GetOrientationDistribution(ray, interval.Shape, position);
+            IProbabilityDistribution<Normal3>? orientations = primitive.Material.OrientationProfile.GetOrientations(position, ray.Direction, primitive.Shape);
+            if (orientations is null) return ISpectrum.Black;
             Normal3 orientation = orientations.Sample(Utils.ThreadRandom);
-            //float orientationImportance = (float)orientations.InverseRelativeProbability(orientation);
 
             /// Get Direct Illumination
-            ISpectrum directIllumination = material.Emittance(position, orientation, -ray.Direction);
+            ISpectrum directIllumination = RGBSpectrum.Black;
+            if (primitive.Material.EmittanceProfile.IsEmitting) {
+                directIllumination = primitive.Material.EmittanceProfile.GetEmittance(position, orientation, -ray.Direction);
+            }
 
-            /// Sample Direction
-            IProbabilityDistribution<Normal3> directions = material.DirectionDistribution(ray.Direction, position, orientation, spectrum);
-            Normal3 direction = directions.Sample(Utils.ThreadRandom);
-            //float directionImportance = (float)directions.InverseRelativeProbability(direction);
+            /// Get Indirect Illumination
+            ISpectrum indirectIllumination = RGBSpectrum.Black;
+            if (!primitive.Material.AbsorptionProfile.IsBlackBody) {
+                /// Sample Direction
+                IProbabilityDistribution<Normal3> directions = primitive.Material.ReflectionProfile.GetDirections(ray.Direction, position, orientation, spectrum);
+                Normal3 direction = directions.Sample(Utils.ThreadRandom);
 
-            /// Get Ray
-            IRay raySample = material.CreateRay(position, orientation, direction);
+                /// Get Albedo
+                ISpectrum albedo = primitive.Material.AbsorptionProfile.GetAlbedo(position, orientation, -direction);
 
-            /// Compute Direction Sampling Throughput
-            //float directionSampleImportance = orientationImportance * directionImportance;
-            ISpectrum absorption = material.Albedo;
-            //ISpectrum directionSampleThroughput = absorption * directionSampleImportance;
+                /// Get Ray
+                IRay raySample = primitive.Material.DensityProfile.GetRay(position, orientation, direction);
 
-            /// Sample Indirect Illumination
-            ISpectrum indirectIllumination = Sample(scene, raySample, spectrum * absorption, recursionDepth + 1);
+                /// Sample Indirect Illumination
+                indirectIllumination = albedo * Sample(scene, raySample, spectrum * albedo, recursionDepth + 1);
+            }
 
             /// Light Throughput Calculation
-            return indirectIllumination * absorption + directIllumination;
+            return (directIllumination + indirectIllumination) * throughput;
         }
     }
 }

@@ -1,5 +1,5 @@
-﻿using OpenTK.Windowing.Common;
 ﻿using OpenTK.Mathematics;
+using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using PathTracer.Drawing;
 using PathTracer.Geometry.Normals;
@@ -10,8 +10,7 @@ using PathTracer.Pathtracing.Integrators;
 using PathTracer.Pathtracing.Observers;
 using PathTracer.Pathtracing.Observers.Cameras;
 using PathTracer.Pathtracing.SceneDescription;
-using PathTracer.Pathtracing.SceneDescription.Materials.SurfaceMaterials;
-using PathTracer.Pathtracing.SceneDescription.Materials.VolumetricMaterials;
+using PathTracer.Pathtracing.SceneDescription.Materials;
 using PathTracer.Pathtracing.SceneDescription.SceneObjects;
 using PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates;
 using PathTracer.Pathtracing.SceneDescription.SceneObjects.Primitives;
@@ -28,19 +27,19 @@ namespace PathTracer {
         #region Default Scene Definition
         /// <summary> The primitives in the default scene </summary>
         public static readonly List<ISceneObject> DefaultPrimitives = new() {
-            new Primitive(new InfinityPlane(), ParametricMaterial.WhiteLight),
-            new Primitive(new Sphere(new Position3(-3, 1, 5), 1), ParametricMaterial.DiffuseGreen),
-            new Primitive(new Sphere(new Position3(3, 1, 5), 1), ParametricMaterial.GlossyRed),
-            new Primitive(new Sphere(new Position3(0, 1, 5), 1), ParametricMaterial.RoughMirror),
-            new Primitive(new Sphere(new Position3(0, 1, 8), 1), ParametricMaterial.Mirror),
-            new Primitive(new Sphere(new Position3(-1, 1, 2), 1), new DiffuseVolumetric(new RGBSpectrum(0.8f, 0.8f, 0.8f), 2)),
-            new Primitive(new Triangle(new Position3(5, 0, 10), new Position3(5, 0, 0), new Position3(-5, 0, 0), null), ParametricMaterial.PurpleHalfMirror),
-            new Primitive(new Triangle(new Position3(5, 0, 10), new Position3(-5, 0, 0), new Position3(-5, 0, 10), null), ParametricMaterial.DiffuseYellow),
-            new Primitive(new Plane(new Normal3(0, 1, 0), new Position1(-1)), ParametricMaterial.DiffuseGray),
+            new Primitive(new InfinityPlane(), Material.Emitter(RGBSpectrum.White)),
+            new Primitive(new Sphere(new Position3(-3, 1, 5), 1), Material.Diffuse(RGBSpectrum.Green)),
+            new Primitive(new Sphere(new Position3(3, 1, 5), 1), Material.Glossy(RGBSpectrum.Red, 0.2f)),
+            new Primitive(new Sphere(new Position3(0, 1, 5), 1), Material.Glossy(RGBSpectrum.OffWhite, 0.2f)),
+            new Primitive(new Sphere(new Position3(0, 1, 8), 1), Material.Specular(RGBSpectrum.OffWhite)),
+            new Primitive(new Sphere(new Position3(-1, 1, 2), 1), Material.DiffuseParticleCloud(RGBSpectrum.LightGray, 2f)),
+            new Primitive(new Triangle(new Position3(5, 0, 10), new Position3(5, 0, 0), new Position3(-5, 0, 0), null), Material.SpecularDiffuseBlend(RGBSpectrum.Purple, 0.5f)),
+            new Primitive(new Triangle(new Position3(5, 0, 10), new Position3(-5, 0, 0), new Position3(-5, 0, 10), null), Material.Diffuse(RGBSpectrum.Yellow)),
+            new Primitive(new Plane(new Normal3(0, 1, 0), new Position1(-1)), Material.Diffuse(RGBSpectrum.Gray)),
             //new Primitive(new AxisAlignedBox(new Position3(-5, 0, 0), new Position3(5, 2, 10)), new DiffuseVolumetric(new RGBSpectrum(0.8f, 0.8f, 0.8f), 0.2)),
         };
 
-        public static readonly List<ISceneObject> DefaultLights = DefaultPrimitives.FindAll(s => s is IPrimitive p && p.Material.IsEmitting);
+        public static readonly List<ISceneObject> DefaultLights = DefaultPrimitives.FindAll(s => s is IPrimitive p && p.Material.EmittanceProfile.IsEmitting);
         #endregion
 
         /// <summary> The threadpool of this application </summary>

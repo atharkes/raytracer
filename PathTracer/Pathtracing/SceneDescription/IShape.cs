@@ -26,7 +26,7 @@ namespace PathTracer.Pathtracing.SceneDescription {
         /// <returns>Whether the <paramref name="position"/> is inside the <see cref="IShape"/></returns>
         bool Inside(Position3 position) {
             IRay ray = new Ray(position, new Normal3(1, 0, 0));
-            return Intersect(ray)?.Inside(0) ?? false;
+            return Intersect(ray)?.Includes(0) ?? false;
         }
 
         /// <summary> Check whether a <paramref name="position"/> is outside the <see cref="IShape"/> </summary>
@@ -68,10 +68,10 @@ namespace PathTracer.Pathtracing.SceneDescription {
         /// <summary> Intersect the <see cref="IShape"/> with a <paramref name="ray"/> </summary>
         /// <param name="ray">The <see cref="IRay"/> to intersect the <see cref="IShape"/></param>
         /// <returns>The collection of intersections with the <see cref="IShape"/>, if there are any</returns>
-        IBoundaryCollection? IIntersectable.Intersect(IRay ray) {
+        IIntervalCollection? IIntersectable.Intersect(IRay ray) {
             IEnumerable<Position1> distances = IntersectDistances(ray);
             if (distances.Any()) {
-                SortedSet<IShapeInterval> intervals = new();
+                SortedSet<IInterval> intervals = new();
                 Queue<Position1> entries = new();
                 foreach (Position1 distance in distances.OrderBy(d => d)) {
                     Position3 position = IntersectPosition(ray, distance);
@@ -80,18 +80,18 @@ namespace PathTracer.Pathtracing.SceneDescription {
                         entries.Enqueue(distance);
                     } else {
                         if (entries.Count > 0) {
-                            intervals.Add(new ShapeInterval(this, entries.Dequeue(), distance));
+                            intervals.Add(new Interval(entries.Dequeue(), distance));
                         } else {
                             Debug.Write($"Warning: {this} might be degenerate; More exits than entries found.");
-                            intervals.Add(new ShapeInterval(this, Position1.NegativeInfinity, distance));
+                            intervals.Add(new Interval(Position1.NegativeInfinity, distance));
                         }
                     }
                 }
                 foreach (Position1 entry in entries) {
                     Debug.Write($"Warning: {this} might be degenerate; More entries than exits found.");
-                    intervals.Add(new ShapeInterval(this, entry, Position1.PositiveInfinity));
+                    intervals.Add(new Interval(entry, Position1.PositiveInfinity));
                 }
-                return new BoundaryCollection(intervals);
+                return new IntervalCollection(intervals.ToArray());
             } else {
                 return null;
             }

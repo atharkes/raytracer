@@ -43,9 +43,9 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes {
         /// <summary> Intersect the <see cref="IPlanarShape"/> with a <paramref name="ray"/> </summary>
         /// <param name="ray">The <see cref="IRay"/> to intersect the <see cref="IPlanarShape"/></param>
         /// <returns>The <see cref="IBoundaryPoint"/>s of the intersections with the <see cref="IPlanarShape"/>, if there are any</returns>
-        IBoundaryCollection? IIntersectable.Intersect(IRay ray) {
+        IIntervalCollection? IIntersectable.Intersect(IRay ray) {
             Position1? distance = IntersectDistance(ray);
-            return distance.HasValue ? new BoundaryCollection(new ShapeInterval(this, distance.Value, distance.Value)) : null;
+            return distance.HasValue ? new IntervalCollection(new Interval(distance.Value, distance.Value)) : null;
         }
 
         /// <summary> Intersect the <see cref="IPlanarShape"/> with a <paramref name="ray"/> </summary>

@@ -37,8 +37,8 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Primitives {
         /// <param name="spectrum">The <see cref="ISpectrum"/> of the <paramref name="ray"/></param>
         /// <returns>The distance and material pdfs</returns>
         public IDistanceQuery? Trace(IRay ray, ISpectrum spectrum) {
-            IBoundaryCollection? boundary = Shape.Intersect(ray);
-            if (boundary is null) {
+            IIntervalCollection? intervals = Shape.Intersect(ray);
+            if (intervals is null) {
                 return null;
             }
             // Note: Intervals are processed individually here.
@@ -47,7 +47,7 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Primitives {
             // the conversion from intervals to distance distributions
             // has to be moved to, and specified by the material itself.
             IDistanceDistribution? result = null;
-            foreach (ShapeInterval interval in boundary) {
+            foreach (IInterval interval in intervals) {
                 IDistanceDistribution? distanceDistribution = Material.DensityProfile.GetDistances(ray, spectrum, interval);
                 if (distanceDistribution is not null) {
                     result += distanceDistribution;

@@ -36,7 +36,6 @@ namespace PathTracer {
             new Primitive(new Sphere(new Position3(0, 1, 5), 1), Material.Glossy(RGBSpectrum.OffWhite, 0.2f)),
             new Primitive(new Sphere(new Position3(0, 1, 8), 1), Material.Specular(RGBSpectrum.OffWhite)),
             new Primitive(new Sphere(new Position3(-1, 1, 2), 1), Material.SpecularParticleCloud(RGBSpectrum.OffWhite, 4f, 0.1f)),
-            new Primitive(new AxisAlignedBox(new Position3(0, 0, 5), new Position3(2, 2, 7)), Material.Glossy(RGBSpectrum.Red, 0.2f)), // Broken due to origin
         };
 
         /// <summary> The scene primitives to test roughness and density of volumetric </summary>
@@ -48,6 +47,13 @@ namespace PathTracer {
             new Primitive(new Sphere(new Position3(0, 1, 5), 1), Material.SpecularParticleCloud(RGBSpectrum.OffWhite, 80000f, 0.2f)),
             new Primitive(new AxisAlignedBox(new Position3(2, 0, 5), new Position3(4, 2, 7)), Material.Diffuse(RGBSpectrum.Blue)),
             new Primitive(new AxisAlignedBox(new Position3(-1.5f, 0, 4.5f), new Position3(-1, .5f, 5)), Material.Diffuse(RGBSpectrum.Green)),
+        };
+
+        /// <summary> Simple test scene </summary>
+        public static readonly List<ISceneObject> Test = new() {
+            new Primitive(new InfinityPlane(), Material.Emitter(RGBSpectrum.White)),
+            new Primitive(new Plane(new Normal3(0, 1, 0), new Position1(0)), Material.Diffuse(RGBSpectrum.DarkGray)),
+            new Primitive(new AxisAlignedBox(new Position3(0, 0, 0), new Position3(2, 2, 2)), Material.Glossy(RGBSpectrum.Red, 0.2f)), // Broken due to origin
         };
         #endregion
 
@@ -78,7 +84,7 @@ namespace PathTracer {
         /// <summary> The <see cref="IIntegrator"/> to integrate the scene </summary>
         public static readonly IIntegrator Integrator = new BackwardsSampler();
         /// <summary> The scene to render </summary>
-        public static readonly IScene Scene = new Scene(Observer.Camera, RoughnessDensityTest);
+        public static readonly IScene Scene = new Scene(Observer.Camera, Test);
         /// <summary> The <see cref="IRenderer"/> to supply images </summary>
         public static readonly IRenderer Renderer = new Renderer(Scene, Integrator, Observer);
 

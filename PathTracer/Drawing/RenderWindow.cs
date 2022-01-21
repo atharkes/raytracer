@@ -38,11 +38,11 @@ namespace PathTracer.Drawing {
         }
 
         public void Clear(int color = 0) => Surface.Clear(color);
-        public void Plot(int x, int y, int color = 16777215) => Surface.Plot(x, y, color);
-        public void Plot(int i, int color = 16777215) => Surface.Plot(i, color);
-        public void Line(int x1, int y1, int x2, int y2, int color = 16777215) => Surface.Line(x1, y1, x2, y2, color);
-        public void Box(int x1, int y1, int x2, int y2, int color = 16777215) => Surface.Box(x1, y1, x2, y2, color);
-        public void Print(string text, int x, int y, int color = 16777215) => Surface.Print(text, x, y, color);
+        public void Plot(int x, int y, int color = 0xffffff) => Surface.Plot(x, y, color);
+        public void Plot(int i, int color = 0xffffff) => Surface.Plot(i, color);
+        public void Line(int x1, int y1, int x2, int y2, int color = 0xffffff) => Surface.Line(x1, y1, x2, y2, color);
+        public void Box(int x1, int y1, int x2, int y2, int color = 0xffffff) => Surface.Box(x1, y1, x2, y2, color);
+        public void Print(string text, int x, int y, int color = 0xffffff) => Surface.Print(text, x, y, color);
 
         /// <summary> Called upon app init </summary>
         /// <param name="e">Arguments given</param>

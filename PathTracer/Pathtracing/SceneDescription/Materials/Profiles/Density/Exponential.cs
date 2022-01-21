@@ -13,7 +13,13 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials.Profiles.Density {
         }
 
         public IDistanceDistribution? GetDistances(IRay ray, ISpectrum spectrum, IInterval interval) {
-            return ray.WithinBounds(interval.Entry) ? new UniformInterval(new Interval(((float)interval.Entry).Decrement(64), interval.Entry)) : null;
+            if (ray.WithinBounds(interval.Entry)) {
+                Position1 entry = Position1.Max(0, ((float)interval.Entry).Decrement(64));
+                Position1 exit = interval.Entry;
+                return new UniformInterval(new Interval(entry, exit));
+            } else {
+                return null;
+            }
         }
 
         public Position3 GetPosition(IRay ray, Position1 distance, IShape shape) {

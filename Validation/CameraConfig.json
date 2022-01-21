@@ -1,0 +1,18 @@
+{
+  "WindowWidth": 500,
+  "WindowHeight": 400,
+  "WindowPositionX": 40,
+  "WindowPositionY": 80,
+  "DrawingMode": 0,
+  "DebugInfo": 0,
+  "DebugColor": 0,
+  "CameraLock": true,
+  "PositionX": -6.6411533,
+  "PositionY": 3.0274537,
+  "PositionZ": 1.8911152,
+  "RotationX": 0.23856784,
+  "RotationY": 0.5452329,
+  "RotationZ": -0.15194742,
+  "RotationW": 0.7891282,
+  "FOV": 90.0
+}

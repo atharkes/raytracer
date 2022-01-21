@@ -78,7 +78,23 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Planars {
         /// <param name="position">The position to check</param>
         /// <param name="epsilon">The epsilon to specify the precision</param>
         /// <returns>Whether the <paramref name="position"/> is on the surface of the <see cref="Triangle"/></returns>
-        public bool OnSurface(Position3 position, float epsilon = 0.001F) => throw new NotImplementedException();
+        public bool OnSurface(Position3 position, float epsilon = 0.001F) {
+            if ((PlaneOfExistence as IShape).OnSurface(position, epsilon)) {
+                Direction3 relativePosition = position - P1;
+                Direction1 s = Direction3.Dot(P1toP2, relativePosition);
+                if (s < -epsilon || 1 + epsilon > s) return false;
+                Direction1 t = Direction3.Dot(P1toP3, relativePosition);
+                if (t < -epsilon || 1 + epsilon > t) return false;
+                else return s + t <= 1 + epsilon;
+            } else {
+                return false;
+            }
+        }
+
+        /// <summary> Get the distance to the surface of the <see cref="Triangle"/> from the specified <paramref name="position"/> </summary>
+        /// <param name="position">The position to get the distance from the surface for</param>
+        /// <returns>The distance to the surface of the <see cref="Triangle"/> from the specified <paramref name="position"/></returns>
+        public float DistanceToSurface(Position3 position) => throw new NotImplementedException("Complicated maths, but required for Tetrahedron");
 
         /// <summary> Get the normal of the <see cref="Triangle"/> </summary>
         /// <param name="surfacePoint">The surface point to get the normal for</param>
@@ -164,5 +180,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Planars {
                 return new Position3[] { plane.Position + v[0], plane.Position + v[1], plane.Position + v[2] };
             }
         }
+
+        
     }
 }

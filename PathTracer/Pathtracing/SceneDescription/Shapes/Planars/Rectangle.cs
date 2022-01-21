@@ -100,12 +100,17 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Planars {
             return new Position2(IDirection3.Dot(LeftToRight, relativePosition), IDirection3.Dot(TopToBottom, relativePosition));
         }
 
+        /// <summary> Get the distance to the surface of the <see cref="Rectangle"/> from the specified <paramref name="position"/> </summary>
+        /// <param name="position">The position to get the distance from the surface for</param>
+        /// <returns>The distance to the surface of the <see cref="Rectangle"/> from the specified <paramref name="position"/></returns>
+        public float DistanceToSurface(Position3 position) => throw new NotImplementedException("Complicated maths");
+
         /// <summary> Check whether a <paramref name="position"/> is on the surface of the <see cref="Rectangle"/> </summary>
         /// <param name="position">The position to check</param>
         /// <param name="epsilon">The epsilon to specify the precision</param>
         /// <returns>Whether the <paramref name="position"/> is on the surface of the <see cref="Rectangle"/></returns>
         public bool OnSurface(Position3 position, float epsilon = 0.001F) {
-            if (PlaneOfExistence.OnSurface(position, epsilon)) {
+            if ((PlaneOfExistence as IShape).OnSurface(position, epsilon)) {
                 IDirection3 relativeIntersection = position - Position;
                 Position1 u = (Position1)IDirection3.Dot(LeftToRight, relativeIntersection) / LeftToRight.LengthSquared;
                 Position1 v = (Position1)IDirection3.Dot(BottomToTop, relativeIntersection) / BottomToTop.LengthSquared;

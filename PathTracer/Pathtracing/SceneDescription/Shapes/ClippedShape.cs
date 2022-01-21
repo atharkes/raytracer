@@ -23,6 +23,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes {
             return (BoundingBox as IIntersectable).Intersects(ray) ? OriginalShape.IntersectDistances(ray) : Enumerable.Empty<Position1>();
         }
 
+        public float DistanceToSurface(Position3 position) => OriginalShape.DistanceToSurface(position);
         public bool OnSurface(Position3 position, float epsilon = 0.001F) => OriginalShape.OnSurface(position, epsilon);
         public Position3 SurfacePosition(Random random) => OriginalShape.SurfacePosition(random);
         public Position2 UVPosition(Position3 position) => OriginalShape.UVPosition(position);

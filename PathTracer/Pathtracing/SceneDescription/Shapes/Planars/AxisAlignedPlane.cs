@@ -62,8 +62,8 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Planars {
         public override bool Equals(object? obj) => obj is AxisAlignedPlane plane && Equals(plane);
         public bool Equals(AxisAlignedPlane other) => PlaneOfExistence.Equals(other.PlaneOfExistence);
 
+        public float DistanceToSurface(Position3 position) => PlaneOfExistence.DistanceToSurface(position);
         public Position1? IntersectDistance(IRay ray) => PlaneOfExistence.IntersectDistance(ray);
-        public bool OnSurface(Position3 position, float epsilon = 0.001F) => PlaneOfExistence.OnSurface(position, epsilon);
         public Position3 SurfacePosition(Random random) => PlaneOfExistence.SurfacePosition(random);
         public Position2 UVPosition(Position3 position) => PlaneOfExistence.UVPosition(position);
     }

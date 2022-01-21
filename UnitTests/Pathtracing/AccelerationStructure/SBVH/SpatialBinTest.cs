@@ -38,7 +38,7 @@ namespace UnitTests.Pathtracing.AccelerationStructure.SBVH {
                 bin.Aggregate.Add(Utils.ThreadRandom.Primitive(0f, 1f));
                 bin.ClipAndAdd(Utils.ThreadRandom.Primitive(1f, 3f));
             }
-            Position3[] bounds = bin.Aggregate.BoundingBox.Bounds;
+            Position3[] bounds = bin.Aggregate.Shape.BoundingBox.Bounds;
             Assert.AreEqual(-1f, bounds[0].X);
             Assert.AreEqual(1f, bounds[1].X);
         }

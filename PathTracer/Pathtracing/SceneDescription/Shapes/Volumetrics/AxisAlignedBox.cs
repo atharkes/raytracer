@@ -88,6 +88,11 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics {
         /// <returns>The UV-position for the <paramref name="position"/></returns>
         public Position2 UVPosition(Position3 position) => throw new NotImplementedException();
 
+        /// <summary> Get the distance to the surface of the <see cref="AxisAlignedBox"/> from the specified <paramref name="position"/> </summary>
+        /// <param name="position">The position to get the distance from the surface for</param>
+        /// <returns>The distance to the surface of the <see cref="AxisAlignedBox"/> from the specified <paramref name="position"/></returns>
+        public float DistanceToSurface(Position3 position) => throw new NotImplementedException();
+
         /// <summary> Check whether a <paramref name="position"/> is on the surface of the <see cref="AxisAlignedBox"/> </summary>
         /// <param name="position">The position to check</param>
         /// <param name="epsilon">The epsilon to specify the precision</param>

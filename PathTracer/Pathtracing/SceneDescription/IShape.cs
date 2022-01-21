@@ -38,7 +38,12 @@ namespace PathTracer.Pathtracing.SceneDescription {
         /// <param name="position">The position to check</param>
         /// <param name="epsilon">The epsilon to specify the precision</param>
         /// <returns>Whether the <paramref name="position"/> is on the surface of the <see cref="IShape"/></returns>
-        bool OnSurface(Position3 position, float epsilon = 0.001F);
+        bool OnSurface(Position3 position, float epsilon = 0.001F) => DistanceToSurface(position) <= epsilon;
+
+        /// <summary> Get the distance to the surface of the <see cref="IShape"/> from the specified <paramref name="position"/> </summary>
+        /// <param name="position">The position to get the distance from the surface for</param>
+        /// <returns>The distance to the surface of the <see cref="IShape"/> from the specified <paramref name="position"/></returns>
+        float DistanceToSurface(Position3 position);
 
         /// <summary> Get a <paramref name="random"/> point on the surface of the <see cref="IShape"/> </summary>
         /// <param name="random">The <see cref="Random"/> to decide the location of the point </param>

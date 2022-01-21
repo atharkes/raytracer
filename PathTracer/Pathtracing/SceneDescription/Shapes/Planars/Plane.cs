@@ -1,4 +1,5 @@
-﻿using PathTracer.Geometry.Normals;
+﻿using PathTracer.Geometry.Directions;
+using PathTracer.Geometry.Normals;
 using PathTracer.Geometry.Positions;
 using PathTracer.Geometry.Vectors;
 using PathTracer.Pathtracing.Rays;
@@ -55,11 +56,12 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Planars {
         /// <returns>The UV-position for the <paramref name="position"/></returns>
         public Position2 UVPosition(Position3 position) => throw new NotImplementedException();
 
-        /// <summary> Check whether a <paramref name="position"/> is on the surface of the <see cref="Plane"/> </summary>
-        /// <param name="position">The position to check</param>
-        /// <param name="epsilon">The epsilon to specify the precision</param>
-        /// <returns>Whether the <paramref name="position"/> is on the surface of the <see cref="Plane"/></returns>
-        public bool OnSurface(Position3 position, float epsilon = 0.001F) => throw new NotImplementedException();
+        /// <summary> Get the distance to the surface of the <see cref="Plane"/> from the specified <paramref name="position"/> </summary>
+        /// <param name="position">The position to get the distance from the surface for</param>
+        /// <returns>The distance to the surface of the <see cref="Plane"/> from the specified <paramref name="position"/></returns>
+        public float DistanceToSurface(Position3 position) {
+            return Math.Abs(Direction3.Dot(position - Position, Normal));
+        }
 
         /// <summary> Get the normal of the <see cref="Plane"/> </summary>
         /// <param name="surfacePoint">The surface point to get the normal for</param>
@@ -72,5 +74,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Planars {
         public Position1? IntersectDistance(IRay ray) {
            return -((Vector3.Dot(ray.Origin.Vector, Normal.Vector) - Distance.Vector) / Vector3.Dot(ray.Direction.Vector, Normal.Vector));
         }
+
+        
     }
 }

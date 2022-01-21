@@ -26,9 +26,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes {
             yield return Position1.MaxValue;
         }
 
-        public bool OnSurface(Position3 position, float epsilon = 0.001F) {
-            throw new NotImplementedException();
-        }
+        public bool OnSurface(Position3 position, float epsilon = 0.001F) => throw new NotImplementedException();
 
         public Normal3 OutwardsDirection(Position3 position) => SurfaceNormal(position);
 
@@ -36,12 +34,10 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes {
             return new Normal3(-((Direction3)position / Vector1.MaxValue));
         }
 
-        public Position3 SurfacePosition(Random random) {
-            throw new NotImplementedException();
-        }
+        public Position3 SurfacePosition(Random random) => throw new NotImplementedException();
 
-        public Position2 UVPosition(Position3 position) {
-            throw new NotImplementedException();
-        }
+        public Position2 UVPosition(Position3 position) => throw new NotImplementedException("Directional information is required for uv mapping");
+
+        public float DistanceToSurface(Position3 position) => float.PositiveInfinity;
     }
 }

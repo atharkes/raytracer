@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PathTracer.Pathtracing.SceneDescription;
 using PathTracer.Pathtracing.SceneDescription.SceneObjects;
+using PathTracer.Pathtracing.SceneDescription.SceneObjects.Primitives;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Planars;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics;
 using PathTracer.Utilities;
@@ -19,11 +20,11 @@ namespace UnitTests.Pathtracing.SceneObjects {
         public void Clip() {
             for (int i = 0; i < 100; i++) {
                 IPrimitive primitive = Utils.ThreadRandom.Primitive();
-                AxisAlignedBox bounds = primitive.BoundingBox;
-                AxisAlignedPlane plane = new(primitive.BoundingBox.Center, Utils.ThreadRandom.Unit());
-                IEnumerable<ISceneObject> fragments = (primitive as IDivisible<ISceneObject>).Clip(plane);
-                foreach (ISceneObject fragment in fragments) {
-                    AxisAlignedBox clipBounds = fragment.BoundingBox;
+                AxisAlignedBox bounds = primitive.Shape.BoundingBox;
+                AxisAlignedPlane plane = new(primitive.Shape.BoundingBox.Center, Utils.ThreadRandom.Unit());
+                IEnumerable<ISceneObject> fragments = primitive.Clip(plane);
+                foreach (PrimitiveFragment fragment in fragments) {
+                    AxisAlignedBox clipBounds = fragment.Shape.BoundingBox;
                     Assert.IsTrue(bounds != clipBounds);
                 }
             }

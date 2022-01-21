@@ -1,9 +1,8 @@
-﻿using PathTracer.Pathtracing.Distributions.Intervals;
-using PathTracer.Pathtracing.Distributions.Distance;
+﻿using PathTracer.Pathtracing.Distributions.Distance;
 using PathTracer.Pathtracing.Distributions.DistanceQuery;
+using PathTracer.Pathtracing.Distributions.Intervals;
 using PathTracer.Pathtracing.Rays;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Planars;
-using PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics;
 using PathTracer.Pathtracing.Spectra;
 using System.Collections.Generic;
 
@@ -14,15 +13,6 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Primitives {
         public IShape Shape { get; }
         /// <summary> The <see cref="SceneDescription.Material"/> of the <see cref="Primitive"/> </summary>
         public IMaterial Material { get; }
-
-        /// <summary> Whether the <see cref="Primitive"/> encompasses a volume </summary>
-        public bool Volumetric => Shape.Volumetric;
-        /// <summary> The volume of the <see cref="Primitive"/> </summary>
-        public float Volume => Shape.Volume;
-        /// <summary> The surface area of the <see cref="Primitive"/> </summary>
-        public float SurfaceArea => Shape.SurfaceArea;
-        /// <summary> The bounding box of the <see cref="Primitive"/> </summary>
-        public AxisAlignedBox BoundingBox => Shape.BoundingBox;
 
         /// <summary> Create a new <see cref="Primitive"/> with a <paramref name="shape"/> and <paramref name="material"/> </summary>
         /// <param name="shape">The <see cref="SceneDescription.Shape"/> of the <see cref="Primitive"/></param>

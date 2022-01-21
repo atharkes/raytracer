@@ -62,6 +62,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes {
             }
         }
 
+        public float DistanceToSurface(Position3 position) => Shapes.Min(t => t.DistanceToSurface(position));
         public bool OnSurface(Position3 position, float epsilon = 0.001F) => Shapes.Any(s => s.OnSurface(position, epsilon));
 
         public Normal3 OutwardsDirection(Position3 position) {

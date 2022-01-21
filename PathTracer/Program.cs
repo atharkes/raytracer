@@ -44,7 +44,7 @@ namespace PathTracer {
             new Primitive(new Plane(new Normal3(0, 1, 0), new Position1(-1)), Material.Diffuse(RGBSpectrum.DarkGray)),
             new Primitive(new Triangle(new Position3(5, 0, 10), new Position3(-5, 0, 0), new Position3(-5, 0, 10), null), Material.Diffuse(RGBSpectrum.Gray)),
             new Primitive(new Triangle(new Position3(5, 0, 10), new Position3(5, 0, 0), new Position3(-5, 0, 0), null), Material.Specular(RGBSpectrum.Gray)),
-            new Primitive(new Sphere(new Position3(0, 1, 5), 1), Material.SpecularParticleCloud(RGBSpectrum.OffWhite, 80000f, 0.2f)),
+            new Primitive(new Sphere(new Position3(0, 1, 5), 1), Material.SpecularParticleCloud(RGBSpectrum.OffWhite, 2f, 0.2f)),
             new Primitive(new AxisAlignedBox(new Position3(2, 0, 5), new Position3(4, 2, 7)), Material.Diffuse(RGBSpectrum.Blue)),
             new Primitive(new AxisAlignedBox(new Position3(-1.5f, 0, 4.5f), new Position3(-1, .5f, 5)), Material.Diffuse(RGBSpectrum.Green)),
         };
@@ -84,7 +84,7 @@ namespace PathTracer {
         /// <summary> The <see cref="IIntegrator"/> to integrate the scene </summary>
         public static readonly IIntegrator Integrator = new BackwardsSampler();
         /// <summary> The scene to render </summary>
-        public static readonly IScene Scene = new Scene(Observer.Camera, Test);
+        public static readonly IScene Scene = new Scene(Observer.Camera, RoughnessDensityTest);
         /// <summary> The <see cref="IRenderer"/> to supply images </summary>
         public static readonly IRenderer Renderer = new Renderer(Scene, Integrator, Observer);
 

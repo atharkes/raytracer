@@ -28,28 +28,26 @@ namespace PathTracer {
         /// <summary> The primitives in the default scene </summary>
         public static readonly List<ISceneObject> DefaultPrimitives = new() {
             new Primitive(new InfinityPlane(), Material.Emitter(RGBSpectrum.White)),
+            new Primitive(new Plane(new Normal3(0, 1, 0), new Position1(-1)), Material.Diffuse(RGBSpectrum.Gray)),
+            new Primitive(new Triangle(new Position3(5, 0, 10), new Position3(-5, 0, 0), new Position3(-5, 0, 10), null), Material.Diffuse(RGBSpectrum.Yellow)),
+            new Primitive(new Triangle(new Position3(5, 0, 10), new Position3(5, 0, 0), new Position3(-5, 0, 0), null), Material.SpecularDiffuseBlend(RGBSpectrum.Purple, 0.5f)),
+            new Primitive(new AxisAlignedBox(new Position3(-5, 0, 0), new Position3(5, 4, 10)), Material.DiffuseParticleCloud(RGBSpectrum.OffWhite, 0.2f)),
             new Primitive(new Sphere(new Position3(-3, 1, 5), 1), Material.Diffuse(RGBSpectrum.Green)),
             new Primitive(new Sphere(new Position3(3, 1, 5), 1), Material.Glossy(RGBSpectrum.Red, 0.2f)),
             new Primitive(new Sphere(new Position3(0, 1, 5), 1), Material.Glossy(RGBSpectrum.OffWhite, 0.2f)),
             new Primitive(new Sphere(new Position3(0, 1, 8), 1), Material.Specular(RGBSpectrum.OffWhite)),
             new Primitive(new Sphere(new Position3(-1, 1, 2), 1), Material.SpecularParticleCloud(RGBSpectrum.OffWhite, 4f, 0.1f)),
-            new Primitive(new Triangle(new Position3(5, 0, 10), new Position3(5, 0, 0), new Position3(-5, 0, 0), null), Material.SpecularDiffuseBlend(RGBSpectrum.Purple, 0.5f)),
-            new Primitive(new Triangle(new Position3(5, 0, 10), new Position3(-5, 0, 0), new Position3(-5, 0, 10), null), Material.Diffuse(RGBSpectrum.Yellow)),
-            new Primitive(new Plane(new Normal3(0, 1, 0), new Position1(-1)), Material.Diffuse(RGBSpectrum.Gray)),
-            new Primitive(new AxisAlignedBox(new Position3(-5, 0, 0), new Position3(5, 2, 10)), Material.DiffuseParticleCloud(RGBSpectrum.OffWhite, 0.05f)),
         };
 
         /// <summary> The primitives in the default scene </summary>
-        public static readonly List<ISceneObject> VolumetricTest = new() {
+        public static readonly List<ISceneObject> RoughnessDensityTest = new() {
             new Primitive(new InfinityPlane(), Material.Emitter(RGBSpectrum.White)),
+            new Primitive(new Plane(new Normal3(0, 1, 0), new Position1(-1)), Material.Diffuse(RGBSpectrum.Gray)),
+            new Primitive(new Triangle(new Position3(5, 0, 10), new Position3(-5, 0, 0), new Position3(-5, 0, 10), null), Material.Diffuse(RGBSpectrum.OffWhite)),
+            new Primitive(new Triangle(new Position3(5, 0, 10), new Position3(5, 0, 0), new Position3(-5, 0, 0), null), Material.Specular(RGBSpectrum.OffWhite)),
+            new Primitive(new Sphere(new Position3(0, 1, 8), 1), Material.SpecularParticleCloud(RGBSpectrum.OffWhite, 4f, 0.2f)),
             new Primitive(new Sphere(new Position3(-3, 1, 5), 1), Material.Diffuse(RGBSpectrum.Green)),
             new Primitive(new Sphere(new Position3(3, 1, 5), 1), Material.Glossy(RGBSpectrum.Red, 0.2f)),
-            new Primitive(new Sphere(new Position3(0, 1, 5), 1), Material.Glossy(RGBSpectrum.OffWhite, 0.2f)),
-            new Primitive(new Sphere(new Position3(0, 1, 8), 1), Material.Specular(RGBSpectrum.OffWhite)),
-            new Primitive(new Sphere(new Position3(-1, 1, 2), 1), Material.SpecularParticleCloud(RGBSpectrum.OffWhite, 4f, 0.2f)),
-            new Primitive(new Triangle(new Position3(5, 0, 10), new Position3(5, 0, 0), new Position3(-5, 0, 0), null), Material.SpecularDiffuseBlend(RGBSpectrum.Purple, 0.5f)),
-            new Primitive(new Triangle(new Position3(5, 0, 10), new Position3(-5, 0, 0), new Position3(-5, 0, 10), null), Material.Diffuse(RGBSpectrum.Yellow)),
-            new Primitive(new Plane(new Normal3(0, 1, 0), new Position1(-1)), Material.Diffuse(RGBSpectrum.Gray)),
         };
         #endregion
 

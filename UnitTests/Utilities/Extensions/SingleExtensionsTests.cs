@@ -138,6 +138,9 @@ namespace UnitTests.Utilities.Extensions {
         #endregion
 
         #region Increment
+        /// <summary> Get the maximum amount that the <paramref name="value"/> can be incremented without overflowing </summary>
+        /// <param name="value">The <see cref="float"/> to get the value for</param>
+        /// <returns>the maximum amount that the <paramref name="value"/> can be incremented without overflowing</returns>
         static uint MaxIncrementable(float value) => (uint)SingleExtensions.MaxIndex - (uint)value.ToIndex() + 1u;
 
         [TestMethod]
@@ -169,6 +172,9 @@ namespace UnitTests.Utilities.Extensions {
         #endregion
 
         #region Decrement
+        /// <summary> Get the maximum amount that the <paramref name="value"/> can be decremented without underflowing </summary>
+        /// <param name="value">The <see cref="float"/> to get the value for</param>
+        /// <returns>the maximum amount that the <paramref name="value"/> can be decremented without underflowing</returns>
         static uint MaxDecrementable(float value) => 1u - (uint)SingleExtensions.MinIndex + (uint)value.ToIndex();
 
         [TestMethod]

@@ -139,6 +139,9 @@ namespace UnitTests.Utilities.Extensions {
         #endregion
 
         #region Increment
+        /// <summary> Get the maximum amount that the <paramref name="value"/> can be incremented without overflowing </summary>
+        /// <param name="value">The <see cref="double"/> to get the value for</param>
+        /// <returns>the maximum amount that the <paramref name="value"/> can be incremented without overflowing</returns>
         static ulong MaxIncrementable(double value) => Math.Min(long.MaxValue, (ulong)DoubleExtensions.MaxIndex - (ulong)value.ToIndex() + 1ul);
 
         [TestMethod]
@@ -177,6 +180,9 @@ namespace UnitTests.Utilities.Extensions {
         #endregion
 
         #region Decrement
+        /// <summary> Get the maximum amount that the <paramref name="value"/> can be decremented without underflowing </summary>
+        /// <param name="value">The <see cref="double"/> to get the value for</param>
+        /// <returns>the maximum amount that the <paramref name="value"/> can be decremented without underflowing</returns>
         static ulong MaxDecrementable(double value) => Math.Min(long.MaxValue, 1ul - (ulong)DoubleExtensions.MinIndex + (ulong)value.ToIndex());
 
         [TestMethod]

@@ -53,7 +53,7 @@ namespace PathTracer {
         public static readonly List<ISceneObject> Test = new() {
             new Primitive(new InfinityPlane(), Material.Emitter(RGBSpectrum.White)),
             new Primitive(new Plane(new Normal3(0, 1, 0), new Position1(0)), Material.Diffuse(RGBSpectrum.DarkGray)),
-            new Primitive(new AxisAlignedBox(new Position3(0, 0, 0), new Position3(2, 2, 2)), Material.Glossy(RGBSpectrum.Red, 0.2f)), // Broken due to origin
+            new Primitive(new AxisAlignedBox(new Position3(0, 0, 0), new Position3(2, 2, 2)), Material.Glossy(RGBSpectrum.Red, 0.0f)), // Broken due to origin
         };
         #endregion
 

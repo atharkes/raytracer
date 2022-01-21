@@ -3,6 +3,7 @@ using PathTracer.Pathtracing.Distributions.Distance;
 using PathTracer.Pathtracing.Distributions.Probabilities;
 using PathTracer.Pathtracing.SceneDescription;
 using PathTracer.Pathtracing.SceneDescription.SceneObjects;
+using System.Linq;
 
 namespace PathTracer.Pathtracing.Distributions.DistanceQuery {
     /// <summary> A distance query from a ray through a scene </summary>

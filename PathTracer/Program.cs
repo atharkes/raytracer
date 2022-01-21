@@ -24,9 +24,23 @@ using System.Collections.Generic;
 
 namespace PathTracer {
     public static class Program {
-        #region Default Scene Definition
+        #region Scene Definitions
         /// <summary> The primitives in the default scene </summary>
         public static readonly List<ISceneObject> DefaultPrimitives = new() {
+            new Primitive(new InfinityPlane(), Material.Emitter(RGBSpectrum.White)),
+            new Primitive(new Sphere(new Position3(-3, 1, 5), 1), Material.Diffuse(RGBSpectrum.Green)),
+            new Primitive(new Sphere(new Position3(3, 1, 5), 1), Material.Glossy(RGBSpectrum.Red, 0.2f)),
+            new Primitive(new Sphere(new Position3(0, 1, 5), 1), Material.Glossy(RGBSpectrum.OffWhite, 0.2f)),
+            new Primitive(new Sphere(new Position3(0, 1, 8), 1), Material.Specular(RGBSpectrum.OffWhite)),
+            new Primitive(new Sphere(new Position3(-1, 1, 2), 1), Material.SpecularParticleCloud(RGBSpectrum.OffWhite, 4f, 0.1f)),
+            new Primitive(new Triangle(new Position3(5, 0, 10), new Position3(5, 0, 0), new Position3(-5, 0, 0), null), Material.SpecularDiffuseBlend(RGBSpectrum.Purple, 0.5f)),
+            new Primitive(new Triangle(new Position3(5, 0, 10), new Position3(-5, 0, 0), new Position3(-5, 0, 10), null), Material.Diffuse(RGBSpectrum.Yellow)),
+            new Primitive(new Plane(new Normal3(0, 1, 0), new Position1(-1)), Material.Diffuse(RGBSpectrum.Gray)),
+            new Primitive(new AxisAlignedBox(new Position3(-5, 0, 0), new Position3(5, 2, 10)), Material.DiffuseParticleCloud(RGBSpectrum.OffWhite, 0.05f)),
+        };
+
+        /// <summary> The primitives in the default scene </summary>
+        public static readonly List<ISceneObject> VolumetricTest = new() {
             new Primitive(new InfinityPlane(), Material.Emitter(RGBSpectrum.White)),
             new Primitive(new Sphere(new Position3(-3, 1, 5), 1), Material.Diffuse(RGBSpectrum.Green)),
             new Primitive(new Sphere(new Position3(3, 1, 5), 1), Material.Glossy(RGBSpectrum.Red, 0.2f)),
@@ -36,10 +50,7 @@ namespace PathTracer {
             new Primitive(new Triangle(new Position3(5, 0, 10), new Position3(5, 0, 0), new Position3(-5, 0, 0), null), Material.SpecularDiffuseBlend(RGBSpectrum.Purple, 0.5f)),
             new Primitive(new Triangle(new Position3(5, 0, 10), new Position3(-5, 0, 0), new Position3(-5, 0, 10), null), Material.Diffuse(RGBSpectrum.Yellow)),
             new Primitive(new Plane(new Normal3(0, 1, 0), new Position1(-1)), Material.Diffuse(RGBSpectrum.Gray)),
-            //new Primitive(new AxisAlignedBox(new Position3(-5, 0, 0), new Position3(5, 2, 10)), new DiffuseVolumetric(new RGBSpectrum(0.8f, 0.8f, 0.8f), 0.2)),
         };
-
-        public static readonly List<ISceneObject> DefaultLights = DefaultPrimitives.FindAll(s => s is IPrimitive p && p.Material.EmittanceProfile.IsEmitting);
         #endregion
 
         /// <summary> The threadpool of this application </summary>
@@ -69,7 +80,7 @@ namespace PathTracer {
         /// <summary> The <see cref="IIntegrator"/> to integrate the scene </summary>
         public static readonly IIntegrator Integrator = new BackwardsSampler();
         /// <summary> The scene to render </summary>
-        public static readonly IScene Scene = new Scene(Observer.Camera, DefaultLights, DefaultPrimitives);
+        public static readonly IScene Scene = new Scene(Observer.Camera, DefaultPrimitives);
         /// <summary> The <see cref="IRenderer"/> to supply images </summary>
         public static readonly IRenderer Renderer = new Renderer(Scene, Integrator, Observer);
 

@@ -16,8 +16,8 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
         public CombinedDistanceDistribution(params IDistanceDistribution[] distributions) {
             List<IDistanceDistribution> simpleDistributions = new();
             foreach(IDistanceDistribution distribution in distributions) {
-                if (distribution is CombinedDistanceDistribution cdd) {
-                    simpleDistributions.AddRange(cdd.distributions);
+                if (distribution is CombinedDistanceDistribution combinedDistribution) {
+                    simpleDistributions.AddRange(combinedDistribution.distributions);
                 } else {
                     simpleDistributions.Add(distribution);
                 }

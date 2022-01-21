@@ -20,7 +20,7 @@ namespace PathTracer.Pathtracing.Integrators {
         /// <summary> The maximum recursion depth for sampling </summary>
         public const int GauranteedRecursionDepth = 6;
         /// <summary> The chance of russian roulette when the gauranteed recursion depth is exceeded </summary>
-        public const float RussianRouletteChance = 0.5f;
+        public const float RussianRouletteChance = 0.9f;
 
         public override void Integrate(IScene scene, int sampleCount) {
             double taskSize = (double)sampleCount / Program.Threadpool.MultithreadingTaskCount;

@@ -15,9 +15,9 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates {
         /// <summary> Create a new scene with some default objects </summary>
         /// <param name="screen">The screen to draw the raytracing to</param>
         /// <param name="primitives">The primitives in the scene</param>
-        public Scene(ICamera camera, IEnumerable<ISceneObject> lights, List<ISceneObject> primitives) { 
+        public Scene(ICamera camera, List<ISceneObject> primitives) { 
             Camera = camera;
-            Lights = lights;
+            Lights = primitives.FindAll(s => s is IPrimitive p && p.Material.EmittanceProfile.IsEmitting);
             Stopwatch timer = Stopwatch.StartNew();
             Items.Add(new SpatialBVH(primitives));
             Console.WriteLine(timer.ElapsedMilliseconds + "\t| (S)BVH Building ms");

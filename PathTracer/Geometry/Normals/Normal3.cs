@@ -79,11 +79,7 @@ namespace PathTracer.Geometry.Normals {
         public static Direction3 operator /(Normal3 normal, Position1 position) => (normal as IDirection3) / position;
 
         public static Normal3 AnyPerpendicular(Normal3 normal) {
-            if (normal.Equals(UnitX)) {
-                return new Normal3(Vector3.Cross(normal.Vector, UnitY.Vector));
-            } else {
-                return new Normal3(Vector3.Cross(normal.Vector, UnitX.Vector));
-            }
+            return normal.Equals(UnitX) || normal.Equals(-UnitX) ? Perpendicular(normal, UnitY) : Perpendicular(normal, UnitX);
         }
 
         public static Normal3 Perpendicular(Normal3 first, Normal3 second) => new(Vector3.Cross(first.Vector, second.Vector));

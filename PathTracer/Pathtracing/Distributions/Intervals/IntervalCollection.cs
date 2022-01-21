@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace PathTracer.Pathtracing.Distributions.Boundaries {
+namespace PathTracer.Pathtracing.Distributions.Intervals {
     /// <summary> A collection of <see cref="IInterval"/>s </summary>
     public class IntervalCollection : IIntervalCollection {
         /// <summary> The <see cref="ICollection{T}"/> of <see cref="IInterval"/>s </summary>

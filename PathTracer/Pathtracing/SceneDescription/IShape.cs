@@ -1,7 +1,7 @@
 ﻿using PathTracer.Geometry.Directions;
 using PathTracer.Geometry.Normals;
 using PathTracer.Geometry.Positions;
-using PathTracer.Pathtracing.Distributions.Boundaries;
+using PathTracer.Pathtracing.Distributions.Intervals;
 using PathTracer.Pathtracing.Rays;
 using PathTracer.Pathtracing.SceneDescription.Shapes;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Planars;

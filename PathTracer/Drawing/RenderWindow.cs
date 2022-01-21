@@ -2,15 +2,16 @@
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
+using PathTracer.Pathtracing.Observers;
 using System.Drawing;
 
 namespace PathTracer.Drawing {
     /// <summary> The main class derived from an OpenTK gamewindow </summary>
-    public class RenderWindow : GameWindow {
+    public class RenderWindow : GameWindow, IScreen {
         /// <summary> The identifier of the gamewindow </summary>
         public int GameWindowID { get; }
         /// <summary> The gamewindow </summary>
-        public Surface GameWindow { get; }
+        public Surface Surface { get; }
 
         readonly Shader shader;
         int vertexBufferObject;
@@ -31,10 +32,17 @@ namespace PathTracer.Drawing {
         };
 
         public RenderWindow(GameWindowSettings gameWindowSettings, NativeWindowSettings nativeWindowSettings) : base(gameWindowSettings, nativeWindowSettings) {
-            GameWindow = new Surface(nativeWindowSettings.Size);
-            GameWindowID = GameWindow.GenTexture();
+            Surface = new Surface(nativeWindowSettings.Size);
+            GameWindowID = Surface.GenTexture();
             shader = new Shader("Drawing\\shader.vert", "Drawing\\shader.frag");
         }
+
+        public void Clear(int color = 0) => Surface.Clear(color);
+        public void Plot(int x, int y, int color = 16777215) => Surface.Plot(x, y, color);
+        public void Plot(int i, int color = 16777215) => Surface.Plot(i, color);
+        public void Line(int x1, int y1, int x2, int y2, int color = 16777215) => Surface.Line(x1, y1, x2, y2, color);
+        public void Box(int x1, int y1, int x2, int y2, int color = 16777215) => Surface.Box(x1, y1, x2, y2, color);
+        public void Print(string text, int x, int y, int color = 16777215) => Surface.Print(text, x, y, color);
 
         /// <summary> Called upon app init </summary>
         /// <param name="e">Arguments given</param>
@@ -68,7 +76,7 @@ namespace PathTracer.Drawing {
         /// <summary> Called upon window resize </summary>
         /// <param name="e">Arguments given</param>
         protected override void OnResize(ResizeEventArgs e) {
-            GameWindow.Size = e.Size;
+            Surface.Size = e.Size;
             GL.Viewport(0, 0, e.Width, e.Height);
             base.OnResize(e);
         }
@@ -85,7 +93,7 @@ namespace PathTracer.Drawing {
             GL.Clear(ClearBufferMask.ColorBufferBit);
             /// Bind Texture
             GL.BindTexture(TextureTarget.Texture2D, GameWindowID);
-            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, GameWindow.Width, GameWindow.Height, 0, PixelFormat.Bgra, PixelType.UnsignedByte, GameWindow.Pixels);
+            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, Surface.Width, Surface.Height, 0, PixelFormat.Bgra, PixelType.UnsignedByte, Surface.Pixels);
             /// Assign Shader
             GL.UseProgram(shader.Handle);
             /// Draw Triangles

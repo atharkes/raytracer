@@ -1,6 +1,6 @@
 ﻿using MathNet.Numerics.Distributions;
 using PathTracer.Geometry.Positions;
-using PathTracer.Pathtracing.Distributions.Boundaries;
+using PathTracer.Pathtracing.Distributions.Intervals;
 using PathTracer.Pathtracing.Distributions.Probabilities;
 using System;
 
@@ -19,6 +19,7 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
 
         public Position1 Sample(Random random) {
             Position1 distance = Domain.Entry + (float)distribution.InverseCumulativeDistribution(random.NextDouble());
+            if (float.IsNaN(distance)) throw new InvalidOperationException($"Exponential distribution returned invalid distance {distance}");
             return distance <= Domain.Exit ? distance : Position1.PositiveInfinity;
         }
 

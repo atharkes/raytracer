@@ -7,7 +7,7 @@ using System.Drawing.Imaging;
 
 namespace PathTracer.Drawing {
     /// <summary> A pixel surface to display </summary>
-    public class Surface : IScreen {
+    public class Surface {
         /// <summary> The font used to write text with </summary>
         public static Surface Font { get; } = new Surface("../../../assets/font.png");
 
@@ -30,7 +30,6 @@ namespace PathTracer.Drawing {
             set {
                 size = value;
                 Pixels = new int[size.X * size.Y];
-                OnResize?.Invoke(this, size);
             }
         }
         /// <summary> The width of the <see cref="Surface"/> </summary>
@@ -39,9 +38,6 @@ namespace PathTracer.Drawing {
         public int Height => Size.Y;
         /// <summary> The pixel array of the <see cref="Surface"/> </summary>
         public int[] Pixels;
-
-        /// <summary> The event that fires when the <see cref="Surface"/> is resized </summary>
-        public event EventHandler<Vector2i>? OnResize;
 
         Vector2i size;
 

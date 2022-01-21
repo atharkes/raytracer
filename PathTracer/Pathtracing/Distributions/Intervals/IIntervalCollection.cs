@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace PathTracer.Pathtracing.Distributions.Boundaries {
+namespace PathTracer.Pathtracing.Distributions.Intervals {
     /// <summary> A collection of <see cref="IInterval"/>s </summary>
     public interface IIntervalCollection : IInterval, ICollection<IInterval> {
         /// <summary> The <see cref="IInterval"/>s in the <see cref="IIntervalCollection"/> </summary>

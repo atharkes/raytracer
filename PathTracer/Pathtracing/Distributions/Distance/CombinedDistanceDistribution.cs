@@ -1,5 +1,5 @@
 ﻿using PathTracer.Geometry.Positions;
-using PathTracer.Pathtracing.Distributions.Boundaries;
+using PathTracer.Pathtracing.Distributions.Intervals;
 using PathTracer.Pathtracing.Distributions.Probabilities;
 using System;
 using System.Collections;

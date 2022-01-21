@@ -9,7 +9,7 @@ namespace PathTracer.Utilities {
     /// <summary> A file that holds the configuration of the camera </summary>
     public class Config {
         /// <summary> The size of the game window </summary>
-        [JsonIgnore] public Vector2i WindowSize { get; set; } = new Vector2i(720, 360);
+        [JsonIgnore] public Vector2i WindowSize { get; set; } = new Vector2i(500, 400);
         /// <summary> The width of the game window </summary>
         public int WindowWidth { get => WindowSize.X; set => WindowSize = new Vector2i(value, WindowSize.Y); }
         /// <summary> The height of the game window </summary>
@@ -71,7 +71,7 @@ namespace PathTracer.Utilities {
         public void SaveToFile(IRenderer renderer) {
             /// Obtain Configuration
             WindowSize = renderer.Observer.Screen.Size;
-            // Window Position is currently not accessible
+            WindowPosition = renderer.Observer.Screen.Location;
             DrawingMode = renderer.Observer.DrawingMode;
             DebugInfo = renderer.Observer.DebugInfo;
             DebugColor = renderer.Observer.DebugColor;

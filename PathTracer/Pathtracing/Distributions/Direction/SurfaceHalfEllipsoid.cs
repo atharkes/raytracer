@@ -40,7 +40,8 @@ namespace PathTracer.Pathtracing.Distributions.Direction {
         public static bool operator !=(SurfaceHalfEllipsoid left, SurfaceHalfEllipsoid right) => !(left == right);
 
         Vector3 SampleVNDF(float r1, float r2) {
-            var rotation = new OpenTK.Mathematics.Quaternion(Vector3.Cross(Orientation.Vector, Vector3.UnitZ), Vector3.Dot(Orientation.Vector, Vector3.UnitZ) + 1).Normalized();
+            Vector3 orthogonal = Normal3.AnyPerpendicular(Orientation).Vector;
+            var rotation = new OpenTK.Mathematics.Quaternion(Vector3.Cross(Orientation.Vector, orthogonal), Vector3.Dot(Orientation.Vector, orthogonal) + 1).Normalized();
             Vector3 Ve = rotation * -IncomingDirection.Vector; 
 
             // Section 3.2: transforming the view direction to the hemisphere configuration

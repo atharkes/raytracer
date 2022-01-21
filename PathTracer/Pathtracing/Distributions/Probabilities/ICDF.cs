@@ -1,4 +1,4 @@
-﻿using PathTracer.Pathtracing.Distributions.Boundaries;
+﻿using PathTracer.Pathtracing.Distributions.Intervals;
 using System;
 
 namespace PathTracer.Pathtracing.Distributions.Probabilities {

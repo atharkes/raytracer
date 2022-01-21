@@ -1,9 +1,14 @@
 ﻿using OpenTK.Mathematics;
+using OpenTK.Windowing.Common;
 using System;
 
 namespace PathTracer.Pathtracing.Observers {
     /// <summary> An interface for a 2d screen used for displaying the 3d scene using raytracing </summary>
     public interface IScreen {
+        /// <summary> The bounds of the <see cref="IScreen"/> </summary>
+        Box2i Bounds => new(Location.X, Location.Y, Size.X, Size.Y);
+        /// <summary> The position of the <see cref="IScreen"/> on the display </summary>
+        Vector2i Location { get; }
         /// <summary> The size of the <see cref="IScreen"/> </summary>
         Vector2i Size { get; }
         /// <summary> The width of the <see cref="IScreen"/> </summary>
@@ -12,7 +17,7 @@ namespace PathTracer.Pathtracing.Observers {
         int Height => Size.Y;
 
         /// <summary> An event that fires when the <see cref="IScreen"/> is resized </summary>
-        event EventHandler<Vector2i>? OnResize;
+        event Action<ResizeEventArgs> Resize;
 
         /// <summary> Clear the screen </summary>
         /// <param name="color">The color to clear the screen width</param>

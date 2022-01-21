@@ -1,4 +1,4 @@
-﻿using PathTracer.Pathtracing.Distributions.Boundaries;
+﻿using PathTracer.Pathtracing.Distributions.Intervals;
 using PathTracer.Pathtracing.Distributions.Distance;
 using PathTracer.Pathtracing.Distributions.DistanceQuery;
 using PathTracer.Pathtracing.Rays;

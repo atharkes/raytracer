@@ -31,5 +31,9 @@ namespace PathTracer.Pathtracing.Rays {
             InvDirection = new Vector3(1 / (float)Direction.X, 1f / (float)Direction.Y, 1f / (float)Direction.Z);
             Sign = new OpenTK.Mathematics.Vector3i(InvDirection.X < 0 ? 1 : 0, InvDirection.Y < 0 ? 1 : 0, InvDirection.Z < 0 ? 1 : 0);
         }
+
+        /// <summary> Create a <see cref="string"/> that represents the <see cref="Ray"/> </summary>
+        /// <returns>A <see cref="string"/> represeting the <see cref="Ray"/></returns>
+        public override string ToString() => $"Origin: {Origin}, Direction: {Direction}";
     }
 }

@@ -31,11 +31,11 @@ namespace PathTracer.Pathtracing.Observers {
         public bool CameraLock { get; set; }
 
         /// <summary> The speed at which the camera moves </summary>
-        public float MoveSpeed { get; set; } = 0.1f;
+        public float MoveSpeed { get; set; } = 0.05f;
         /// <summary> The sensitivity of turning the camera </summary>
-        public float RotateSensitivity { get; set; } = 0.1f;
+        public float RotateSensitivity { get; set; } = 0.05f;
         /// <summary> The sensitivity when changing the FOV of the camera </summary>
-        public float FOVSensitivity { get; set; } = 0.1f;
+        public float FOVSensitivity { get; set; } = 0.05f;
 
         /// <summary> Create a new <see cref="Observer"/> </summary>
         /// <param name="screen">The <see cref="IScreen"/> of the <see cref="Observer"/></param>
@@ -44,8 +44,8 @@ namespace PathTracer.Pathtracing.Observers {
             Camera = camera;
             Accumulator = new Accumulator(screen.Width, screen.Height);
             Screen = screen;
-            Screen.OnResize += (_, size) => Accumulator = new Accumulator(size.X, size.Y);
-            Screen.OnResize += (_, size) => Camera.AspectRatio = (float)size.X / size.Y;
+            Screen.Resize += (e) => Accumulator = new Accumulator(e.Width, e.Height);
+            Screen.Resize += (e) => Camera.AspectRatio = (float)e.Width / e.Height;
             Camera.OnMoved += (_, _) => Accumulator.Clear();
             Camera.Film.SampleRegistered += (_, sample) => Accumulator.Add(sample);
         }
@@ -76,10 +76,9 @@ namespace PathTracer.Pathtracing.Observers {
                     Screen.Print($"Lock (L): {CameraLock}", 1, 17, DebugColor);
                     Screen.Print($"Position: {Camera.Position.ToString(Format)}", 1, 33, DebugColor);
                     Screen.Print($"View direction: {Camera.ViewDirection.ToString(Format)}", 1, 49, DebugColor);
-                    Screen.Print($"Rotation: {Camera.Rotation}", 1, 65, DebugColor);
-                    Screen.Print($"FOV: {Camera.FieldOfViewAngles.ToString(Format)}", 1, 81, DebugColor);
-                    Screen.Print($"Aspect ratio: {Camera.AspectRatio.ToString(Format)}", 1, 97, DebugColor);
-                    Screen.Print($"Screen size: {Screen.Size}", 1, 113, DebugColor);
+                    Screen.Print($"FOV: {Camera.FieldOfViewAngles.ToString(Format)}", 1, 65, DebugColor);
+                    Screen.Print($"Aspect ratio: {Camera.AspectRatio.ToString(Format)}", 1, 81, DebugColor);
+                    Screen.Print($"Screen size: {Screen.Size}", 1, 97, DebugColor);
                     break;
                 case DebugOutput.Validation:
                     Screen.Print($"Validation", 1, 1, DebugColor);
@@ -109,8 +108,8 @@ namespace PathTracer.Pathtracing.Observers {
                 if (keyboard.IsKeyDown(Keys.A)) Camera.Move(Camera.Left * MoveSpeed);
                 if (keyboard.IsKeyDown(Keys.S)) Camera.Move(Camera.Back * MoveSpeed);
                 if (keyboard.IsKeyDown(Keys.D)) Camera.Move(Camera.Right * MoveSpeed);
-                if (keyboard.IsKeyPressed(Keys.KeyPadAdd)) Camera.HorizontalFOV *= 1f + FOVSensitivity;
-                if (keyboard.IsKeyPressed(Keys.KeyPadSubtract)) Camera.HorizontalFOV /= 1f + FOVSensitivity;
+                if (keyboard.IsKeyPressed(Keys.Equal)) Camera.HorizontalFOV *= 1f + FOVSensitivity;
+                if (keyboard.IsKeyPressed(Keys.Minus)) Camera.HorizontalFOV /= 1f + FOVSensitivity;
                 if (keyboard.IsKeyDown(Keys.Up)) Camera.Rotate(Normal3.DefaultRight, -RotateSensitivity);
                 if (keyboard.IsKeyDown(Keys.Down)) Camera.Rotate(Normal3.DefaultRight, RotateSensitivity);
                 if (keyboard.IsKeyDown(Keys.Right)) Camera.Rotate(Normal3.DefaultUp, RotateSensitivity);

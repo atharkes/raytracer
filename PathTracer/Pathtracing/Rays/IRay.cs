@@ -2,6 +2,7 @@
 using PathTracer.Geometry.Normals;
 using PathTracer.Geometry.Positions;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics;
+using System;
 
 namespace PathTracer.Pathtracing.Rays {
     /// <summary> An interface for an <see cref="IRay"/> traversing through space </summary>

@@ -2,7 +2,7 @@
 using PathTracer.Pathtracing.SceneDescription;
 using System;
 
-namespace PathTracer.Pathtracing.Distributions.Boundaries {
+namespace PathTracer.Pathtracing.Distributions.Intervals {
     /// <summary> A generic interval </summary>
     /// <typeparam name="T">The type of interval</typeparam>
     public interface IInterval<T> : IEquatable<IInterval<T>>, IComparable<IInterval<T>> where T : IEquatable<T>, IComparable<T> {

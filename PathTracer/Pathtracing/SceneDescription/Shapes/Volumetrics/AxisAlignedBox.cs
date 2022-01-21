@@ -103,10 +103,10 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics {
         /// <param name="position">The surface position to get the normal for</param>
         /// <returns>The normal at the specified <paramref name="position"/></returns>
         public Normal3 SurfaceNormal(Position3 position) {
-            IDirection3 direction = (position - Center) / (Position3.Origin + Size);
-            IDirection1 x = IDirection1.Abs(direction.X);
-            IDirection1 y = IDirection1.Abs(direction.Y);
-            IDirection1 z = IDirection1.Abs(direction.Z);
+            Direction3 direction = (position - Center) / (Position3.Origin + Size);
+            Direction1 x = IDirection1.Abs(direction.X);
+            Direction1 y = IDirection1.Abs(direction.Y);
+            Direction1 z = IDirection1.Abs(direction.Z);
             Normal3 normal;
             if (x > y && x > z) {
                 normal = direction.X > 0f ? Normal3.UnitX : -Normal3.UnitX;

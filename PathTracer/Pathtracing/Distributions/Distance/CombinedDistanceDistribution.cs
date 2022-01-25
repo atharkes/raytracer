@@ -29,10 +29,12 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
             double probabilityDensity = 0;
             double cdf = CumulativeProbability(sample);
             var contains = distributions.TakeWhile(d => d.Domain.Entry <= sample);
-            foreach (var d in contains) {
-                double localCdf = d.CumulativeProbability(sample);
-                double beforeCdf = (localCdf - cdf) / (localCdf - 1);
-                probabilityDensity += d.Probability(sample) * beforeCdf;
+            if (contains.Count() == 1) return contains.First().ProbabilityDensity(sample);
+            foreach (var current in contains) {
+                double currentCdf = current.CumulativeProbability(sample);
+                double othersCdf = (currentCdf - cdf) / (currentCdf - 1);
+                if (currentCdf == 1 || currentCdf == othersCdf) return current.ProbabilityDensity(sample);
+                probabilityDensity += current.Probability(sample) * othersCdf;
             }
             return probabilityDensity;
         }

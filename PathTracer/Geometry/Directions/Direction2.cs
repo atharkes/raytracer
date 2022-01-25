@@ -39,6 +39,7 @@ namespace PathTracer.Geometry.Directions {
         public static Direction2 operator +(Direction2 left, Direction2 right) => left.Vector + right.Vector;
         public static Direction2 operator -(Direction2 direction) => -direction.Vector;
         public static Direction2 operator -(Direction2 left, Direction2 right) => left.Vector - right.Vector;
+        public static Direction2 operator *(Direction2 direction, float scale) => direction.Vector * scale;
         public static Direction2 operator *(Direction2 direction, Position1 scale) => direction.Vector * scale.Vector;
         public static Direction2 operator *(Direction2 direction, Position2 scale) => direction.Vector * scale.Vector;
         public static Direction2 operator /(Direction2 direction, Position1 scale) => direction.Vector / scale.Vector;

@@ -2,6 +2,7 @@
 using PathTracer.Geometry.Vectors;
 using PathTracer.Pathtracing.Distributions.Probabilities;
 using System;
+using System.Diagnostics;
 
 namespace PathTracer.Pathtracing.Distributions.Direction {
     /// <summary> Used for the symmetric surface GGX distribution for visible normals </summary>
@@ -59,7 +60,7 @@ namespace PathTracer.Pathtracing.Distributions.Direction {
             // Build orthonormal basis
             Vector3 wi = -IncomingDirection.Vector;
             Vector3 wk, wj;
-            if (wi.Z < -0.9999999f) {
+            if (wi.Z == -1f) {
                 wk = new Vector3(0.0f, -1.0f, 0.0f);
                 wj = new Vector3(-1.0f, 0.0f, 0.0f);
             } else {
@@ -80,14 +81,16 @@ namespace PathTracer.Pathtracing.Distributions.Direction {
             // Compute normal
             float sqrtDetSkji = (float)Math.Sqrt(Math.Abs(Skk * Sjj * Sii - Skj * Skj * Sii - Ski * Ski * Sjj - Sji * Sji * Skk + 2.0f * Skj * Ski * Sji));
             float inv_sqrtS_ii = 1.0f / (float)Math.Sqrt(Sii);
-            float tmp = (float)Math.Sqrt(Sjj * Sii - Sji * Sji);
-            Vector3 Mk = new(sqrtDetSkji/ tmp, 0.0f, 0.0f);
-            Vector3 Mj = new(-inv_sqrtS_ii * (Ski * Sji - Skj * Sii) / tmp, inv_sqrtS_ii* tmp, 0);
-            Vector3 Mi = new(inv_sqrtS_ii* Ski, inv_sqrtS_ii* Sji, inv_sqrtS_ii* Sii);
+            float tmp = (float)Math.Sqrt(Math.Max(0, Sjj * Sii - Sji * Sji));
+            Vector3 Mk = new(sqrtDetSkji / tmp, 0.0f, 0.0f);
+            Vector3 Mj = new(-inv_sqrtS_ii * (Ski * Sji - Skj * Sii) / tmp, inv_sqrtS_ii * tmp, 0);
+            Vector3 Mi = new(inv_sqrtS_ii * Ski, inv_sqrtS_ii * Sji, inv_sqrtS_ii * Sii);
             Vector3 wm_kji = (u * Mk + v * Mj + w * Mi).Normalized();
 
             // Rotate back to world basis
-            return wm_kji.X * wk + wm_kji.Y * wj + wm_kji.Z * wi;
+            Vector3 result = wm_kji.X * wk + wm_kji.Y * wj + wm_kji.Z * wi;
+            Debug.Assert(!Vector3.IsNaN(result) && result.Length > 0, "Orientation has NaN or is 0");
+            return result;
         }
     }
 }

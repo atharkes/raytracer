@@ -38,7 +38,7 @@ namespace PathTracer.Pathtracing.SceneDescription {
         /// <param name="position">The position to check</param>
         /// <param name="epsilon">The epsilon to specify the precision</param>
         /// <returns>Whether the <paramref name="position"/> is on the surface of the <see cref="IShape"/></returns>
-        bool OnSurface(Position3 position, float epsilon = 0.001F) => DistanceToSurface(position) <= epsilon;
+        bool OnSurface(Position3 position, float epsilon = 0.0001F) => DistanceToSurface(position) <= epsilon;
 
         /// <summary> Get the distance to the surface of the <see cref="IShape"/> from the specified <paramref name="position"/> </summary>
         /// <param name="position">The position to get the distance from the surface for</param>
@@ -80,20 +80,23 @@ namespace PathTracer.Pathtracing.SceneDescription {
                 Queue<Position1> entries = new();
                 foreach (Position1 distance in distances.OrderBy(d => d)) {
                     Position3 position = IntersectPosition(ray, distance);
-                    bool enters = !IDirection3.InSameOpenHemisphere(SurfaceNormal(position), ray.Direction);
+                    Normal3 normal = SurfaceNormal(position);
+                    bool enters = !IDirection3.InSameOpenHemisphere(normal, ray.Direction);
                     if (enters) {
                         entries.Enqueue(distance);
                     } else {
                         if (entries.Count > 0) {
                             intervals.Add(new Interval(entries.Dequeue(), distance));
                         } else {
-                            Debug.Write($"Warning: {this} might be degenerate; More exits than entries found.");
+                            //Debug.Write($"Warning: {this} might be degenerate; More exits than entries found.");
+                            // InfinityPlane and Inverted volumetrics rely on this assumption
                             intervals.Add(new Interval(Position1.NegativeInfinity, distance));
                         }
                     }
                 }
                 foreach (Position1 entry in entries) {
-                    Debug.Write($"Warning: {this} might be degenerate; More entries than exits found.");
+                    //Debug.Write($"Warning: {this} might be degenerate; More entries than exits found.");
+                    // InfinityPlane and Inverted volumetrics rely on this assumption
                     intervals.Add(new Interval(entry, Position1.PositiveInfinity));
                 }
                 return new IntervalCollection(intervals.ToArray());

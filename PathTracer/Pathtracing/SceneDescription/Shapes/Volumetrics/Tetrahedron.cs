@@ -17,10 +17,10 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics {
         readonly Triangle[] triangles;
 
         public static Tetrahedron Regular(Position3 position, float size) {
-            Position3 v1 = position + new Direction3(size);
-            Position3 v2 = position + new Direction3(size, -size, -size);
-            Position3 v3 = position + new Direction3(-size, size, -size);
-            Position3 v4 = position + new Direction3(-size, -size, size);
+            Position3 v1 = position + new Direction3(-size / (float)Math.Sqrt(3), 0, size);
+            Position3 v2 = position + new Direction3(-size / (float)Math.Sqrt(3), 0, -size);
+            Position3 v3 = position + new Direction3(size * 2f / (float)Math.Sqrt(3f), 0, 0);
+            Position3 v4 = position + new Direction3(0, size * 4f / (float)Math.Sqrt(6f), 0);
             return new Tetrahedron(v1, v2, v3, v4);
         }
 
@@ -42,7 +42,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics {
             }
         }
 
-        public bool OnSurface(Position3 position, float epsilon = 0.001F) => triangles.Any(t => t.OnSurface(position, epsilon));
+        public bool OnSurface(Position3 position, float epsilon = 0.0001F) => triangles.Any(t => t.OnSurface(position, epsilon));
 
         public float DistanceToSurface(Position3 position) => triangles.Min(t => t.DistanceToSurface(position));
 

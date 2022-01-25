@@ -22,11 +22,16 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Planars {
         /// <summary> The normal of the <see cref="Triangle"/> </summary>
         public readonly Normal3 Normal;
 
-        /// <summary> The direction vector from <see cref="P1"/> to <see cref="P2"/></summary>
+        /// <summary> The vector from <see cref="P1"/> to <see cref="P2"/></summary>
         public readonly Direction3 P1toP2;
-        /// <summary> The direction vector from <see cref="P1"/> to <see cref="P3"/> </summary>
+        /// <summary> The vector from <see cref="P1"/> to <see cref="P3"/> </summary>
         public readonly Direction3 P1toP3;
+        /// <summary> The vector from <see cref="P2"/> to <see cref="P3"/> </summary>
+        public readonly Direction3 P2toP3;
+        /// <summary> The vector from <see cref="P3"/> to <see cref="P1"/> </summary>
+        public readonly Direction3 P3toP1;
 
+        public Position3 Center => (P1.Vector + P2.Vector + P3.Vector) / 3f;
         /// <summary> The surface area of the <see cref="Triangle"/> </summary>
         public float SurfaceArea => Vector3.Cross(P2.Vector - P1.Vector, P3.Vector - P1.Vector).Length * 0.5f;
         /// <summary> The <see cref="Plane"/> in which the <see cref="Triangle"/> lies </summary>
@@ -46,6 +51,11 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Planars {
             P3 = p3;
             P1toP2 = P2 - P1;
             P1toP3 = P3 - P1;
+            P2toP3 = P3 - P2;
+            P3toP1 = P1 - P3;
+            // Triangle Normals in Left-Handed Coordiante system:
+            // Clockwise vertices = Normal faces towards
+            // Counter Clockwise vertices = Normal faces away
             Normal = normal ?? new Normal3(Vector3.Cross(P1toP2.Vector, P1toP3.Vector));
         }
 
@@ -78,14 +88,9 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Planars {
         /// <param name="position">The position to check</param>
         /// <param name="epsilon">The epsilon to specify the precision</param>
         /// <returns>Whether the <paramref name="position"/> is on the surface of the <see cref="Triangle"/></returns>
-        public bool OnSurface(Position3 position, float epsilon = 0.001F) {
+        public bool OnSurface(Position3 position, float epsilon = 0.0001F) {
             if ((PlaneOfExistence as IShape).OnSurface(position, epsilon)) {
-                Direction3 relativePosition = position - P1;
-                Direction1 s = Direction3.Dot(P1toP2, relativePosition);
-                if (s < -epsilon || 1 + epsilon > s) return false;
-                Direction1 t = Direction3.Dot(P1toP3, relativePosition);
-                if (t < -epsilon || 1 + epsilon > t) return false;
-                else return s + t <= 1 + epsilon;
+                return DistanceToSurface(position) < epsilon;
             } else {
                 return false;
             }
@@ -94,7 +99,25 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Planars {
         /// <summary> Get the distance to the surface of the <see cref="Triangle"/> from the specified <paramref name="position"/> </summary>
         /// <param name="position">The position to get the distance from the surface for</param>
         /// <returns>The distance to the surface of the <see cref="Triangle"/> from the specified <paramref name="position"/></returns>
-        public float DistanceToSurface(Position3 position) => throw new NotImplementedException("Complicated maths, but required for Tetrahedron");
+        public float DistanceToSurface(Position3 position) {
+            Position3 planePosition = PlaneOfExistence.Project(position);
+            float s = (float)Direction3.Dot(planePosition - P1, P1toP2) / P1toP2.LengthSquared;
+            float t = (float)Direction3.Dot(planePosition - P2, P2toP3) / P2toP3.LengthSquared;
+            float u = (float)Direction3.Dot(planePosition - P3, P3toP1) / P3toP1.LengthSquared;
+
+            /// Get closest point on the Triangle
+            Position3 closestPointOnTriangle;
+            if (s <= 0 && u >= 1) closestPointOnTriangle = P1;
+            else if (t <= 0 && s >= 1) closestPointOnTriangle = P2;
+            else if (u <= 0 && t >= 1) closestPointOnTriangle = P3;
+            else if (0 < s && s < 1 && t - u - (float)Direction3.Dot(P2toP3, P3toP1) / P3toP1.LengthSquared < 0) closestPointOnTriangle = P1 + P1toP2 * s;
+            else if (0 < t && t < 1 && u - s - (float)Direction3.Dot(P3toP1, P1toP2) / P1toP2.LengthSquared < 0) closestPointOnTriangle = P2 + P2toP3 * t;
+            else if (0 < u && u < 1 && s - t - (float)Direction3.Dot(P1toP2, P2toP3) / P2toP3.LengthSquared < 0) closestPointOnTriangle = P3 + P3toP1 * u;
+            else closestPointOnTriangle = planePosition;
+
+            Direction3 toTriangle = closestPointOnTriangle - position;
+            return toTriangle.Length;
+        }
 
         /// <summary> Get the normal of the <see cref="Triangle"/> </summary>
         /// <param name="surfacePoint">The surface point to get the normal for</param>

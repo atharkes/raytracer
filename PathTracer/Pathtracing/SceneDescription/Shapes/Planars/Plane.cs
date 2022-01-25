@@ -63,6 +63,13 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Planars {
             return Math.Abs(Direction3.Dot(position - Position, Normal));
         }
 
+        /// <summary> Project a <paramref name="position"/> into the <see cref="Plane"/> </summary>
+        /// <param name="position">The position to project into the <see cref="Plane"/></param>
+        /// <returns>The projected <paramref name="position"/> into the <see cref="Plane"/></returns>
+        public Position3 Project(Position3 position) {
+            return position + Normal * (float)Direction3.Dot(Position - position, Normal);
+        }
+
         /// <summary> Get the normal of the <see cref="Plane"/> </summary>
         /// <param name="surfacePoint">The surface point to get the normal for</param>
         /// <returns>The normal of the <see cref="Plane"/></returns>

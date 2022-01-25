@@ -13,7 +13,7 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates {
         public IEnumerable<ISceneObject> Lights { get; }
 
         /// <summary> Create a new scene with some default objects </summary>
-        /// <param name="screen">The screen to draw the raytracing to</param>
+        /// <param name="camera">The camera of the observer in the scene</param>
         /// <param name="primitives">The primitives in the scene</param>
         public Scene(ICamera camera, List<ISceneObject> primitives) { 
             Camera = camera;

@@ -44,16 +44,17 @@ namespace PathTracer {
             new Primitive(new Plane(new Normal3(0, 1, 0), new Position1(-1)), Material.Diffuse(RGBSpectrum.DarkGray)),
             new Primitive(new Triangle(new Position3(5, 0, 10), new Position3(-5, 0, 0), new Position3(-5, 0, 10), null), Material.Diffuse(RGBSpectrum.Gray)),
             new Primitive(new Triangle(new Position3(5, 0, 10), new Position3(5, 0, 0), new Position3(-5, 0, 0), null), Material.Specular(RGBSpectrum.Gray)),
-            new Primitive(new Sphere(new Position3(0, 1, 5), 1), Material.SpecularParticleCloud(RGBSpectrum.OffWhite, 2f, 0.2f)),
+            new Primitive(new Sphere(new Position3(0, 1, 5), 1), Material.SpecularParticleCloud(RGBSpectrum.OffWhite, 1024f, 0.001f)),
             new Primitive(new AxisAlignedBox(new Position3(2, 0, 5), new Position3(4, 2, 7)), Material.Diffuse(RGBSpectrum.Blue)),
-            new Primitive(new AxisAlignedBox(new Position3(-1.5f, 0, 4.5f), new Position3(-1, .5f, 5)), Material.Diffuse(RGBSpectrum.Green)),
+            //new Primitive(new AxisAlignedBox(new Position3(-1.5f, 0, 4.5f), new Position3(-1, .5f, 5)), Material.Diffuse(RGBSpectrum.Green)),
+            new Primitive(Tetrahedron.Regular(new Position3(-1.25f, 0, 4.75f), .5f), Material.Diffuse(RGBSpectrum.Green)),
         };
 
         /// <summary> Simple test scene </summary>
         public static readonly List<ISceneObject> Test = new() {
             new Primitive(new InfinityPlane(), Material.Emitter(RGBSpectrum.White)),
             new Primitive(new Plane(new Normal3(0, 1, 0), new Position1(0)), Material.Diffuse(RGBSpectrum.DarkGray)),
-            new Primitive(new AxisAlignedBox(new Position3(0, 0, 0), new Position3(2, 2, 2)), Material.Glossy(RGBSpectrum.Red, 0.0f)), // Broken due to origin
+            new Primitive(new AxisAlignedBox(new Position3(0, 0, 0), new Position3(2, 2, 2)), Material.SpecularParticleCloud(RGBSpectrum.Red, 1024f, 0.0f)),
         };
         #endregion
 

@@ -1,7 +1,6 @@
 ﻿using PathTracer.Geometry.Directions;
 using PathTracer.Geometry.Normals;
 using PathTracer.Geometry.Positions;
-using PathTracer.Geometry.Vectors;
 using PathTracer.Pathtracing.Rays;
 using System;
 using System.Collections.Generic;
@@ -12,7 +11,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics {
         /// <summary> Position of the <see cref="ISphere"/> </summary>
         Position3 Position { get; }
         /// <summary> The radius of the <see cref="ISphere"/> </summary>
-        Vector1 Radius { get; }
+        float Radius { get; }
         /// <summary> The volume of the <see cref="ISphere"/> </summary>
         float IShape.Volume => 4f / 3f * (float)Math.PI * Radius * Radius * Radius;
         /// <summary> The surface area of the <see cref="ISphere"/> </summary>

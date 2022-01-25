@@ -109,7 +109,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Planars {
         /// <param name="position">The position to check</param>
         /// <param name="epsilon">The epsilon to specify the precision</param>
         /// <returns>Whether the <paramref name="position"/> is on the surface of the <see cref="Rectangle"/></returns>
-        public bool OnSurface(Position3 position, float epsilon = 0.001F) {
+        public bool OnSurface(Position3 position, float epsilon = 0.0001F) {
             if ((PlaneOfExistence as IShape).OnSurface(position, epsilon)) {
                 IDirection3 relativeIntersection = position - Position;
                 Position1 u = (Position1)IDirection3.Dot(LeftToRight, relativeIntersection) / LeftToRight.LengthSquared;

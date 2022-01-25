@@ -12,7 +12,8 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials.Profiles.Orientation
         }
 
         public IProbabilityDistribution<Normal3> GetOrientations(Position3 position, Normal3 direction, IShape shape) {
-            return new SurfaceEllipsoid(shape.OutwardsDirection(position), Roughness, direction);
+            Normal3 orientation = shape.OutwardsDirection(position);
+            return Roughness > 0f ? new SurfaceEllipsoid(orientation, Roughness, direction) : new UniformPMF<Normal3>(orientation);
         }
     }
 }

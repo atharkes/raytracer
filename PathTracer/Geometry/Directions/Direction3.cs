@@ -46,14 +46,15 @@ namespace PathTracer.Geometry.Directions {
         public static bool operator ==(Direction3 left, Direction3 right) => left.Equals(right);
         public static bool operator !=(Direction3 left, Direction3 right) => !(left == right);
 
-        public static Direction3 operator +(Direction3 left, Direction3 right) => new(left.Vector + right.Vector);
-        public static Direction3 operator -(Direction3 direction) => new(-direction.Vector);
-        public static Direction3 operator -(Direction3 left, Direction3 right) => new(left.Vector - right.Vector);
-        public static Direction3 operator *(Direction3 direction, Position1 scale) => new(direction.Vector * scale.Vector);
-        public static Direction3 operator *(Direction3 direction, Position3 scale) => new(direction.Vector * scale.Vector);
-        public static Direction3 operator /(Direction3 direction, Position1 scale) => new(direction.Vector / scale.Vector);
+        public static Direction3 operator +(Direction3 left, Direction3 right) => left.Vector + right.Vector;
+        public static Direction3 operator -(Direction3 direction) => -direction.Vector;
+        public static Direction3 operator -(Direction3 left, Direction3 right) => left.Vector - right.Vector;
+        public static Direction3 operator *(Direction3 direction, float scale) => direction.Vector * scale;
+        public static Direction3 operator *(Direction3 direction, Position1 scale) => direction.Vector * scale.Vector;
+        public static Direction3 operator *(Direction3 direction, Position3 scale) => direction.Vector * scale.Vector;
+        public static Direction3 operator /(Direction3 direction, Position1 scale) => direction.Vector / scale.Vector;
         public static Direction3 operator /(Position1 scale, Direction3 direction) => scale.Vector / direction.Vector;
-        public static Direction3 operator /(Direction3 direction, Position3 scale) => new(direction.Vector / scale.Vector);
+        public static Direction3 operator /(Direction3 direction, Position3 scale) => direction.Vector / scale.Vector;
 
         public static Direction1 Dot(IDirection3 left, IDirection3 right) => new(Vector3.Dot(left.Vector, right.Vector));
         public static Direction3 Lerp(IDirection3 a, IDirection3 b, Vector1 blend) => Vector3.Lerp(a.Vector, b.Vector, blend);

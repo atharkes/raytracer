@@ -4,6 +4,7 @@ using PathTracer.Geometry.Positions;
 using PathTracer.Geometry.Vectors;
 using PathTracer.Pathtracing.Rays;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics;
+using PathTracer.Utilities.Extensions;
 using System;
 using System.Collections.Generic;
 
@@ -22,7 +23,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes {
         public bool Equals(InfinityPlane other) => true;
         
         public IEnumerable<Position1> IntersectDistances(IRay ray) {
-            yield return Position1.MinValue;
+            yield return Position1.MinValue;   
             yield return Position1.MaxValue;
         }
 

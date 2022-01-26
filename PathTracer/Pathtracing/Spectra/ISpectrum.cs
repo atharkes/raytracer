@@ -10,9 +10,9 @@ namespace PathTracer.Pathtracing.Spectra {
         const float MaximumWavelength = 7e-7f;
 
         /// <summary> The <see cref="ISpectrum"/> that represents no light </summary>
-        static readonly ISpectrum Black = RGBSpectrum.Black;
+        static readonly ISpectrum Black = RGBColors.Black;
         /// <summary> The <see cref="ISpectrum"/> that represents light of all wavelengths </summary>
-        static readonly ISpectrum White = RGBSpectrum.White;
+        static readonly ISpectrum White = RGBColors.White;
 
         /// <summary> Whether the <see cref="ISpectrum"/> is black </summary>
         bool IsBlack => Equals(Black);

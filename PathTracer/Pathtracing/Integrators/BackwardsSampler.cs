@@ -39,9 +39,13 @@ namespace PathTracer.Pathtracing.Integrators {
                 Position2 position = new((float)Utils.ThreadRandom.NextDouble(), (float)Utils.ThreadRandom.NextDouble());
                 Direction2 direction = new((float)Utils.ThreadRandom.NextDouble(), (float)Utils.ThreadRandom.NextDouble());
                 CameraRay ray = scene.Camera.GetCameraRay(position, direction);
-                ISpectrum light = Sample(scene, ray, ISpectrum.White, 0);
-                ISample sample = new Sample() { Position = position, Direction = direction, Light = light, Intersection = ray.Intersection, PrimaryBVHTraversals = ray.BVHTraversals };
-                scene.Camera.Film.RegisterSample(sample);
+                try {
+                    ISpectrum light = Sample(scene, ray, ISpectrum.White, 0);
+                    ISample sample = new Sample() { Position = position, Direction = direction, Light = light, Intersection = ray.Intersection, PrimaryBVHTraversals = ray.BVHTraversals };
+                    scene.Camera.Film.RegisterSample(sample);
+                } catch (Exception ex) {
+                    Console.WriteLine(ex.ToString());
+                }
             }
         }
 
@@ -84,13 +88,13 @@ namespace PathTracer.Pathtracing.Integrators {
             Normal3 orientation = orientations.Sample(Utils.ThreadRandom);
 
             /// Get Direct Illumination
-            ISpectrum directIllumination = RGBSpectrum.Black;
+            ISpectrum directIllumination = RGBColors.Black;
             if (primitive.Material.EmittanceProfile.IsEmitting) {
                 directIllumination = primitive.Material.EmittanceProfile.GetEmittance(position, orientation, -ray.Direction);
             }
 
             /// Get Indirect Illumination
-            ISpectrum indirectIllumination = RGBSpectrum.Black;
+            ISpectrum indirectIllumination = RGBColors.Black;
             if (!primitive.Material.AbsorptionProfile.IsBlackBody) {
                 /// Sample Direction
                 IProbabilityDistribution<Normal3> directions = primitive.Material.ReflectionProfile.GetDirections(ray.Direction, position, orientation, spectrum);

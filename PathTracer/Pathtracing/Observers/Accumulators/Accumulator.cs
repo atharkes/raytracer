@@ -13,7 +13,7 @@ namespace PathTracer.Pathtracing.Observers.Accumulators {
         /// <summary> The average accumulated light in the <see cref="Accumulator"/> </summary>
         public RGBSpectrum AccumulatedRGB {
             get {
-                RGBSpectrum result = RGBSpectrum.Black;
+                RGBSpectrum result = RGBColors.Black;
                 foreach (Cavity cavity in cavities) {
                     result += cavity.RGBColor;
                 }
@@ -32,6 +32,14 @@ namespace PathTracer.Pathtracing.Observers.Accumulators {
             for (int i = 0; i < cavities.Length; i++) {
                 cavities[i] = new Cavity();
             }
+        }
+
+        /// <summary> Get the <see cref="Cavity"/> at the specified coordinates </summary>
+        /// <param name="x">The x coordinate of the <see cref="Cavity"/></param>
+        /// <param name="y">The y coordinate of the <see cref="Cavity"/></param>
+        /// <returns>The <see cref="Cavity"/> at the specified coordinates</returns>
+        public Cavity Get(int x, int y) {
+            return cavities[x + y * Width];
         }
 
         /// <summary> Add a <paramref name="sample"/> to the <see cref="Accumulator"/> </summary>

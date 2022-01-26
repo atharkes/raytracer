@@ -6,7 +6,7 @@ using PathTracer.Pathtracing.Spectra;
 namespace PathTracer.Pathtracing.SceneDescription.Materials.Profiles {
     /// <summary> The absorption profile of an <see cref="IMaterial"/> </summary>
     public interface IAbsorptionProfile {
-        public static readonly IAbsorptionProfile BlackBody = new Uniform(RGBSpectrum.Black);
+        public static readonly IAbsorptionProfile BlackBody = new Uniform(RGBColors.Black);
         public static IAbsorptionProfile Uniform(ISpectrum albedo) => new Uniform(albedo);
 
         /// <summary> Whether the <see cref="IAbsorptionProfile"/> absorbs all incoming light </summary>

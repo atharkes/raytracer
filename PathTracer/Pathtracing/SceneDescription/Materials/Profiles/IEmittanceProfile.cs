@@ -6,7 +6,7 @@ using PathTracer.Pathtracing.Spectra;
 namespace PathTracer.Pathtracing.SceneDescription.Materials.Profiles {
     /// <summary> The emittance profile of an <see cref="IMaterial"/> </summary>
     public interface IEmittanceProfile {
-        public static readonly IEmittanceProfile None = new Uniform(RGBSpectrum.Black);
+        public static readonly IEmittanceProfile None = new Uniform(RGBColors.Black);
         public static IEmittanceProfile Uniform(ISpectrum spectrum) => new Uniform(spectrum);
 
         /// <summary> Whether the <see cref="IEmittanceProfile"/> is emitting light </summary>

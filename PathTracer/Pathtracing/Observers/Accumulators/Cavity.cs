@@ -14,7 +14,7 @@ namespace PathTracer.Pathtracing.Observers.Accumulators {
         public int Intersections { get; private set; } = 0;
 
         /// <summary> The color of the <see cref="Cavity"/> </summary>
-        public RGBSpectrum RGBColor => Samples == 0 ? RGBSpectrum.Black : Light.ToRGBSpectrum() * (1f / Samples);
+        public RGBSpectrum RGBColor => Samples == 0 ? RGBColors.Black : Light.ToRGBSpectrum() * (1f / Samples);
         /// <summary> Average light of the photons in the cavity </summary>
         public ISpectrum AverageLight => Samples == 0 ? ISpectrum.Black : Light * (1f / Samples);
         /// <summary> Average BVH traversals of photons in the cavity </summary>

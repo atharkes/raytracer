@@ -4,9 +4,8 @@
 *Disclaimer: This framework is by no means efficient at pathtracing. It's main goal is to be general enough to be able to support a multitude of different (monte carlo) rendering algorithms, while breaking them into smaller pieces to avoid blobs and code duplication.*
 
 #### Required:
-Visual Studio 2019 with:
+Visual Studio 2021 with:
 - .Net 6
-- Class Designer (only for viewing the class diagram)
 
 #### Features:
 - Pathtracing architecture
@@ -42,8 +41,8 @@ Visual Studio 2019 with:
 - AABB-Ray Intersection: https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-box-intersection
 - BVH Binning: On fast Construction of SAH-based Bounding Volume Hierarchies - I. Wald
 - Triangle Clipping: Efficient Triangle and Quadrilateral Clipping within Shaders - M. McGuire
-- SBVH Idea: Spatial Splits in Bounding Volume Hierarchies - M. Stich, H. Friedrich, A. Dietrich
-- SBVH Implementation: Parallel Spatial Splits in Bounding Volume Hierarchies - V. Fuetterling, C. Lojewski, F.-J Pfreundt and A. Ebert
+- SBVH: Spatial Splits in Bounding Volume Hierarchies - M. Stich, H. Friedrich, A. Dietrich
+- SBVH implementation: Parallel Spatial Splits in Bounding Volume Hierarchies - V. Fuetterling, C. Lojewski, F.-J Pfreundt and A. Ebert
 - GGX: The Ellipsoid Normal Distribution Function - B. Walter, Z. Dong, S. Marschner and D. P. Greenberg
 - GGX implementation: A Simpler and Exact Sampling Routine for the GGX Distribution of Visible Normals - E. Heitz
 - SGGX: The SGGX microflake distribution - E. Heitz, J. Dupuy, C. Crassin and C. Dachsbacher

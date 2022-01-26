@@ -30,7 +30,7 @@ Visual Studio 2021 with:
 - F3:           Cycle through Debug information color
 - =:            Increase FOV
 - -:            Decrease FOV
-- ESC           Exit the application
+- ESC:          Exit the application
 
 #### References:
 - Inspiration: Graphics (2015-2016) & Advanced Graphics (2019-2020) courses at the Utrecht University

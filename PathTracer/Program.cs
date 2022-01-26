@@ -22,6 +22,7 @@ using SimpleImageIO;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 
 namespace PathTracer {
     public static class Program {
@@ -95,6 +96,7 @@ namespace PathTracer {
         /// <summary> Entry point of the application </summary>
         /// <param name="args">Arguments given</param>
         public static void Main() {
+            CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
             RunTests();
         }
 
@@ -120,7 +122,7 @@ namespace PathTracer {
         }
 
         static void RunTests() {
-            TimeSpan renderTime = new(0, 0, 30);
+            TimeSpan renderTime = new(0, 20, 00);
             float[] densityValues = { 0.5f, 2f, 8f, 32f };
             float[] rougnessValues = { 0f, 0.1f, 0.2f, 0.5f, 1f };
             foreach (float density in densityValues) {

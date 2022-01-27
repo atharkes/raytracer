@@ -64,83 +64,59 @@ namespace PathTracer {
         public static readonly Threadpool Threadpool = new();
         /// <summary> The configuration of the renderer </summary>
         public static readonly Config Config = Config.LoadFromFile();
-        /// <summary> The window supplied by OpenTK to render to </summary>
-        public static readonly RenderWindow Window = new(
-            new GameWindowSettings() {
-                UpdateFrequency = 0,
-                RenderFrequency = 0,
-                IsMultiThreaded = false,
-            },
-            new NativeWindowSettings() {
-                Location = Config.WindowPosition,
-                Size = Config.WindowSize,
-                Title = "C# .NET 5 OpenTK Pathtracer",
-                WindowBorder = WindowBorder.Resizable,
-            });
-        /// <summary> The <see cref="ICamera"/> viewing the scene </summary>
-        public static readonly ICamera Camera = new PinholeCamera(Config.Position, Config.Rotation, Config.AspectRatio, Config.FOV);
-        /// <summary> The <see cref="IObserver"/> viewing the scene </summary>
-        public static readonly IObserver Observer = new Observer(Window, Camera) {
-            DrawingMode = Config.DrawingMode,
-            DebugInfo = Config.DebugInfo,
-            DebugColor = Config.DebugColor,
-            CameraLock = Config.CameraLock,
-        };
         /// <summary> The <see cref="IIntegrator"/> to integrate the scene </summary>
         public static readonly IIntegrator Integrator = new BackwardsSampler();
-        /// <summary> The scene to render </summary>
-        public static readonly IScene Scene = new Scene(Observer.Camera, RoughnessDensityTest(2f, 0.1f));
-        /// <summary> The <see cref="IRenderer"/> to supply images </summary>
-        public static readonly IRenderer Renderer = new Renderer(Scene, Integrator, Observer);
+        /// <summary> The <see cref="GameWindow"/> settings </summary>
+        public static readonly GameWindowSettings GameWindowSettings = new() {
+            UpdateFrequency = 0,
+            RenderFrequency = 0,
+            IsMultiThreaded = false
+        };
+        /// <summary> The <see cref="NativeWindow"/> settings </summary>
+        public static readonly NativeWindowSettings NativeWindowSettings = new() {
+            Location = Config.WindowPosition,
+            Size = Config.WindowSize,
+            Title = "C# .NET 6 OpenTK Pathtracer",
+            WindowBorder = WindowBorder.Resizable,
+        };
 
         /// <summary> Entry point of the application </summary>
-        /// <param name="args">Arguments given</param>
         public static void Main() {
             CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
             RunTests();
+            Threadpool.Dispose();
         }
 
         static void RunGameWindow() {
+            /// Setup
+            RenderWindow window = new(GameWindowSettings, NativeWindowSettings);
+            ICamera camera = new PinholeCamera(Config.Position, Config.Rotation, Config.AspectRatio, Config.FOV);
+            IObserver observer = new Observer(window, camera) {
+                DrawingMode = Config.DrawingMode,
+                DebugInfo = Config.DebugInfo,
+                DebugColor = Config.DebugColor,
+                CameraLock = Config.CameraLock,
+            };
+            IScene scene = new Scene(observer.Camera, RoughnessDensityTest(2f, 0.1f));
+            IRenderer renderer = new Renderer(scene, Integrator, observer);
             OutputBlenderInformation();
 
-            void UpdateRenderer(FrameEventArgs obj) => Renderer.Render(Renderer.Observer.TargetFrameTime);
-            void HandleInput(FrameEventArgs obj) => Renderer.Observer.HandleInput(Window.KeyboardState, Window.MouseState);
+            /// Attach to Game Window
+            void UpdateRenderer(FrameEventArgs obj) => renderer.Render(renderer.Observer.TargetFrameTime);
+            void HandleInput(FrameEventArgs obj) => renderer.Observer.HandleInput(window.KeyboardState, window.MouseState);
+            window.UpdateFrame += HandleInput;
+            window.RenderFrame += UpdateRenderer;
 
             /// Run Renderer
-            Window.UpdateFrame += HandleInput;
-            Window.RenderFrame += UpdateRenderer;
-            Window.Run();
+            window.Run();
 
             /// Dispose
-            Window.UpdateFrame -= HandleInput;
-            Window.RenderFrame -= UpdateRenderer;
-            Window.Dispose();
-            Threadpool.Dispose();
+            window.UpdateFrame -= HandleInput;
+            window.RenderFrame -= UpdateRenderer;
+            window.Dispose();
 
             /// Output
-            Config.SaveToFile(Renderer);
-        }
-
-        static void RunTests() {
-            TimeSpan renderTime = new(0, 20, 00);
-            float[] densityValues = { 0.5f, 2f, 8f, 32f };
-            float[] rougnessValues = { 0f, 0.1f, 0.2f, 0.5f, 1f };
-            foreach (float density in densityValues) {
-                foreach (float roughness in rougnessValues) {
-                    Console.WriteLine($"Time = {DateTime.Now.TimeOfDay:c} | Currently at: density = {density:0.0}, roughness = {roughness:0.00}");
-                    /// Setup
-                    IObserver observer = new Observer(Window, Camera);
-                    IScene scene = new Scene(observer.Camera, RoughnessDensityTest(density, roughness));
-                    IRenderer renderer = new Renderer(scene, Integrator, observer);
-                    /// Render
-                    var timer = Stopwatch.StartNew();
-                    while (timer.Elapsed < renderTime) {
-                        renderer.Render(renderTime - timer.Elapsed);
-                    }
-                    /// Output
-                    OutputImage($"density{density:0.0}roughness{roughness:0.00}");
-                }
-            }
+            Config.SaveToFile(renderer);
         }
 
         static void OutputBlenderInformation() {
@@ -150,11 +126,36 @@ namespace PathTracer {
             Console.WriteLine($"Blender Rotation Quaternion | {blenderRotation * blenderFrontCompensation}");
         }
 
-        static void OutputImage(string filename) {
-            RgbImage img = new(w: Config.WindowWidth, h: Config.WindowHeight);
-            for (int y = 0; y < Config.WindowHeight; y++) {
-                for (int x = 0; x < Config.WindowWidth; x++) {
-                    RGBSpectrum color = Observer.Accumulator.Get(x, y).AverageLight.ToRGBSpectrum();
+        static void RunTests() {
+            TimeSpan renderTime = new(0, 5, 00);
+            float[] densityValues = { 0.5f, 2f, 8f, 32f };
+            float[] rougnessValues = { 0f, 0.1f, 0.2f, 0.5f, 1f };
+            RenderWindow placeholder = new(GameWindowSettings, NativeWindowSettings);
+            foreach (float density in densityValues) {
+                foreach (float roughness in rougnessValues) {
+                    Console.WriteLine($"Time = {DateTime.Now.TimeOfDay:c} | Currently at: density = {density:0.0}, roughness = {roughness:0.00}");
+                    /// Setup
+                    ICamera camera = new PinholeCamera(Config.Position, Config.Rotation, Config.AspectRatio, Config.FOV);
+                    IObserver observer = new Observer(placeholder, camera) { DrawingMode = Config.DrawingMode, DebugInfo = Config.DebugInfo, DebugColor = Config.DebugColor, CameraLock = Config.CameraLock };
+                    IScene scene = new Scene(observer.Camera, RoughnessDensityTest(density, roughness));
+                    IRenderer renderer = new Renderer(scene, Integrator, observer);
+                    /// Render
+                    var timer = Stopwatch.StartNew();
+                    while (timer.Elapsed < renderTime) {
+                        renderer.Render(renderTime - timer.Elapsed);
+                    }
+                    /// Output
+                    OutputImage(observer, $"density{density:0.0}roughness{roughness:0.00}");
+                }
+            }
+            placeholder.Dispose();
+        }
+
+        static void OutputImage(IObserver observer, string filename) {
+            RgbImage img = new(w: observer.Accumulator.Width, h: observer.Accumulator.Height);
+            for (int y = 0; y < observer.Accumulator.Height; y++) {
+                for (int x = 0; x < observer.Accumulator.Width; x++) {
+                    RGBSpectrum color = observer.Accumulator.Get(x, y).AverageLight.ToRGBSpectrum();
                     img.SetPixel(x, y, new(color.Red, color.Green, color.Blue));
                 }
             }

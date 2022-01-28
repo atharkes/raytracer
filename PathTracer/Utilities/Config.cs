@@ -25,11 +25,11 @@ namespace PathTracer.Utilities {
         public int WindowPositionY { get => WindowPosition.Y; set => WindowPosition = new Vector2i(WindowPosition.X, value); }
 
         /// <summary> The drawing mode of the observer </summary>
-        public DrawingMode DrawingMode { get; set; } = DrawingMode.Light;
+        public DrawingMode Drawing { get; set; } = DrawingMode.Light;
         /// <summary> Which debug information is being displayed to the observer </summary>
-        public DebugOutput DebugInfo { get; set; } = DebugOutput.None;
+        public DebugOutput Debug { get; set; } = DebugOutput.None;
         /// <summary> The color of the debug output </summary>
-        public int DebugColor { get; set; } = 0xffffff;
+        public int TextColor { get; set; } = 0xffffff;
         /// <summary> Whether the camera is locked </summary>
         public bool CameraLock { get; set; } = false;
 
@@ -70,12 +70,14 @@ namespace PathTracer.Utilities {
         /// <summary> Save the camera configuration to the file </summary>
         public void SaveToFile(IRenderer renderer) {
             /// Obtain Configuration
-            WindowSize = renderer.Observer.Screen.Size;
-            WindowPosition = renderer.Observer.Screen.Location;
-            DrawingMode = renderer.Observer.DrawingMode;
-            DebugInfo = renderer.Observer.DebugInfo;
-            DebugColor = renderer.Observer.DebugColor;
-            CameraLock = renderer.Observer.CameraLock; 
+            if (renderer.Observer is IInteractiveObserver observer) {
+                WindowSize = observer.Screen.Size;
+                WindowPosition = observer.Screen.Location;
+                Drawing = observer.Drawing;
+                Debug = observer.Debug;
+                TextColor = observer.TextColor;
+                CameraLock = observer.CameraLock;
+            }
             Position = renderer.Observer.Camera.Position;
             Rotation = renderer.Observer.Camera.Rotation;
             FOV = renderer.Observer.Camera.HorizontalFOV;

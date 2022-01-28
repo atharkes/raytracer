@@ -91,10 +91,10 @@ namespace PathTracer {
             /// Setup
             RenderWindow window = new(GameWindowSettings, NativeWindowSettings);
             ICamera camera = new PinholeCamera(Config.Position, Config.Rotation, Config.AspectRatio, Config.FOV);
-            IObserver observer = new Observer(window, camera) {
-                DrawingMode = Config.DrawingMode,
-                DebugInfo = Config.DebugInfo,
-                DebugColor = Config.DebugColor,
+            IInteractiveObserver observer = new InteractiveObserver(window, camera) {
+                Drawing = Config.Drawing,
+                Debug = Config.Debug,
+                TextColor = Config.TextColor,
                 CameraLock = Config.CameraLock,
             };
             IScene scene = new Scene(observer.Camera, RoughnessDensityTest(2f, 0.1f));
@@ -102,8 +102,8 @@ namespace PathTracer {
             OutputBlenderInformation();
 
             /// Attach to Game Window
-            void UpdateRenderer(FrameEventArgs obj) => renderer.Render(renderer.Observer.TargetFrameTime);
-            void HandleInput(FrameEventArgs obj) => renderer.Observer.HandleInput(window.KeyboardState, window.MouseState);
+            void UpdateRenderer(FrameEventArgs obj) => renderer.Render(observer.TargetFrameTime);
+            void HandleInput(FrameEventArgs obj) => observer.HandleInput(window.KeyboardState, window.MouseState);
             window.UpdateFrame += HandleInput;
             window.RenderFrame += UpdateRenderer;
 
@@ -127,16 +127,15 @@ namespace PathTracer {
         }
 
         static void RunTests() {
-            TimeSpan renderTime = new(0, 5, 00);
+            TimeSpan renderTime = new(0, 20, 00);
             float[] densityValues = { 0.5f, 2f, 8f, 32f };
             float[] rougnessValues = { 0f, 0.1f, 0.2f, 0.5f, 1f };
-            RenderWindow placeholder = new(GameWindowSettings, NativeWindowSettings);
             foreach (float density in densityValues) {
                 foreach (float roughness in rougnessValues) {
                     Console.WriteLine($"Time = {DateTime.Now.TimeOfDay:c} | Currently at: density = {density:0.0}, roughness = {roughness:0.00}");
                     /// Setup
                     ICamera camera = new PinholeCamera(Config.Position, Config.Rotation, Config.AspectRatio, Config.FOV);
-                    IObserver observer = new Observer(placeholder, camera) { DrawingMode = Config.DrawingMode, DebugInfo = Config.DebugInfo, DebugColor = Config.DebugColor, CameraLock = Config.CameraLock };
+                    IObserver observer = new Observer(camera, Config.WindowWidth, Config.WindowHeight);
                     IScene scene = new Scene(observer.Camera, RoughnessDensityTest(density, roughness));
                     IRenderer renderer = new Renderer(scene, Integrator, observer);
                     /// Render
@@ -148,7 +147,6 @@ namespace PathTracer {
                     OutputImage(observer, $"density{density:0.0}roughness{roughness:0.00}");
                 }
             }
-            placeholder.Dispose();
         }
 
         static void OutputImage(IObserver observer, string filename) {

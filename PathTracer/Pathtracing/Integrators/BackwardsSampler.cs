@@ -14,7 +14,7 @@ using System;
 
 namespace PathTracer.Pathtracing.Integrators {
     /// <summary> An <see cref="Integrator"/> that samples from the <see cref="ICamera"/> </summary>
-    public class BackwardsSampler : Integrator {
+    public class BackwardsSampler : IIntegrator {
         /// <summary> The minimum amount of samples per integration cycle of the <see cref="BackwardsSampler"/> </summary>
         public static readonly int MinimumSampleCount = Program.Threadpool.MultithreadingTaskCount * 10;
         /// <summary> The maximum recursion depth for sampling </summary>
@@ -22,7 +22,7 @@ namespace PathTracer.Pathtracing.Integrators {
         /// <summary> The chance of russian roulette when the gauranteed recursion depth is exceeded </summary>
         public const float RussianRouletteChance = 0.9f;
 
-        public override void Integrate(IScene scene, int sampleCount) {
+        public void Integrate(IScene scene, int sampleCount) {
             double taskSize = (double)sampleCount / Program.Threadpool.MultithreadingTaskCount;
             Action[] tasks = new Action[Program.Threadpool.MultithreadingTaskCount];
             for (int i = 0; i < Program.Threadpool.MultithreadingTaskCount; i++) {

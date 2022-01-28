@@ -40,7 +40,9 @@ namespace PathTracer.Pathtracing {
             Statistics.SampleCountLastTick = sampleCount;
             Statistics.LogTaskTime(Statistics.IntegratorTime);
             // Drawing
-            Observer.DrawFrame(Statistics);
+            if (Observer is IInteractiveObserver interactiveObserver) {
+                interactiveObserver.DrawFrame(Statistics);
+            }
             Statistics.LogTaskTime(Statistics.DrawingTime);
         }
 

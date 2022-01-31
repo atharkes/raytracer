@@ -89,7 +89,7 @@ namespace PathTracer {
         static void RunGameWindow() {
             /// Setup
             RenderWindow window = new(GameWindowSettings, NativeWindowSettings);
-            ICamera camera = new PinholeCamera(Config.Position, Config.Rotation, Config.AspectRatio, Config.FOV);
+            ICamera camera = new PinholeCamera(Config.Position, Config.Rotation, Config.AspectRatio, Config.HorizontalFOV);
             IInteractiveObserver observer = new InteractiveObserver(window, camera) {
                 Drawing = Config.Drawing,
                 Debug = Config.Debug,
@@ -119,11 +119,10 @@ namespace PathTracer {
 
         static void CreateLuxCoreComparisonImage() {
             /// Setup
-            ICamera camera = new PinholeCamera(Config.Position, Config.Rotation, Config.AspectRatio, Config.FOV);
+            ICamera camera = new PinholeCamera(Config.Position, Config.Rotation, Config.AspectRatio, Config.HorizontalFOV);
             IObserver observer = new Observer(camera, Config.WindowWidth, Config.WindowHeight);
             IScene scene = new Scene(observer.Camera, LuxCoreComparison);
             IRenderer renderer = new Renderer(scene, Integrator, observer);
-            OutputBlenderInformation(observer);
             /// Render
             TimeSpan renderTime = new(0, 30, 00);
             var timer = Stopwatch.StartNew();
@@ -134,26 +133,6 @@ namespace PathTracer {
             OutputImage(observer, $"pathtracer-minutes{renderTime.Minutes}");
         }
 
-        static void OutputBlenderInformation(IObserver observer) {
-            Console.WriteLine($"Blender Camera Properties");
-
-            /// Position
-            Vector3 position = observer.Camera.Position.Vector;
-            Vector3 blenderPosition = new(position.X, position.Z, position.Y);
-            Console.WriteLine($"Position | {blenderPosition}");
-
-            /// Rotation
-            var blenderRotation = new Quaternion(-observer.Camera.Rotation.X, -observer.Camera.Rotation.Z, -observer.Camera.Rotation.Y, observer.Camera.Rotation.W);
-            var blenderFrontCompensation = new Quaternion((float)Math.Sqrt(2) / 2f, 0f, 0f, (float)Math.Sqrt(2) / 2f);
-            Console.WriteLine($"Rotation | {blenderRotation * blenderFrontCompensation}");
-
-            /// Field of View
-            Console.WriteLine($"Horizontal FOV | {observer.Camera.HorizontalFOV}");
-
-            /// Screen Resolution
-            Console.WriteLine($"Screen Resolution | {observer.Accumulator.Size}");
-        }
-
         static void CreateDensityRoughnessImages() {
             TimeSpan renderTime = new(0, 20, 00);
             float[] densityValues = { 0.5f, 2f, 8f, 32f };
@@ -162,7 +141,7 @@ namespace PathTracer {
                 foreach (float roughness in rougnessValues) {
                     Console.WriteLine($"Time = {DateTime.Now.TimeOfDay:c} | Currently at: density = {density:0.0}, roughness = {roughness:0.00}");
                     /// Setup
-                    ICamera camera = new PinholeCamera(Config.Position, Config.Rotation, Config.AspectRatio, Config.FOV);
+                    ICamera camera = new PinholeCamera(Config.Position, Config.Rotation, Config.AspectRatio, Config.HorizontalFOV);
                     IObserver observer = new Observer(camera, Config.WindowWidth, Config.WindowHeight);
                     IScene scene = new Scene(observer.Camera, RoughnessDensityTest(density, roughness));
                     IRenderer renderer = new Renderer(scene, Integrator, observer);

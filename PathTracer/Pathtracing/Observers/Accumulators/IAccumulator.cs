@@ -3,6 +3,8 @@
 namespace PathTracer.Pathtracing.Observers.Accumulators {
     /// <summary> The part of the <see cref="ICamera"/> that accumulates the light samples </summary>
     public interface IAccumulator {
+        /// <summary> The size of the <see cref="IAccumulator"/> </summary>
+        OpenTK.Mathematics.Vector2i Size => new(Width, Height);
         /// <summary> The width of the <see cref="IAccumulator"/> </summary>
         int Width { get; }
         /// <summary> The height of the <see cref="IAccumulator"/> </summary>

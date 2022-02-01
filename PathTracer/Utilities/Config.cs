@@ -35,26 +35,42 @@ namespace PathTracer.Utilities {
 
         /// <summary> The position of the camera </summary>
         [JsonIgnore] public Position3 Position { get; set; } = new Position3(0, 1, 0);
-        /// <summary> The x position of the camera </summary>
+        /// <summary> The X-position of the camera </summary>
         public float PositionX { get => Position.X.Vector.Value; set => Position = new Position3(value, Position.Y, Position.Z); }
-        /// <summary> The y position of the camera </summary>
+        /// <summary> The Y-position of the camera </summary>
         public float PositionY { get => Position.Y.Vector.Value; set => Position = new Position3(Position.X, value, Position.Z); }
-        /// <summary> The z position of the camera </summary>
+        /// <summary> The Z-position of the camera </summary>
         public float PositionZ { get => Position.Z.Vector.Value; set => Position = new Position3(Position.X, Position.Y, value); }
+
+        /// <summary> The X-position of the camera in Blender </summary>
+        public float BlenderPositionX => PositionX;
+        /// <summary> The Y-position of the camera in Blender </summary>
+        public float BlenderPositionY => PositionZ;
+        /// <summary> The Z-position of the camera in Blender </summary>
+        public float BlenderPositionZ => PositionY;
 
         /// <summary> The rotation quaternion of the camera </summary>
         [JsonIgnore] public Quaternion Rotation { get; set; } = Quaternion.Identity;
-        /// <summary> The x component of the rotation quaternion </summary>
-        public float RotationX { get => Rotation.X; set => Rotation = new Quaternion(value, Rotation.Y, Rotation.Z, Rotation.W); }
-        /// <summary> The y component of the rotation quaternion </summary>
-        public float RotationY { get => Rotation.Y; set => Rotation = new Quaternion(Rotation.X, value, Rotation.Z, Rotation.W); }
-        /// <summary> The z component of the rotation quaternion </summary>
-        public float RotationZ { get => Rotation.Z; set => Rotation = new Quaternion(Rotation.X, Rotation.Y, value, Rotation.W); }
-        /// <summary> The w component of the rotation quaternion </summary>
+        /// <summary> The W-component of the rotation quaternion </summary>
         public float RotationW { get => Rotation.W; set => Rotation = new Quaternion(Rotation.X, Rotation.Y, Rotation.Z, value); }
+        /// <summary> The X-component of the rotation quaternion </summary>
+        public float RotationX { get => Rotation.X; set => Rotation = new Quaternion(value, Rotation.Y, Rotation.Z, Rotation.W); }
+        /// <summary> The Y-component of the rotation quaternion </summary>
+        public float RotationY { get => Rotation.Y; set => Rotation = new Quaternion(Rotation.X, value, Rotation.Z, Rotation.W); }
+        /// <summary> The Z-component of the rotation quaternion </summary>
+        public float RotationZ { get => Rotation.Z; set => Rotation = new Quaternion(Rotation.X, Rotation.Y, value, Rotation.W); }
 
-        /// <summary> The field of view of the camera </summary>
-        public float FOV { get; set; } = 90f;
+        /// <summary> The W-component of the rotation quaternion in Blender </summary>
+        public float BlenderRotationW => 0.70710678118f * RotationW - 0.70710678118f * -RotationX;
+        /// <summary> The X-component of the rotation quaternion in Blender </summary>
+        public float BlenderRotationX => 0.70710678118f * -RotationX + 0.70710678118f * RotationW;
+        /// <summary> The Y-component of the rotation quaternion in Blender </summary>
+        public float BlenderRotationY => 0.70710678118f * -RotationZ + 0.70710678118f * -RotationY;
+        /// <summary> The Z-component of the rotation quaternion in Blender </summary>
+        public float BlenderRotationZ => 0.70710678118f * -RotationY - 0.70710678118f * -RotationZ;
+
+        /// <summary> The horizontal field of view of the camera </summary>
+        public float HorizontalFOV { get; set; } = 90f;
 
         /// <summary> The name of the file in which the config is saved </summary>
         public const string FileName = "CameraConfig.json";
@@ -80,7 +96,7 @@ namespace PathTracer.Utilities {
             }
             Position = renderer.Observer.Camera.Position;
             Rotation = renderer.Observer.Camera.Rotation;
-            FOV = renderer.Observer.Camera.HorizontalFOV;
+            HorizontalFOV = renderer.Observer.Camera.HorizontalFOV;
             /// Write to File
             FileStream.SetLength(0);
             StreamWriter streamWriter = new(FileStream);

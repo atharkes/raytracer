@@ -27,18 +27,24 @@ using System.Globalization;
 namespace PathTracer {
     public static class Program {
         #region Scene Definitions
+        /// <summary> Simple test scene </summary>
+        public static readonly List<ISceneObject> Test = new() {
+            new Primitive(new InfinityPlane(), Material.Emitter(RGBColors.White)),
+            new Primitive(new Plane(new Normal3(0, 1, 0), new Position1(0)), Material.Diffuse(RGBColors.DarkGray)),
+            new Primitive(new AxisAlignedBox(new Position3(0, 0, 0), new Position3(2, 2, 2)), Material.SpecularParticleCloud(RGBColors.Red, 1024f, 0.0f)),
+        };
+
         /// <summary> The primitives in the default scene </summary>
-        public static readonly List<ISceneObject> DefaultPrimitives = new() {
+        public static readonly List<ISceneObject> LuxCoreComparison = new() {
             new Primitive(new InfinityPlane(), Material.Emitter(RGBColors.White)),
             new Primitive(new Plane(new Normal3(0, 1, 0), new Position1(-1)), Material.Diffuse(RGBColors.Gray)),
             new Primitive(new Triangle(new Position3(5, 0, 10), new Position3(-5, 0, 0), new Position3(-5, 0, 10), null), Material.Diffuse(RGBColors.Yellow)),
             new Primitive(new Triangle(new Position3(5, 0, 10), new Position3(5, 0, 0), new Position3(-5, 0, 0), null), Material.SpecularDiffuseBlend(RGBColors.Purple, 0.5f)),
-            new Primitive(new AxisAlignedBox(new Position3(-5, 0, 0), new Position3(5, 3f, 10)), Material.DiffuseParticleCloud(RGBColors.OffWhite, 0.2f)),
             new Primitive(new Sphere(new Position3(-3, 1, 5), 1), Material.Diffuse(RGBColors.Green)),
             new Primitive(new Sphere(new Position3(3, 1, 5), 1), Material.Glossy(RGBColors.Red, 0.2f)),
             new Primitive(new Sphere(new Position3(0, 1, 5), 1), Material.Glossy(RGBColors.OffWhite, 0.2f)),
             new Primitive(new Sphere(new Position3(0, 1, 8), 1), Material.Specular(RGBColors.OffWhite)),
-            new Primitive(new Sphere(new Position3(-1, 1, 2), 1), Material.SpecularParticleCloud(RGBColors.OffWhite, 4f, 0.1f)),
+            new Primitive(new Sphere(new Position3(-1, 1, 2), 1), Material.DiffuseParticleCloud(RGBColors.OffWhite, 4f, 0.1f)),
         };
 
         /// <summary> The scene primitives to test roughness and density of volumetric </summary>
@@ -50,13 +56,6 @@ namespace PathTracer {
             new Primitive(new Sphere(new Position3(0, 1, 5), 1), Material.SpecularParticleCloud(RGBColors.OffWhite, density, roughness)),
             new Primitive(new AxisAlignedBox(new Position3(2, 0, 5), new Position3(4, 2, 7)), Material.Diffuse(RGBColors.Blue)),
             new Primitive(Tetrahedron.Regular(new Position3(-1.25f, 0, 4.75f), .5f), Material.Diffuse(RGBColors.Green)),
-        };
-
-        /// <summary> Simple test scene </summary>
-        public static readonly List<ISceneObject> Test = new() {
-            new Primitive(new InfinityPlane(), Material.Emitter(RGBColors.White)),
-            new Primitive(new Plane(new Normal3(0, 1, 0), new Position1(0)), Material.Diffuse(RGBColors.DarkGray)),
-            new Primitive(new AxisAlignedBox(new Position3(0, 0, 0), new Position3(2, 2, 2)), Material.SpecularParticleCloud(RGBColors.Red, 1024f, 0.0f)),
         };
         #endregion
 
@@ -83,23 +82,22 @@ namespace PathTracer {
         /// <summary> Entry point of the application </summary>
         public static void Main() {
             CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
-            RunTests();
+            CreateLuxCoreComparisonImage();
             Threadpool.Dispose();
         }
 
         static void RunGameWindow() {
             /// Setup
             RenderWindow window = new(GameWindowSettings, NativeWindowSettings);
-            ICamera camera = new PinholeCamera(Config.Position, Config.Rotation, Config.AspectRatio, Config.FOV);
+            ICamera camera = new PinholeCamera(Config.Position, Config.Rotation, Config.AspectRatio, Config.HorizontalFOV);
             IInteractiveObserver observer = new InteractiveObserver(window, camera) {
                 Drawing = Config.Drawing,
                 Debug = Config.Debug,
                 TextColor = Config.TextColor,
                 CameraLock = Config.CameraLock,
             };
-            IScene scene = new Scene(observer.Camera, RoughnessDensityTest(2f, 0.1f));
+            IScene scene = new Scene(observer.Camera, LuxCoreComparison);
             IRenderer renderer = new Renderer(scene, Integrator, observer);
-            OutputBlenderInformation();
 
             /// Attach to Game Window
             void UpdateRenderer(FrameEventArgs obj) => renderer.Render(observer.TargetFrameTime);
@@ -119,14 +117,23 @@ namespace PathTracer {
             Config.SaveToFile(renderer);
         }
 
-        static void OutputBlenderInformation() {
-            /// Compute Blender Rotation Quaternion
-            var blenderRotation = new Quaternion(-Config.Rotation.X, -Config.Rotation.Z, -Config.Rotation.Y, Config.Rotation.W);
-            var blenderFrontCompensation = new Quaternion((float)Math.Sqrt(2) / 2f, 0f, 0f, (float)Math.Sqrt(2) / 2f);
-            Console.WriteLine($"Blender Rotation Quaternion | {blenderRotation * blenderFrontCompensation}");
+        static void CreateLuxCoreComparisonImage() {
+            /// Setup
+            ICamera camera = new PinholeCamera(Config.Position, Config.Rotation, Config.AspectRatio, Config.HorizontalFOV);
+            IObserver observer = new Observer(camera, Config.WindowWidth, Config.WindowHeight);
+            IScene scene = new Scene(observer.Camera, LuxCoreComparison);
+            IRenderer renderer = new Renderer(scene, Integrator, observer);
+            /// Render
+            TimeSpan renderTime = new(0, 30, 00);
+            var timer = Stopwatch.StartNew();
+            while (timer.Elapsed < renderTime) {
+                renderer.Render(renderTime - timer.Elapsed);
+            }
+            /// Output
+            OutputImage(observer, $"pathtracer-minutes{renderTime.Minutes}");
         }
 
-        static void RunTests() {
+        static void CreateDensityRoughnessImages() {
             TimeSpan renderTime = new(0, 20, 00);
             float[] densityValues = { 0.5f, 2f, 8f, 32f };
             float[] rougnessValues = { 0f, 0.1f, 0.2f, 0.5f, 1f };
@@ -134,7 +141,7 @@ namespace PathTracer {
                 foreach (float roughness in rougnessValues) {
                     Console.WriteLine($"Time = {DateTime.Now.TimeOfDay:c} | Currently at: density = {density:0.0}, roughness = {roughness:0.00}");
                     /// Setup
-                    ICamera camera = new PinholeCamera(Config.Position, Config.Rotation, Config.AspectRatio, Config.FOV);
+                    ICamera camera = new PinholeCamera(Config.Position, Config.Rotation, Config.AspectRatio, Config.HorizontalFOV);
                     IObserver observer = new Observer(camera, Config.WindowWidth, Config.WindowHeight);
                     IScene scene = new Scene(observer.Camera, RoughnessDensityTest(density, roughness));
                     IRenderer renderer = new Renderer(scene, Integrator, observer);

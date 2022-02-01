@@ -44,7 +44,7 @@ namespace PathTracer {
             new Primitive(new Sphere(new Position3(3, 1, 5), 1), Material.Glossy(RGBColors.Red, 0.2f)),
             new Primitive(new Sphere(new Position3(0, 1, 5), 1), Material.Glossy(RGBColors.OffWhite, 0.2f)),
             new Primitive(new Sphere(new Position3(0, 1, 8), 1), Material.Specular(RGBColors.OffWhite)),
-            new Primitive(new Sphere(new Position3(-1, 1, 2), 1), Material.DiffuseParticleCloud(RGBColors.OffWhite, 4f, 0.1f)),
+            new Primitive(new Sphere(new Position3(-1, 1, 2), 1), Material.IsotropicVolumetric(RGBColors.OffWhite, 2f)),
         };
 
         /// <summary> The scene primitives to test roughness and density of volumetric </summary>
@@ -124,7 +124,7 @@ namespace PathTracer {
             IScene scene = new Scene(observer.Camera, LuxCoreComparison);
             IRenderer renderer = new Renderer(scene, Integrator, observer);
             /// Render
-            TimeSpan renderTime = new(0, 30, 00);
+            TimeSpan renderTime = new(0, 2, 00);
             var timer = Stopwatch.StartNew();
             while (timer.Elapsed < renderTime) {
                 renderer.Render(renderTime - timer.Elapsed);

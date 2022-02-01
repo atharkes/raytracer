@@ -61,13 +61,13 @@ namespace PathTracer.Utilities {
         public float RotationZ { get => Rotation.Z; set => Rotation = new Quaternion(Rotation.X, Rotation.Y, value, Rotation.W); }
 
         /// <summary> The W-component of the rotation quaternion in Blender </summary>
-        public float BlenderRotationW => 0.70710678118f * RotationW - 0.70710678118f * -RotationX;
+        public float BlenderRotationW => 0.7071f * RotationW - 0.7071f * -RotationX;
         /// <summary> The X-component of the rotation quaternion in Blender </summary>
-        public float BlenderRotationX => 0.70710678118f * -RotationX + 0.70710678118f * RotationW;
+        public float BlenderRotationX => 0.7071f * -RotationX + 0.7071f * RotationW;
         /// <summary> The Y-component of the rotation quaternion in Blender </summary>
-        public float BlenderRotationY => 0.70710678118f * -RotationZ + 0.70710678118f * -RotationY;
+        public float BlenderRotationY => 0.7071f * -RotationZ + 0.7071f * -RotationY;
         /// <summary> The Z-component of the rotation quaternion in Blender </summary>
-        public float BlenderRotationZ => 0.70710678118f * -RotationY - 0.70710678118f * -RotationZ;
+        public float BlenderRotationZ => 0.7071f * -RotationY - 0.7071f * -RotationZ;
 
         /// <summary> The horizontal field of view of the camera </summary>
         public float HorizontalFOV { get; set; } = 90f;

@@ -40,7 +40,7 @@ namespace PathTracer.Pathtracing.Observers.Cameras {
         /// <param name="fov">The field of view of the <see cref="PinholeCamera"/></param>
         public PinholeCamera(Position3 position, Quaternion rotation, float aspectRatio, float fov) {
             this.position  = position;
-            this.rotation = rotation;
+            this.rotation = rotation.Normalized();
             this.fov = fov;
             this.aspectRatio = aspectRatio;
             Rectangle filmRectangle = new(Position, new Position2(aspectRatio, 1), rotation);

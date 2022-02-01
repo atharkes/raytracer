@@ -124,7 +124,7 @@ namespace PathTracer {
             IScene scene = new Scene(observer.Camera, LuxCoreComparison);
             IRenderer renderer = new Renderer(scene, Integrator, observer);
             /// Render
-            TimeSpan renderTime = new(0, 2, 00);
+            TimeSpan renderTime = new(0, 30, 00);
             var timer = Stopwatch.StartNew();
             while (timer.Elapsed < renderTime) {
                 renderer.Render(renderTime - timer.Elapsed);

@@ -66,10 +66,10 @@ def plot_distribution_combined(distances, material_densities, probability_densit
 
     plt.show()
 
-#distances = args.distances
-#material_densities = args.material_densities
-#probability_densities = args.probability_densities
-#cummulative_probabilities = args.cummulative_probabilities
+distances = args.distances
+material_densities = args.material_densities
+probability_densities = args.probability_densities
+cummulative_probabilities = args.cummulative_probabilities
 
-(distances, material_densities, probability_densities, cummulative_probabilities) = Distributions.uniform.get_data(0.0, 1.0)
+#(distances, material_densities, probability_densities, cummulative_probabilities) = Distributions.uniform.get_data(0.0, 1.0)
 plot_distribution_seperate(distances, material_densities, probability_densities, cummulative_probabilities)

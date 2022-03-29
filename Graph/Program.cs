@@ -1,14 +1,34 @@
-﻿// See https://aka.ms/new-console-template for more information
+﻿using Graph;
 using System.Diagnostics;
 
-Console.WriteLine("Hello, World!");
+/// <summary> Try get the path to the python executable </summary>
+string PythonPath = PythonFinder.TryGetPythonPath("3.9");
+/// <summary> Python script to plot the data with </summary>
+string FilePath = Path.Combine(Environment.CurrentDirectory.Split(@"\Graph\")[0], @"Plot\plot.py");
+/// <summary> The name of the distances argument in the python script </summary>
+const string DistancesName = "--distances";
+/// <summary> The name of the material densities argument in the python script </summary>
+const string MaterialDensitiesName = "--material_densities";
+/// <summary> The name of the probability densities argument in the python script </summary>
+const string ProbabilityDensitiesName = "--probability_densities";
+/// <summary> The name of the cummulative probabilities argument in the python script </summary>
+const string CummulativeProbabilitiesName = "--cummulative_probabilities";
 
-string filepath = @"C:\Users\Theo\Desktop\Repo\Pathtracer\Plots\Plots\Plots\Plots.py";
-string arguments = "";
+List<float> distances = new() { 0, 1 };
+List<float> materialDensities = new() { 0, 1 };
+List<float> probabilityDensities = new() { 0, 1 };
+List<float> cummulativeProbabilities = new() { 0, 1 };
 
-ProcessStartInfo start = new ProcessStartInfo();
-start.FileName = "my/full/path/to/python.exe";
-start.Arguments = string.Format("{0} {1}", filepath, arguments);
+/// <summary> Arguments of the python script as defined by argparse </summary>
+string arguments = 
+    $"{DistancesName} {string.Join(" ", distances)} " +
+    $"{MaterialDensitiesName} {string.Join(" ", materialDensities)} " +
+    $"{ProbabilityDensitiesName} {string.Join(" ", probabilityDensities)} " +
+    $"{CummulativeProbabilitiesName} {string.Join(" ", cummulativeProbabilities)}";
+
+ProcessStartInfo start = new();
+start.FileName = PythonPath;
+start.Arguments = string.Format("{0} {1}", FilePath, arguments);
 start.UseShellExecute = false;
 start.RedirectStandardOutput = true;
 using (Process? process = Process.Start(start)) {

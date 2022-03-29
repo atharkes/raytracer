@@ -1,0 +1,30 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import math
+
+def get_data(start, end, density):
+    distribution_start = start
+    distribution_end = end
+    distribution_size = distribution_end - distribution_start
+    material_density = density
+
+    steps = 1000
+    step_size = distribution_size / steps
+
+    graph_start = distribution_start - 0.1
+    graph_end = distribution_end + 0.1
+
+    distances = np.arange(graph_start, graph_end, step_size)
+    material_densities = []
+    probability_densities = []
+    cummulative_probabilities = []
+    for distance in distances:
+        if distribution_start <= distance <= distribution_end:
+            probability_densities.append()
+            material_densities.append(material_density)
+        else:
+            material_densities.append(0)
+            probability_densities.append(0)
+        cummulative_probabilities.append(min(max(distance - distribution_start, 0), size) * probability_density)
+    
+    return (distances, material_densities, probability_densities, cummulative_probabilities)

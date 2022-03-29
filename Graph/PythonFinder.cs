@@ -1,7 +1,15 @@
 ﻿using Microsoft.Win32;
 
 namespace Graph {
+    /// <summary> Helper class to find the python executable </summary>
     public static class PythonFinder {
+        /// <summary> Try to get the path to the python executable.
+        /// Credits: https://stackoverflow.com/questions/41920032/automatically-find-the-path-of-the-python-executable </summary>
+        /// <param name="requiredVersion">The required python version</param>
+        /// <param name="maxVersion">The maximum python version</param>
+        /// <returns>The path to the python executable</returns>
+        /// <exception cref="PlatformNotSupportedException">Only windows is supported</exception>
+        /// <exception cref="InvalidOperationException">Python has to be installed</exception>
         public static string TryGetPythonPath(string requiredVersion = "", string maxVersion = "") {
             if (!OperatingSystem.IsWindows()) throw new PlatformNotSupportedException("Currently python can only be found on Windows");
 

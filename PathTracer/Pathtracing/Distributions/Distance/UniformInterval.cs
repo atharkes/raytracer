@@ -16,7 +16,7 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
         }
 
         public double ProbabilityDensity(Position1 sample) {
-            return 1d / Domain.CoveredArea;
+            return Domain.Includes(sample) ? 1d / Domain.CoveredArea : 0d;
         }
 
         public double CumulativeProbability(Position1 sample) {

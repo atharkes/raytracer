@@ -1,4 +1,6 @@
 ﻿using Graph;
+using PathTracer.Pathtracing.Distributions.Distance;
+using PathTracer.Pathtracing.Distributions.Intervals;
 using System.Diagnostics;
 
 /// <summary> Try get the path to the python executable </summary>
@@ -14,17 +16,32 @@ const string ProbabilityDensitiesName = "--probability_densities";
 /// <summary> The name of the cummulative probabilities argument in the python script </summary>
 const string CummulativeProbabilitiesName = "--cummulative_probabilities";
 
-List<float> distances = new() { 0, 1 };
-List<float> materialDensities = new() { 0, 1 };
-List<float> probabilityDensities = new() { 0, 1 };
-List<float> cummulativeProbabilities = new() { 0, 1 };
+UniformInterval uniform = new(new Interval(0, 1));
+const int steps = 100;
+float stepSize = uniform.Domain.CoveredArea / steps;
+float dataStart = uniform.Domain.Entry - 0.1f;
+float dataEnd = uniform.Domain.Exit + 0.1f;
+
+List<float> distances = new();
+List<float> materialDensities = new();
+List<double> probabilityDensities = new();
+List<double> cummulativeProbabilities = new();
+
+for (float distance = dataStart; distance <= dataEnd; distance += stepSize) {
+    distances.Add(distance);
+    float materialDensiy = uniform.Domain.Includes(distance) ? 1f / ((float)uniform.Domain.Exit - (float)distance) : 0f;
+    materialDensities.Add(materialDensiy);
+    probabilityDensities.Add(uniform.ProbabilityDensity(distance));
+    cummulativeProbabilities.Add(uniform.CumulativeProbability(distance));
+}
 
 /// <summary> Arguments of the python script as defined by argparse </summary>
-string arguments = 
-    $"{DistancesName} {string.Join(" ", distances)} " +
-    $"{MaterialDensitiesName} {string.Join(" ", materialDensities)} " +
-    $"{ProbabilityDensitiesName} {string.Join(" ", probabilityDensities)} " +
-    $"{CummulativeProbabilitiesName} {string.Join(" ", cummulativeProbabilities)}";
+string format = "0." + new string('#', 339);
+string arguments =
+    $"{DistancesName} {string.Join(" ", distances.Select(d => d.ToString(format)))} " +
+    $"{MaterialDensitiesName} {string.Join(" ", materialDensities.Select(d => d.ToString(format)))} " +
+    $"{ProbabilityDensitiesName} {string.Join(" ", probabilityDensities.Select(d => d.ToString(format)))} " +
+    $"{CummulativeProbabilitiesName} {string.Join(" ", cummulativeProbabilities.Select(d => d.ToString(format)))}";
 
 ProcessStartInfo start = new();
 start.FileName = PythonPath;
@@ -37,3 +54,6 @@ using (Process? process = Process.Start(start)) {
     string result = reader.ReadToEnd();
     Console.Write(result);
 }
+
+Console.WriteLine(arguments);
+Console.ReadLine();

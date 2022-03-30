@@ -28,6 +28,8 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
         public bool Equals(UniformInterval other) => Domain.Equals(other.Domain);
         public override int GetHashCode() => HashCode.Combine(963929819, Domain);
 
+        public override string ToString() => $"Uniform{Domain}";
+
         public static bool operator ==(UniformInterval left, UniformInterval right) => left.Equals(right);
         public static bool operator !=(UniformInterval left, UniformInterval right) => !(left == right);
     }

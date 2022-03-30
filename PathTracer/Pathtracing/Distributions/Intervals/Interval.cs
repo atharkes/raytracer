@@ -1,5 +1,7 @@
 ﻿using PathTracer.Geometry.Positions;
+using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 namespace PathTracer.Pathtracing.Distributions.Intervals {
     /// <summary> An interval </summary>
@@ -17,5 +19,12 @@ namespace PathTracer.Pathtracing.Distributions.Intervals {
             Entry = entry;
             Exit = exit;
         }
+
+        public static bool operator ==(Interval left, Interval right) => left.Equals(right);
+        public static bool operator !=(Interval left, Interval right) => !(left == right);
+
+        public override bool Equals([NotNullWhen(true)] object? obj) => obj is Interval other && Entry.Equals(other.Entry) && Exit.Equals(other.Exit);
+        public override int GetHashCode() => HashCode.Combine(287655961, Entry, Exit);
+        public override string? ToString() => $"[{Entry},{Exit}]";
     }
 }

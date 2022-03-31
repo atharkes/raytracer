@@ -8,8 +8,8 @@ using System.Linq;
 
 namespace PathTracer.Pathtracing.Distributions.Distance {
     public class CombinedDistanceDistribution : IDistanceDistribution, IEnumerable<IDistanceDistribution>, IEquatable<CombinedDistanceDistribution> {
-        IInterval IDistanceDistribution.Domain => new IntervalCollection(distributions.Select(x => x.Domain).ToArray());
-        bool IPDF.ContainsDelta => distributions.Any(d => d.ContainsDelta);
+        public IInterval Domain => new IntervalCollection(distributions.Select(x => x.Domain).ToArray());
+        public bool ContainsDelta => distributions.Any(d => d.ContainsDelta);
 
         readonly SortedSet<IDistanceDistribution> distributions;
 
@@ -25,6 +25,11 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
             this.distributions = new(simpleDistributions, Comparer<IDistanceDistribution>.Create((a, b) => a.Domain.Entry.CompareTo(b.Domain.Entry)));
         }
 
+        /// <summary> Get the material density at the specified <paramref name="distance"/> </summary>
+        /// <param name="distance">The distance to get the material density at</param>
+        /// <returns>The material density at the specified <paramref name="distance"/></returns>
+        public double MaterialDensity(Position1 distance) => distributions.Sum(d => d.MaterialDensity(distance));
+
         public double ProbabilityDensity(Position1 sample) {
             double probabilityDensity = 0;
             double cdf = CumulativeProbability(sample);
@@ -34,7 +39,7 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
                 double currentCdf = current.CumulativeProbability(sample);
                 double othersCdf = (currentCdf - cdf) / (currentCdf - 1);
                 if (currentCdf == 1 || currentCdf == othersCdf) return current.ProbabilityDensity(sample);
-                probabilityDensity += current.Probability(sample) * othersCdf;
+                probabilityDensity += current.Probability(sample) * (1 - othersCdf);
             }
             return probabilityDensity;
         }
@@ -67,6 +72,7 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
         public bool Equals(IProbabilityDistribution<Position1>? other) => other is CombinedDistanceDistribution cdd && Equals(cdd);
         public bool Equals(CombinedDistanceDistribution? other) => other is not null && distributions.Equals(other.distributions);
         public override int GetHashCode() => HashCode.Combine(664311359, distributions);
+        public override string ToString() => $"Combined[{string.Join(',', distributions)}]";
 
         public IEnumerator<IDistanceDistribution> GetEnumerator() => distributions.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)distributions).GetEnumerator();

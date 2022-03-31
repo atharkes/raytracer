@@ -52,7 +52,9 @@ namespace PathTracer.Pathtracing.Distributions.Intervals {
     /// <summary> An interface for a boundary interval for an <see cref="IRay"/> traced through a (volumetric) <see cref="IShape"/> </summary>
     public interface IInterval : IInterval<Position1>, IEquatable<IInterval>, IComparable<IInterval> {
         /// <summary> The size of the <see cref="IInterval"/> </summary>
-        float CoveredArea => Exit - Entry;
+        float Size => Exit - Entry;
+        /// <summary> The covered area of the <see cref="IInterval"/> </summary>
+        float CoveredArea => Size;
 
         /// <summary> Check whether the <see cref="IInterval"/> is equal to an <paramref name="other"/> </summary>
         /// <param name="other">The other <see cref="IInterval"/></param>

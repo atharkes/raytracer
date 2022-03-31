@@ -7,23 +7,26 @@ using System.Text.Json;
 Dictionary<string, DistributionData> data = new();
 
 // Create data of a uniform distribution
-UniformInterval uniform = new(new Interval(0, 1));
-const int distributionSteps = 1000;
-float stepSize = uniform.Domain.CoveredArea / distributionSteps;
-float dataStart = uniform.Domain.Entry - 0.1f;
-float dataEnd = uniform.Domain.Exit + 0.1f;
+UniformInterval uniform = new(new Interval(0f, 1f));
+UniformInterval uniform2 = new(new Interval(0.5f, 1.5f));
+CombinedDistanceDistribution distribution = new(uniform, uniform2);
+
+const int steps = 1000;
+float margin = distribution.Domain.Size * 0.05f;
+float dataStart = distribution.Domain.Entry - margin;
+float dataEnd = distribution.Domain.Exit + margin;
+float stepSize = (dataEnd - dataStart) / steps;
 
 DistributionData uniformData = new();
 for (float distance = dataStart; distance <= dataEnd; distance += stepSize) {
     uniformData.Distances.Add(distance);
-    float materialDensiy = uniform.Domain.Includes(distance) ? 1f / ((float)uniform.Domain.Exit - (float)distance) : 0f;
-    uniformData.MaterialDensities.Add(materialDensiy);
-    uniformData.ProbabilityDensities.Add(uniform.ProbabilityDensity(distance));
-    uniformData.CummulativeProbabilities.Add(uniform.CumulativeProbability(distance));
+    uniformData.MaterialDensities.Add(distribution.MaterialDensity(distance));
+    uniformData.ProbabilityDensities.Add(distribution.ProbabilityDensity(distance));
+    uniformData.CummulativeProbabilities.Add(distribution.CumulativeProbability(distance));
 }
 
 // Write distribution data to File
-data.Add(uniform.ToString(), uniformData);
+data.Add(distribution.ToString(), uniformData);
 string fileLocation = Environment.CurrentDirectory;
 string fileName = @"data.json";
 string filePath = Path.Combine(fileLocation, fileName);

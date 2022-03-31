@@ -17,6 +17,11 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
             distribution = new Exponential(density);
         }
 
+        /// <summary> Get the material density at the specified <paramref name="distance"/> </summary>
+        /// <param name="distance">The distance to get the material density at</param>
+        /// <returns>The material density at the specified <paramref name="distance"/></returns>
+        public double MaterialDensity(Position1 distance) => Density;
+
         public Position1 Sample(Random random) {
             Position1 distance = Domain.Entry + (float)distribution.InverseCumulativeDistribution(random.NextDouble());
             if (float.IsNaN(distance)) throw new InvalidOperationException($"Exponential distribution returned invalid distance {distance}");
@@ -41,6 +46,7 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
         public bool Equals(IProbabilityDistribution<Position1>? other) => other is ExponentialInterval ed && Equals(ed);
         public bool Equals(ExponentialInterval other) => Domain.Equals(other.Domain) && Density.Equals(other.Density);
         public override int GetHashCode() => HashCode.Combine(973102703, Domain, Density);
+        public override string ToString() => $"Exponential{Density}{Domain}";
 
         public static bool operator ==(ExponentialInterval left, ExponentialInterval right) => left.Equals(right);
         public static bool operator !=(ExponentialInterval left, ExponentialInterval right) => !(left == right);

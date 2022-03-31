@@ -20,7 +20,7 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
         /// <summary> Get the material density at the specified <paramref name="distance"/> </summary>
         /// <param name="distance">The distance to get the material density at</param>
         /// <returns>The material density at the specified <paramref name="distance"/></returns>
-        public double MaterialDensity(Position1 distance) => Density;
+        public double MaterialDensity(Position1 distance) => Domain.Includes(distance) ? Density : 0d;
 
         public Position1 Sample(Random random) {
             Position1 distance = Domain.Entry + (float)distribution.InverseCumulativeDistribution(random.NextDouble());

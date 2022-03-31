@@ -12,6 +12,11 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
             Distance = distance;
         }
 
+        /// <summary> Get the material density at the specified <paramref name="distance"/> </summary>
+        /// <param name="distance">The distance to get the material density at</param>
+        /// <returns>The material density at the specified <paramref name="distance"/></returns>
+        public double MaterialDensity(Position1 distance) => double.PositiveInfinity;
+
         public Position1 Sample(Random random) => Distance;
 
         public double ProbabilityDensity(Position1 sample) => sample.Equals(Distance) ? double.PositiveInfinity : 0d;
@@ -22,6 +27,7 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
         public bool Equals(IProbabilityDistribution<Position1>? other) => other is DeltaDistance dd && Equals(dd);
         public bool Equals(DeltaDistance other) => Distance.Equals(other.Distance);
         public override int GetHashCode() => HashCode.Combine(818834969, Distance);
+        public override string ToString() => $"Delta{Distance}";
 
         public static bool operator ==(DeltaDistance left, DeltaDistance right) => left.Equals(right);
         public static bool operator !=(DeltaDistance left, DeltaDistance right) => !(left == right);

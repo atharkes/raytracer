@@ -22,6 +22,11 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
             Right = right;
         }
 
+        /// <summary> Get the material density at the specified <paramref name="distance"/> </summary>
+        /// <param name="distance">The distance to get the material density at</param>
+        /// <returns>The material density at the specified <paramref name="distance"/></returns>
+        public double MaterialDensity(Position1 distance) => Left.MaterialDensity(distance) + Right.MaterialDensity(distance);
+
         /// <summary> Sample the <see cref="IRecursiveDistanceDistribution{T}"/> </summary>
         /// <param name="random">The <see cref="Random"/> to use for sampling</param>
         /// <returns>A <paramref name="random"/> <see cref="Position1"/></returns>
@@ -72,6 +77,7 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
         public bool Equals(IProbabilityDistribution<Position1>? other) => other is RecursiveDistanceDistribution rdd && Equals(rdd);
         public bool Equals(RecursiveDistanceDistribution? other) => other is not null && Left.Equals(other.Left) && Right.Equals(other.Right);
         public override int GetHashCode() => HashCode.Combine(648696017, Left, Right);
+        public override string ToString() => $"Recursive[{string.Join(',', Left, Right)}]";
 
         public static bool operator ==(RecursiveDistanceDistribution left, RecursiveDistanceDistribution right) => left.Equals(right);
         public static bool operator !=(RecursiveDistanceDistribution left, RecursiveDistanceDistribution right) => !(left == right);

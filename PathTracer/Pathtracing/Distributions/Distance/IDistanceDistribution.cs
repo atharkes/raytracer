@@ -33,5 +33,10 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
                 return new CombinedDistanceDistribution(first, last);
             }
         }
+
+        /// <summary> Get the material density at the specified <paramref name="distance"/> </summary>
+        /// <param name="distance">The distance to get the material density at</param>
+        /// <returns>The material density at the specified <paramref name="distance"/></returns>
+        double MaterialDensity(Position1 distance);
     }
 }

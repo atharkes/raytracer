@@ -1,26 +1,20 @@
 import argparse
 import math
+import json
 import numpy as np
 import matplotlib.pyplot as plt
-import Distributions.uniform
 
 # Define command line options (also generates --help and error handling)
 CLI = argparse.ArgumentParser()
 
-# Add arguments
-CLI.add_argument("--distances", nargs="*", type=float, default=[])
-CLI.add_argument("--material_densities", nargs="*", type=float, default=[])
-CLI.add_argument("--probability_densities", nargs="*", type=float, default=[])
-CLI.add_argument("--cummulative_probabilities", nargs="*", type=float, default=[])
+# Add and parse arguments
+CLI.add_argument('--data_path', type=str)
+CLI.add_argument('--distances', nargs="*", type=float, default=[])
+CLI.add_argument('--material_densities', nargs="*", type=float, default=[])
+CLI.add_argument('--probability_densities', nargs="*", type=float, default=[])
+CLI.add_argument('--cummulative_probabilities', nargs="*", type=float, default=[])
 
-# Parse the command line
 args = CLI.parse_args()
-
-# Access CLI options
-print("distances: %r" % args.distances)
-print("material_densities: %r" % args.material_densities)
-print("probability_densities: %r" % args.probability_densities)
-print("cummulative_probabilities: %r" % args.cummulative_probabilities)
 
 def plot_distribution_seperate(distances, material_densities, probability_densities, cummulative_probabilities):
     steps = len(distances)
@@ -66,10 +60,20 @@ def plot_distribution_combined(distances, material_densities, probability_densit
 
     plt.show()
 
+
 distances = args.distances
 material_densities = args.material_densities
 probability_densities = args.probability_densities
 cummulative_probabilities = args.cummulative_probabilities
 
-#(distances, material_densities, probability_densities, cummulative_probabilities) = Distributions.uniform.get_data(0.0, 1.0)
-plot_distribution_seperate(distances, material_densities, probability_densities, cummulative_probabilities)
+if (args.data_path != ''):
+    with open(args.data_path, 'r') as f:
+        data = json.load(f)
+        for distribution_data in data.values():
+            print(distribution_data)
+            distances = distribution_data['Distances']
+            material_densities = distribution_data['MaterialDensities']
+            probability_densities = distribution_data['ProbabilityDensities']
+            cummulative_probabilities = distribution_data['CummulativeProbabilities']
+            plot_distribution_seperate(distances, material_densities, probability_densities, cummulative_probabilities)
+

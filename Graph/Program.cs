@@ -8,7 +8,7 @@ Dictionary<string, DistributionData> data = new();
 
 // Create data of a uniform distribution
 UniformInterval uniform = new(new Interval(0, 1));
-const int distributionSteps = 100;
+const int distributionSteps = 1000;
 float stepSize = uniform.Domain.CoveredArea / distributionSteps;
 float dataStart = uniform.Domain.Entry - 0.1f;
 float dataEnd = uniform.Domain.Exit + 0.1f;
@@ -38,7 +38,7 @@ string PythonPath = PythonFinder.TryGetPythonPath("3.9");
 /// <summary> Python script to plot the data with </summary>
 string PlotScriptPath = Path.Combine(Environment.CurrentDirectory.Split(@"\Graph\")[0], @"Plot\plot.py");
 
-string indirectArguments = $"--filepath {filePath}";
+string indirectArguments = $"--data_path {filePath}";
 
 // Initiate Plot Script
 ProcessStartInfo start = new();
@@ -52,6 +52,8 @@ using (Process? process = Process.Start(start)) {
     string result = reader.ReadToEnd();
     Console.Write(result);
 }
+
+Console.ReadLine();
 
 
 string GetDirectArguments(DistributionData data) {

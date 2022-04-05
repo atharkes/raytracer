@@ -8,11 +8,11 @@ using System.Text.Json;
 Dictionary<string, DistributionData> data = new();
 
 // Create data of a uniform distribution
-UniformInterval uniform = new(new Interval(0.9f, 1f));
+UniformInterval uniform1 = new(new Interval(0f, 1f));
 UniformInterval uniform2 = new(new Interval(1.4f, 1.5f));
-ExponentialInterval exponential = new(new Interval(0.0f, 0.4f), 3d);
+ExponentialInterval exponential1 = new(new Interval(0.0f, 1.0f), 1d);
 ExponentialInterval exponential2 = new(new Interval(0.2f, 0.85f), 2d);
-CombinedDistanceDistribution distribution = new(uniform, uniform2, exponential, exponential2);
+CombinedDistanceDistribution distribution = new(uniform1, uniform2, exponential1, exponential2);
 
 const int steps = 1000;
 float margin = distribution.Domain.Size * 0.05f;
@@ -32,7 +32,7 @@ for (float distance = dataStart; distance <= dataEnd; distance += stepSize) {
 }
 distributionData.Distances.Sort();
 
-// Collect data for distance samples
+// Collect sample data
 foreach (float distance in distributionData.Distances) {
     distributionData.MaterialDensities.Add(distribution.MaterialDensity(distance).TryMakeFinite());
     distributionData.ProbabilityDensities.Add(distribution.ProbabilityDensity(distance).TryMakeFinite());

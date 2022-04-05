@@ -19,7 +19,7 @@ args = CLI.parse_args()
 def plot_distribution_seperate(distances, material_densities, probability_densities, cummulative_probabilities):
     steps = len(distances)
 
-    fig1, (material_density_plot, probability_density_plot, cummulative_probability_plot) = plt.subplots(3, 1, sharex=True)
+    fig1, (material_density_plot, probability_density_plot, cummulative_probability_plot) = plt.subplots(3, 1, sharex=True, figsize=(6, 6.5))
 
     material_density_plot.grid(axis='y', color='lightgray', linestyle='--')
     material_density_plot.fill_between(distances, material_densities, 0, facecolor='lightblue')

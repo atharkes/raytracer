@@ -11,7 +11,7 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
         public IInterval Domain => new IntervalCollection(distributions.Select(x => x.Domain).ToArray());
         public bool ContainsDelta => distributions.Any(d => d.ContainsDelta);
 
-        readonly SortedSet<IDistanceDistribution> distributions;
+        readonly IOrderedEnumerable<IDistanceDistribution> distributions;
 
         public CombinedDistanceDistribution(params IDistanceDistribution[] distributions) {
             List<IDistanceDistribution> simpleDistributions = new();
@@ -22,7 +22,7 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
                     simpleDistributions.Add(distribution);
                 }
             }
-            this.distributions = new(simpleDistributions, Comparer<IDistanceDistribution>.Create((a, b) => a.Domain.Entry.CompareTo(b.Domain.Entry)));
+            this.distributions = simpleDistributions.OrderBy(d => d.Domain.Entry);
         }
 
         /// <summary> Get the material density at the specified <paramref name="distance"/> </summary>

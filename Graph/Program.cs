@@ -1,6 +1,7 @@
 ﻿using Graph;
 using PathTracer.Pathtracing.Distributions.Distance;
 using PathTracer.Pathtracing.Distributions.Intervals;
+using PathTracer.Utilities.Extensions;
 using System.Diagnostics;
 using System.Text.Json;
 
@@ -9,7 +10,7 @@ Dictionary<string, DistributionData> data = new();
 // Create data of a uniform distribution
 UniformInterval uniform = new(new Interval(0.8f, 1f));
 UniformInterval uniform2 = new(new Interval(0.5f, 1.5f));
-ExponentialInterval exponential = new(new Interval(0.1f, 0.4f), 3d);
+ExponentialInterval exponential = new(new Interval(0.0f, 0.4f), 3d);
 CombinedDistanceDistribution distribution = new(uniform, uniform2, exponential);
 
 const int steps = 1000;
@@ -17,13 +18,24 @@ float margin = distribution.Domain.Size * 0.05f;
 float dataStart = distribution.Domain.Entry - margin;
 float dataEnd = distribution.Domain.Exit + margin;
 float stepSize = (dataEnd - dataStart) / steps;
-
 DistributionData distributionData = new();
+
+// Determine sample positions
+foreach (float transition in distribution.Domain.Transitions) {
+    distributionData.Distances.Add(transition.Previous());
+    distributionData.Distances.Add(transition);
+    distributionData.Distances.Add(transition.Next());
+}
 for (float distance = dataStart; distance <= dataEnd; distance += stepSize) {
     distributionData.Distances.Add(distance);
-    distributionData.MaterialDensities.Add(distribution.MaterialDensity(distance));
-    distributionData.ProbabilityDensities.Add(distribution.ProbabilityDensity(distance));
-    distributionData.CummulativeProbabilities.Add(distribution.CumulativeProbability(distance));
+}
+distributionData.Distances.Sort();
+
+// Collect data for distance samples
+foreach (float distance in distributionData.Distances) {
+    distributionData.MaterialDensities.Add(distribution.MaterialDensity(distance).TryMakeFinite());
+    distributionData.ProbabilityDensities.Add(distribution.ProbabilityDensity(distance).TryMakeFinite());
+    distributionData.CummulativeProbabilities.Add(distribution.CumulativeProbability(distance).TryMakeFinite());
 }
 data.Add(distribution.ToString(), distributionData);
 
@@ -32,7 +44,10 @@ string fileLocation = Environment.CurrentDirectory;
 string fileName = @"data.json";
 string filePath = Path.Combine(fileLocation, fileName);
 using (StreamWriter file = File.CreateText(fileName)) {
-    JsonSerializerOptions options = new() { WriteIndented = true, IncludeFields = true };
+    JsonSerializerOptions options = new() { 
+        WriteIndented = true,
+        IncludeFields = true
+    };
     string json = JsonSerializer.Serialize(data, options);
     file.Write(json);
 }

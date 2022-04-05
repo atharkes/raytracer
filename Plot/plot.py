@@ -25,20 +25,19 @@ def plot_distribution_seperate(distances, material_densities, probability_densit
     material_density_plot.fill_between(distances, material_densities, 0, facecolor='lightblue')
     material_density_plot.plot(distances, material_densities, linewidth=3)
     material_density_plot.set_yscale('log')
-
-    material_density_plot.set_ylim([min(x for x in material_densities if x > 0) / 10, max(x for x in material_densities if x > 0)])
+    material_density_plot.set_ylim([0.1, 10000])
     material_density_plot.set_ylabel('material density')
 
     probability_density_plot.grid(axis='y', color='lightgray', linestyle='--')
     probability_density_plot.fill_between(distances, probability_densities, 0, facecolor='lightcoral', edgecolor='firebrick', hatch='///')
     probability_density_plot.plot(distances, probability_densities, linewidth=3, color='crimson')
-    probability_density_plot.set_ylim([0, math.log(steps, 10) + 1])
+    probability_density_plot.set_ylim([0, 4.2])
     probability_density_plot.set_ylabel('probability density')
 
     cummulative_probability_plot.grid(axis='y', color='lightgray', linestyle='--')
     cummulative_probability_plot.fill_between(distances, cummulative_probabilities, 0, facecolor='plum', edgecolor='purple', hatch='///')
     cummulative_probability_plot.plot(distances, cummulative_probabilities, linewidth=3, color='darkviolet')
-    cummulative_probability_plot.set_ylim([0, math.log(steps, 10) + 1])
+    cummulative_probability_plot.set_ylim([0, 1.05])
     cummulative_probability_plot.set_ylabel('cumulative probability')
     cummulative_probability_plot.set_xlim([distances[0], distances[-1]])
     cummulative_probability_plot.set_xlabel('distance')
@@ -76,4 +75,3 @@ if (args.data_path != ''):
             probability_densities = distribution_data['ProbabilityDensities']
             cummulative_probabilities = distribution_data['CummulativeProbabilities']
             plot_distribution_seperate(distances, material_densities, probability_densities, cummulative_probabilities)
-

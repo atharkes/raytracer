@@ -14,6 +14,8 @@ namespace PathTracer.Pathtracing.Distributions.Intervals {
         /// <summary> Whether the <see cref="IIntervalCollection"/> is Read-Only </summary>
         bool ICollection<IInterval>.IsReadOnly => Intervals.IsReadOnly;
 
+        /// <summary> The transition points in the <see cref="IIntervalCollection"/> </summary>
+        IOrderedEnumerable<Position1> IInterval<Position1>.Transitions => Intervals.SelectMany(i => i.Transitions).GroupBy(f => f).Select(y => y.First()).OrderBy(f => f);
         /// <summary> The first entry of the <see cref="IIntervalCollection"/> </summary>
         Position1 IInterval<Position1>.Entry => Intervals.Min(i => i.Entry);
         /// <summary> The alst exit of the <see cref="IIntervalCollection"/> </summary>

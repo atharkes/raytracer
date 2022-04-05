@@ -85,5 +85,21 @@ namespace PathTracer.Utilities.Extensions {
                 return index.FromIndex();
             }
         }
+
+        /// <summary> Try make the <paramref name="value"/> finite </summary>
+        /// <param name="value">The <see cref="double"/> to try make finite</param>
+        /// <returns>A finite float</returns>
+        /// <exception cref="ArgumentException"><see cref="double.NaN"/> can not be made finite</exception>
+        public static double TryMakeFinite(this double value) {
+            if (double.IsFinite(value)) {
+                return value;
+            } else if (double.IsPositiveInfinity(value)) {
+                return double.MaxValue;
+            } else if (double.IsNegativeInfinity(value)) {
+                return double.MinValue;
+            } else {
+                throw new ArgumentException($"{value} can not be made finite.");
+            }
+        }
     }
 }

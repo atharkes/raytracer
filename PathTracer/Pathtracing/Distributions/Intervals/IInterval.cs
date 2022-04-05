@@ -1,6 +1,7 @@
 ﻿using PathTracer.Geometry.Positions;
 using PathTracer.Pathtracing.SceneDescription;
 using System;
+using System.Linq;
 
 namespace PathTracer.Pathtracing.Distributions.Intervals {
     /// <summary> A generic interval </summary>
@@ -11,6 +12,8 @@ namespace PathTracer.Pathtracing.Distributions.Intervals {
         /// <summary> The exit-point of the <see cref="IInterval{T}"/> </summary>
         T Exit { get; }
 
+        /// <summary> The transition points in the <see cref="IInterval{T}"/> </summary>
+        IOrderedEnumerable<T> Transitions => new T[] { Entry, Exit }.OrderBy(t => t);
         /// <summary> Whether the <see cref="IInterval{T}"/> is a valid interval </summary>
         bool Valid => Entry.CompareTo(Exit) <= 0;
         /// <summary> Whether the <see cref="IInterval{T}"/> is volumetric </summary>

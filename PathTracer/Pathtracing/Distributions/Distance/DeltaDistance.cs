@@ -21,7 +21,7 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
 
         public double ProbabilityDensity(Position1 sample) => sample.Equals(Distance) ? double.PositiveInfinity : 0d;
 
-        public double CumulativeProbability(Position1 sample) => sample >= Distance ? 1d : 0d;
+        public double CumulativeProbability(Position1 sample) => sample > Distance ? 1d : 0d;
 
         public override bool Equals(object? obj) => obj is DeltaDistance dd && Equals(dd);
         public bool Equals(IProbabilityDistribution<Position1>? other) => other is DeltaDistance dd && Equals(dd);

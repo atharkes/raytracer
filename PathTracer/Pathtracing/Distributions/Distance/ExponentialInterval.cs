@@ -2,6 +2,7 @@
 using PathTracer.Geometry.Positions;
 using PathTracer.Pathtracing.Distributions.Intervals;
 using PathTracer.Pathtracing.Distributions.Probabilities;
+using PathTracer.Utilities.Extensions;
 using System;
 
 namespace PathTracer.Pathtracing.Distributions.Distance {
@@ -32,11 +33,11 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
             return Domain.Includes(sample) ? distribution.Density(sample - Domain.Entry) : 0;
         }
 
-        public double CumulativeProbability(Position1 distance) {
-            if (distance < Domain.Entry) {
+        public double CumulativeProbability(Position1 sample) {
+            if (sample <= Domain.Entry) {
                 return 0;
-            } else if (distance < Domain.Exit) {
-                return distribution.CumulativeDistribution(distance - Domain.Entry);
+            } else if (sample <= Domain.Exit) {
+                return distribution.CumulativeDistribution(((float)sample).Previous() - Domain.Entry);
             } else {
                 return distribution.CumulativeDistribution(Domain.CoveredArea);
             }

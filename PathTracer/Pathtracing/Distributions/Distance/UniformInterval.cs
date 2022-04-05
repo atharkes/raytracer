@@ -1,6 +1,7 @@
 ﻿using PathTracer.Geometry.Positions;
 using PathTracer.Pathtracing.Distributions.Intervals;
 using PathTracer.Pathtracing.Distributions.Probabilities;
+using PathTracer.Utilities.Extensions;
 using System;
 
 namespace PathTracer.Pathtracing.Distributions.Distance {
@@ -27,7 +28,7 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
         }
 
         public double CumulativeProbability(Position1 sample) {
-            return Math.Min(Math.Max(0d, sample - Domain.Entry), Domain.CoveredArea) / Domain.CoveredArea;
+            return Math.Min(Math.Max(0d, ((float)sample).Previous() - Domain.Entry), Domain.CoveredArea) / Domain.CoveredArea;
         }
 
         public override bool Equals(object? obj) => obj is UniformInterval ud && Equals(ud);

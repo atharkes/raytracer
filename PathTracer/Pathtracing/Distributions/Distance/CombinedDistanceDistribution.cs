@@ -33,12 +33,11 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
         public double ProbabilityDensity(Position1 sample) {
             double probabilityDensity = 0;
             double cdf = CumulativeProbability(sample);
+            if (cdf == 1d) return 0f;
             var contains = distributions.TakeWhile(d => d.Domain.Entry <= sample);
-            if (contains.Count() == 1) return contains.First().ProbabilityDensity(sample);
             foreach (var current in contains) {
                 double currentCdf = current.CumulativeProbability(sample);
                 double othersCdf = (currentCdf - cdf) / (currentCdf - 1);
-                if (currentCdf == 1 || currentCdf == othersCdf) return current.ProbabilityDensity(sample);
                 probabilityDensity += current.Probability(sample) * (1 - othersCdf);
             }
             return probabilityDensity;
@@ -48,7 +47,7 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
             var relevant = distributions.TakeWhile(d => d.Domain.Entry <= sample);
             double inverseCdf = 1d;
             foreach (var d in relevant) {
-                inverseCdf *= (1d - d.CumulativeProbability(sample));
+                inverseCdf *= 1d - d.CumulativeProbability(sample);
             }
             return 1d - inverseCdf;
         }

@@ -25,7 +25,7 @@ def plot_distribution_seperate(distances, material_densities, probability_densit
     material_density_plot.fill_between(distances, material_densities, 0, facecolor='lightblue')
     material_density_plot.plot(distances, material_densities, linewidth=3)
     material_density_plot.set_yscale('log')
-    material_density_plot.set_ylim([0.1, 10000])
+    material_density_plot.set_ylim([0.1, 2000])
     material_density_plot.set_ylabel('material density')
 
     probability_density_plot.grid(axis='y', color='lightgray', linestyle='--')

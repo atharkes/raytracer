@@ -30,19 +30,16 @@ for (float distance = dataStart; distance <= dataEnd; distance += stepSize) {
 }
 data.Distances = new List<float>(data.Distances.GroupBy(d => d).Select(l => l.First()).OrderBy(d => d));
 
-List<IDistanceDistribution> currentDistributions = new List<IDistanceDistribution>();
-foreach (IDistanceDistribution distribution in combinedDistribution) {
-    currentDistributions.Add(distribution);
-    CombinedDistanceDistribution currentDistribution = new(currentDistributions.ToArray());
-    DistributionData currentDistributionData = new();
-
-    // Collect sample data
+// Log Data per Distribution
+foreach (IDistanceDistribution current in combinedDistribution) {
+    IDistanceDistribution others = new CombinedDistanceDistribution(combinedDistribution.Where(d => !d.Equals(current)).ToArray());
+    DistributionData distributionData = new();
     foreach (float distance in data.Distances) {
-        currentDistributionData.MaterialDensities.Add(currentDistribution.MaterialDensity(distance).TryMakeFinite());
-        currentDistributionData.ProbabilityDensities.Add(currentDistribution.ProbabilityDensity(distance).TryMakeFinite());
-        currentDistributionData.CumulativeProbabilities.Add(currentDistribution.CumulativeProbability(distance).TryMakeFinite());
+        distributionData.MaterialDensities.Add(current.MaterialDensity(distance).TryMakeFinite());
+        distributionData.ProbabilityDensities.Add((current.ProbabilityDensity(distance) * (1 - others.CumulativeProbability(distance))).TryMakeFinite());
+        distributionData.CumulativeProbabilities.Add(current.CumulativeProbability(distance).TryMakeFinite());
     }
-    data.Distributions.Add(currentDistribution.ToString(), currentDistributionData);
+    data.Distributions.Add(current.ToString(), distributionData);
 }
 
 // Write distribution data to File

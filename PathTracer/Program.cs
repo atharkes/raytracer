@@ -11,6 +11,7 @@ using PathTracer.Pathtracing.Observers;
 using PathTracer.Pathtracing.Observers.Cameras;
 using PathTracer.Pathtracing.SceneDescription;
 using PathTracer.Pathtracing.SceneDescription.Materials;
+using PathTracer.Pathtracing.SceneDescription.Materials.Profiles.Density;
 using PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates;
 using PathTracer.Pathtracing.SceneDescription.SceneObjects.Primitives;
 using PathTracer.Pathtracing.SceneDescription.Shapes;
@@ -30,8 +31,8 @@ namespace PathTracer {
         /// <summary> Simple test scene </summary>
         public static readonly List<ISceneObject> Test = new() {
             new Primitive(new InfinityPlane(), Material.Emitter(RGBColors.White)),
-            new Primitive(new Plane(new Normal3(0, 1, 0), new Position1(0)), Material.Diffuse(RGBColors.DarkGray)),
-            new Primitive(new AxisAlignedBox(new Position3(0, 0, 0), new Position3(2, 2, 2)), Material.SpecularParticleCloud(RGBColors.Red, 1024f, 0.0f)),
+            new Primitive(new Plane(new Normal3(0, 1, 0), new Position1(0)), Material.Diffuse(RGBColors.Gray)),
+            new Primitive(new AxisAlignedBox(new Position3(0, 0, 0), new Position3(2, 2, 2)), Material.Diffuse(RGBColors.Red)),
         };
 
         /// <summary> The primitives in the default scene </summary>
@@ -48,7 +49,7 @@ namespace PathTracer {
         };
 
         /// <summary> The scene primitives to test roughness and density of volumetric </summary>
-        public static List<ISceneObject> RoughnessDensityTest(float density, float roughness) => new() {
+        public static List<ISceneObject> RoughnessDensityComparison(float density, float roughness) => new() {
             new Primitive(new InfinityPlane(), Material.Emitter(RGBColors.White)),
             new Primitive(new Plane(new Normal3(0, 1, 0), new Position1(-1)), Material.Diffuse(RGBColors.DarkGray)),
             new Primitive(new Triangle(new Position3(5, 0, 10), new Position3(-5, 0, 0), new Position3(-5, 0, 10), null), Material.Diffuse(RGBColors.Gray)),
@@ -56,6 +57,14 @@ namespace PathTracer {
             new Primitive(new Sphere(new Position3(0, 1, 5), 1), Material.SpecularParticleCloud(RGBColors.OffWhite, density, roughness)),
             new Primitive(new AxisAlignedBox(new Position3(2, 0, 5), new Position3(4, 2, 7)), Material.Diffuse(RGBColors.Blue)),
             new Primitive(Tetrahedron.Regular(new Position3(-1.25f, 0, 4.75f), .5f), Material.Diffuse(RGBColors.Green)),
+        };
+
+        /// <summary> Simple test scene </summary>
+        public static readonly List<ISceneObject> SurfaceIntervalSizeComparison = new() {
+            new Primitive(new InfinityPlane(), Material.Emitter(RGBColors.White)),
+            new Primitive(new Plane(new Normal3(0, 1, 0), new Position1(0)), Material.Diffuse(RGBColors.Gray)),
+            new Primitive(new Plane(new Normal3(0, 0, 1), new Position1(-1)), Material.Specular(RGBColors.OffWhite)),
+            new Primitive(new AxisAlignedBox(new Position3(0, 0, 0), new Position3(2, 2, 2)), Material.Diffuse(RGBColors.Red)),
         };
         #endregion
 
@@ -82,7 +91,7 @@ namespace PathTracer {
         /// <summary> Entry point of the application </summary>
         public static void Main() {
             CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
-            CreateLuxCoreComparisonImage();
+            CreateSelfIntersectionImages();
             Threadpool.Dispose();
         }
 
@@ -96,7 +105,7 @@ namespace PathTracer {
                 TextColor = Config.TextColor,
                 CameraLock = Config.CameraLock,
             };
-            IScene scene = new Scene(observer.Camera, LuxCoreComparison);
+            IScene scene = new Scene(observer.Camera, SurfaceIntervalSizeComparison);
             IRenderer renderer = new Renderer(scene, Integrator, observer);
 
             /// Attach to Game Window
@@ -133,6 +142,29 @@ namespace PathTracer {
             OutputImage(observer, $"pathtracer-minutes{renderTime.Minutes}");
         }
 
+        static void CreateSelfIntersectionImages() {
+            TimeSpan renderTime = new(0, 1, 00);
+            uint[] bitLengthValues = { 1, 2, 3, 4, 5, 18, 19, 20, 21, 22 };
+            foreach (int bitLength in bitLengthValues) {
+                Console.WriteLine($"Time = {DateTime.Now.TimeOfDay:c} | Currently at: bit length = {bitLength:0.0}");
+                uint intervalLength = 1u << (bitLength - 1);
+                InverseMultiplicative.IntervalLength = intervalLength;
+
+                /// Setup
+                ICamera camera = new PinholeCamera(Config.Position, Config.Rotation, Config.AspectRatio, Config.HorizontalFOV);
+                IObserver observer = new Observer(camera, Config.WindowWidth, Config.WindowHeight);
+                IScene scene = new Scene(observer.Camera, SurfaceIntervalSizeComparison);
+                IRenderer renderer = new Renderer(scene, Integrator, observer);
+                /// Render
+                var timer = Stopwatch.StartNew();
+                while (timer.Elapsed < renderTime) {
+                    renderer.Render(renderTime - timer.Elapsed);
+                }
+                /// Output
+                OutputImage(observer, $"bitLength{bitLength:0.0}");
+            }
+        }
+
         static void CreateDensityRoughnessImages() {
             TimeSpan renderTime = new(0, 20, 00);
             float[] densityValues = { 0.5f, 2f, 8f, 32f };
@@ -143,7 +175,7 @@ namespace PathTracer {
                     /// Setup
                     ICamera camera = new PinholeCamera(Config.Position, Config.Rotation, Config.AspectRatio, Config.HorizontalFOV);
                     IObserver observer = new Observer(camera, Config.WindowWidth, Config.WindowHeight);
-                    IScene scene = new Scene(observer.Camera, RoughnessDensityTest(density, roughness));
+                    IScene scene = new Scene(observer.Camera, RoughnessDensityComparison(density, roughness));
                     IRenderer renderer = new Renderer(scene, Integrator, observer);
                     /// Render
                     var timer = Stopwatch.StartNew();

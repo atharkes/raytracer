@@ -38,5 +38,9 @@ namespace PathTracer.Pathtracing.Distributions.Distance {
         /// <param name="distance">The distance to get the material density at</param>
         /// <returns>The material density at the specified <paramref name="distance"/></returns>
         double MaterialDensity(Position1 distance);
+
+        /// <summary> Convert the <see cref="IDistanceDistribution"/> to a <see cref="string"/> </summary>
+        /// <returns>The <see cref="string"/> representing the <see cref="IDistanceDistribution"/></returns>
+        string ToString();
     }
 }

@@ -3,6 +3,7 @@ import math
 import json
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.colors import LinearSegmentedColormap
 
 # Define command line options (also generates --help and error handling)
 CLI = argparse.ArgumentParser()
@@ -66,28 +67,39 @@ def plot_distributions_combined(data):
     cummulative_probability_plot.set_xlabel('Distance')
     cummulative_probability_plot.set_xlim([distances[0], distances[-1]])
 
-    previous_material_densities = 0
-    previous_probability_densities = 0
-    previous_cumulative_probabilities = 0
+    previous_material_densities = [0] * len(distances)
+    previous_probability_densities = [0] * len(distances)
+    previous_cumulative_probabilities = [0] * len(distances)
 
+    cmap = plt.cm.get_cmap('hsv', len(data['Distributions']) + 1)
+    c_index = 0
+    
     for distribution_data in data['Distributions'].values():
-        material_densities = distribution_data['MaterialDensities']
-        probability_densities = distribution_data['ProbabilityDensities']
-        cumulative_probabilities = distribution_data['CumulativeProbabilities']
+        line_width = 2
+        line_style = (3 * c_index, (4, 6))
+        color = cmap(c_index)
+        line_color = (color[0], color[1], color[2], 0.8)
+        face_color = (color[0], color[1], color[2], 0.5)
+        edge_color = (color[0] * 0.5, color[1] * 0.5, color[2] * 0.5, 0.5)
+        hatch_style = '..'
 
-        material_density_plot.fill_between(distances, material_densities, previous_material_densities, facecolor='lightblue')
-        material_density_plot.plot(distances, material_densities, linewidth=3, color='#1f77b4')
+        material_densities = distribution_data['MaterialDensities']
+        probability_densities = np.add(previous_probability_densities, distribution_data['ProbabilityDensities'])
+        cumulative_probabilities = list(map(lambda x, y: 1 - (1 - x) * (1 - y), previous_cumulative_probabilities, distribution_data['CumulativeProbabilities']))
+
+        material_density_plot.fill_between(distances, material_densities, 0, facecolor=face_color, edgecolor=edge_color, hatch=hatch_style)
+        material_density_plot.plot(distances, material_densities, linewidth=line_width, color=line_color, linestyle=line_style)
         
-        probability_density_plot.fill_between(distances, probability_densities, previous_probability_densities, facecolor='lightcoral', edgecolor='firebrick', hatch='///')
-        probability_density_plot.plot(distances, probability_densities, linewidth=3, color='crimson')
+        probability_density_plot.fill_between(distances, probability_densities, previous_probability_densities, facecolor=face_color, edgecolor=edge_color, hatch=hatch_style)
+        probability_density_plot.plot(distances, probability_densities, linewidth=line_width, color=line_color, linestyle=line_style)
         
-        cummulative_probability_plot.fill_between(distances, cumulative_probabilities, previous_cumulative_probabilities, facecolor='plum', edgecolor='purple', hatch='///')
-        cummulative_probability_plot.plot(distances, cumulative_probabilities, linewidth=3, color='darkviolet')
+        cummulative_probability_plot.fill_between(distances, cumulative_probabilities, previous_cumulative_probabilities, facecolor=face_color, edgecolor=edge_color, hatch=hatch_style)
+        cummulative_probability_plot.plot(distances, cumulative_probabilities, linewidth=line_width, color=line_color, linestyle=line_style)
 
         previous_material_densities = material_densities
         previous_probability_densities = probability_densities
         previous_cumulative_probabilities = cumulative_probabilities
-
+        c_index = c_index + 1
     plt.show()
 
 

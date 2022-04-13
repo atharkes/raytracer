@@ -75,8 +75,8 @@ def plot_distributions_combined(data):
     c_index = 0
     
     for distribution_data in data['Distributions'].values():
-        line_width = 2
-        line_style = (3 * c_index, (4, 6))
+        line_width = 3
+        line_style = (0, (5, 0))
         color = cmap(c_index)
         line_color = (color[0], color[1], color[2], 0.8)
         face_color = (color[0], color[1], color[2], 0.5)
@@ -87,14 +87,14 @@ def plot_distributions_combined(data):
         probability_densities = np.add(previous_probability_densities, distribution_data['ProbabilityDensities'])
         cumulative_probabilities = list(map(lambda x, y: 1 - (1 - x) * (1 - y), previous_cumulative_probabilities, distribution_data['CumulativeProbabilities']))
 
-        material_density_plot.fill_between(distances, material_densities, 0, facecolor=face_color, edgecolor=edge_color, hatch=hatch_style)
-        material_density_plot.plot(distances, material_densities, linewidth=line_width, color=line_color, linestyle=line_style)
+        material_density_plot.fill_between(distances, material_densities, 0, facecolor=face_color, zorder=10+c_index)
+        material_density_plot.plot(distances, material_densities, linewidth=line_width, color=line_color, linestyle=line_style, zorder=20+c_index)
         
-        probability_density_plot.fill_between(distances, probability_densities, previous_probability_densities, facecolor=face_color, edgecolor=edge_color, hatch=hatch_style)
-        probability_density_plot.plot(distances, probability_densities, linewidth=line_width, color=line_color, linestyle=line_style)
+        probability_density_plot.fill_between(distances, probability_densities, previous_probability_densities, facecolor=face_color, zorder=10-c_index)
+        probability_density_plot.plot(distances, probability_densities, linewidth=line_width, color=line_color, linestyle=line_style, zorder=20-c_index)
         
-        cummulative_probability_plot.fill_between(distances, cumulative_probabilities, previous_cumulative_probabilities, facecolor=face_color, edgecolor=edge_color, hatch=hatch_style)
-        cummulative_probability_plot.plot(distances, cumulative_probabilities, linewidth=line_width, color=line_color, linestyle=line_style)
+        cummulative_probability_plot.fill_between(distances, cumulative_probabilities, previous_cumulative_probabilities, facecolor=face_color, zorder=10-c_index)
+        cummulative_probability_plot.plot(distances, cumulative_probabilities, linewidth=line_width, color=line_color, linestyle=line_style, zorder=20-c_index)
 
         previous_material_densities = material_densities
         previous_probability_densities = probability_densities

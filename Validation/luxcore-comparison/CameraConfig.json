@@ -13,13 +13,13 @@
   "BlenderPositionX": -7.55,
   "BlenderPositionY": 1.76,
   "BlenderPositionZ": 3.34,
-  "RotationW": 0.8094412,
-  "RotationX": 0.15808618,
-  "RotationY": 0.5573038,
-  "RotationZ": -0.096052356,
-  "BlenderRotationW": 0.6841386,
-  "BlenderRotationX": 0.46057314,
-  "BlenderRotationY": -0.32615086,
-  "BlenderRotationZ": -0.46198812,
-  "HorizontalFOV": 63.961346
+  "RotationW": 0.802,
+  "RotationX": 0.168,
+  "RotationY": 0.564,
+  "RotationZ": -0.1023523,
+  "BlenderRotationW": 0.6858871,
+  "BlenderRotationX": 0.44830146,
+  "BlenderRotationY": -0.32643133,
+  "BlenderRotationZ": -0.47117752,
+  "HorizontalFOV": 64.0
 }

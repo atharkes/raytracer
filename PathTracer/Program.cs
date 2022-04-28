@@ -1,5 +1,4 @@
-﻿using OpenTK.Mathematics;
-using OpenTK.Windowing.Common;
+﻿using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using PathTracer.Drawing;
 using PathTracer.Geometry.Normals;
@@ -91,7 +90,7 @@ namespace PathTracer {
         /// <summary> Entry point of the application </summary>
         public static void Main() {
             CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
-            CreateLuxCoreComparisonImage();
+            CreateLuxCoreComparisonImage(5);
             Threadpool.Dispose();
         }
 
@@ -126,20 +125,20 @@ namespace PathTracer {
             Config.SaveToFile(renderer);
         }
 
-        static void CreateLuxCoreComparisonImage() {
+        static void CreateLuxCoreComparisonImage(int mins = 30) {
             /// Setup
             ICamera camera = new PinholeCamera(Config.Position, Config.Rotation, Config.AspectRatio, Config.HorizontalFOV);
             IObserver observer = new Observer(camera, Config.WindowWidth, Config.WindowHeight);
             IScene scene = new Scene(observer.Camera, LuxCoreComparison);
             IRenderer renderer = new Renderer(scene, Integrator, observer);
             /// Render
-            TimeSpan renderTime = new(0, 30, 00);
+            TimeSpan renderTime = new(0, mins, 00);
             var timer = Stopwatch.StartNew();
             while (timer.Elapsed < renderTime) {
                 renderer.Render(renderTime - timer.Elapsed);
             }
             /// Output
-            OutputImage(observer, $"pathtracer-mins{renderTime.Minutes}");
+            OutputImage(observer, $"pathtracer-mins{renderTime.TotalMinutes}");
         }
 
         static void CreateSelfIntersectionImages() {

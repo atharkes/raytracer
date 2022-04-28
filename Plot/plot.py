@@ -77,6 +77,11 @@ def plot_distributions_combined(data):
     previous_absorption_factors = [0] * sample_count
     previous_transmittance_factors = [1] * sample_count
 
+    accumulated_material_densities = [0] * sample_count
+    accumulated_free_flight_probabilities = [0] * sample_count
+    accumulated_absorption_factors = [0] * sample_count
+    accumulated_transmittance_factors = [1] * sample_count
+
     line_width = 3
     line_style = (0, (5, 0))
     hatch_style = '..'
@@ -84,38 +89,54 @@ def plot_distributions_combined(data):
     cmap = plt.cm.get_cmap('hsv', color_count)
     def line_color(i):
         color = cmap(i)
-        return (color[0], color[1], color[2], 0.8)
+        factor = 0.7
+        alpha = 0.8
+        return (factor * color[0], factor * color[1], factor * color[2], alpha)
     def face_color(i):
         color = cmap(i)
-        return (color[0], color[1], color[2], 0.5)
+        factor = 0.9
+        alpha = 1.0
+        return (factor * color[0], factor * color[1], factor * color[2], alpha)
     def edge_color(i):
         color = cmap(i)
-        return (0.5 * color[0], 0.5 * color[1], 0.5 * color[2], 0.5)
+        factor = 0.5
+        alpha = 0.5
+        return (factor * color[0], factor * color[1], factor * color[2], alpha)
 
-    index = 0
+    index = 1
     for distribution_data in data['Distributions'].values():
         material_densities = distribution_data['MaterialDensities']
-        free_flight_probabilities = np.add(previous_free_flight_probabilities, distribution_data['ProbabilityDensities'])
-        absorption_factors = list(map(lambda x, y: 1 - (1 - x) * (1 - y), previous_absorption_factors, distribution_data['CumulativeProbabilities']))
-        transmittance_factors = list(map(lambda x, y: x * (1 - y), previous_transmittance_factors, distribution_data['CumulativeProbabilities']))
+        free_flight_probabilities = distribution_data['ProbabilityDensities']
+        absorption_factors = distribution_data['CumulativeProbabilities']
+        transmittance_factors = list(map(lambda x: 1 - x, absorption_factors))
 
-        material_density_plot.fill_between(distances, material_densities, 0, facecolor=face_color(index), zorder=10+index)
-        material_density_plot.plot(distances, material_densities, linewidth=line_width, color=line_color(index), linestyle=line_style, zorder=20+index)
-        
-        free_flight_plot.fill_between(distances, free_flight_probabilities, previous_free_flight_probabilities, facecolor=face_color(index), zorder=10-index)
-        free_flight_plot.plot(distances, free_flight_probabilities, linewidth=line_width, color=line_color(index), linestyle=line_style, zorder=20-index)
-        
-        absorption_plot.fill_between(distances, absorption_factors, previous_absorption_factors, facecolor=face_color(index), zorder=10-index)
-        absorption_plot.plot(distances, absorption_factors, linewidth=line_width, color=line_color(index), linestyle=line_style, zorder=20-index)
+        accumulated_material_densities = np.add(accumulated_material_densities, material_densities) 
+        accumulated_free_flight_probabilities = np.add(accumulated_free_flight_probabilities, free_flight_probabilities)
+        accumulated_absorption_factors = list(map(lambda x, y: 1 - (1 - x) * (1 - y), accumulated_absorption_factors, absorption_factors))
+        accumulated_transmittance_factors = list(map(lambda x, y: x * y, accumulated_transmittance_factors, transmittance_factors))
 
-        previous_material_densities = material_densities
-        previous_free_flight_probabilities = free_flight_probabilities
-        previous_absorption_factors = absorption_factors
-        previous_transmittance_factors = transmittance_factors
+        material_density_plot.fill_between(distances, accumulated_material_densities, previous_material_densities, facecolor=face_color(index), zorder=10+index)
+        #material_density_plot.plot(distances, material_densities, linewidth=line_width, color=line_color(index), linestyle=line_style, zorder=20-index)
+        
+        free_flight_plot.fill_between(distances, accumulated_free_flight_probabilities, previous_free_flight_probabilities, facecolor=face_color(index), zorder=10-index)
+        #free_flight_plot.plot(distances, free_flight_probabilities, linewidth=line_width, color=line_color(index), linestyle=line_style, zorder=20-index)
+        
+        absorption_plot.fill_between(distances, accumulated_absorption_factors, previous_absorption_factors, facecolor=face_color(index), zorder=10-index)
+        #absorption_plot.plot(distances, absorption_factors, linewidth=line_width, color=line_color(index), linestyle=line_style, zorder=20-index)
+
+        previous_material_densities = accumulated_material_densities
+        previous_free_flight_probabilities = accumulated_free_flight_probabilities
+        previous_absorption_factors = accumulated_absorption_factors
+        previous_transmittance_factors = accumulated_transmittance_factors
         index = index + 1
 
-    transmittance_plot.fill_between(distances, transmittance_factors, 0, facecolor=face_color(color_count - 2))
-    transmittance_plot.plot(distances, transmittance_factors, linewidth=line_width, color=line_color(color_count - 2), linestyle=line_style)
+    combined_index = 0
+    material_density_plot.plot(distances, accumulated_material_densities, linewidth=line_width, color=line_color(combined_index), linestyle=line_style, zorder=20)
+    free_flight_plot.plot(distances, accumulated_free_flight_probabilities, linewidth=line_width, color=line_color(combined_index), linestyle=line_style, zorder=20)
+    absorption_plot.plot(distances, accumulated_absorption_factors, linewidth=line_width, color=line_color(combined_index), linestyle=line_style, zorder=20)
+
+    transmittance_plot.fill_between(distances, accumulated_transmittance_factors, 0, facecolor=face_color(combined_index), zorder=10)
+    transmittance_plot.plot(distances, accumulated_transmittance_factors, linewidth=line_width, color=line_color(combined_index), linestyle=line_style, zorder=20)
     plt.show()
 
 

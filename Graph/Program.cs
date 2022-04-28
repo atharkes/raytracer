@@ -10,7 +10,7 @@ UniformInterval uniform1 = new(new Interval(0f, 1f));
 UniformInterval uniform2 = new(new Interval(1.4f, 1.5f));
 ExponentialInterval exponential1 = new(new Interval(0.0f, 1.0f), 1d);
 ExponentialInterval exponential2 = new(new Interval(1.1f, 1.3f), 4d);
-CombinedDistanceDistribution combinedDistribution = new(uniform1, uniform2, exponential1, exponential2);
+CombinedDistanceDistribution combinedDistribution = new(exponential1, exponential2, uniform1, uniform2);
 PlotData data = new();
 
 const int steps = 1000;

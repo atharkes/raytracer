@@ -91,11 +91,11 @@ namespace PathTracer {
         /// <summary> Entry point of the application </summary>
         public static void Main() {
             CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
-            CreateSelfIntersectionImages();
+            CreateLuxCoreComparisonImage();
             Threadpool.Dispose();
         }
 
-        static void RunGameWindow() {
+        static void RunGameWindow(List<ISceneObject> sceneObjects) {
             /// Setup
             RenderWindow window = new(GameWindowSettings, NativeWindowSettings);
             ICamera camera = new PinholeCamera(Config.Position, Config.Rotation, Config.AspectRatio, Config.HorizontalFOV);
@@ -105,7 +105,7 @@ namespace PathTracer {
                 TextColor = Config.TextColor,
                 CameraLock = Config.CameraLock,
             };
-            IScene scene = new Scene(observer.Camera, SurfaceIntervalSizeComparison);
+            IScene scene = new Scene(observer.Camera, sceneObjects);
             IRenderer renderer = new Renderer(scene, Integrator, observer);
 
             /// Attach to Game Window
@@ -139,7 +139,7 @@ namespace PathTracer {
                 renderer.Render(renderTime - timer.Elapsed);
             }
             /// Output
-            OutputImage(observer, $"pathtracer-minutes{renderTime.Minutes}");
+            OutputImage(observer, $"pathtracer-mins{renderTime.Minutes}");
         }
 
         static void CreateSelfIntersectionImages() {

@@ -18,7 +18,7 @@ namespace PathTracer.Pathtracing.Integrators {
         /// <summary> The minimum amount of samples per integration cycle of the <see cref="BackwardsSampler"/> </summary>
         public static readonly int MinimumSampleCount = Program.Threadpool.MultithreadingTaskCount * 10;
         /// <summary> The maximum recursion depth for sampling </summary>
-        public const int GauranteedRecursionDepth = 6;
+        public const int GauranteedRecursionDepth = 16;
         /// <summary> The chance of russian roulette when the gauranteed recursion depth is exceeded </summary>
         public const float RussianRouletteChance = 0.9f;
 

@@ -19,7 +19,7 @@ Visual Studio 2021 with:
 - Acceleration Structure: SBVH, BVH (SAH, Binning, Split-Ordered-Traversal & BVH rendering)
 - Multithreading: Threadpool with worker threads
 
-#### Controls:
+#### Game Window Controls:
 - Arrow keys:   Rotate Camera
 - W,A,S,D:      Move Camera
 - Space:        Move Camera Up

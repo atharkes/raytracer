@@ -90,7 +90,7 @@ namespace PathTracer {
         /// <summary> Entry point of the application </summary>
         public static void Main() {
             CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
-            CreateLuxCoreComparisonImage(5);
+            CreateLuxCoreComparisonImage();
             Threadpool.Dispose();
         }
 

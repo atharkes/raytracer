@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using PathTracer.Pathtracing.Rays;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace PathTracer.Pathtracing.SceneDescription.SceneObjects {
@@ -19,6 +20,11 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects {
         /// <param name="item">The <see cref="ISceneObject"/> to remove</param>
         /// <returns>Whether the <paramref name="item"/> was found and removed from the <see cref="IAggregate"/></returns>
         bool Remove(ISceneObject item);
+
+        /// <summary> Get the children of the <see cref="IAggregate"/> in the order in which they are likely intersected by the <paramref name="ray"/> </summary>
+        /// <param name="ray">The <see cref="IRay"/> that determines the order of the children</param>
+        /// <returns>The children of the <see cref="IAggregate"/></returns>
+        IEnumerable<ISceneObject> GetChildren(IRay ray);
 
         /// <summary> Get the <see cref="IEnumerator"/> of the <see cref="IAggregate"/> </summary>
         /// <returns>The <see cref="IEnumerator"/></returns>

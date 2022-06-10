@@ -47,5 +47,7 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates {
         public IEnumerable<ISceneObject> Clip(AxisAlignedPlane plane) {
             throw new NotImplementedException("Split items and clip items on the border");
         }
+
+        public IEnumerable<ISceneObject> GetChildren(IRay ray) => Items;
     }
 }

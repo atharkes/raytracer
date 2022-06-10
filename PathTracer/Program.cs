@@ -31,7 +31,8 @@ namespace PathTracer {
         public static readonly List<ISceneObject> Test = new() {
             new Primitive(new InfinityPlane(), Material.Emitter(RGBColors.White)),
             new Primitive(new Plane(new Normal3(0, 1, 0), new Position1(0)), Material.Diffuse(RGBColors.Gray)),
-            new Primitive(new AxisAlignedBox(new Position3(0, 0, 0), new Position3(2, 2, 2)), Material.Diffuse(RGBColors.Red)),
+            new Primitive(new AxisAlignedBox(new Position3(0, 1, 0), new Position3(2, 3, 2)), Material.Diffuse(RGBColors.Red)),
+            new Primitive(new AxisAlignedBox(new Position3(20, 20, 20), new Position3(-20, 0, -20)), Material.DiffuseParticleCloud(RGBColors.OffWhite, 0.01f)),
         };
 
         /// <summary> The primitives in the default scene </summary>
@@ -90,7 +91,7 @@ namespace PathTracer {
         /// <summary> Entry point of the application </summary>
         public static void Main() {
             CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
-            CreateLuxCoreComparisonImage(5);
+            RunGameWindow(Test);
             Threadpool.Dispose();
         }
 

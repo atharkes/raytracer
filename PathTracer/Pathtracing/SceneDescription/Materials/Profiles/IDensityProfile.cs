@@ -9,8 +9,13 @@ using PathTracer.Pathtracing.Spectra;
 namespace PathTracer.Pathtracing.SceneDescription.Materials.Profiles {
     /// <summary> The density profile of an <see cref="IMaterial"/> </summary>
     public interface IDensityProfile {
+        /// <summary> The default surface <see cref="IDensityProfile"/> </summary>
         public static readonly IDensityProfile Surface = new InverseMultiplicative();
-        public static IDensityProfile Volumetric(float density) => new Uniform(density);
+
+        /// <summary> Create a new <see cref="IDensityProfile"/> for a homogenous volumetric </summary>
+        /// <param name="density">The material density of the homogenous volumetric</param>
+        /// <returns>The <see cref="IDensityProfile"/> for a homogenous volumetric with the specified <paramref name="density"/></returns>
+        public static IDensityProfile HomogenousVolumetric(float density) => new Uniform(density);
 
         /// <summary> Get the <see cref="IDistanceDistribution"/> along the specified <paramref name="ray"/> </summary>
         /// <param name="ray">The <see cref="IRay"/> through the <see cref="IDensityProfile"/></param>

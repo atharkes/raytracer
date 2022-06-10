@@ -70,7 +70,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials {
         }
 
         public static Material IsotropicVolumetric(RGBSpectrum albedo, float density) {
-            return new(IDensityProfile.Volumetric(density),
+            return new(IDensityProfile.HomogenousVolumetric(density),
                        IAbsorptionProfile.Uniform(albedo),
                        IOrientationProfile.Forwards,
                        IReflectionProfile.Spherical,
@@ -78,7 +78,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials {
         }
 
         public static Material DiffuseParticleCloud(RGBSpectrum albedo, float density) {
-            return new(IDensityProfile.Volumetric(density),
+            return new(IDensityProfile.HomogenousVolumetric(density),
                        IAbsorptionProfile.Uniform(albedo),
                        IOrientationProfile.Uniform,
                        IReflectionProfile.Diffuse,
@@ -86,7 +86,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials {
         }
 
         public static Material DiffuseParticleCloud(RGBSpectrum albedo, float density, float roughness) {
-            return new(IDensityProfile.Volumetric(density),
+            return new(IDensityProfile.HomogenousVolumetric(density),
                        IAbsorptionProfile.Uniform(albedo),
                        IOrientationProfile.SurfaceSGGX(roughness),
                        IReflectionProfile.Diffuse,
@@ -94,7 +94,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials {
         }
 
         public static Material SpecularParticleCloud(RGBSpectrum albedo, float density) {
-            return new(IDensityProfile.Volumetric(density),
+            return new(IDensityProfile.HomogenousVolumetric(density),
                        IAbsorptionProfile.Uniform(albedo),
                        IOrientationProfile.Uniform,
                        IReflectionProfile.Specular,
@@ -102,7 +102,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials {
         }
 
         public static Material SpecularParticleCloud(RGBSpectrum albedo, float density, float roughness) {
-            return new(IDensityProfile.Volumetric(density),
+            return new(IDensityProfile.HomogenousVolumetric(density),
                        IAbsorptionProfile.Uniform(albedo),
                        IOrientationProfile.SurfaceSGGX(roughness),
                        IReflectionProfile.Specular,

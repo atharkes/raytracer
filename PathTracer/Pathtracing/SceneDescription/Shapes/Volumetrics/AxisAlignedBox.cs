@@ -1,6 +1,7 @@
 ﻿using PathTracer.Geometry.Directions;
 using PathTracer.Geometry.Normals;
 using PathTracer.Geometry.Positions;
+using PathTracer.Pathtracing.Distributions.Intervals;
 using PathTracer.Pathtracing.Rays;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Planars;
 using System;
@@ -125,23 +126,31 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics {
 
         /// <summary> Intersect the <see cref="AxisAlignedBox"/> by a <paramref name="ray"/>.
         /// Using Amy Williams's "An Efficient and Robust Ray–Box Intersection" Algorithm </summary>
-        /// <param name="ray">The <see cref="Ray"/> to intersect the <see cref="IAxisAlignedBox"/> with</param>
-        /// <returns>Whether and when the <see cref="Ray"/> intersects the <see cref="IAxisAlignedBox"/></returns>
+        /// <param name="ray">The <see cref="IRay"/> to intersect the <see cref="AxisAlignedBox"/> with</param>
+        /// <returns>Whether and when the <see cref="IRay"/> intersects the <see cref="AxisAlignedBox"/></returns>
         public IEnumerable<Position1> IntersectDistances(IRay ray) {
+            IInterval? interval = Intersect(ray);
+            if (interval is null) yield break;
+            else {
+                yield return interval.Entry;
+                yield return interval.Exit;
+            }
+        }
+
+        public IInterval? Intersect(IRay ray) {
             Position1 tmin = (Bounds[ray.Sign.X].X - ray.Origin.X) * ray.InvDirection.X;
             Position1 tmax = (Bounds[1 - ray.Sign.X].X - ray.Origin.X) * ray.InvDirection.X;
 
             Position1 tymin = (Bounds[ray.Sign.Y].Y - ray.Origin.Y) * ray.InvDirection.Y;
             Position1 tymax = (Bounds[1 - ray.Sign.Y].Y - ray.Origin.Y) * ray.InvDirection.Y;
-            if ((tmin > tymax) || (tmax < tymin)) yield break;
+            if ((tmin > tymax) || (tmax < tymin)) return null;
             tmin = Position1.Max(tmin, tymin);
             tmax = Position1.Min(tmax, tymax);
 
             Position1 tzmin = (Bounds[ray.Sign.Z].Z - ray.Origin.Z) * ray.InvDirection.Z;
             Position1 tzmax = (Bounds[1 - ray.Sign.Z].Z - ray.Origin.Z) * ray.InvDirection.Z;
-            if ((tmin > tzmax) || (tmax < tzmin)) yield break;
-            yield return Position1.Max(tmin, tzmin);
-            yield return Position1.Min(tmax, tzmax);
+            if ((tmin > tzmax) || (tmax < tzmin)) return null;
+            return new Interval(Position1.Max(tmin, tzmin), Position1.Min(tmax, tzmax));
         }
 
         /// <summary> Clip the <see cref="AxisAlignedBox"/> by a <paramref name="plane"/> </summary>

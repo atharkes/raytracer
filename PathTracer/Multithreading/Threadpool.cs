@@ -35,10 +35,11 @@ namespace PathTracer.Multithreading {
             done = new bool[ThreadCount];
             for (var i = 0; i < ThreadCount; i++) {
                 int threadNumber = i;
-                go[i] = new EventWaitHandle(false, EventResetMode.AutoReset);
-                doneHandle[i] = new EventWaitHandle(false, EventResetMode.AutoReset);
-                done[i] = true;
+                go[threadNumber] = new EventWaitHandle(false, EventResetMode.AutoReset);
+                doneHandle[threadNumber] = new EventWaitHandle(false, EventResetMode.AutoReset);
+                done[threadNumber] = true;
                 Thread workerThread = new(() => ThreadMain(threadNumber));
+                workerThreads[threadNumber] = workerThread;
                 workerThread.Start();
             }
         }
@@ -71,11 +72,12 @@ namespace PathTracer.Multithreading {
         /// <summary> Main method for the worker threads </summary>
         /// <param name="threadID">The identifier of the thread</param>
         void ThreadMain(int threadID) {
+            // Lock to Core
+            Thread.BeginThreadAffinity();
+            CPUaffinity.RunOnCore(threadID);
             while (active) {
                 // Wait for the Go Signal
                 go[threadID].WaitOne();
-                // Lock to Core
-                CPUaffinity.RunOnCore(threadID);
                 // Do Tasks
                 while (remaining > 0) {
                     int task = Interlocked.Decrement(ref remaining);
@@ -87,6 +89,7 @@ namespace PathTracer.Multithreading {
                 done[threadID] = true;
                 doneHandle[threadID].Set();
             }
+            Thread.EndThreadAffinity();
         }
 
         /// <summary> Dispose the <see cref="ThreadPool"/> </summary>

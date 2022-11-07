@@ -1,4 +1,8 @@
-﻿using OpenTK.Windowing.Common;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Globalization;
+using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using PathTracer.Drawing;
 using PathTracer.Geometry.Normals;
@@ -19,10 +23,6 @@ using PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics;
 using PathTracer.Pathtracing.Spectra;
 using PathTracer.Utilities;
 using SimpleImageIO;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Globalization;
 
 namespace PathTracer {
     public static class Program {
@@ -90,7 +90,7 @@ namespace PathTracer {
         /// <summary> Entry point of the application </summary>
         public static void Main() {
             CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
-            CreateLuxCoreComparisonImage();
+            RunGameWindow(RoughnessDensityComparison(2, 2));
             Threadpool.Dispose();
         }
 

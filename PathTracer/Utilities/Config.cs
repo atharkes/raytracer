@@ -1,9 +1,10 @@
-﻿using Newtonsoft.Json;
-using OpenTK.Mathematics;
+﻿using OpenTK.Mathematics;
 using PathTracer.Geometry.Positions;
 using PathTracer.Pathtracing;
 using PathTracer.Pathtracing.Observers;
 using System.IO;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace PathTracer.Utilities {
     /// <summary> A file that holds the configuration of the camera </summary>
@@ -76,12 +77,8 @@ namespace PathTracer.Utilities {
         public const string FileName = "CameraConfig.json";
         /// <summary> The path of the file in which the config is saved </summary>
         public static readonly string FilePath = Path.Combine(Directory.GetCurrentDirectory(), FileName);
-        /// <summary> The filestream to the config file </summary>
-        public static readonly FileStream FileStream = File.Open(FilePath, FileMode.OpenOrCreate);
         /// <summary> The settings of the json serializer </summary>
-        public static readonly JsonSerializerSettings Settings = new() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore, Formatting = Formatting.Indented };
-        /// <summary> The json serializer </summary>
-        public static readonly JsonSerializer JsonSerializer = JsonSerializer.Create(Settings);
+        public static readonly JsonSerializerOptions Options = new() { WriteIndented = true, };
 
         /// <summary> Save the camera configuration to the file </summary>
         public void SaveToFile(IRenderer renderer) {
@@ -98,18 +95,17 @@ namespace PathTracer.Utilities {
             Rotation = renderer.Observer.Camera.Rotation;
             HorizontalFOV = renderer.Observer.Camera.HorizontalFOV;
             /// Write to File
-            FileStream.SetLength(0);
-            StreamWriter streamWriter = new(FileStream);
-            JsonSerializer.Serialize(streamWriter, this);
-            streamWriter.Flush();
+            using var fileStream = File.Open(FilePath, FileMode.OpenOrCreate);
+            JsonSerializer.Serialize(fileStream, this, Options);
         }
 
         /// <summary> Load the camera configuration from the file </summary>
         /// <returns>The camera configuration from the file</returns>
         public static Config LoadFromFile() {
             if (!File.Exists(FilePath)) return new Config();
-            JsonTextReader reader = new(new StreamReader(FileStream));
-            return JsonSerializer.Deserialize<Config>(reader) ?? new Config();
+
+            using var fileStream = File.Open(FilePath, FileMode.Open);
+            return JsonSerializer.Deserialize<Config>(fileStream, Options) ?? new Config();
         }
     }
 }

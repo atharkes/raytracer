@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Globalization;
-using OpenTK.Windowing.Common;
+﻿using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using PathTracer.Drawing;
 using PathTracer.Geometry.Normals;
@@ -23,6 +19,10 @@ using PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics;
 using PathTracer.Pathtracing.Spectra;
 using PathTracer.Utilities;
 using SimpleImageIO;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Globalization;
 
 namespace PathTracer {
     public static class Program {
@@ -76,14 +76,12 @@ namespace PathTracer {
         /// <summary> The <see cref="GameWindow"/> settings </summary>
         public static readonly GameWindowSettings GameWindowSettings = new() {
             UpdateFrequency = 0,
-            RenderFrequency = 0,
-            IsMultiThreaded = false
         };
         /// <summary> The <see cref="NativeWindow"/> settings </summary>
         public static readonly NativeWindowSettings NativeWindowSettings = new() {
             Location = Config.WindowPosition,
             Size = Config.WindowSize,
-            Title = "C# .NET 6 OpenTK Pathtracer",
+            Title = ".NET OpenTK Pathtracer",
             WindowBorder = WindowBorder.Resizable,
         };
 
@@ -96,43 +94,41 @@ namespace PathTracer {
 
         static void RunGameWindow(List<ISceneObject> sceneObjects) {
             /// Setup
-            RenderWindow window = new(GameWindowSettings, NativeWindowSettings);
-            ICamera camera = new PinholeCamera(Config.Position, Config.Rotation, Config.AspectRatio, Config.HorizontalFOV);
-            IInteractiveObserver observer = new InteractiveObserver(window, camera) {
+            var window = new RenderWindow(GameWindowSettings, NativeWindowSettings);
+            var camera = new PinholeCamera(Config.Position, Config.Rotation, Config.AspectRatio, Config.HorizontalFOV);
+            var observer = new InteractiveObserver(window, camera) {
                 Drawing = Config.Drawing,
                 Debug = Config.Debug,
                 TextColor = Config.TextColor,
                 CameraLock = Config.CameraLock,
             };
-            IScene scene = new Scene(observer.Camera, sceneObjects);
+            var scene = new Scene(observer.Camera, sceneObjects);
             IRenderer renderer = new Renderer(scene, Integrator, observer);
 
             /// Attach to Game Window
-            void UpdateRenderer(FrameEventArgs obj) => renderer.Render(observer.TargetFrameTime);
+            void UpdateRenderer(FrameEventArgs obj) => renderer.Render((observer as IInteractiveObserver).TargetFrameTime);
             void HandleInput(FrameEventArgs obj) => observer.HandleInput(window.KeyboardState, window.MouseState);
             window.UpdateFrame += HandleInput;
             window.RenderFrame += UpdateRenderer;
 
-            /// Run Renderer
             window.Run();
 
-            /// Dispose
             window.UpdateFrame -= HandleInput;
             window.RenderFrame -= UpdateRenderer;
-            window.Dispose();
 
-            /// Output
             Config.SaveToFile(renderer);
+
+            window.Dispose();
         }
 
         static void CreateLuxCoreComparisonImage(int mins = 30) {
             /// Setup
-            ICamera camera = new PinholeCamera(Config.Position, Config.Rotation, Config.AspectRatio, Config.HorizontalFOV);
-            IObserver observer = new Observer(camera, Config.WindowWidth, Config.WindowHeight);
-            IScene scene = new Scene(observer.Camera, LuxCoreComparison);
-            IRenderer renderer = new Renderer(scene, Integrator, observer);
+            var camera = new PinholeCamera(Config.Position, Config.Rotation, Config.AspectRatio, Config.HorizontalFOV);
+            var observer = new Observer(camera, Config.WindowWidth, Config.WindowHeight);
+            var scene = new Scene(observer.Camera, LuxCoreComparison);
+            var renderer = new Renderer(scene, Integrator, observer);
             /// Render
-            TimeSpan renderTime = new(0, mins, 00);
+            var renderTime = new TimeSpan(0, mins, 00);
             var timer = Stopwatch.StartNew();
             while (timer.Elapsed < renderTime) {
                 renderer.Render(renderTime - timer.Elapsed);
@@ -142,18 +138,18 @@ namespace PathTracer {
         }
 
         static void CreateSelfIntersectionImages() {
-            TimeSpan renderTime = new(0, 1, 00);
-            uint[] bitLengthValues = { 1, 2, 3, 4, 5, 18, 19, 20, 21, 22 };
-            foreach (int bitLength in bitLengthValues) {
+            var renderTime = new TimeSpan(0, 1, 00);
+            int[] bitLengthValues = { 1, 2, 3, 4, 5, 18, 19, 20, 21, 22 };
+            foreach (var bitLength in bitLengthValues) {
                 Console.WriteLine($"Time = {DateTime.Now.TimeOfDay:c} | Currently at: bit length = {bitLength:0.0}");
                 uint intervalLength = 1u << (bitLength - 1);
                 InverseMultiplicative.IntervalLength = intervalLength;
 
                 /// Setup
-                ICamera camera = new PinholeCamera(Config.Position, Config.Rotation, Config.AspectRatio, Config.HorizontalFOV);
-                IObserver observer = new Observer(camera, Config.WindowWidth, Config.WindowHeight);
-                IScene scene = new Scene(observer.Camera, SurfaceIntervalSizeComparison);
-                IRenderer renderer = new Renderer(scene, Integrator, observer);
+                var camera = new PinholeCamera(Config.Position, Config.Rotation, Config.AspectRatio, Config.HorizontalFOV);
+                var observer = new Observer(camera, Config.WindowWidth, Config.WindowHeight);
+                var scene = new Scene(observer.Camera, SurfaceIntervalSizeComparison);
+                var renderer = new Renderer(scene, Integrator, observer);
                 /// Render
                 var timer = Stopwatch.StartNew();
                 while (timer.Elapsed < renderTime) {
@@ -165,17 +161,17 @@ namespace PathTracer {
         }
 
         static void CreateDensityRoughnessImages() {
-            TimeSpan renderTime = new(0, 20, 00);
-            float[] densityValues = { 0.5f, 2f, 8f, 32f };
-            float[] rougnessValues = { 0f, 0.1f, 0.2f, 0.5f, 1f };
+            var renderTime = new TimeSpan(0, 20, 00);
+            var densityValues = new float[] { 0.5f, 2f, 8f, 32f };
+            var rougnessValues = new float[] { 0f, 0.1f, 0.2f, 0.5f, 1f };
             foreach (float density in densityValues) {
                 foreach (float roughness in rougnessValues) {
                     Console.WriteLine($"Time = {DateTime.Now.TimeOfDay:c} | Currently at: density = {density:0.0}, roughness = {roughness:0.00}");
                     /// Setup
-                    ICamera camera = new PinholeCamera(Config.Position, Config.Rotation, Config.AspectRatio, Config.HorizontalFOV);
-                    IObserver observer = new Observer(camera, Config.WindowWidth, Config.WindowHeight);
-                    IScene scene = new Scene(observer.Camera, RoughnessDensityComparison(density, roughness));
-                    IRenderer renderer = new Renderer(scene, Integrator, observer);
+                    var camera = new PinholeCamera(Config.Position, Config.Rotation, Config.AspectRatio, Config.HorizontalFOV);
+                    var observer = new Observer(camera, Config.WindowWidth, Config.WindowHeight);
+                    var scene = new Scene(observer.Camera, RoughnessDensityComparison(density, roughness));
+                    var renderer = new Renderer(scene, Integrator, observer);
                     /// Render
                     var timer = Stopwatch.StartNew();
                     while (timer.Elapsed < renderTime) {
@@ -189,9 +185,9 @@ namespace PathTracer {
 
         static void OutputImage(IObserver observer, string filename) {
             RgbImage img = new(w: observer.Accumulator.Width, h: observer.Accumulator.Height);
-            for (int y = 0; y < observer.Accumulator.Height; y++) {
-                for (int x = 0; x < observer.Accumulator.Width; x++) {
-                    RGBSpectrum color = observer.Accumulator.Get(x, y).AverageLight.ToRGBSpectrum();
+            for (var y = 0; y < observer.Accumulator.Height; y++) {
+                for (var x = 0; x < observer.Accumulator.Width; x++) {
+                    var color = observer.Accumulator.Get(x, y).AverageLight.ToRGBSpectrum();
                     img.SetPixel(x, y, new(color.Red, color.Green, color.Blue));
                 }
             }

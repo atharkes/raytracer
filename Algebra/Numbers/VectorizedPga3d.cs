@@ -22,8 +22,14 @@ public class VectorizedPga3d {
 
     public VectorizedPga3d(Number[] array) {
         if (array.Length != _basis.Length) throw new ArgumentException(string.Empty, nameof(array));
-        for (var i = 0; i < values.Length; i++) {
+        for (var i = 0; i < VectorCount; i++) {
             values[i] = new Vector<Number>(array, i * Vector<Number>.Count);
+        }
+    }
+
+    public VectorizedPga3d(VectorizedPga3d reference) {
+        for (var i = 0; i < VectorCount; i++) {
+            values[i] = reference.values[i];
         }
     }
 
@@ -40,6 +46,20 @@ public class VectorizedPga3d {
     }
     #endregion
 
+    public VectorizedPga3d With(byte index, Number value) {
+        var result = new VectorizedPga3d(this);
+        result[index] = value;
+        return result;
+    }
+
+    public Number[] ToArray() {
+        var result = new Number[BasisLength];
+        for (var i = 0; i < VectorCount; i++) {
+            values[i].CopyTo(result, i * Vector<Number>.Count);
+        }
+        return result;
+    }
+
     #region Overloaded Operators
     /// <summary>
     /// VectorizedPga3d.Reverse : res = ~a
@@ -47,22 +67,9 @@ public class VectorizedPga3d {
     /// </summary>
     public static VectorizedPga3d operator ~(VectorizedPga3d a) {
         var result = new VectorizedPga3d();
-        result[0] = a[0];
-        result[1] = a[1];
-        result[2] = a[2];
-        result[3] = a[3];
-        result[4] = a[4];
-        result[5] = -a[5];
-        result[6] = -a[6];
-        result[7] = -a[7];
-        result[8] = -a[8];
-        result[9] = -a[9];
-        result[10] = -a[10];
-        result[11] = -a[11];
-        result[12] = -a[12];
-        result[13] = -a[13];
-        result[14] = -a[14];
-        result[15] = a[15];
+        for (var i = 0; i < VectorCount; i++) {
+            result.values[i] = -a.values[i];
+        }
         return result;
     }
 
@@ -71,24 +78,7 @@ public class VectorizedPga3d {
     /// Poincare duality operator.
     /// </summary>
     public static VectorizedPga3d operator !(VectorizedPga3d a) {
-        var result = new VectorizedPga3d();
-        result[0] = a[15];
-        result[1] = a[14];
-        result[2] = a[13];
-        result[3] = a[12];
-        result[4] = a[11];
-        result[5] = a[10];
-        result[6] = a[9];
-        result[7] = a[8];
-        result[8] = a[7];
-        result[9] = a[6];
-        result[10] = a[5];
-        result[11] = a[4];
-        result[12] = a[3];
-        result[13] = a[2];
-        result[14] = a[1];
-        result[15] = a[0];
-        return result;
+        return new(a.ToArray().Reverse().ToArray());
     }
 
     /// <summary>
@@ -294,24 +284,7 @@ public class VectorizedPga3d {
     /// scalar/multivector addition
     /// </summary>
     public static VectorizedPga3d operator +(Number a, VectorizedPga3d b) {
-        var result = new VectorizedPga3d();
-        result[0] = a + b[0];
-        result[1] = b[1];
-        result[2] = b[2];
-        result[3] = b[3];
-        result[4] = b[4];
-        result[5] = b[5];
-        result[6] = b[6];
-        result[7] = b[7];
-        result[8] = b[8];
-        result[9] = b[9];
-        result[10] = b[10];
-        result[11] = b[11];
-        result[12] = b[12];
-        result[13] = b[13];
-        result[14] = b[14];
-        result[15] = b[15];
-        return result;
+        return b.With(0, a + b.values[0][0]);
     }
 
     /// <summary>
@@ -319,24 +292,7 @@ public class VectorizedPga3d {
     /// multivector/scalar addition
     /// </summary>
     public static VectorizedPga3d operator +(VectorizedPga3d a, Number b) {
-        var result = new VectorizedPga3d();
-        result[0] = a[0] + b;
-        result[1] = a[1];
-        result[2] = a[2];
-        result[3] = a[3];
-        result[4] = a[4];
-        result[5] = a[5];
-        result[6] = a[6];
-        result[7] = a[7];
-        result[8] = a[8];
-        result[9] = a[9];
-        result[10] = a[10];
-        result[11] = a[11];
-        result[12] = a[12];
-        result[13] = a[13];
-        result[14] = a[14];
-        result[15] = a[15];
-        return result;
+        return a.With(0, a.values[0][0] + b);
     }
 
     /// <summary>
@@ -344,24 +300,7 @@ public class VectorizedPga3d {
     /// scalar/multivector subtraction
     /// </summary>
     public static VectorizedPga3d operator -(Number a, VectorizedPga3d b) {
-        var result = new VectorizedPga3d();
-        result[0] = a - b[0];
-        result[1] = -b[1];
-        result[2] = -b[2];
-        result[3] = -b[3];
-        result[4] = -b[4];
-        result[5] = -b[5];
-        result[6] = -b[6];
-        result[7] = -b[7];
-        result[8] = -b[8];
-        result[9] = -b[9];
-        result[10] = -b[10];
-        result[11] = -b[11];
-        result[12] = -b[12];
-        result[13] = -b[13];
-        result[14] = -b[14];
-        result[15] = -b[15];
-        return result;
+        return (~b).With(0, a - b.values[0][0]);
     }
 
     /// <summary>
@@ -369,24 +308,7 @@ public class VectorizedPga3d {
     /// multivector/scalar subtraction
     /// </summary>
     public static VectorizedPga3d operator -(VectorizedPga3d a, Number b) {
-        var result = new VectorizedPga3d();
-        result[0] = a[0] - b;
-        result[1] = a[1];
-        result[2] = a[2];
-        result[3] = a[3];
-        result[4] = a[4];
-        result[5] = a[5];
-        result[6] = a[6];
-        result[7] = a[7];
-        result[8] = a[8];
-        result[9] = a[9];
-        result[10] = a[10];
-        result[11] = a[11];
-        result[12] = a[12];
-        result[13] = a[13];
-        result[14] = a[14];
-        result[15] = a[15];
-        return result;
+        return a.With(0, a.values[0][0] - b);
     }
     #endregion
 

@@ -6,6 +6,7 @@ public class VectorizedPga3d {
     public const byte BasisLength = 16;
     public static readonly byte VectorCount = (byte)(BasisLength / Vector<Number>.Count);
     public static readonly byte BitShifts = (byte)(Math.Sqrt(Vector<Number>.Count) + 1);
+    public static readonly int VectorComponentFilter = Vector<Number>.Count - 1;
     // just for debug and print output, the basis names
     public static readonly string[] _basis = ["1", "e0", "e1", "e2", "e3", "e01", "e02", "e03", "e12", "e31", "e23", "e021", "e013", "e032", "e123", "e0123"];
 
@@ -35,14 +36,8 @@ public class VectorizedPga3d {
 
     #region Array Access
     public Number this[int index] {
-        get {
-            var vectorIndex = index >> BitShifts;
-            return values[vectorIndex][index - vectorIndex * Vector<Number>.Count];
-        }
-        set {
-            var vectorIndex = index >> BitShifts;
-            values[vectorIndex] = values[vectorIndex].WithElement(index - vectorIndex * Vector<Number>.Count, value);
-        }
+        get => values[index >> BitShifts][index & VectorComponentFilter];
+        set => values[index >> BitShifts] = values[index >> BitShifts].WithElement(index & VectorComponentFilter, value);
     }
     #endregion
 
@@ -86,7 +81,7 @@ public class VectorizedPga3d {
     /// Clifford Conjugation
     /// </summary>
     public VectorizedPga3d Conjugate() {
-        var result = new VectorizedPga3d();
+        var result = new Number[BasisLength];
         result[0] = this[0];
         result[1] = -this[1];
         result[2] = -this[2];
@@ -103,7 +98,7 @@ public class VectorizedPga3d {
         result[13] = this[13];
         result[14] = this[14];
         result[15] = this[15];
-        return result;
+        return new VectorizedPga3d(result);
     }
 
     /// <summary>
@@ -111,7 +106,7 @@ public class VectorizedPga3d {
     /// Main involution
     /// </summary>
     public VectorizedPga3d Involute() {
-        var result = new VectorizedPga3d();
+        var result = new Number[BasisLength];
         result[0] = this[0];
         result[1] = -this[1];
         result[2] = -this[2];
@@ -128,7 +123,7 @@ public class VectorizedPga3d {
         result[13] = -this[13];
         result[14] = -this[14];
         result[15] = this[15];
-        return result;
+        return new VectorizedPga3d(result);
     }
 
     /// <summary>
@@ -136,7 +131,7 @@ public class VectorizedPga3d {
     /// The geometric product.
     /// </summary>
     public static VectorizedPga3d operator *(VectorizedPga3d a, VectorizedPga3d b) {
-        var result = new VectorizedPga3d();
+        var result = new Number[BasisLength];
         result[0] = b[0] * a[0] + b[2] * a[2] + b[3] * a[3] + b[4] * a[4] - b[8] * a[8] - b[9] * a[9] - b[10] * a[10] - b[14] * a[14];
         result[1] = b[1] * a[0] + b[0] * a[1] - b[5] * a[2] - b[6] * a[3] - b[7] * a[4] + b[2] * a[5] + b[3] * a[6] + b[4] * a[7] + b[11] * a[8] + b[12] * a[9] + b[13] * a[10] + b[8] * a[11] + b[9] * a[12] + b[10] * a[13] + b[15] * a[14] - b[14] * a[15];
         result[2] = b[2] * a[0] + b[0] * a[2] - b[8] * a[3] + b[9] * a[4] + b[3] * a[8] - b[4] * a[9] - b[14] * a[10] - b[10] * a[14];
@@ -153,7 +148,7 @@ public class VectorizedPga3d {
         result[13] = b[13] * a[0] - b[10] * a[1] + b[15] * a[2] + b[7] * a[3] - b[6] * a[4] - b[14] * a[5] - b[4] * a[6] + b[3] * a[7] + b[12] * a[8] - b[11] * a[9] - b[1] * a[10] + b[9] * a[11] - b[8] * a[12] + b[0] * a[13] + b[5] * a[14] - b[2] * a[15];
         result[14] = b[14] * a[0] + b[10] * a[2] + b[9] * a[3] + b[8] * a[4] + b[4] * a[8] + b[3] * a[9] + b[2] * a[10] + b[0] * a[14];
         result[15] = b[15] * a[0] + b[14] * a[1] + b[13] * a[2] + b[12] * a[3] + b[11] * a[4] + b[10] * a[5] + b[9] * a[6] + b[8] * a[7] + b[7] * a[8] + b[6] * a[9] + b[5] * a[10] - b[4] * a[11] - b[3] * a[12] - b[2] * a[13] - b[1] * a[14] + b[0] * a[15];
-        return result;
+        return new VectorizedPga3d(result);
     }
 
     /// <summary>
@@ -161,7 +156,7 @@ public class VectorizedPga3d {
     /// The outer product. (MEET)
     /// </summary>
     public static VectorizedPga3d operator ^(VectorizedPga3d a, VectorizedPga3d b) {
-        var result = new VectorizedPga3d();
+        var result = new Number[BasisLength];
         result[0] = b[0] * a[0];
         result[1] = b[1] * a[0] + b[0] * a[1];
         result[2] = b[2] * a[0] + b[0] * a[2];
@@ -178,7 +173,7 @@ public class VectorizedPga3d {
         result[13] = b[13] * a[0] - b[10] * a[1] + b[7] * a[3] - b[6] * a[4] - b[4] * a[6] + b[3] * a[7] - b[1] * a[10] + b[0] * a[13];
         result[14] = b[14] * a[0] + b[10] * a[2] + b[9] * a[3] + b[8] * a[4] + b[4] * a[8] + b[3] * a[9] + b[2] * a[10] + b[0] * a[14];
         result[15] = b[15] * a[0] + b[14] * a[1] + b[13] * a[2] + b[12] * a[3] + b[11] * a[4] + b[10] * a[5] + b[9] * a[6] + b[8] * a[7] + b[7] * a[8] + b[6] * a[9] + b[5] * a[10] - b[4] * a[11] - b[3] * a[12] - b[2] * a[13] - b[1] * a[14] + b[0] * a[15];
-        return result;
+        return new VectorizedPga3d(result);
     }
 
     /// <summary>
@@ -186,7 +181,7 @@ public class VectorizedPga3d {
     /// The regressive product. (JOIN)
     /// </summary>
     public static VectorizedPga3d operator &(VectorizedPga3d a, VectorizedPga3d b) {
-        var result = new VectorizedPga3d();
+        var result = new Number[BasisLength];
         result[15] = 1 * (a[15] * b[15]);
         result[14] = -1 * (a[14] * -1 * b[15] + a[15] * b[14] * -1);
         result[13] = -1 * (a[13] * -1 * b[15] + a[15] * b[13] * -1);
@@ -203,7 +198,7 @@ public class VectorizedPga3d {
         result[2] = 1 * (a[2] * b[15] - a[5] * b[14] * -1 + a[8] * b[12] * -1 - a[9] * b[11] * -1 - a[11] * -1 * b[9] + a[12] * -1 * b[8] - a[14] * -1 * b[5] + a[15] * b[2]);
         result[1] = 1 * (a[1] * b[15] + a[5] * b[13] * -1 + a[6] * b[12] * -1 + a[7] * b[11] * -1 + a[11] * -1 * b[7] + a[12] * -1 * b[6] + a[13] * -1 * b[5] + a[15] * b[1]);
         result[0] = 1 * (a[0] * b[15] + a[1] * b[14] * -1 + a[2] * b[13] * -1 + a[3] * b[12] * -1 + a[4] * b[11] * -1 + a[5] * b[10] + a[6] * b[9] + a[7] * b[8] + a[8] * b[7] + a[9] * b[6] + a[10] * b[5] - a[11] * -1 * b[4] - a[12] * -1 * b[3] - a[13] * -1 * b[2] - a[14] * -1 * b[1] + a[15] * b[0]);
-        return result;
+        return new VectorizedPga3d(result);
     }
 
     /// <summary>
@@ -211,7 +206,7 @@ public class VectorizedPga3d {
     /// The inner product.
     /// </summary>
     public static VectorizedPga3d operator |(VectorizedPga3d a, VectorizedPga3d b) {
-        var result = new VectorizedPga3d();
+        var result = new Number[BasisLength];
         result[0] = b[0] * a[0] + b[2] * a[2] + b[3] * a[3] + b[4] * a[4] - b[8] * a[8] - b[9] * a[9] - b[10] * a[10] - b[14] * a[14];
         result[1] = b[1] * a[0] + b[0] * a[1] - b[5] * a[2] - b[6] * a[3] - b[7] * a[4] + b[2] * a[5] + b[3] * a[6] + b[4] * a[7] + b[11] * a[8] + b[12] * a[9] + b[13] * a[10] + b[8] * a[11] + b[9] * a[12] + b[10] * a[13] + b[15] * a[14] - b[14] * a[15];
         result[2] = b[2] * a[0] + b[0] * a[2] - b[8] * a[3] + b[9] * a[4] + b[3] * a[8] - b[4] * a[9] - b[14] * a[10] - b[10] * a[14];
@@ -228,7 +223,7 @@ public class VectorizedPga3d {
         result[13] = b[13] * a[0] + b[15] * a[2] + b[0] * a[13] - b[2] * a[15];
         result[14] = b[14] * a[0] + b[0] * a[14];
         result[15] = b[15] * a[0] + b[0] * a[15];
-        return result;
+        return new VectorizedPga3d(result);
     }
 
     /// <summary>

@@ -8,11 +8,21 @@ public class VectorizedPga3dTests {
     public void Addition_ShouldBeValid() {
         var left = Random.Shared.NextVectorizedPGA3d();
         var right = Random.Shared.NextVectorizedPGA3d();
+        var expected = new PGA3D(left.ToArray()) + new PGA3D(right.ToArray());
 
         var result = left + right;
 
-        for (var i = 0; i < VectorizedPga3d.BasisLength; i++) {
-            result[i].Should().Be(left[i] + right[i]);
-        }
+        new PGA3D(result.ToArray()).Should().BeEquivalentTo(expected);
+    }
+
+    [Fact]
+    public void Multiplication_ShouldBeValid() {
+        var left = Random.Shared.NextVectorizedPGA3d();
+        var right = Random.Shared.NextVectorizedPGA3d();
+        var expected = new PGA3D(left.ToArray()) * new PGA3D(right.ToArray());
+
+        var result = left * right;
+
+        new PGA3D(result.ToArray()).Should().BeEquivalentTo(expected);
     }
 }

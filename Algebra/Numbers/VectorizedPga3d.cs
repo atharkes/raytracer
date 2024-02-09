@@ -1,11 +1,12 @@
 ﻿using System.Numerics;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace Algebra.Numbers;
 public class VectorizedPga3d {
     public const byte BasisLength = 16;
-    public static readonly byte VectorCount = (byte)(BasisLength / Vector<Number>.Count);
-    public static readonly byte BitShifts = (byte)(Math.Sqrt(Vector<Number>.Count) + 1);
+    public static readonly int VectorCount = BasisLength / Vector<Number>.Count;
+    public static readonly int VectorIndexShift = (int)Math.Log2(Vector<Number>.Count);
     public static readonly int VectorComponentFilter = Vector<Number>.Count - 1;
     // just for debug and print output, the basis names
     public static readonly string[] _basis = ["1", "e0", "e1", "e2", "e3", "e01", "e02", "e03", "e12", "e31", "e23", "e021", "e013", "e032", "e123", "e0123"];
@@ -36,12 +37,14 @@ public class VectorizedPga3d {
 
     #region Array Access
     public Number this[int index] {
-        get => values[index >> BitShifts][index & VectorComponentFilter];
-        set => values[index >> BitShifts] = values[index >> BitShifts].WithElement(index & VectorComponentFilter, value);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => values[index >> VectorIndexShift][index & VectorComponentFilter];
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        set => values[index >> VectorIndexShift] = values[index >> VectorIndexShift].WithElement(index & VectorComponentFilter, value);
     }
     #endregion
 
-    public VectorizedPga3d With(byte index, Number value) {
+    public VectorizedPga3d With(int index, Number value) {
         var result = new VectorizedPga3d(this);
         result[index] = value;
         return result;
@@ -130,6 +133,7 @@ public class VectorizedPga3d {
     /// VectorizedPga3d.Mul : res = a * b
     /// The geometric product.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static VectorizedPga3d operator *(VectorizedPga3d a, VectorizedPga3d b) {
         var result = new Number[BasisLength];
         result[0] = b[0] * a[0] + b[2] * a[2] + b[3] * a[3] + b[4] * a[4] - b[8] * a[8] - b[9] * a[9] - b[10] * a[10] - b[14] * a[14];
@@ -230,6 +234,7 @@ public class VectorizedPga3d {
     /// VectorizedPga3d.Add : res = a + b
     /// Multivector addition
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static VectorizedPga3d operator +(VectorizedPga3d a, VectorizedPga3d b) {
         var result = new VectorizedPga3d();
         for (var i = 0; i < VectorCount; i++) {

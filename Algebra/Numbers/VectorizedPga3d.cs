@@ -4,22 +4,19 @@ using System.Text;
 
 namespace Algebra.Numbers;
 public class VectorizedPga3d {
-    public const byte BasisLength = 16;
+    public const int BasisLength = 16;
     public static readonly int VectorCount = BasisLength / Vector<Number>.Count;
-    public static readonly int VectorIndexShift = (int)Math.Log2(Vector<Number>.Count);
+    public static readonly int VectorIndexShift = BitOperations.Log2((uint)Vector<Number>.Count);
     public static readonly int VectorComponentFilter = Vector<Number>.Count - 1;
     // just for debug and print output, the basis names
     public static readonly string[] _basis = ["1", "e0", "e1", "e2", "e3", "e01", "e02", "e03", "e12", "e31", "e23", "e021", "e013", "e032", "e123", "e0123"];
 
-    public readonly Vector<Number>[] values = new Vector<float>[VectorCount];
+    public readonly Vector<Number>[] values = new Vector<Number>[VectorCount];
 
-    /// <summary>
-    /// Ctor
-    /// </summary>
-    /// <param name="f"></param>
-    /// <param name="idx"></param>
-    public VectorizedPga3d(Number f = 0f, byte idx = 0) {
-        this[idx] = f;
+    public VectorizedPga3d() { }
+
+    public VectorizedPga3d(Number f = 0f, int index = 0) {
+        this[index] = f;
     }
 
     public VectorizedPga3d(Number[] array) {
@@ -283,33 +280,29 @@ public class VectorizedPga3d {
     /// VectorizedPga3d.sadd : res = a + b
     /// scalar/multivector addition
     /// </summary>
-    public static VectorizedPga3d operator +(Number a, VectorizedPga3d b) {
-        return b.With(0, a + b.values[0][0]);
-    }
+    public static VectorizedPga3d operator +(Number a, VectorizedPga3d b)
+        => b.With(0, a + b.values[0][0]);
 
     /// <summary>
     /// VectorizedPga3d.adds : res = a + b
     /// multivector/scalar addition
     /// </summary>
-    public static VectorizedPga3d operator +(VectorizedPga3d a, Number b) {
-        return a.With(0, a.values[0][0] + b);
-    }
+    public static VectorizedPga3d operator +(VectorizedPga3d a, Number b)
+        => a.With(0, a.values[0][0] + b);
 
     /// <summary>
     /// VectorizedPga3d.ssub : res = a - b
     /// scalar/multivector subtraction
     /// </summary>
-    public static VectorizedPga3d operator -(Number a, VectorizedPga3d b) {
-        return (~b).With(0, a - b.values[0][0]);
-    }
+    public static VectorizedPga3d operator -(Number a, VectorizedPga3d b)
+        => (~b).With(0, a - b.values[0][0]);
 
     /// <summary>
     /// VectorizedPga3d.subs : res = a - b
     /// multivector/scalar subtraction
     /// </summary>
-    public static VectorizedPga3d operator -(VectorizedPga3d a, Number b) {
-        return a.With(0, a.values[0][0] - b);
-    }
+    public static VectorizedPga3d operator -(VectorizedPga3d a, Number b)
+        => a.With(0, a.values[0][0] - b);
     #endregion
 
     /// <summary>
@@ -390,7 +383,7 @@ public class VectorizedPga3d {
     public override string ToString() {
         var sb = new StringBuilder();
         var n = 0;
-        for (var i = 0; i < 16; ++i) {
+        for (var i = 0; i < BasisLength; ++i) {
             if (this[i] != 0.0f) {
                 _ = sb.Append($"{this[i]}{(i == 0 ? string.Empty : _basis[i])} + ");
                 n++;

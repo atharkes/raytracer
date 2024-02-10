@@ -4,7 +4,7 @@
 /// <param name="y"></param>
 /// <param name="z"></param>
 public class Point(Number x, Number y, Number z) {
-    public Number E123 { get; } = 1;
+    public const Number E123 = 1;
     public Number E032 { get; } = x;
     public Number E013 { get; } = y;
     public Number E021 { get; } = z;

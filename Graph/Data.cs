@@ -1,12 +1,12 @@
-﻿namespace Graph {
-    public class PlotData {
-        public List<float> Distances = new();
-        public Dictionary<string, DistributionData> Distributions = new();
-    }
+﻿namespace Graph;
 
-    public class DistributionData {
-        public List<double> MaterialDensities = new();
-        public List<double> ProbabilityDensities = new();
-        public List<double> CumulativeProbabilities = new();
-    }
+public class PlotData {
+    public List<float> Distances = new();
+    public Dictionary<string, DistributionData> Distributions = new();
+}
+
+public class DistributionData {
+    public List<double> MaterialDensities = new();
+    public List<double> ProbabilityDensities = new();
+    public List<double> CumulativeProbabilities = new();
 }

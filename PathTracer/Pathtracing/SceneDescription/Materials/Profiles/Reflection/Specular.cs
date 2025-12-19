@@ -4,10 +4,8 @@ using PathTracer.Pathtracing.Distributions.Direction;
 using PathTracer.Pathtracing.Distributions.Probabilities;
 using PathTracer.Pathtracing.Spectra;
 
-namespace PathTracer.Pathtracing.SceneDescription.Materials.Profiles.Reflection {
-    public class Specular : IReflectionProfile {
-        public IProbabilityDistribution<Normal3> GetDirections(Normal3 incomingDirection, Position3 position, Normal3 orientation, ISpectrum spectrum) {
-            return new SpecularReflection(orientation, incomingDirection);
-        }
-    }
+namespace PathTracer.Pathtracing.SceneDescription.Materials.Profiles.Reflection;
+
+public class Specular : IReflectionProfile {
+    public IProbabilityDistribution<Normal3> GetDirections(Normal3 incomingDirection, Position3 position, Normal3 orientation, ISpectrum spectrum) => new SpecularReflection(orientation, incomingDirection);
 }

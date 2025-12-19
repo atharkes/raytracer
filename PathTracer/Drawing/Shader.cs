@@ -1,72 +1,66 @@
 ﻿using OpenTK.Graphics.ES30;
-using System;
-using System.IO;
 using System.Text;
 
-namespace PathTracer.Drawing {
-    public class Shader : IDisposable {
-        public readonly int Handle;
-        bool disposed = false;
+namespace PathTracer.Drawing;
 
-        public Shader(string vertexPath, string fragmentPath) {
-            /// Create Vertex Shader
-            string VertexShaderSource;
-            using (StreamReader reader = new(vertexPath, Encoding.UTF8)) {
-                VertexShaderSource = reader.ReadToEnd();
-            }
-            int VertexShader = GL.CreateShader(ShaderType.VertexShader);
-            GL.ShaderSource(VertexShader, VertexShaderSource);
-            GL.CompileShader(VertexShader);
-            string infoLogVert = GL.GetShaderInfoLog(VertexShader);
-            if (infoLogVert != string.Empty) {
-                Console.WriteLine(infoLogVert);
-            }
-            /// Create Fragment Shader
-            string FragmentShaderSource;
-            using (StreamReader reader = new(fragmentPath, Encoding.UTF8)) {
-                FragmentShaderSource = reader.ReadToEnd();
-            }
-            int FragmentShader = GL.CreateShader(ShaderType.FragmentShader);
-            GL.ShaderSource(FragmentShader, FragmentShaderSource);
-            GL.CompileShader(FragmentShader);
-            string infoLogFrag = GL.GetShaderInfoLog(FragmentShader);
-            if (infoLogFrag != string.Empty) {
-                Console.WriteLine(infoLogFrag);
-            }
-            /// Create Program
-            Handle = GL.CreateProgram();
-            GL.AttachShader(Handle, VertexShader);
-            GL.AttachShader(Handle, FragmentShader);
-            GL.LinkProgram(Handle);
-            /// Cleanup
-            GL.DetachShader(Handle, VertexShader);
-            GL.DetachShader(Handle, FragmentShader);
-            GL.DeleteShader(FragmentShader);
-            GL.DeleteShader(VertexShader);
-        }
+public class Shader : IDisposable {
+    public readonly int Handle;
+    private bool disposed = false;
 
-        public int GetAttribLocation(string attribName) {
-            return GL.GetAttribLocation(Handle, attribName);
+    public Shader(string vertexPath, string fragmentPath) {
+        /// Create Vertex Shader
+        string VertexShaderSource;
+        using (StreamReader reader = new(vertexPath, Encoding.UTF8)) {
+            VertexShaderSource = reader.ReadToEnd();
         }
+        var VertexShader = GL.CreateShader(ShaderType.VertexShader);
+        GL.ShaderSource(VertexShader, VertexShaderSource);
+        GL.CompileShader(VertexShader);
+        var infoLogVert = GL.GetShaderInfoLog(VertexShader);
+        if (infoLogVert != string.Empty) {
+            Console.WriteLine(infoLogVert);
+        }
+        /// Create Fragment Shader
+        string FragmentShaderSource;
+        using (StreamReader reader = new(fragmentPath, Encoding.UTF8)) {
+            FragmentShaderSource = reader.ReadToEnd();
+        }
+        var FragmentShader = GL.CreateShader(ShaderType.FragmentShader);
+        GL.ShaderSource(FragmentShader, FragmentShaderSource);
+        GL.CompileShader(FragmentShader);
+        var infoLogFrag = GL.GetShaderInfoLog(FragmentShader);
+        if (infoLogFrag != string.Empty) {
+            Console.WriteLine(infoLogFrag);
+        }
+        /// Create Program
+        Handle = GL.CreateProgram();
+        GL.AttachShader(Handle, VertexShader);
+        GL.AttachShader(Handle, FragmentShader);
+        GL.LinkProgram(Handle);
+        /// Cleanup
+        GL.DetachShader(Handle, VertexShader);
+        GL.DetachShader(Handle, FragmentShader);
+        GL.DeleteShader(FragmentShader);
+        GL.DeleteShader(VertexShader);
+    }
 
-        public void Use() {
-            GL.UseProgram(Handle);
-        }
+    public int GetAttribLocation(string attribName) => GL.GetAttribLocation(Handle, attribName);
 
-        protected virtual void Dispose(bool disposing) {
-            if (!disposed) {
-                GL.DeleteProgram(Handle);
-                disposed = true;
-            }
-        }
+    public void Use() => GL.UseProgram(Handle);
 
-        public void Dispose() {
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
+    protected virtual void Dispose(bool disposing) {
+        if (!disposed) {
+            GL.DeleteProgram(Handle);
+            disposed = true;
         }
+    }
 
-        ~Shader() {
-            Dispose(disposing: false);
-        }
+    public void Dispose() {
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
+    }
+
+    ~Shader() {
+        Dispose(disposing: false);
     }
 }

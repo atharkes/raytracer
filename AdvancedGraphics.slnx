@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path="Directory.Build.props" />
+    <File Path="settings.VisualStudio.json" />
+  </Folder>
+  <Project Path="Graph/Graph.csproj" />
+  <Project Path="PathTracer/PathTracer.csproj" />
+  <Project Path="Plot/Plot.pyproj" Type="888888a0-9f3d-457c-b088-3a5042f75d52" Id="31eb3efd-0f98-4dad-bbb4-e39256c10911">
+    <Build Project="false" />
+  </Project>
+  <Project Path="UnitTests/UnitTests.csproj" />
+</Solution>

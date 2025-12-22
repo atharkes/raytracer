@@ -1,114 +1,112 @@
 ﻿using PathTracer.Geometry.Positions;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 
-namespace PathTracer.Pathtracing.Distributions.Intervals {
-    /// <summary> A collection of <see cref="IInterval"/>s </summary>
-    public interface IIntervalCollection : IInterval, ICollection<IInterval> {
-        /// <summary> The <see cref="IInterval"/>s in the <see cref="IIntervalCollection"/> </summary>
-        ICollection<IInterval> Intervals { get; }
+namespace PathTracer.Pathtracing.Distributions.Intervals;
 
-        /// <summary> The amount of items in the <see cref="IIntervalCollection"/> </summary>
-        int ICollection<IInterval>.Count => Intervals.Count;
-        /// <summary> Whether the <see cref="IIntervalCollection"/> is Read-Only </summary>
-        bool ICollection<IInterval>.IsReadOnly => Intervals.IsReadOnly;
+/// <summary> A collection of <see cref="IInterval"/>s </summary>
+public interface IIntervalCollection : IInterval, ICollection<IInterval> {
+    /// <summary> The <see cref="IInterval"/>s in the <see cref="IIntervalCollection"/> </summary>
+    ICollection<IInterval> Intervals { get; }
 
-        /// <summary> The transition points in the <see cref="IIntervalCollection"/> </summary>
-        IOrderedEnumerable<Position1> IInterval<Position1>.Transitions => Intervals.SelectMany(i => i.Transitions).GroupBy(f => f).Select(y => y.First()).OrderBy(f => f);
-        /// <summary> The first entry of the <see cref="IIntervalCollection"/> </summary>
-        Position1 IInterval<Position1>.Entry => Intervals.Min(i => i.Entry);
-        /// <summary> The alst exit of the <see cref="IIntervalCollection"/> </summary>
-        Position1 IInterval<Position1>.Exit => Intervals.Max(i => i.Exit);
-        /// <summary> Whether the <see cref="IIntervalCollection"/> is volumetric </summary>
-        bool IInterval<Position1>.Volumetric => Intervals.Any(i => i.Volumetric);
-        /// <summary> Whether the <see cref="IIntervalCollection"/> is planar </summary>
-        bool IInterval<Position1>.Planar => Intervals.All(i => i.Planar);
-        /// <summary> The area covered by the <see cref="IIntervalCollection"/> </summary>
-        float IInterval.CoveredArea {
-            get {
-                List<(float position, int change)> changes = new(Count * 2);
-                foreach (IInterval interval in Intervals) {
-                    changes.Add((interval.Entry, +1));
-                    changes.Add((interval.Exit, -1));
+    /// <summary> The amount of items in the <see cref="IIntervalCollection"/> </summary>
+    int ICollection<IInterval>.Count => Intervals.Count;
+    /// <summary> Whether the <see cref="IIntervalCollection"/> is Read-Only </summary>
+    bool ICollection<IInterval>.IsReadOnly => Intervals.IsReadOnly;
+
+    /// <summary> The transition points in the <see cref="IIntervalCollection"/> </summary>
+    IOrderedEnumerable<Position1> IInterval<Position1>.Transitions => Intervals.SelectMany(i => i.Transitions).GroupBy(f => f).Select(y => y.First()).OrderBy(f => f);
+    /// <summary> The first entry of the <see cref="IIntervalCollection"/> </summary>
+    Position1 IInterval<Position1>.Entry => Intervals.Min(i => i.Entry);
+    /// <summary> The alst exit of the <see cref="IIntervalCollection"/> </summary>
+    Position1 IInterval<Position1>.Exit => Intervals.Max(i => i.Exit);
+    /// <summary> Whether the <see cref="IIntervalCollection"/> is volumetric </summary>
+    bool IInterval<Position1>.Volumetric => Intervals.Any(i => i.Volumetric);
+    /// <summary> Whether the <see cref="IIntervalCollection"/> is planar </summary>
+    bool IInterval<Position1>.Planar => Intervals.All(i => i.Planar);
+    /// <summary> The area covered by the <see cref="IIntervalCollection"/> </summary>
+    float IInterval.CoveredArea {
+        get {
+            List<(float position, int change)> changes = new(Count * 2);
+            foreach (var interval in Intervals) {
+                changes.Add((interval.Entry, +1));
+                changes.Add((interval.Exit, -1));
+            }
+            var orderedChanges = changes.OrderBy(c => c.position).ThenBy(c => c.change);
+            var inside = 0;
+            float previous = 0;
+            float area = 0;
+            foreach ((var position, var change) in orderedChanges) {
+                var current = position;
+                if (inside > 0) {
+                    area += current - previous;
                 }
-                var orderedChanges = changes.OrderBy(c => c.position).ThenBy(c => c.change);
-                int inside = 0;
-                float previous = 0;
-                float area = 0;
-                foreach ((float position, int change) in orderedChanges) {
-                    float current = position;
-                    if (inside > 0) {
-                        area += current - previous;
-                    }
-                    inside += change;
-                    previous = current;
-                }
-                return area;
+                inside += change;
+                previous = current;
             }
+            return area;
         }
-
-        /// <summary> Add two <see cref="IBoundaryCollection"/>s together </summary>
-        /// <param name="left">The left <see cref="IBoundaryCollection"/></param>
-        /// <param name="right">The right <see cref="IBoundaryCollection"/></param>
-        /// <returns>An <see cref="IBoundaryCollection"/> containing the combined <see cref="IShapeInterval"/>s of <paramref name="left"/> and <paramref name="right"/></returns>
-        public static IIntervalCollection? operator +(IIntervalCollection? left, IIntervalCollection? right) {
-            if (right is null) {
-                return left;
-            } else if (left is null) {
-                return right;
-            } else {
-                left.Add(right);
-                return left;
-            }
-        }
-
-        /// <summary> Add another <see cref="IIntervalCollection"/> to this <see cref="IIntervalCollection"/> </summary>
-        /// <param name="other">The other <see cref="IIntervalCollection"/></param>
-        void Add(IIntervalCollection other) {
-            foreach (IInterval interval in other) {
-                Intervals.Add(interval);
-            }
-        }
-
-        /// <summary> Check whether the <paramref name="item"/> falls inside the <see cref="IIntervalCollection"/> </summary>
-        /// <param name="item">The <see cref="Position1"/> to check</param>
-        /// <returns>Whether the <paramref name="item"/> falls inside the <see cref="IIntervalCollection"/></returns>
-        bool IInterval<Position1>.Includes(Position1 item) => Intervals.Any(i => i.Includes(item));
-
-        /// <summary> Check whether the <paramref name="item"/> falls outside the <see cref="IIntervalCollection"/> </summary>
-        /// <param name="item">The <see cref="Position1"/> to check</param>
-        /// <returns>Whether the <paramref name="item"/> falls outside the <see cref="IIntervalCollection"/></returns>
-        bool IInterval<Position1>.Excludes(Position1 item) => Intervals.All(i => i.Excludes(item));
-
-        /// <summary> Add an <paramref name="item"/> to the <see cref="IIntervalCollection"/> </summary>
-        /// <param name="item">The <see cref="IInterval"/> to add to the <see cref="IIntervalCollection"/></param>
-        void ICollection<IInterval>.Add(IInterval item) => Intervals.Add(item);
-
-        /// <summary> Clear the items from the <see cref="IIntervalCollection"/> </summary>
-        void ICollection<IInterval>.Clear() => Intervals.Clear();
-
-        /// <summary> Check whether the <see cref="IIntervalCollection"/> contains an <paramref name="item"/> </summary>
-        /// <param name="item">The <see cref="IInterval"/> to check</param>
-        /// <returns>Whether the <see cref="IIntervalCollection"/> contains the <paramref name="item"/></returns>
-        bool ICollection<IInterval>.Contains(IInterval item) => Intervals.Contains(item);
-
-        /// <summary> Copy the items from the <see cref="IIntervalCollection"/> to an <paramref name="array"/></summary>
-        /// <param name="array">The array to copy to</param>
-        /// <param name="arrayIndex">The index in the <paramref name="array"/> to copy it to</param>
-        void ICollection<IInterval>.CopyTo(IInterval[] array, int arrayIndex) => Intervals.CopyTo(array, arrayIndex);
-
-        /// <summary> Remove an <paramref name="item"/> from the <see cref="IIntervalCollection"/> </summary>
-        /// <param name="item">The <see cref="IInterval"/> to remove from the <see cref="IIntervalCollection"/></param>
-        /// <returns>Whether the <paramref name="item"/> was present in the <see cref="IIntervalCollection"/></returns>
-        bool ICollection<IInterval>.Remove(IInterval item) => Intervals.Remove(item);
-
-        /// <summary> Get the <see cref="IEnumerator{T}"/> of the <see cref="IIntervalCollection"/> </summary>
-        /// <returns>The <see cref="IEnumerator{T}"/> of the <see cref="IIntervalCollection"/></returns>
-        IEnumerator<IInterval> IEnumerable<IInterval>.GetEnumerator() => Intervals.GetEnumerator();
-
-        /// <summary> Get the <see cref="IEnumerator"/> of the <see cref="IIntervalCollection"/> </summary>
-        /// <returns>The <see cref="IEnumerator"/> of the <see cref="IIntervalCollection"/></returns>
-        IEnumerator IEnumerable.GetEnumerator() => Intervals.GetEnumerator();
     }
+
+    /// <summary> Add two <see cref="IBoundaryCollection"/>s together </summary>
+    /// <param name="left">The left <see cref="IBoundaryCollection"/></param>
+    /// <param name="right">The right <see cref="IBoundaryCollection"/></param>
+    /// <returns>An <see cref="IBoundaryCollection"/> containing the combined <see cref="IShapeInterval"/>s of <paramref name="left"/> and <paramref name="right"/></returns>
+    static IIntervalCollection? operator +(IIntervalCollection? left, IIntervalCollection? right) {
+        if (right is null) {
+            return left;
+        } else if (left is null) {
+            return right;
+        } else {
+            left.Add(right);
+            return left;
+        }
+    }
+
+    /// <summary> Add another <see cref="IIntervalCollection"/> to this <see cref="IIntervalCollection"/> </summary>
+    /// <param name="other">The other <see cref="IIntervalCollection"/></param>
+    void Add(IIntervalCollection other) {
+        foreach (var interval in other) {
+            Intervals.Add(interval);
+        }
+    }
+
+    /// <summary> Check whether the <paramref name="item"/> falls inside the <see cref="IIntervalCollection"/> </summary>
+    /// <param name="item">The <see cref="Position1"/> to check</param>
+    /// <returns>Whether the <paramref name="item"/> falls inside the <see cref="IIntervalCollection"/></returns>
+    bool IInterval<Position1>.Includes(Position1 item) => Intervals.Any(i => i.Includes(item));
+
+    /// <summary> Check whether the <paramref name="item"/> falls outside the <see cref="IIntervalCollection"/> </summary>
+    /// <param name="item">The <see cref="Position1"/> to check</param>
+    /// <returns>Whether the <paramref name="item"/> falls outside the <see cref="IIntervalCollection"/></returns>
+    bool IInterval<Position1>.Excludes(Position1 item) => Intervals.All(i => i.Excludes(item));
+
+    /// <summary> Add an <paramref name="item"/> to the <see cref="IIntervalCollection"/> </summary>
+    /// <param name="item">The <see cref="IInterval"/> to add to the <see cref="IIntervalCollection"/></param>
+    void ICollection<IInterval>.Add(IInterval item) => Intervals.Add(item);
+
+    /// <summary> Clear the items from the <see cref="IIntervalCollection"/> </summary>
+    void ICollection<IInterval>.Clear() => Intervals.Clear();
+
+    /// <summary> Check whether the <see cref="IIntervalCollection"/> contains an <paramref name="item"/> </summary>
+    /// <param name="item">The <see cref="IInterval"/> to check</param>
+    /// <returns>Whether the <see cref="IIntervalCollection"/> contains the <paramref name="item"/></returns>
+    bool ICollection<IInterval>.Contains(IInterval item) => Intervals.Contains(item);
+
+    /// <summary> Copy the items from the <see cref="IIntervalCollection"/> to an <paramref name="array"/></summary>
+    /// <param name="array">The array to copy to</param>
+    /// <param name="arrayIndex">The index in the <paramref name="array"/> to copy it to</param>
+    void ICollection<IInterval>.CopyTo(IInterval[] array, int arrayIndex) => Intervals.CopyTo(array, arrayIndex);
+
+    /// <summary> Remove an <paramref name="item"/> from the <see cref="IIntervalCollection"/> </summary>
+    /// <param name="item">The <see cref="IInterval"/> to remove from the <see cref="IIntervalCollection"/></param>
+    /// <returns>Whether the <paramref name="item"/> was present in the <see cref="IIntervalCollection"/></returns>
+    bool ICollection<IInterval>.Remove(IInterval item) => Intervals.Remove(item);
+
+    /// <summary> Get the <see cref="IEnumerator{T}"/> of the <see cref="IIntervalCollection"/> </summary>
+    /// <returns>The <see cref="IEnumerator{T}"/> of the <see cref="IIntervalCollection"/></returns>
+    IEnumerator<IInterval> IEnumerable<IInterval>.GetEnumerator() => Intervals.GetEnumerator();
+
+    /// <summary> Get the <see cref="IEnumerator"/> of the <see cref="IIntervalCollection"/> </summary>
+    /// <returns>The <see cref="IEnumerator"/> of the <see cref="IIntervalCollection"/></returns>
+    IEnumerator IEnumerable.GetEnumerator() => Intervals.GetEnumerator();
 }

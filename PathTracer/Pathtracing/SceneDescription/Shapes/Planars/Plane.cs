@@ -8,11 +8,11 @@ using PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics;
 namespace PathTracer.Pathtracing.SceneDescription.Shapes.Planars;
 
 /// <summary> A <see cref="Plane"/> <see cref="Shape"/> </summary>
-public struct Plane : IPlanarShape {
+public readonly struct Plane : IPlanarShape {
     /// <summary> Normal vector of the <see cref="Plane"/> </summary>
-    public Normal3 Normal { get; set; }
+    public Normal3 Normal { get; }
     /// <summary> Distance of the <see cref="Plane"/> from the origin </summary>
-    public Position1 Distance { get; set; }
+    public Position1 Distance { get; }
     /// <summary> The position of the <see cref="Plane"/> </summary>
     public Position3 Position => Position3.Origin + Normal * Distance;
 

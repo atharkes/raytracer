@@ -71,10 +71,10 @@ public interface IShape : IIntersectable, IBoundable, IDivisible<IShape> {
     /// <returns>The collection of intersections with the <see cref="IShape"/>, if there are any</returns>
     IIntervalCollection? IIntersectable.Intersect(IRay ray) {
         var distances = IntersectDistances(ray);
-        if (distances.Any()) {
+        if (!distances.IsEmpty) {
             SortedSet<IInterval> intervals = new();
             Queue<Position1> entries = new();
-            foreach (var distance in distances.OrderBy(d => d)) {
+            foreach (var distance in distances.ToArray().OrderBy(d => d)) {
                 var position = IntersectPosition(ray, distance);
                 var normal = SurfaceNormal(position);
                 var enters = !IDirection3.InSameOpenHemisphere(normal, ray.Direction);

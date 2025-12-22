@@ -9,12 +9,12 @@ public interface IIntersectable {
     /// <summary> Intersect the <see cref="IIntersectable"/> with a <paramref name="ray"/> </summary>
     /// <param name="ray">The <see cref="IRay"/> to intersect the <see cref="IIntersectable"/> with</param>
     /// <returns>Whether the <paramref name="ray"/> intersects the <see cref="IIntersectable"/></returns>
-    bool Intersects(IRay ray) => IntersectDistances(ray).Any();
+    bool Intersects(IRay ray) => !IntersectDistances(ray).IsEmpty;
 
     /// <summary> Intersect the <see cref="IIntersectable"/> with a <paramref name="ray"/> </summary>
     /// <param name="ray">The <see cref="IRay"/> to intersect the <see cref="IIntersectable"/> with</param>
     /// <returns>The distances of the intersections with a <see cref="IIntersectable"/>, if there are any</returns>
-    IEnumerable<Position1> IntersectDistances(IRay ray);
+    ReadOnlySpan<Position1> IntersectDistances(IRay ray);
 
     /// <summary> Get the position of a <paramref name="ray"/> intersecting the <see cref="IIntersectable"/> at a specified <paramref name="distance"/> </summary>
     /// <param name="ray">The <see cref="IRay"/> that intersects the <see cref="IIntersectable"/></param>

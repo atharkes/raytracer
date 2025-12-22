@@ -6,18 +6,18 @@ using PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics;
 namespace PathTracer.Pathtracing.SceneDescription.Shapes;
 
 public class ClippedShape : IShape {
+    public AxisAlignedBox BoundingBox { get; }
     private IShape OriginalShape { get; }
     public bool Volumetric => OriginalShape.Volumetric;
     public float Volume => OriginalShape.Volume;
     public float SurfaceArea => OriginalShape.SurfaceArea;
-    public AxisAlignedBox BoundingBox { get; }
 
     public ClippedShape(IShape original, AxisAlignedBox clippedBoundingBox) {
         OriginalShape = original;
         BoundingBox = clippedBoundingBox;
     }
 
-    public IEnumerable<Position1> IntersectDistances(IRay ray) => (BoundingBox as IIntersectable).Intersects(ray) ? OriginalShape.IntersectDistances(ray) : Enumerable.Empty<Position1>();
+    public ReadOnlySpan<Position1> IntersectDistances(IRay ray) => (BoundingBox as IIntersectable).Intersects(ray) ? OriginalShape.IntersectDistances(ray) : [];
 
     public float DistanceToSurface(Position3 position) => OriginalShape.DistanceToSurface(position);
     public bool OnSurface(Position3 position, float epsilon = 0.0001F) => OriginalShape.OnSurface(position, epsilon);

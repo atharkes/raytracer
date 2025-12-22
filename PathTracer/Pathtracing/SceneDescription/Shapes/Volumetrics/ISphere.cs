@@ -72,15 +72,13 @@ public interface ISphere : IVolumetricShape, IEquatable<ISphere> {
     /// <summary> Intersect the <see cref="ISphere"/> with a <paramref name="ray"/> </summary>
     /// <param name="ray">The <see cref="IRay"/> to intersect the <see cref="ISphere"/> with</param>
     /// <returns>Whether and when the <see cref="IRay"/>intersects the <see cref="ISphere"/></returns>
-    IEnumerable<Position1> IIntersectable.IntersectDistances(IRay ray) {
+    ReadOnlySpan<Position1> IIntersectable.IntersectDistances(IRay ray) {
         var rayOriginToSpherePosition = Position - ray.Origin;
         float sphereInDirectionOfRay = IDirection3.Dot(rayOriginToSpherePosition, ray.Direction);
         float rayNormalDistance = rayOriginToSpherePosition.LengthSquared - sphereInDirectionOfRay * sphereInDirectionOfRay;
-        if (rayNormalDistance > Radius * Radius) {
-            yield break;
-        }
+        if (rayNormalDistance > Radius * Radius) return [];
+
         var raySphereDistance = (float)Math.Sqrt(Radius * Radius - rayNormalDistance);
-        yield return sphereInDirectionOfRay - raySphereDistance;
-        yield return sphereInDirectionOfRay + raySphereDistance;
+        return new Position1[] { sphereInDirectionOfRay - raySphereDistance, sphereInDirectionOfRay + raySphereDistance };
     }
 }

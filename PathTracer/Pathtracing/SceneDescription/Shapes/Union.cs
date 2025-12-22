@@ -44,13 +44,7 @@ public class Union : IShape, ICollection<IShape> {
 
     IEnumerator IEnumerable.GetEnumerator() => Shapes.GetEnumerator();
 
-    public IEnumerable<Position1> IntersectDistances(IRay ray) {
-        foreach (var shape in Shapes) {
-            foreach (var distance in shape.IntersectDistances(ray)) {
-                yield return distance;
-            }
-        }
-    }
+    public ReadOnlySpan<Position1> IntersectDistances(IRay ray) => Shapes.SelectMany(s => s.IntersectDistances(ray).ToArray()).ToArray();
 
     public float DistanceToSurface(Position3 position) => Shapes.Min(t => t.DistanceToSurface(position));
     public bool OnSurface(Position3 position, float epsilon = 0.001F) => Shapes.Any(s => s.OnSurface(position, epsilon));

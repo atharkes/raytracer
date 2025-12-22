@@ -32,13 +32,7 @@ public readonly struct Tetrahedron : IVolumetricShape {
         };
     }
 
-    public IEnumerable<Position1> IntersectDistances(IRay ray) {
-        foreach (var triangle in triangles) {
-            if (triangle.IntersectDistance(ray) is Position1 distance) {
-                yield return distance;
-            }
-        }
-    }
+    public ReadOnlySpan<Position1> IntersectDistances(IRay ray) => triangles.Select(t => t.IntersectDistance(ray)).OfType<Position1>().ToArray();
 
     public bool OnSurface(Position3 position, float epsilon = 0.0001F) => triangles.Any(t => t.OnSurface(position, epsilon));
 

@@ -8,7 +8,7 @@ using PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics;
 namespace PathTracer.Pathtracing.SceneDescription.Shapes.Planars;
 
 /// <summary> A <see cref="Triangle"/> <see cref="Shape"/> </summary>
-public struct Triangle : IPlanarShape {
+public readonly struct Triangle : IPlanarShape {
     /// <summary> Epsilon used for the Möller–Trumbore triangle intersection </summary>
     public const float IntersectionEpsilon = 0.0000001f;
 
@@ -101,8 +101,9 @@ public struct Triangle : IPlanarShape {
         /// Get closest point on the Triangle
         Position3 closestPointOnTriangle;
         if (s <= 0 && u >= 1) closestPointOnTriangle = P1;
-        else if (t <= 0 && s >= 1) closestPointOnTriangle = P2;
-        else closestPointOnTriangle = u <= 0 && t >= 1
+        else closestPointOnTriangle = t <= 0 && s >= 1
+            ? P2
+            : u <= 0 && t >= 1
             ? P3
             : 0 < s && s < 1 && t - u - (float)Direction3.Dot(P2toP3, P3toP1) / P3toP1.LengthSquared < 0
             ? P1 + P1toP2 * s
@@ -128,7 +129,7 @@ public struct Triangle : IPlanarShape {
         var P = Vector3.Cross(ray.Direction.Vector, P1toP3.Vector);
         // If determinant is near zero, ray lies in plane of triangle
         var determinant = Vector3.Dot(P1toP2.Vector, P);
-        if (determinant is > (-IntersectionEpsilon) and < IntersectionEpsilon) return null;
+        if (determinant is > -IntersectionEpsilon and < IntersectionEpsilon) return null;
         var determinantInverted = 1f / determinant;
 
         // Calculate distance from P1 to ray origin

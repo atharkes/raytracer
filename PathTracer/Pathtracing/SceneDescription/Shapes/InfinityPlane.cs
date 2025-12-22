@@ -7,7 +7,7 @@ using PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics;
 
 namespace PathTracer.Pathtracing.SceneDescription.Shapes;
 
-public struct InfinityPlane : IShape, IEquatable<InfinityPlane> {
+public readonly struct InfinityPlane : IShape, IEquatable<InfinityPlane> {
     public bool Volumetric => false;
     public float Volume => 0;
     public float SurfaceArea => float.PositiveInfinity;
@@ -20,10 +20,7 @@ public struct InfinityPlane : IShape, IEquatable<InfinityPlane> {
     public override bool Equals(object? obj) => obj is InfinityPlane infPlane && Equals(infPlane);
     public bool Equals(InfinityPlane other) => true;
 
-    public IEnumerable<Position1> IntersectDistances(IRay ray) {
-        yield return Position1.MinValue;
-        yield return Position1.MaxValue;
-    }
+    public readonly ReadOnlySpan<Position1> IntersectDistances(IRay ray) => new Position1[] { Position1.MinValue, Position1.MaxValue };
 
     public bool OnSurface(Position3 position, float epsilon = 0.001F) => throw new NotImplementedException();
 

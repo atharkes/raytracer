@@ -120,21 +120,21 @@ public readonly struct AxisAlignedBox : IVolumetricShape, IEquatable<AxisAligned
     /// Using Amy Williams's "An Efficient and Robust Ray–Box Intersection" Algorithm </summary>
     /// <param name="ray">The <see cref="Ray"/> to intersect the <see cref="IAxisAlignedBox"/> with</param>
     /// <returns>Whether and when the <see cref="Ray"/> intersects the <see cref="IAxisAlignedBox"/></returns>
-    public IEnumerable<Position1> IntersectDistances(IRay ray) {
+    public ReadOnlySpan<Position1> IntersectDistances(IRay ray) {
         var tmin = (Bounds[ray.Sign.X].X - ray.Origin.X) * ray.InvDirection.X;
         var tmax = (Bounds[1 - ray.Sign.X].X - ray.Origin.X) * ray.InvDirection.X;
 
         var tymin = (Bounds[ray.Sign.Y].Y - ray.Origin.Y) * ray.InvDirection.Y;
         var tymax = (Bounds[1 - ray.Sign.Y].Y - ray.Origin.Y) * ray.InvDirection.Y;
-        if (tmin > tymax || tmax < tymin) yield break;
+        if (tmin > tymax || tmax < tymin) return [];
         tmin = Position1.Max(tmin, tymin);
         tmax = Position1.Min(tmax, tymax);
 
         var tzmin = (Bounds[ray.Sign.Z].Z - ray.Origin.Z) * ray.InvDirection.Z;
         var tzmax = (Bounds[1 - ray.Sign.Z].Z - ray.Origin.Z) * ray.InvDirection.Z;
-        if (tmin > tzmax || tmax < tzmin) yield break;
-        yield return Position1.Max(tmin, tzmin);
-        yield return Position1.Min(tmax, tzmax);
+        if (tmin > tzmax || tmax < tzmin) return [];
+
+        return new Position1[] { Position1.Max(tmin, tzmin), Position1.Min(tmax, tzmax) };
     }
 
     /// <summary> Clip the <see cref="AxisAlignedBox"/> by a <paramref name="plane"/> </summary>

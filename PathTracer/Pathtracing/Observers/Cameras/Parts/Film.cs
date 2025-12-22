@@ -11,7 +11,7 @@ public class Film : IFilm {
     /// <summary>  The <see cref="Rectangle"/> of the <see cref="Film"/> </summary>
     public Rectangle Rectangle { get; private set; }
     /// <summary> The event that fires when a sample is registered </summary>
-    public event EventHandler<ISample>? SampleRegistered;
+    public event EventHandler<Sample>? SampleRegistered;
 
     /// <summary> Create a <see cref="Film"/> </summary>
     /// <param name="rectangle">The <see cref="IShape"/> of the <see cref="Film"/></param>
@@ -21,7 +21,7 @@ public class Film : IFilm {
 
     /// <summary> Register a <paramref name="sample"/> to the <see cref="IFilm"/> </summary>
     /// <param name="sample">The <see cref="ISample"/> to register</param>
-    public void RegisterSample(ISample sample) => SampleRegistered?.Invoke(this, sample);
+    public void RegisterSample(Sample sample) => SampleRegistered?.Invoke(this, sample);
 
     /// <summary> Position the <see cref="IFilm"/> according to the <paramref name="camera"/> </summary>
     /// <param name="camera">The <see cref="ICamera"/> to position for</param>

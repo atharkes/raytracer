@@ -5,12 +5,12 @@ using PathTracer.Pathtracing.Spectra;
 namespace PathTracer.Pathtracing.SceneDescription.Materials.Profiles.Absorption;
 
 public class Uniform : IAbsorptionProfile {
-    public ISpectrum Albedo { get; }
+    public RGBSpectrum Albedo { get; }
     public bool IsBlackBody => Albedo.IsBlack;
 
-    public Uniform(ISpectrum albedo) {
+    public Uniform(RGBSpectrum albedo) {
         Albedo = albedo;
     }
 
-    public ISpectrum GetAlbedo(Position3 position, Normal3 orientation, Normal3 direction) => Albedo;
+    public RGBSpectrum GetAlbedo(Position3 position, Normal3 orientation, Normal3 direction) => Albedo;
 }

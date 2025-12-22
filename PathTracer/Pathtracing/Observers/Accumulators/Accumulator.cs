@@ -15,7 +15,7 @@ public class Accumulator : IAccumulator {
         get {
             var result = RGBColors.Black;
             foreach (var cavity in cavities) {
-                result += cavity.RGBColor;
+                result += cavity.AverageLight;
             }
             return result;
         }
@@ -41,8 +41,8 @@ public class Accumulator : IAccumulator {
     public Cavity Get(int x, int y) => cavities[x + y * Width];
 
     /// <summary> Add a <paramref name="sample"/> to the <see cref="Accumulator"/> </summary>
-    /// <param name="sample">The <see cref="ISample"/> to add</param>
-    public void Add(ISample sample) {
+    /// <param name="sample">The <see cref="Sample"/> to add.</param>
+    public void Add(Sample sample) {
         var x = (int)(sample.Position.X * Width);
         var y = (int)(sample.Position.Y * Height);
         var index = y * Width + x;
@@ -65,7 +65,7 @@ public class Accumulator : IAccumulator {
             var higherbound = (int)((i + 1) * size);
             switch (drawingMode) {
                 case DrawingMode.Light:
-                    tasks[i] = () => { for (var i = lowerbound; i < higherbound; i++) screen.Plot(i, cavities[i].RGBColor.ToRGBInt()); };
+                    tasks[i] = () => { for (var i = lowerbound; i < higherbound; i++) screen.Plot(i, cavities[i].AverageLight.ToRGBInt()); };
                     break;
                 case DrawingMode.BVHNodeTraversals:
                     tasks[i] = () => { for (var i = lowerbound; i < higherbound; i++) screen.Plot(i, cavities[i].AverageBVHTraversalColor.ToRGBInt()); };
@@ -86,4 +86,6 @@ public class Accumulator : IAccumulator {
             cavity.Clear();
         }
     }
+
+    public void Add(ISample sample) => throw new NotImplementedException();
 }

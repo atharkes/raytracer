@@ -5,6 +5,11 @@ namespace PathTracer.Pathtracing.Spectra;
 
 /// <summary> A color <see cref="ISpectrum"/> that holds a single value for red, green, and blue </summary>
 public readonly struct RGBSpectrum : ISpectrum, IEquatable<RGBSpectrum> {
+    /// <summary> The <see cref="RGBSpectrum"/> that represents no light </summary>
+    public static readonly RGBSpectrum Black = new(0);
+    /// <summary> The <see cref="RGBSpectrum"/> that represents light of all wavelengths </summary>
+    public static readonly RGBSpectrum White = new(1);
+
     /// <summary> The red component of the <see cref="RGBSpectrum"/> </summary>
     public readonly float Red => rgb.X;
     /// <summary> The green component of the <see cref="RGBSpectrum"/> </summary>
@@ -32,6 +37,11 @@ public readonly struct RGBSpectrum : ISpectrum, IEquatable<RGBSpectrum> {
     /// <summary> Create an <see cref="RGBSpectrum"/> with the same red green and blue values </summary>
     /// <param name="rgb">The red green and blue value</param>
     public RGBSpectrum(float rgb) : this(rgb, rgb, rgb) { }
+
+    /// <summary> Whether the <see cref="ISpectrum"/> is black </summary>
+    public bool IsBlack => Equals(Black);
+    /// <summary> Whether the <see cref="ISpectrum"/> is white </summary>
+    public bool IsWhite => Equals(White);
 
     /// <summary> Convert the <see cref="RGBSpectrum"/> to an <see cref="RGBSpectrum"/> </summary>
     /// <returns>An <see cref="RGBSpectrum"/></returns>

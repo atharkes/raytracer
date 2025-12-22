@@ -188,7 +188,7 @@ public static class Program {
         RgbImage img = new(w: observer.Accumulator.Width, h: observer.Accumulator.Height);
         for (var y = 0; y < observer.Accumulator.Height; y++) {
             for (var x = 0; x < observer.Accumulator.Width; x++) {
-                var color = observer.Accumulator.Get(x, y).AverageLight.ToRGBSpectrum();
+                var color = observer.Accumulator.Get(x, y).AverageLight;
                 img.SetPixel(x, y, new(color.Red, color.Green, color.Blue));
             }
         }

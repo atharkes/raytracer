@@ -11,7 +11,7 @@ public interface ISample {
     /// <summary> The direction of the <see cref="ISample"/> from the <see cref="IAccumulator"/> (0 <= values < 1) </summary>
     Direction2 Direction { get; }
     /// <summary> The (amount of) light contributed by the <see cref="ISample"/> </summary>
-    ISpectrum Light { get; }
+    RGBSpectrum Light { get; }
     /// <summary> The amount of bounding box traversels by the primary ray </summary>
     int PrimaryBVHTraversals { get; }
     /// <summary> Whether the <see cref="ISample"/> intersected anything </summary>
@@ -19,9 +19,9 @@ public interface ISample {
 }
 
 public readonly struct Sample : ISample {
-    public Position2 Position { get; init; }
-    public Direction2 Direction { get; init; }
-    public ISpectrum Light { get; init; }
-    public int PrimaryBVHTraversals { get; init; }
-    public bool Intersection { get; init; }
+    public required Position2 Position { get; init; }
+    public required Direction2 Direction { get; init; }
+    public required RGBSpectrum Light { get; init; }
+    public required int PrimaryBVHTraversals { get; init; }
+    public required bool Intersection { get; init; }
 }

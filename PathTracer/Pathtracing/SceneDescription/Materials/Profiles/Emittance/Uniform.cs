@@ -5,12 +5,12 @@ using PathTracer.Pathtracing.Spectra;
 namespace PathTracer.Pathtracing.SceneDescription.Materials.Profiles.Emittance;
 
 public class Uniform : IEmittanceProfile {
-    public ISpectrum Spectrum { get; }
+    public RGBSpectrum Spectrum { get; }
     public bool IsEmitting => !Spectrum.IsBlack;
 
-    public Uniform(ISpectrum spectrum) {
+    public Uniform(RGBSpectrum spectrum) {
         Spectrum = spectrum;
     }
 
-    public ISpectrum GetEmittance(Position3 position, Normal3 orientation, Normal3 direction) => Spectrum;
+    public RGBSpectrum GetEmittance(Position3 position, Normal3 orientation, Normal3 direction) => Spectrum;
 }

@@ -1,10 +1,8 @@
 ﻿using PathTracer.Geometry.Directions;
 using PathTracer.Geometry.Positions;
-using PathTracer.Pathtracing.Distributions.Probabilities;
 using PathTracer.Pathtracing.Observers;
 using PathTracer.Pathtracing.Observers.Cameras;
 using PathTracer.Pathtracing.Rays;
-using PathTracer.Pathtracing.SceneDescription.SceneObjects;
 using PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates;
 using PathTracer.Pathtracing.Spectra;
 using PathTracer.Utilities;
@@ -39,7 +37,7 @@ public class BackwardsSampler : IIntegrator {
             var ray = scene.Camera.GetCameraRay(position, direction);
             try {
                 var light = Sample(scene, ray, ISpectrum.White, 0);
-                ISample sample = new Sample() { Position = position, Direction = direction, Light = light, Intersection = ray.Intersection, PrimaryBVHTraversals = ray.BVHTraversals };
+                var sample = new Sample() { Position = position, Direction = direction, Light = light, Intersection = ray.Intersection, PrimaryBVHTraversals = ray.BVHTraversals };
                 scene.Camera.Film.RegisterSample(sample);
             } catch (Exception ex) {
                 Console.WriteLine(ex.ToString());
@@ -53,14 +51,14 @@ public class BackwardsSampler : IIntegrator {
     /// <param name="spectrum">The throughput <see cref="ISpectrum"/></param>
     /// <param name="recursionDepth">The depth of recursion</param>
     /// <returns>The color found for the <see cref="ISample"/></returns>
-    public ISpectrum Sample(IScene scene, IRay ray, ISpectrum spectrum, int recursionDepth) {
-        if (spectrum.Equals(ISpectrum.Black)) return ISpectrum.Black;
+    public RGBSpectrum Sample(IScene scene, IRay ray, ISpectrum spectrum, int recursionDepth) {
+        if (spectrum.Equals(RGBSpectrum.Black)) return RGBSpectrum.Black;
 
         /// Russian Roulette
         var throughput = 1f;
         if (recursionDepth >= GauranteedRecursionDepth) {
             if (Utils.ThreadRandom.NextSingle() < RussianRouletteChance) {
-                return ISpectrum.Black;
+                return RGBSpectrum.Black;
             } else {
                 throughput = 1f / RussianRouletteChance;
             }
@@ -68,13 +66,12 @@ public class BackwardsSampler : IIntegrator {
 
         /// Sample Distance
         var distanceQuery = scene.Trace(ray, spectrum);
-        if (distanceQuery is null) return ISpectrum.Black;
+        if (distanceQuery is null) return RGBSpectrum.Black;
         var distance = distanceQuery.DistanceDistribution.Sample(Utils.ThreadRandom);
-        if (distance == Position1.PositiveInfinity) return ISpectrum.Black;
+        if (distance == Position1.PositiveInfinity) return RGBSpectrum.Black;
 
         /// Sample Primitive
-        IProbabilityDistribution<IPrimitive>? primitives = distanceQuery.TryGetPrimitives(distance);
-        if (primitives is null) throw new InvalidOperationException("Distance was sampled but no primitive was found");
+        var primitives = distanceQuery.TryGetPrimitives(distance) ?? throw new InvalidOperationException("Distance was sampled but no primitive was found");
         var primitive = primitives.Sample(Utils.ThreadRandom);
 
         /// Get Intersection Position
@@ -82,17 +79,17 @@ public class BackwardsSampler : IIntegrator {
 
         /// Sample Material Orientation
         var orientations = primitive.Material.OrientationProfile.GetOrientations(position, ray.Direction, primitive.Shape);
-        if (orientations is null) return ISpectrum.Black;
+        if (orientations is null) return RGBSpectrum.Black;
         var orientation = orientations.Sample(Utils.ThreadRandom);
 
         /// Get Direct Illumination
-        ISpectrum directIllumination = RGBColors.Black;
+        var directIllumination = RGBSpectrum.Black;
         if (primitive.Material.EmittanceProfile.IsEmitting) {
             directIllumination = primitive.Material.EmittanceProfile.GetEmittance(position, orientation, -ray.Direction);
         }
 
         /// Get Indirect Illumination
-        ISpectrum indirectIllumination = RGBColors.Black;
+        var indirectIllumination = RGBSpectrum.Black;
         if (!primitive.Material.AbsorptionProfile.IsBlackBody) {
             /// Sample Direction
             var directions = primitive.Material.ReflectionProfile.GetDirections(ray.Direction, position, orientation, spectrum);

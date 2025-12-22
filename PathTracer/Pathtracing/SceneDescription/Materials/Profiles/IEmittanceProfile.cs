@@ -8,7 +8,7 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials.Profiles;
 /// <summary> The emittance profile of an <see cref="IMaterial"/> </summary>
 public interface IEmittanceProfile {
     static readonly IEmittanceProfile None = new Uniform(RGBColors.Black);
-    static IEmittanceProfile Uniform(ISpectrum spectrum) => new Uniform(spectrum);
+    static IEmittanceProfile Uniform(RGBSpectrum spectrum) => new Uniform(spectrum);
 
     /// <summary> Whether the <see cref="IEmittanceProfile"/> is emitting light </summary>
     bool IsEmitting { get; }
@@ -18,5 +18,5 @@ public interface IEmittanceProfile {
     /// <param name="orientation">The orientation of the <see cref="IMaterial"/> at the <paramref name="position"/></param>
     /// <param name="direction">The direction of the emission</param>
     /// <returns>The emission at the <paramref name="position"/> in the specified <paramref name="direction"/></returns>
-    ISpectrum GetEmittance(Position3 position, Normal3 orientation, Normal3 direction);
+    RGBSpectrum GetEmittance(Position3 position, Normal3 orientation, Normal3 direction);
 }

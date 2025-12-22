@@ -7,8 +7,8 @@ namespace PathTracer.Pathtracing.SceneDescription.Materials.Profiles;
 
 /// <summary> The absorption profile of an <see cref="IMaterial"/> </summary>
 public interface IAbsorptionProfile {
-    static readonly IAbsorptionProfile BlackBody = new Uniform(RGBColors.Black);
-    static IAbsorptionProfile Uniform(ISpectrum albedo) => new Uniform(albedo);
+    static readonly IAbsorptionProfile BlackBody = new Uniform(RGBSpectrum.Black);
+    static IAbsorptionProfile Uniform(RGBSpectrum albedo) => new Uniform(albedo);
 
     /// <summary> Whether the <see cref="IAbsorptionProfile"/> absorbs all incoming light </summary>
     bool IsBlackBody { get; }
@@ -18,5 +18,5 @@ public interface IAbsorptionProfile {
     /// <param name="orientation">The orientation of the <see cref="IMaterial"/> at the <paramref name="position"/></param>
     /// <param name="direction">The incoming direction of the light</param>
     /// <returns>The albedo at the <paramref name="position"/> in the specified <paramref name="direction"/></returns>
-    ISpectrum GetAlbedo(Position3 position, Normal3 orientation, Normal3 direction);
+    RGBSpectrum GetAlbedo(Position3 position, Normal3 orientation, Normal3 direction);
 }

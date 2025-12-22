@@ -6,7 +6,7 @@ namespace PathTracer.Pathtracing.Observers.Accumulators;
 /// <summary> A cavity of the accumulator that catches light </summary>
 public class Cavity {
     /// <summary> The amount of light in the cavity </summary>
-    public ISpectrum Light { get; private set; } = ISpectrum.Black;
+    public RGBSpectrum Light { get; private set; } = RGBSpectrum.Black;
     /// <summary> The amount of photons caught by the cavity </summary>
     public int Samples { get; private set; } = 0;
     /// <summary> Amount of times the bvh is traversed by photons in the cavity </summary>
@@ -14,10 +14,8 @@ public class Cavity {
     /// <summary> How many samples have intersected something </summary>
     public int Intersections { get; private set; } = 0;
 
-    /// <summary> The color of the <see cref="Cavity"/> </summary>
-    public RGBSpectrum RGBColor => Samples == 0 ? RGBColors.Black : Light.ToRGBSpectrum() * (1f / Samples);
     /// <summary> Average light of the photons in the cavity </summary>
-    public ISpectrum AverageLight => Samples == 0 ? ISpectrum.Black : Light * (1f / Samples);
+    public RGBSpectrum AverageLight => Samples == 0 ? RGBSpectrum.Black : Light / Samples;
     /// <summary> Average BVH traversals of photons in the cavity </summary>
     public float AverageBVHTraversals => Samples > 0 ? BVHTraversals / Samples : 0f;
     /// <summary> The green to red color fade for the BVH traversals </summary>
@@ -29,7 +27,7 @@ public class Cavity {
 
     /// <summary> Add a sample to the cavity </summary>
     /// <param name="light">The light to add to the cavity</param>
-    public void AddSample(ISpectrum light, int bvhTraversals, bool intersection) {
+    public void AddSample(RGBSpectrum light, int bvhTraversals, bool intersection) {
         Light += light;
         BVHTraversals += bvhTraversals;
         if (intersection) Intersections++;
@@ -38,7 +36,7 @@ public class Cavity {
 
     /// <summary> Clear the light in the cavity </summary>
     public void Clear() {
-        Light = ISpectrum.Black;
+        Light = RGBSpectrum.Black;
         BVHTraversals = 0;
         Intersections = 0;
         Samples = 0;

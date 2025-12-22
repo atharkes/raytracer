@@ -23,7 +23,7 @@ public interface IAccumulator {
 
     /// <summary> Add a <paramref name="sample"/> to the <see cref="IAccumulator"/></summary>
     /// <param name="sample">The <see cref="ISample"/> to add</param>
-    void Add(ISample sample);
+    void Add(Sample sample);
 
     /// <summary> Clear the samples in the <see cref="IAccumulator"/> </summary>
     void Clear();

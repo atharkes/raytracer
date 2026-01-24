@@ -52,8 +52,8 @@ public class BoundingVolumeHierarchy : AccelerationStructure, IBinaryTree {
     /// <summary> Split this node </summary>
     /// <param name="split">The split to split this node with</param>
     protected virtual void Split(Split split) {
-        Left = new BoundingVolumeHierarchy(split.Left);
-        Right = new BoundingVolumeHierarchy(split.Right);
+        Left = [.. split.Left];
+        Right = [.. split.Right];
         SplitDirection = split.Direction;
         Items = new HashSet<ISceneObject>() { Left, Right };
     }
@@ -74,11 +74,11 @@ public class BoundingVolumeHierarchy : AccelerationStructure, IBinaryTree {
     /// <summary> Check all possible splits </summary>
     /// <returns>The best split for every axis</returns>
     private Split? BestSweepSplit() {
-        List<Split?> splits = new() {
+        List<Split?> splits = [
             BestLinearSplitAfterSort(Normal3.UnitX, p => p.Shape.BoundingBox.Center.X),
             BestLinearSplitAfterSort(Normal3.UnitY, p => p.Shape.BoundingBox.Center.Y),
             BestLinearSplitAfterSort(Normal3.UnitZ, p => p.Shape.BoundingBox.Center.Z)
-        };
+        ];
         splits.RemoveAll(s => s == null);
         return splits.OrderBy(s => s?.SurfaceAreaHeuristic).FirstOrDefault();
     }
@@ -116,8 +116,8 @@ public class BoundingVolumeHierarchy : AccelerationStructure, IBinaryTree {
         var bestSplitCost = SurfaceAreaHeuristic(Items.Count, Shape.BoundingBox.SurfaceArea);
         Split? bestSplit = null;
         for (var i = 1; i < BinAmount; i++) {
-            Aggregate left = new();
-            Aggregate right = new();
+            Aggregate left = [];
+            Aggregate right = [];
             // Populate Split
             foreach (var primitive in Items) {
                 var binID = (int)(k1 * (axis(primitive.Shape.BoundingBox.Center.Vector) - axis(Shape.BoundingBox.MinCorner.Vector)));

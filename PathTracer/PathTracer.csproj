@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
+    <PackageReference Include="ObjParser" Version="0.1.0" />
     <PackageReference Include="OpenTK" Version="4.9.4" />
     <PackageReference Include="SimpleImageIO" Version="1.8.3" />
     <PackageReference Include="System.Drawing.Common" Version="10.0.1" />

@@ -17,6 +17,7 @@ using PathTracer.Pathtracing.SceneDescription.Shapes;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Planars;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics;
 using PathTracer.Pathtracing.Spectra;
+using PathTracer.Services;
 using PathTracer.Utilities;
 using SimpleImageIO;
 using System.Diagnostics;
@@ -55,6 +56,7 @@ public static class Program {
         new Primitive(new Sphere(new Position3(0, 1, 5), 1), Material.SpecularParticleCloud(RGBColors.OffWhite, density, roughness)),
         new Primitive(new AxisAlignedBox(new Position3(2, 0, 5), new Position3(4, 2, 7)), Material.Diffuse(RGBColors.Blue)),
         new Primitive(Tetrahedron.Regular(new Position3(-1.25f, 0, 4.75f), .5f), Material.Diffuse(RGBColors.Green)),
+        .. ObjFileLoader.Load("C:\\Users\\Theo\\Documents\\Repository\\Pathtracer\\Scenes\\stanford-bunny.obj")
     ];
 
     /// <summary> Simple test scene </summary>

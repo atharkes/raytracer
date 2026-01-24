@@ -22,7 +22,7 @@ public interface IShape : IIntersectable, IBoundable, IDivisible<IShape> {
     /// <returns>Whether the <paramref name="position"/> is inside the <see cref="IShape"/></returns>
     bool Inside(Position3 position) {
         IRay ray = new Ray(position, new Normal3(1, 0, 0));
-        return Intersect(ray)?.Includes(0) ?? false;
+        return Intersect(ray).Any(interval => interval.Entry <= 0 && interval.Exit >= 0);
     }
 
     /// <summary> Check whether a <paramref name="position"/> is outside the <see cref="IShape"/> </summary>
@@ -69,35 +69,30 @@ public interface IShape : IIntersectable, IBoundable, IDivisible<IShape> {
     /// <summary> Intersect the <see cref="IShape"/> with a <paramref name="ray"/> </summary>
     /// <param name="ray">The <see cref="IRay"/> to intersect the <see cref="IShape"/></param>
     /// <returns>The collection of intersections with the <see cref="IShape"/>, if there are any</returns>
-    IIntervalCollection? IIntersectable.Intersect(IRay ray) {
+    IEnumerable<Interval> IIntersectable.Intersect(IRay ray) {
         var distances = IntersectDistances(ray);
-        if (distances.Any()) {
-            SortedSet<IInterval> intervals = new();
-            Queue<Position1> entries = new();
-            foreach (var distance in distances.OrderBy(d => d)) {
-                var position = IntersectPosition(ray, distance);
-                var normal = SurfaceNormal(position);
-                var enters = !IDirection3.InSameOpenHemisphere(normal, ray.Direction);
-                if (enters) {
-                    entries.Enqueue(distance);
+
+        Queue<Position1> entries = new();
+        foreach (var distance in distances) {
+            var position = IntersectPosition(ray, distance);
+            var normal = SurfaceNormal(position);
+            var enters = !IDirection3.InSameOpenHemisphere(normal, ray.Direction);
+            if (enters) {
+                entries.Enqueue(distance);
+            } else {
+                if (entries.Count > 0) {
+                    yield return new Interval(entries.Dequeue(), distance);
                 } else {
-                    if (entries.Count > 0) {
-                        intervals.Add(new Interval(entries.Dequeue(), distance));
-                    } else {
-                        //Debug.Write($"Warning: {this} might be degenerate; More exits than entries found.");
-                        // InfinityPlane and Inverted volumetrics rely on this assumption
-                        intervals.Add(new Interval(Position1.NegativeInfinity, distance));
-                    }
+                    // Edge case: More exits than entries.
+                    // Planar shapes and inverted volumetrics rely on this.
+                    yield return new Interval(Position1.NegativeInfinity, distance);
                 }
             }
-            foreach (var entry in entries) {
-                //Debug.Write($"Warning: {this} might be degenerate; More entries than exits found.");
-                // InfinityPlane and Inverted volumetrics rely on this assumption
-                intervals.Add(new Interval(entry, Position1.PositiveInfinity));
-            }
-            return new IntervalCollection(intervals.ToArray());
-        } else {
-            return null;
+        }
+        foreach (var entry in entries) {
+            // Edge case: more entries than exists.
+            // Planar shapes and inverted volumetrics rely on this.
+            yield return new Interval(entry, Position1.PositiveInfinity);
         }
     }
 

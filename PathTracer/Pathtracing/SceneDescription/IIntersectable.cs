@@ -25,5 +25,5 @@ public interface IIntersectable {
     /// <summary> Intersect the <see cref="IIntersectable"/> with a <paramref name="ray"/> </summary>
     /// <param name="ray">The <see cref="IRay"/> to intersect the <see cref="IIntersectable"/></param>
     /// <returns>The <see cref="IIntervalCollection"/> if there are any intersections</returns>
-    IIntervalCollection? Intersect(IRay ray);
+    IEnumerable<Interval> Intersect(IRay ray);
 }

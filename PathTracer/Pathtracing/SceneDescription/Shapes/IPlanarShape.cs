@@ -43,9 +43,11 @@ public interface IPlanarShape : IShape {
     /// <summary> Intersect the <see cref="IPlanarShape"/> with a <paramref name="ray"/> </summary>
     /// <param name="ray">The <see cref="IRay"/> to intersect the <see cref="IPlanarShape"/></param>
     /// <returns>The <see cref="IBoundaryPoint"/>s of the intersections with the <see cref="IPlanarShape"/>, if there are any</returns>
-    IIntervalCollection? IIntersectable.Intersect(IRay ray) {
+    IEnumerable<Interval> IIntersectable.Intersect(IRay ray) {
         var distance = IntersectDistance(ray);
-        return distance.HasValue ? new IntervalCollection(new Interval(distance.Value, distance.Value)) : null;
+        if (distance.HasValue) {
+            yield return new Interval(distance.Value, distance.Value);
+        }
     }
 
     /// <summary> Intersect the <see cref="IPlanarShape"/> with a <paramref name="ray"/> </summary>

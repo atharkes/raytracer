@@ -1,5 +1,4 @@
 ﻿using PathTracer.Pathtracing.Spectra;
-using PathTracer.Utilities;
 using PathTracer.Utilities.Extensions;
 
 namespace UnitTests.Pathtracing.Spectra;
@@ -7,7 +6,7 @@ namespace UnitTests.Pathtracing.Spectra;
 [TestClass]
 public class RGBSpectrumTest {
     [TestMethod]
-    public void Contructor() => _ = new RGBSpectrum(Utils.DeterministicRandom.Vector());
+    public void Contructor() => _ = new RGBSpectrum(Random.Shared.Vector());
 
     [TestMethod]
     public void Equality() {

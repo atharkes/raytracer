@@ -10,9 +10,9 @@ namespace UnitTests.Pathtracing.SceneObjects.Shapes;
 public class TriangleTest {
     [TestMethod]
     public void Constructor() {
-        var P1 = Utils.ThreadRandom.Vector();
-        var P2 = Utils.ThreadRandom.Vector();
-        var P3 = Utils.ThreadRandom.Vector();
+        var P1 = Random.Shared.Vector();
+        var P2 = Random.Shared.Vector();
+        var P3 = Random.Shared.Vector();
         Triangle triangle = new(P1, P2, P3);
         Assert.AreEqual(P1, triangle.P1);
         Assert.AreEqual(P2, triangle.P2);
@@ -23,7 +23,7 @@ public class TriangleTest {
     public void GetClippedPoints_NoneClipped() {
         var plane = new AxisAlignedPlane(Unit3.Z, 0);
         for (var i = 0; i < 100; i++) {
-            var triangle = Utils.ThreadRandom.CreateTriangle(0f, 1f);
+            var triangle = Random.Shared.CreateTriangle(0f, 1f);
             var points = triangle.GetClippedPoints(plane).ToArray();
             Assert.HasCount(3, points);
             Assert.AreEqual(points[0], triangle.P1);
@@ -72,7 +72,7 @@ public class TriangleTest {
     public void GetClippedPoints_AllClipped() {
         AxisAlignedPlane plane = new(Unit3.MinZ, 0);
         for (var i = 0; i < 100; i++) {
-            var triangle = Utils.ThreadRandom.CreateTriangle(0f, 1f);
+            var triangle = Random.Shared.CreateTriangle(0f, 1f);
             var points = triangle.GetClippedPoints(plane).ToArray();
             Assert.IsEmpty(points);
         }

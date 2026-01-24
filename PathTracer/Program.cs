@@ -27,14 +27,14 @@ namespace PathTracer;
 public static class Program {
     #region Scene Definitions
     /// <summary> Simple test scene </summary>
-    public static readonly List<ISceneObject> Test = new() {
+    public static readonly List<ISceneObject> Test = [
         new Primitive(new InfinityPlane(), Material.Emitter(RGBColors.White)),
         new Primitive(new Plane(new Normal3(0, 1, 0), new Position1(0)), Material.Diffuse(RGBColors.Gray)),
         new Primitive(new AxisAlignedBox(new Position3(0, 0, 0), new Position3(2, 2, 2)), Material.Diffuse(RGBColors.Red)),
-    };
+    ];
 
     /// <summary> The primitives in the default scene </summary>
-    public static readonly List<ISceneObject> LuxCoreComparison = new() {
+    public static readonly List<ISceneObject> LuxCoreComparison = [
         new Primitive(new InfinityPlane(), Material.Emitter(RGBColors.White)),
         new Primitive(new Plane(new Normal3(0, 1, 0), new Position1(-1)), Material.Diffuse(RGBColors.Gray)),
         new Primitive(new Triangle(new Position3(5, 0, 10), new Position3(-5, 0, 0), new Position3(-5, 0, 10), null), Material.Diffuse(RGBColors.Yellow)),
@@ -44,10 +44,10 @@ public static class Program {
         new Primitive(new Sphere(new Position3(0, 1, 5), 1), Material.Glossy(RGBColors.OffWhite, 0.2f)),
         new Primitive(new Sphere(new Position3(0, 1, 8), 1), Material.Specular(RGBColors.OffWhite)),
         new Primitive(new Sphere(new Position3(-1, 1, 2), 1), Material.IsotropicVolumetric(RGBColors.OffWhite, 2f)),
-    };
+    ];
 
     /// <summary> The scene primitives to test roughness and density of volumetric </summary>
-    public static List<ISceneObject> RoughnessDensityComparison(float density, float roughness) => new() {
+    public static List<ISceneObject> RoughnessDensityComparison(float density, float roughness) => [
         new Primitive(new InfinityPlane(), Material.Emitter(RGBColors.White)),
         new Primitive(new Plane(new Normal3(0, 1, 0), new Position1(-1)), Material.Diffuse(RGBColors.DarkGray)),
         new Primitive(new Triangle(new Position3(5, 0, 10), new Position3(-5, 0, 0), new Position3(-5, 0, 10), null), Material.Diffuse(RGBColors.Gray)),
@@ -55,15 +55,15 @@ public static class Program {
         new Primitive(new Sphere(new Position3(0, 1, 5), 1), Material.SpecularParticleCloud(RGBColors.OffWhite, density, roughness)),
         new Primitive(new AxisAlignedBox(new Position3(2, 0, 5), new Position3(4, 2, 7)), Material.Diffuse(RGBColors.Blue)),
         new Primitive(Tetrahedron.Regular(new Position3(-1.25f, 0, 4.75f), .5f), Material.Diffuse(RGBColors.Green)),
-    };
+    ];
 
     /// <summary> Simple test scene </summary>
-    public static readonly List<ISceneObject> SurfaceIntervalSizeComparison = new() {
+    public static readonly List<ISceneObject> SurfaceIntervalSizeComparison = [
         new Primitive(new InfinityPlane(), Material.Emitter(RGBColors.White)),
         new Primitive(new Plane(new Normal3(0, 1, 0), new Position1(0)), Material.Diffuse(RGBColors.Gray)),
         new Primitive(new Plane(new Normal3(0, 0, 1), new Position1(-1)), Material.Specular(RGBColors.OffWhite)),
         new Primitive(new AxisAlignedBox(new Position3(0, 0, 0), new Position3(2, 2, 2)), Material.Diffuse(RGBColors.Red)),
-    };
+    ];
     #endregion
 
     /// <summary> The threadpool of this application </summary>
@@ -102,7 +102,7 @@ public static class Program {
             CameraLock = Config.CameraLock,
         };
         var scene = new Scene(observer.Camera, sceneObjects);
-        IRenderer renderer = new Renderer(scene, Integrator, observer);
+        var renderer = new Renderer(scene, Integrator, observer);
 
         /// Attach to Game Window
         void UpdateRenderer(FrameEventArgs obj) => renderer.Render((observer as IInteractiveObserver).TargetFrameTime);

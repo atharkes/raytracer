@@ -50,7 +50,7 @@ public class Accumulator : IAccumulator {
             cavities[index].AddSample(sample.Light, sample.PrimaryBVHTraversals, sample.Intersection);
             SampleCount++;
         } catch (IndexOutOfRangeException) {
-            Console.WriteLine($"Exception when adding a sample to the Accumulator. Has the screen be resized?");
+            Console.WriteLine($"Exception when adding a sample on index '{index}' with position '{sample.Position}' to the Accumulator. Has the screen be resized?");
         }
     }
 

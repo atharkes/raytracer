@@ -18,6 +18,12 @@ public readonly struct Normal3 : IDirection3, IEquatable<Normal3> {
     public static readonly Normal3 UnitY = new(Unit3.Y);
     /// <summary> The unit vector in the Z direction </summary>
     public static readonly Normal3 UnitZ = new(Unit3.Z);
+
+    public static readonly Normal3 XY = new(1, 1, 0);
+    public static readonly Normal3 XZ = new(1, 0, 1);
+    public static readonly Normal3 YZ = new(0, 1, 1);
+    public static readonly Normal3 XYZ = new(1, 1, 1);
+
     /// <summary> The default right direction when no rotation is applied </summary>
     public static readonly Normal3 DefaultRight = UnitX;
     /// <summary> The default left direction when no rotation is applied </summary>

@@ -43,7 +43,7 @@ public readonly struct AxisAlignedBox : IVolumetricShape, IEquatable<AxisAligned
             minCorner = Position3.ComponentMin(minCorner, position);
             maxCorner = Position3.ComponentMax(maxCorner, position);
         }
-        Bounds = new Position3[] { minCorner, maxCorner };
+        Bounds = [minCorner, maxCorner];
     }
 
     /// <summary> Create an <see cref="AxisAlignedBox"/> from <paramref name="boxes"/> </summary>

@@ -12,7 +12,7 @@ public interface IRay {
     /// <summary> The direction the <see cref="IRay"/> is travelling in </summary>
     Normal3 Direction { get; }
     /// <summary> The total distance the <see cref="IRay"/> is travelling </summary>
-    Position1 Length { get; set; }
+    Position1 Length { get; }
     /// <summary> The destination of the <see cref="IRay"/> </summary>
     Position3 Destination => Travel(Length);
 

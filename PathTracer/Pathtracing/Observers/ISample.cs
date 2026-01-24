@@ -18,7 +18,7 @@ public interface ISample {
     bool Intersection { get; }
 }
 
-public readonly struct Sample : ISample {
+public readonly record struct Sample : ISample {
     public required Position2 Position { get; init; }
     public required Direction2 Direction { get; init; }
     public required RGBSpectrum Light { get; init; }

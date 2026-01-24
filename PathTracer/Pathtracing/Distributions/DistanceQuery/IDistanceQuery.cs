@@ -38,8 +38,11 @@ public interface IDistanceQuery {
         }
         var first = left.DistanceDistribution.Domain.Entry < right.DistanceDistribution.Domain.Entry ? left : right;
         var last = first == left ? right : left;
-        return first.DistanceDistribution.CumulativeProbability(last.DistanceDistribution.Domain.Entry) >= 1
-            ? first
-            : new CombinedDistanceQuery(first, last);
+
+        if (first.DistanceDistribution.CumulativeProbability(last.DistanceDistribution.Domain.Entry) >= 1) {
+            return first;
+        }
+
+        return new CombinedDistanceQuery(first, last);
     }
 }

@@ -11,7 +11,7 @@ public class BVHTreeTest {
     private static BoundingVolumeHierarchy RandomBVH(int primitiveAmount) {
         List<ISceneObject> sceneObjects = new(primitiveAmount);
         for (var i = 0; i < primitiveAmount; i++) {
-            sceneObjects.Add(Utils.ThreadRandom.Primitive(100f, 100f));
+            sceneObjects.Add(Random.Shared.Primitive(100f, 100f));
         }
         return new BoundingVolumeHierarchy(sceneObjects);
     }

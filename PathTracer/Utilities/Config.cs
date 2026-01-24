@@ -95,7 +95,7 @@ public class Config {
         Rotation = renderer.Observer.Camera.Rotation;
         HorizontalFOV = renderer.Observer.Camera.HorizontalFOV;
         /// Write to File
-        using var fileStream = File.Open(FilePath, FileMode.OpenOrCreate);
+        using var fileStream = File.Open(FilePath, File.Exists(FilePath) ? FileMode.Truncate : FileMode.Create);
         JsonSerializer.Serialize(fileStream, this, Options);
     }
 

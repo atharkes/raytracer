@@ -12,7 +12,7 @@ public class SBVHTreeTest {
     private static SpatialBVH RandomSBVH(int primitiveAmount) {
         var sceneObjects = new List<ISceneObject>(primitiveAmount);
         for (var i = 0; i < primitiveAmount; i++) {
-            sceneObjects.Add(Utils.ThreadRandom.Primitive(100f, 100f));
+            sceneObjects.Add(Random.Shared.Primitive(100f, 100f));
         }
         return new SpatialBVH(sceneObjects);
     }

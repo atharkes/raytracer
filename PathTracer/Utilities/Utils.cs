@@ -4,11 +4,6 @@ namespace PathTracer.Utilities;
 
 /// <summary> Just some usefull static methods </summary>
 public static class Utils {
-    /// <summary> A deterministic <see cref="Random"/> to generate random scenes which are always the same </summary>
-    public static Random DeterministicRandom { get; } = new Random(0);
-    /// <summary> The <see cref="Random"/> to use per thread </summary>
-    public static Random ThreadRandom => Random.Shared;
-
     /// <summary> Get the minimum of two <see cref="IComparable{T}"/> </summary>
     /// <typeparam name="T">The type of the objects</typeparam>
     /// <param name="first">The first <see cref="IComparable{T}"/></param>

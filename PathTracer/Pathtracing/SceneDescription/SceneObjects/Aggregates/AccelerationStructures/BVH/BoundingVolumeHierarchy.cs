@@ -24,7 +24,19 @@ public class BoundingVolumeHierarchy : AccelerationStructure, IBinaryTree {
     /// <summary> An epsilon for the binning process </summary>
     public const float BinningEpsilon = 0.99999f;
 
-    public static float SurfaceAreaHeuristic(int itemCount, float surfaceArea) => TraversalCost + IntersectionCost * itemCount * surfaceArea;
+    /// <summary> The cost of intersecting <paramref name="itemCount"/> items in a box of <paramref name="surfaceArea"/>, weighted by that area </summary>
+    /// <param name="itemCount">The amount of items</param>
+    /// <param name="surfaceArea">The surface area of the box around the items</param>
+    /// <returns>The area weighted intersection cost</returns>
+    public static float SurfaceAreaHeuristic(int itemCount, float surfaceArea) => IntersectionCost * itemCount * surfaceArea;
+
+    /// <summary> The area weighted cost of keeping this node a leaf </summary>
+    protected float LeafCost => SurfaceAreaHeuristic(Items.Count, Shape.BoundingBox.SurfaceArea);
+
+    /// <summary> The area weighted cost of splitting this node </summary>
+    /// <param name="childrenCost">The summed <see cref="SurfaceAreaHeuristic"/> of the children</param>
+    /// <returns>The cost of traversing this node plus that of its children</returns>
+    protected float SplitCost(float childrenCost) => TraversalCost * Shape.BoundingBox.SurfaceArea + childrenCost;
 
     /// <summary> The left child node if it has one </summary>
     public BoundingVolumeHierarchy? Left { get; protected set; }
@@ -42,7 +54,17 @@ public class BoundingVolumeHierarchy : AccelerationStructure, IBinaryTree {
 
     /// <summary> Create a BVH node, splitting into smaller nodes if beneficial </summary>
     /// <param name="sceneObjects">The scene objects for the node</param>
-    public BoundingVolumeHierarchy(IEnumerable<ISceneObject> sceneObjects) : base(sceneObjects) {
+    public BoundingVolumeHierarchy(IEnumerable<ISceneObject> sceneObjects) : this(sceneObjects, build: true) { }
+
+    /// <summary> Create a BVH node, leaving the splitting to <see cref="Build"/> when <paramref name="build"/> is false </summary>
+    /// <param name="sceneObjects">The scene objects for the node</param>
+    /// <param name="build">Whether to build the node right away</param>
+    protected BoundingVolumeHierarchy(IEnumerable<ISceneObject> sceneObjects, bool build) : base(sceneObjects) {
+        if (build) Build();
+    }
+
+    /// <summary> Split this node into smaller nodes if beneficial </summary>
+    protected void Build() {
         TrySplit();
         // Fill the cached bounds now, so render threads only ever read them
         _ = Shape.BoundingBox;
@@ -88,20 +110,13 @@ public class BoundingVolumeHierarchy : AccelerationStructure, IBinaryTree {
     /// <summary> Get the best split for this node </summary>
     /// <returns>The best split for this BVH node</returns>
     protected virtual Split? GetSplit() {
-        if (Bin && Items.Count > BinAmount) {
-            var size = Shape.BoundingBox.Size;
-            return size.X > size.Y && size.X > size.Z
-                ? BestBinSplit(Normal3.UnitX, v => v.X)
-                : size.Y > size.Z ? BestBinSplit(Normal3.UnitY, v => v.Y) : BestBinSplit(Normal3.UnitZ, v => v.Z);
-        } else {
-            return BestSweepSplit();
-        }
+        return Bin && Items.Count > BinAmount ? BestBinSplit() : BestSweepSplit();
     }
 
     /// <summary> Check all possible splits </summary>
     /// <returns>The best split for every axis</returns>
     private Split? BestSweepSplit() {
-        var bestSplitCost = SurfaceAreaHeuristic(Items.Count, Shape.BoundingBox.SurfaceArea);
+        var bestSplitCost = LeafCost;
         Split? bestSplit = null;
         foreach (var (direction, axis) in new (Normal3, Func<Vector3, float>)[] { (Normal3.UnitX, v => v.X), (Normal3.UnitY, v => v.Y), (Normal3.UnitZ, v => v.Z) }) {
             var split = BestLinearSplitAfterSort(direction, axis, ref bestSplitCost);
@@ -127,7 +142,7 @@ public class BoundingVolumeHierarchy : AccelerationStructure, IBinaryTree {
         AxisAlignedBox? left = null;
         for (var leftCount = 1; leftCount < sorted.Length; leftCount++) {
             left = Encompass(left, sorted[leftCount - 1].Box);
-            var splitCost = SurfaceAreaHeuristic(leftCount, left.Value.SurfaceArea) + SurfaceAreaHeuristic(sorted.Length - leftCount, rightAreas[leftCount]);
+            var splitCost = SplitCost(SurfaceAreaHeuristic(leftCount, left.Value.SurfaceArea) + SurfaceAreaHeuristic(sorted.Length - leftCount, rightAreas[leftCount]));
             if (splitCost < bestSplitCost) {
                 bestSplitCost = splitCost;
                 bestLeftCount = leftCount;
@@ -137,21 +152,25 @@ public class BoundingVolumeHierarchy : AccelerationStructure, IBinaryTree {
         return new Split(sortDirection, sorted[..bestLeftCount].Select(p => p.Item), sorted[bestLeftCount..].Select(p => p.Item));
     }
 
-    /// <summary> Get the best binning split for a certain axis </summary>
-    /// <param name="binningDirection">The direction the binning proces is going</param>
-    /// <param name="axis">The axis selector</param>
-    /// <returns>The best binning split in the specified direction</returns>
-    private Split? BestBinSplit(Normal3 binningDirection, Func<Vector3, float> axis) {
-        var bounds = Shape.BoundingBox;
-        var k1 = BinAmount * BinningEpsilon / axis(bounds.Size.Vector);
-        if (!float.IsFinite(k1)) return BestSweepSplit();
-        var binStart = axis(bounds.MinCorner.Vector);
+    /// <summary> Get the best binning split along the axis on which the centers of the items are spread widest </summary>
+    /// <returns>The best binning split, if any beats keeping this node a leaf</returns>
+    private Split? BestBinSplit() {
+        var items = Items.Select(item => (Item: item, Box: item.Shape.BoundingBox)).ToArray();
+        var centers = new AxisAlignedBox(items.Select(item => item.Box.Center).ToArray());
+        var size = centers.Size;
+        var (binningDirection, axis) = size.X > size.Y && size.X > size.Z
+            ? (Normal3.UnitX, (Func<Vector3, float>)(v => v.X))
+            : size.Y > size.Z ? (Normal3.UnitY, v => v.Y) : (Normal3.UnitZ, v => v.Z);
+        var extent = axis(size.Vector);
+        // All centers coincide, so no bin boundary can separate them
+        if (!(extent > 0) || !float.IsFinite(extent)) return null;
+        var k1 = BinAmount * BinningEpsilon / extent;
+        var binStart = axis(centers.MinCorner.Vector);
         // Populate bins
-        var binIDs = new Dictionary<ISceneObject, int>(Items.Count);
+        var binIDs = new Dictionary<ISceneObject, int>(items.Length);
         var binCounts = new int[BinAmount];
         var binBoxes = new AxisAlignedBox?[BinAmount];
-        foreach (var item in Items) {
-            var box = item.Shape.BoundingBox;
+        foreach (var (item, box) in items) {
             var binID = Math.Clamp((int)(k1 * (axis(box.Center.Vector) - binStart)), 0, BinAmount - 1);
             binIDs[item] = binID;
             binCounts[binID]++;
@@ -167,14 +186,14 @@ public class BoundingVolumeHierarchy : AccelerationStructure, IBinaryTree {
             rightCounts[i] = count;
             rightAreas[i] = right?.SurfaceArea ?? 0;
         }
-        var bestSplitCost = SurfaceAreaHeuristic(Items.Count, bounds.SurfaceArea);
+        var bestSplitCost = LeafCost;
         var bestSplitBin = 0;
         AxisAlignedBox? left = null;
         for (int i = 1, leftCount = 0; i < BinAmount; i++) {
             leftCount += binCounts[i - 1];
             if (binBoxes[i - 1] is { } binBox) left = Encompass(left, binBox);
             if (leftCount == 0 || rightCounts[i] == 0) continue;
-            var splitCost = SurfaceAreaHeuristic(leftCount, left!.Value.SurfaceArea) + SurfaceAreaHeuristic(rightCounts[i], rightAreas[i]);
+            var splitCost = SplitCost(SurfaceAreaHeuristic(leftCount, left!.Value.SurfaceArea) + SurfaceAreaHeuristic(rightCounts[i], rightAreas[i]));
             if (splitCost < bestSplitCost) {
                 bestSplitCost = splitCost;
                 bestSplitBin = i;

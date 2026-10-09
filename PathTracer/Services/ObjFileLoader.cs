@@ -9,17 +9,23 @@ using PathTracer.Pathtracing.Spectra;
 namespace PathTracer.Services;
 
 public class ObjFileLoader {
-    public static Aggregate Load(string path) {
+    /// <summary> Load a model, uniformly scaled to <paramref name="height"/> and standing with the center of its base on <paramref name="position"/> </summary>
+    /// <param name="path">The path of the .obj file</param>
+    /// <param name="position">Where the center of the bottom of the model is placed</param>
+    /// <param name="height">The height of the model after scaling</param>
+    /// <returns>An <see cref="Aggregate"/> with a <see cref="Primitive"/> per face</returns>
+    public static Aggregate Load(string path, Position3 position, float height) {
         var obj = new ObjModel();
         obj.Load(path);
 
-        var triangles = obj.Faces.Select(face => {
-            var v1 = ToPos3(obj.Vertices[face.VertexIndexList[0] - 1]);
-            var v2 = ToPos3(obj.Vertices[face.VertexIndexList[1] - 1]);
-            var v3 = ToPos3(obj.Vertices[face.VertexIndexList[2] - 1]);
+        var vertices = obj.Vertices.Select(ToPos3).ToArray();
+        var min = vertices.Aggregate(Position3.PositiveInfinity, Position3.ComponentMin);
+        var max = vertices.Aggregate(Position3.NegativeInfinity, Position3.ComponentMax);
+        var scale = height / (float)(max.Y - min.Y);
+        var baseCenter = new Position3((min.X + max.X) / 2, min.Y, (min.Z + max.Z) / 2);
+        Position3 Place(int index) => position + (vertices[index - 1] - baseCenter) * scale;
 
-            return new Triangle(v1, v2, v3);
-        });
+        var triangles = obj.Faces.Select(face => new Triangle(Place(face.VertexIndexList[0]), Place(face.VertexIndexList[1]), Place(face.VertexIndexList[2])));
 
         var primitives = triangles.Select(triangle => new Primitive(triangle, Pathtracing.SceneDescription.Materials.Material.Diffuse(RGBColors.Red)));
 

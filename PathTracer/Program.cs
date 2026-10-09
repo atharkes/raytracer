@@ -56,7 +56,7 @@ public static class Program {
         new Primitive(new Sphere(new Position3(0, 1, 5), 1), Material.SpecularParticleCloud(RGBColors.OffWhite, density, roughness)),
         new Primitive(new AxisAlignedBox(new Position3(2, 0, 5), new Position3(4, 2, 7)), Material.Diffuse(RGBColors.Blue)),
         new Primitive(Tetrahedron.Regular(new Position3(-1.25f, 0, 4.75f), .5f), Material.Diffuse(RGBColors.Green)),
-        .. ObjFileLoader.Load(Path.Combine(AppContext.BaseDirectory, "models", "stanford-bunny.obj"))
+        .. ObjFileLoader.Load(Path.Combine(AppContext.BaseDirectory, "models", "stanford-bunny.obj"), new Position3(-3, 0, 6.5f), 1.5f)
     ];
 
     /// <summary> Simple test scene </summary>

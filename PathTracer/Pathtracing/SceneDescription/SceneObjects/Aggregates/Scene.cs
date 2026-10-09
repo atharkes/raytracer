@@ -1,5 +1,5 @@
 ﻿using PathTracer.Pathtracing.Observers.Cameras;
-using PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates.AccelerationStructures.SBVH;
+using PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates.AccelerationStructures.BVH;
 using System.Diagnostics;
 
 namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates;
@@ -20,7 +20,7 @@ public class Scene : Aggregate, IScene {
         var timer = Stopwatch.StartNew();
         var bounded = primitives.ToLookup(p => float.IsFinite(p.Shape.BoundingBox.SurfaceArea));
         AddRange(bounded[false]);
-        Add(new SpatialBVH(bounded[true].ToList()));
-        Console.WriteLine(timer.ElapsedMilliseconds + "\t| (S)BVH Building ms");
+        Add(new BoundingVolumeHierarchy(bounded[true]));
+        Console.WriteLine(timer.ElapsedMilliseconds + "\t| BVH Building ms");
     }
 }

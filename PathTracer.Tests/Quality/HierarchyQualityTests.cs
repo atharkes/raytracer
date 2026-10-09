@@ -14,6 +14,7 @@ public class HierarchyQualityTests {
         await Assert.That(metrics.References).IsEqualTo(metrics.Primitives);
         await Assert.That(metrics.SahCost).IsLessThan(36);
         await Assert.That(metrics.PrimitiveTestsPerRay).IsLessThan(3);
+        await Assert.That(metrics.BoxTestsPerRay).IsLessThan(41);
         await Assert.That(metrics.MaxLeafSize).IsLessThanOrEqualTo(8);
     }
 
@@ -24,6 +25,7 @@ public class HierarchyQualityTests {
         await Assert.That(metrics.References).IsEqualTo(metrics.Primitives);
         await Assert.That(metrics.SahCost).IsLessThan(66);
         await Assert.That(metrics.PrimitiveTestsPerRay).IsLessThan(2.5);
+        await Assert.That(metrics.BoxTestsPerRay).IsLessThan(147);
     }
 
     [Test]
@@ -34,6 +36,7 @@ public class HierarchyQualityTests {
         await Assert.That(metrics.References).IsGreaterThanOrEqualTo(metrics.Primitives);
         await Assert.That(metrics.References).IsLessThan(metrics.Primitives * 11 / 10);
         await Assert.That(metrics.SahCost).IsLessThan(32);
+        await Assert.That(metrics.BoxTestsPerRay).IsLessThan(83);
     }
 
     private static HierarchyMetrics Report(HierarchyMetrics metrics) {

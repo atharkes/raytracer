@@ -5,24 +5,24 @@ using PathTracer.Pathtracing.Observers.Cameras.Parts;
 namespace PathTracer.Pathtracing.Rays;
 
 /// <summary> A ray sent from the camera into the scene </summary>
-public record struct CameraRay : IRay {
+public sealed class CameraRay : IRay {
     /// <summary> The <see cref="Ray"/> </summary>
     public Ray Ray { get; }
 
-    public readonly Position3 Origin => Ray.Origin;
+    public Position3 Origin => Ray.Origin;
 
-    public readonly Normal3 Direction => Ray.Direction;
+    public Normal3 Direction => Ray.Direction;
 
-    public readonly Position1 Length => Ray.Length;
+    public Position1 Length => Ray.Length;
 
     /// <summary> The <see cref="IFilm"/> from which the <see cref="CameraRay"/> originates </summary>
     public IFilm Film { get; }
-    /// <summary> How many times a BVH node is intersected </summary>
+    /// <summary> How many BVH node bounding boxes the ray is tested against </summary>
     public int BVHTraversals { get; set; } = 0;
     /// <summary> Whether the camera ray interacted with something </summary>
     public int Intersections { get; set; } = 0;
 
-    public readonly bool Intersection => Intersections != 0;
+    public bool Intersection => Intersections != 0;
 
     /// <summary> Create a new camera ray </summary>
     /// <param name="origin">The origin of the ray</param>

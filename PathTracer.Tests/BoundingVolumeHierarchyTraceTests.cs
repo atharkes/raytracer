@@ -58,4 +58,18 @@ public class BoundingVolumeHierarchyTraceTests {
         await Assert.That((float)result!.DistanceDistribution.Domain.Entry).IsEqualTo(1f).Within(0.001f);
         await Assert.That(boxes.Sum(b => b.Counter.Count)).IsLessThan(8);
     }
+
+    [Test]
+    public async Task Trace_ShouldCountBoundingBoxTestsOnCameraRays() {
+        var boxes = Enumerable.Range(0, 64)
+            .Select(i => (ISceneObject)new Primitive(new AxisAlignedBox(new Position3(i * 2, 0, 0), new Position3(i * 2 + 1, 1, 1)), Material.Diffuse(RGBColors.Gray)))
+            .ToList();
+        var sut = new BoundingVolumeHierarchy(boxes);
+        var ray = new CameraRay(new Position3(-1, .5f, .5f), Normal3.UnitX, null!);
+
+        sut.Trace(ray, RGBSpectrum.White);
+
+        await Assert.That(ray.BVHTraversals).IsGreaterThanOrEqualTo(3);
+        await Assert.That(ray.BVHTraversals).IsLessThan(2 * 64);
+    }
 }

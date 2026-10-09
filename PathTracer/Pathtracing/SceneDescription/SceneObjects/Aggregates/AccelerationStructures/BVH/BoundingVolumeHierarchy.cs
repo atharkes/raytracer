@@ -74,11 +74,14 @@ public class BoundingVolumeHierarchy : AccelerationStructure, IBinaryTree {
     /// <param name="ray">The <see cref="IRay"/> to trace</param>
     /// <param name="spectrum">The <see cref="ISpectrum"/> of the <paramref name="ray"/></param>
     /// <returns>The <see cref="IDistanceQuery"/> through the hierarchy</returns>
-    public override IDistanceQuery? Trace(IRay ray, ISpectrum spectrum)
-        => Shape.BoundingBox.EntryDistance(ray) is null ? null : TraceEntered(ray, spectrum);
+    public override IDistanceQuery? Trace(IRay ray, ISpectrum spectrum) {
+        CountTraversals(ray, 1);
+        return Shape.BoundingBox.EntryDistance(ray) is null ? null : TraceEntered(ray, spectrum);
+    }
 
     private IDistanceQuery? TraceEntered(IRay ray, ISpectrum spectrum) {
         if (Leaf) return base.Trace(ray, spectrum);
+        CountTraversals(ray, 2);
         var leftEntry = Left!.Shape.BoundingBox.EntryDistance(ray);
         var rightEntry = Right!.Shape.BoundingBox.EntryDistance(ray);
         if (leftEntry is null) return rightEntry is null ? null : Right.TraceEntered(ray, spectrum);
@@ -87,6 +90,10 @@ public class BoundingVolumeHierarchy : AccelerationStructure, IBinaryTree {
         var result = near.TraceEntered(ray, spectrum);
         if (result is not null && result.DistanceDistribution.CumulativeProbability(farEntry) >= 1) return result;
         return result + far.TraceEntered(ray, spectrum);
+    }
+
+    private static void CountTraversals(IRay ray, int boxTests) {
+        if (ray is CameraRay cameraRay) cameraRay.BVHTraversals += boxTests;
     }
 
     /// <summary> Try split node into two smaller nodes </summary>

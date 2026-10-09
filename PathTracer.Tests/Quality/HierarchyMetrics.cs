@@ -18,11 +18,12 @@ namespace PathTracer.Tests.Quality;
 /// <param name="MaxLeafSize">The largest amount of items in a leaf</param>
 /// <param name="SahCost">The surface area heuristic cost of the whole tree, with traversal and intersection weighted equally</param>
 /// <param name="PrimitiveTestsPerRay">The average amount of primitives traced per ray</param>
+/// <param name="BoxTestsPerRay">The average amount of node bounding boxes tested per ray</param>
 /// <param name="BuildMilliseconds">The time to build the hierarchy</param>
-public sealed record HierarchyMetrics(int Primitives, int References, int Nodes, int MaxDepth, double AverageLeafSize, int MaxLeafSize, double SahCost, double PrimitiveTestsPerRay, long BuildMilliseconds) {
+public sealed record HierarchyMetrics(int Primitives, int References, int Nodes, int MaxDepth, double AverageLeafSize, int MaxLeafSize, double SahCost, double PrimitiveTestsPerRay, double BoxTestsPerRay, long BuildMilliseconds) {
     public override string ToString()
         => $"primitives {Primitives}, references {References}, nodes {Nodes}, depth {MaxDepth}, leaf avg {AverageLeafSize:F1} max {MaxLeafSize}, "
-         + $"SAH {SahCost:F1}, tests/ray {PrimitiveTestsPerRay:F1}, build {BuildMilliseconds} ms";
+         + $"SAH {SahCost:F1}, tests/ray {PrimitiveTestsPerRay:F1}, boxes/ray {BoxTestsPerRay:F1}, build {BuildMilliseconds} ms";
 
     public static HierarchyMetrics Measure(IReadOnlyList<ISceneObject> primitives, Func<List<ISceneObject>, BoundingVolumeHierarchy> build, int rayCount = 2_000) {
         var counter = new TraceCounter();
@@ -49,8 +50,11 @@ public sealed record HierarchyMetrics(int Primitives, int References, int Nodes,
         }
         Visit(root, 1);
 
+        var boxTests = 0L;
         foreach (var ray in Rays(root.Shape.BoundingBox, rayCount)) {
-            root.Trace(ray, RGBSpectrum.White);
+            var cameraRay = new CameraRay(ray.Origin, ray.Direction, null!);
+            root.Trace(cameraRay, RGBSpectrum.White);
+            boxTests += cameraRay.BVHTraversals;
         }
 
         return new HierarchyMetrics(
@@ -62,6 +66,7 @@ public sealed record HierarchyMetrics(int Primitives, int References, int Nodes,
             MaxLeafSize: leaves.Max(leaf => leaf.Node.ItemCount),
             SahCost: sah,
             PrimitiveTestsPerRay: (double)counter.Count / rayCount,
+            BoxTestsPerRay: (double)boxTests / rayCount,
             BuildMilliseconds: buildMilliseconds);
     }
 

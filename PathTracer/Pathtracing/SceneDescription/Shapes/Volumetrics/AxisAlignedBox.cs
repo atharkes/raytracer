@@ -50,6 +50,13 @@ public readonly struct AxisAlignedBox : IVolumetricShape, IEquatable<AxisAligned
     /// <param name="boxes">The <see cref="AxisAlignedBox"/>s to create an <see cref="AxisAlignedBox"/> for</param>
     public AxisAlignedBox(params AxisAlignedBox[] boxes) : this(boxes.SelectMany(b => b.Bounds).ToArray()) { }
 
+    /// <summary> Create the smallest <see cref="AxisAlignedBox"/> that encompasses both <paramref name="left"/> and <paramref name="right"/> </summary>
+    /// <param name="left">The first <see cref="AxisAlignedBox"/> to encompass</param>
+    /// <param name="right">The second <see cref="AxisAlignedBox"/> to encompass</param>
+    /// <returns>The <see cref="AxisAlignedBox"/> encompassing both</returns>
+    public static AxisAlignedBox Encompass(AxisAlignedBox left, AxisAlignedBox right)
+        => new(Position3.ComponentMin(left.MinCorner, right.MinCorner), Position3.ComponentMax(left.MaxCorner, right.MaxCorner));
+
     /// <summary> Check whether <paramref name="left"/> equals <paramref name="right"/> </summary>
     /// <param name="left">The left <see cref="AxisAlignedBox"/></param>
     /// <param name="right">The right <see cref="AxisAlignedBox"/></param>

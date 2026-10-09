@@ -51,7 +51,9 @@ public class SpatialBVH : BoundingVolumeHierarchy {
         Left = new SpatialBVH(split.Left);
         Right = new SpatialBVH(split.Right);
         SplitDirection = split.Direction;
-        Items = new HashSet<ISceneObject>() { Left, Right };
+        Clear();
+        Add(Left);
+        Add(Right);
     }
 
     /// <summary> Get the best spatial binning split for a certain axis </summary>

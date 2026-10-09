@@ -7,37 +7,42 @@ using System.Collections;
 namespace PathTracer.Pathtracing.SceneDescription.Shapes;
 
 public class Union : IShape, ICollection<IShape> {
-    public AxisAlignedBox BoundingBox => new(Shapes.Select(s => s.BoundingBox).ToArray()); //= new(Position3.PositiveInfinity, Position3.NegativeInfinity);
+    public AxisAlignedBox BoundingBox => boundingBox ??= new(Shapes.Select(s => s.BoundingBox).ToArray());
     public bool Volumetric => Shapes.Any(i => i.Volumetric);
     public float Volume => Shapes.Sum(i => i.Volume);
     public float SurfaceArea => Shapes.Sum(i => i.SurfaceArea);
 
     /// <summary> The <see cref="ISceneObject"/>s in the <see cref="IAggregate"/> </summary>
-    protected ICollection<IShape> Shapes { get; set; } = new HashSet<IShape>();
+    protected HashSet<IShape> Shapes { get; }
+
+    private AxisAlignedBox? boundingBox;
 
     public int Count => Shapes.Count;
-    public bool IsReadOnly => Shapes.IsReadOnly;
+    public bool IsReadOnly => false;
 
     public Union(params IShape[] shapes) {
         Shapes = new HashSet<IShape>(shapes);
     }
 
-    public void Add(IShape item) => Shapes.Add(item);//Position3 minCorner = Position3.ComponentMax(BoundingBox.MinCorner, item.BoundingBox.MinCorner);//Position3 maxCorner = Position3.ComponentMin(BoundingBox.MaxCorner, item.BoundingBox.MaxCorner);//BoundingBox = new(minCorner, maxCorner);
+    public void Add(IShape item) {
+        if (Shapes.Add(item) && boundingBox is { } box) {
+            boundingBox = AxisAlignedBox.Encompass(box, item.BoundingBox);
+        }
+    }
 
-    public void Clear() => Shapes.Clear();//BoundingBox = new AxisAlignedBox();
+    public void Clear() {
+        Shapes.Clear();
+        boundingBox = null;
+    }
 
     public bool Contains(IShape item) => Shapes.Contains(item);
 
     public void CopyTo(IShape[] array, int arrayIndex) => Shapes.CopyTo(array, arrayIndex);
 
     public bool Remove(IShape item) {
-        if (Shapes.Contains(item)) {
-            Shapes.Remove(item);
-            //BoundingBox = new(Shapes.Select(s => s.BoundingBox).ToArray());
-            return true;
-        } else {
-            return false;
-        }
+        if (!Shapes.Remove(item)) return false;
+        boundingBox = null;
+        return true;
     }
 
     public IEnumerator<IShape> GetEnumerator() => Shapes.GetEnumerator();

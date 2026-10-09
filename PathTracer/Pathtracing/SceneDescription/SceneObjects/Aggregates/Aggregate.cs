@@ -11,10 +11,13 @@ public class Aggregate : IAggregate {
     /// <summary> The amount of children of the <see cref="Aggregate"/> </summary>
     public int ItemCount => Items.Count;
     /// <summary> The <see cref="IShape"/> of the items in this <see cref="Aggregate"/> </summary>
-    public IShape Shape => new Union(Items.Select(i => i.Shape).ToArray());
+    public IShape Shape => shape ??= new Union(items.Select(i => i.Shape).ToArray());
 
     /// <summary> The <see cref="ISceneObject"/>s in the <see cref="IAggregate"/> </summary>
-    protected ICollection<ISceneObject> Items { get; set; } = new HashSet<ISceneObject>();
+    protected IReadOnlyCollection<ISceneObject> Items => items;
+
+    private readonly HashSet<ISceneObject> items = [];
+    private Union? shape;
 
     public Aggregate() { }
 
@@ -22,7 +25,9 @@ public class Aggregate : IAggregate {
         AddRange(items);
     }
 
-    public void Add(ISceneObject item) => Items.Add(item);
+    public void Add(ISceneObject item) {
+        if (items.Add(item)) shape?.Add(item.Shape);
+    }
 
     public void AddRange(IEnumerable<ISceneObject> items) {
         foreach (var item in items) {
@@ -30,13 +35,22 @@ public class Aggregate : IAggregate {
         }
     }
 
-    public bool Remove(ISceneObject item) => Items.Remove(item);
+    public bool Remove(ISceneObject item) {
+        if (!items.Remove(item)) return false;
+        shape = null;
+        return true;
+    }
 
-    public IEnumerator<ISceneObject> GetEnumerator() => Items.GetEnumerator();
+    public void Clear() {
+        items.Clear();
+        shape = null;
+    }
+
+    public IEnumerator<ISceneObject> GetEnumerator() => items.GetEnumerator();
 
     public IDistanceQuery? Trace(IRay ray, ISpectrum spectrum) {
         IDistanceQuery? result = null;
-        foreach (var sceneObject in Items) {
+        foreach (var sceneObject in items) {
             result += sceneObject.Trace(ray, spectrum);
         }
         return result;

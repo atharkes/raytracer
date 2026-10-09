@@ -18,7 +18,10 @@ public class BoundingVolumeHierarchyTraceTests {
     [Test]
     public async Task Trace_ShouldMatchTracingEveryPrimitive() {
         var random = new Random(1);
-        List<ISceneObject> primitives = [.. Enumerable.Range(0, 500).Select(_ => random.Primitive(100f, 5f))];
+        List<ISceneObject> primitives = [
+            .. Enumerable.Range(0, 400).Select(_ => random.Primitive(100f, 5f)),
+            .. Enumerable.Range(0, 100).Select(_ => new Primitive(random.Shape(100f, 10f), Material.IsotropicVolumetric(RGBColors.Gray, .05f))),
+        ];
         var flat = new Aggregate(primitives);
         var sut = new BoundingVolumeHierarchy(primitives);
 
@@ -32,7 +35,12 @@ public class BoundingVolumeHierarchyTraceTests {
 
             await Assert.That(actual is null).IsEqualTo(expected is null);
             if (expected is null || actual is null) continue;
-            await Assert.That((float)actual.DistanceDistribution.Domain.Entry).IsEqualTo((float)expected.DistanceDistribution.Domain.Entry);
+            var entry = (float)expected.DistanceDistribution.Domain.Entry;
+            await Assert.That((float)actual.DistanceDistribution.Domain.Entry).IsEqualTo(entry);
+            foreach (var offset in new[] { 0f, .5f, 2f, 10f, 50f, 500f }) {
+                await Assert.That(actual.DistanceDistribution.CumulativeProbability(entry + offset))
+                    .IsEqualTo(expected.DistanceDistribution.CumulativeProbability(entry + offset)).Within(1e-6);
+            }
         }
     }
 

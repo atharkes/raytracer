@@ -44,6 +44,8 @@ public class BoundingVolumeHierarchy : AccelerationStructure, IBinaryTree {
     /// <param name="sceneObjects">The scene objects for the node</param>
     public BoundingVolumeHierarchy(IEnumerable<ISceneObject> sceneObjects) : base(sceneObjects) {
         TrySplit();
+        // Fill the cached bounds now, so render threads only ever read them
+        _ = Shape.BoundingBox;
     }
 
     /// <summary> Trace a <paramref name="ray"/> through the nearest child first, skipping the other child when nothing passes the first hit </summary>

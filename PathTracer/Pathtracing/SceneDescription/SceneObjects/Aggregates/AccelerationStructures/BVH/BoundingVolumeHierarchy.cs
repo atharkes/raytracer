@@ -1,5 +1,8 @@
 ﻿using PathTracer.Geometry.Normals;
 using PathTracer.Geometry.Vectors;
+using PathTracer.Pathtracing.Distributions.DistanceQuery;
+using PathTracer.Pathtracing.Rays;
+using PathTracer.Pathtracing.Spectra;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics;
 
 namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates.AccelerationStructures.BVH;
@@ -41,6 +44,25 @@ public class BoundingVolumeHierarchy : AccelerationStructure, IBinaryTree {
     /// <param name="sceneObjects">The scene objects for the node</param>
     public BoundingVolumeHierarchy(IEnumerable<ISceneObject> sceneObjects) : base(sceneObjects) {
         TrySplit();
+    }
+
+    /// <summary> Trace a <paramref name="ray"/> through the nearest child first, skipping the other child when nothing passes the first hit </summary>
+    /// <param name="ray">The <see cref="IRay"/> to trace</param>
+    /// <param name="spectrum">The <see cref="ISpectrum"/> of the <paramref name="ray"/></param>
+    /// <returns>The <see cref="IDistanceQuery"/> through the hierarchy</returns>
+    public override IDistanceQuery? Trace(IRay ray, ISpectrum spectrum)
+        => Shape.BoundingBox.EntryDistance(ray) is null ? null : TraceEntered(ray, spectrum);
+
+    private IDistanceQuery? TraceEntered(IRay ray, ISpectrum spectrum) {
+        if (Leaf) return base.Trace(ray, spectrum);
+        var leftEntry = Left!.Shape.BoundingBox.EntryDistance(ray);
+        var rightEntry = Right!.Shape.BoundingBox.EntryDistance(ray);
+        if (leftEntry is null) return rightEntry is null ? null : Right.TraceEntered(ray, spectrum);
+        if (rightEntry is null) return Left.TraceEntered(ray, spectrum);
+        var (near, far, farEntry) = leftEntry <= rightEntry ? (Left, Right, rightEntry.Value) : (Right, Left, leftEntry.Value);
+        var result = near.TraceEntered(ray, spectrum);
+        if (result is not null && result.DistanceDistribution.CumulativeProbability(farEntry) >= 1) return result;
+        return result + far.TraceEntered(ray, spectrum);
     }
 
     /// <summary> Try split node into two smaller nodes </summary>

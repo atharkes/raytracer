@@ -48,7 +48,7 @@ public class Aggregate : IAggregate {
 
     public IEnumerator<ISceneObject> GetEnumerator() => items.GetEnumerator();
 
-    public IDistanceQuery? Trace(IRay ray, ISpectrum spectrum) {
+    public virtual IDistanceQuery? Trace(IRay ray, ISpectrum spectrum) {
         IDistanceQuery? result = null;
         foreach (var sceneObject in items) {
             result += sceneObject.Trace(ray, spectrum);

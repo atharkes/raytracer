@@ -144,6 +144,29 @@ public readonly struct AxisAlignedBox : IVolumetricShape, IEquatable<AxisAligned
         yield return Position1.Min(tmax, tzmax);
     }
 
+    /// <summary> Get the distance at which a <paramref name="ray"/> enters the <see cref="AxisAlignedBox"/> </summary>
+    /// <param name="ray">The <see cref="IRay"/> to intersect the <see cref="AxisAlignedBox"/> with</param>
+    /// <returns>The entry distance, negative when the <paramref name="ray"/> starts inside; <see langword="null"/> if the <paramref name="ray"/> misses</returns>
+    public float? EntryDistance(IRay ray) {
+        var origin = ray.Origin.Vector;
+        var direction = ray.Direction.Vector;
+        var entry = float.NegativeInfinity;
+        var exit = float.PositiveInfinity;
+        for (var axis = 0; axis < 3; axis++) {
+            float o = axis == 0 ? origin.X : axis == 1 ? origin.Y : origin.Z;
+            float d = axis == 0 ? direction.X : axis == 1 ? direction.Y : direction.Z;
+            float min = axis == 0 ? MinCorner.X : axis == 1 ? MinCorner.Y : MinCorner.Z;
+            float max = axis == 0 ? MaxCorner.X : axis == 1 ? MaxCorner.Y : MaxCorner.Z;
+            var inverse = 1f / d;
+            var near = (min - o) * inverse;
+            var far = (max - o) * inverse;
+            if (inverse < 0) (near, far) = (far, near);
+            if (near > entry) entry = near;
+            if (far < exit) exit = far;
+        }
+        return entry <= exit && exit >= 0 && entry <= ray.Length ? entry : null;
+    }
+
     /// <summary> Clip the <see cref="AxisAlignedBox"/> by a <paramref name="plane"/> </summary>
     /// <param name="plane">The <see cref="AxisAlignedPlane"/> to clip the <see cref="AxisAlignedBox"/> with</param>
     /// <returns>A new clipped <see cref="AxisAlignedBox"/> if it's not clipped entirely</returns>

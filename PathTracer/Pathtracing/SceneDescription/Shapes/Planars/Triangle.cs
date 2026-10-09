@@ -36,7 +36,7 @@ public struct Triangle : IPlanarShape {
     /// <summary> The <see cref="Plane"/> in which the <see cref="Triangle"/> lies </summary>
     public Plane PlaneOfExistence => new(P1, Normal);
     /// <summary> The bounding box of the <see cref="Triangle"/> </summary>
-    public AxisAlignedBox BoundingBox => new(P1, P2, P3);
+    public AxisAlignedBox BoundingBox { get; }
 
     /// <summary> Create a new <see cref="Triangle"/></summary>
     /// <param name="p1">The first point of the <see cref="Triangle"/></param>
@@ -56,6 +56,7 @@ public struct Triangle : IPlanarShape {
         // Clockwise vertices = Normal faces towards
         // Counter Clockwise vertices = Normal faces away
         Normal = normal ?? new Normal3(Vector3.Cross(P1toP2.Vector, P1toP3.Vector));
+        BoundingBox = new(P1, P2, P3);
     }
 
     /// <summary> Get a <paramref name="random"/> point on the surface of the <see cref="Triangle"/> </summary>

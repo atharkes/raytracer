@@ -61,19 +61,22 @@ public class SpatialBVH : BoundingVolumeHierarchy {
     /// <param name="axis">The axis selector</param>
     /// <returns>The best spatial binning split in the specified direction</returns>
     private Split? BestSpatialBinSplit(Normal3 splitDirection, Func<bool, float, AxisAlignedPlane> clipPlaneCreator, Func<Vector3, float> axis) {
-        var binStart = axis(Shape.BoundingBox.MinCorner.Vector);
-        var binEnd = axis(Shape.BoundingBox.MaxCorner.Vector);
-        var binSize = axis(Shape.BoundingBox.Size.Vector) / SpatialBinAmount;
-        var k1 = SpatialBinAmount * BinningEpsilon / axis(Shape.BoundingBox.Size.Vector);
-        var bestSplitCost = SurfaceAreaHeuristic(Items.Count, Shape.BoundingBox.SurfaceArea);
+        var bounds = Shape.BoundingBox;
+        var binStart = axis(bounds.MinCorner.Vector);
+        var binEnd = axis(bounds.MaxCorner.Vector);
+        var binSize = axis(bounds.Size.Vector) / SpatialBinAmount;
+        var k1 = SpatialBinAmount * BinningEpsilon / axis(bounds.Size.Vector);
+        var bestSplitCost = SurfaceAreaHeuristic(Items.Count, bounds.SurfaceArea);
+        var binnedItems = Items.Select(item => {
+            var box = item.Shape.BoundingBox;
+            return (Item: item, BinID1: (int)(k1 * (axis(box.MinCorner.Vector) - binStart)), BinID2: (int)(k1 * (axis(box.MaxCorner.Vector) - binStart)));
+        }).ToArray();
         Split? bestSplit = null;
         for (var i = 1; i < SpatialBinAmount; i++) {
             SpatialBin left = new(clipPlaneCreator, binStart, binSize * i);
             SpatialBin right = new(clipPlaneCreator, binSize * i, binEnd);
             // Populate Split
-            foreach (var primitive in Items) {
-                var binID1 = (int)(k1 * (axis(primitive.Shape.BoundingBox.MinCorner.Vector) - axis(Shape.BoundingBox.MinCorner.Vector)));
-                var binID2 = (int)(k1 * (axis(primitive.Shape.BoundingBox.MaxCorner.Vector) - axis(Shape.BoundingBox.MinCorner.Vector)));
+            foreach (var (primitive, binID1, binID2) in binnedItems) {
                 if (binID1 < i && binID2 < i) left.Aggregate.Add(primitive);
                 else if (binID1 > i && binID2 > i) right.Aggregate.Add(primitive);
                 else {

@@ -18,7 +18,9 @@ public class Scene : Aggregate, IScene {
         Camera = camera;
         Lights = primitives.FindAll(s => s is IPrimitive p && p.Material.EmittanceProfile.IsEmitting);
         var timer = Stopwatch.StartNew();
-        Add(new SpatialBVH(primitives));
+        var bounded = primitives.ToLookup(p => float.IsFinite(p.Shape.BoundingBox.SurfaceArea));
+        AddRange(bounded[false]);
+        Add(new SpatialBVH(bounded[true].ToList()));
         Console.WriteLine(timer.ElapsedMilliseconds + "\t| (S)BVH Building ms");
     }
 }

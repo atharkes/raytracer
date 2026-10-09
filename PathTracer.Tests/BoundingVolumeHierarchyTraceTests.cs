@@ -10,6 +10,7 @@ using PathTracer.Pathtracing.SceneDescription.SceneObjects.Primitives;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Planars;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics;
 using PathTracer.Pathtracing.Spectra;
+using PathTracer.Tests.Quality;
 using PathTracer.Utilities.Extensions;
 
 namespace PathTracer.Tests;
@@ -55,18 +56,6 @@ public class BoundingVolumeHierarchyTraceTests {
         var result = sut.Trace(ray, RGBSpectrum.White);
 
         await Assert.That((float)result!.DistanceDistribution.Domain.Entry).IsEqualTo(1f).Within(0.001f);
-        await Assert.That(boxes.Sum(b => b.TraceCount)).IsLessThan(8);
-    }
-
-    private sealed class CountingSceneObject(ISceneObject inner) : ISceneObject {
-        public int TraceCount { get; private set; }
-        public IShape Shape => inner.Shape;
-
-        public IDistanceQuery? Trace(IRay ray, ISpectrum spectrum) {
-            TraceCount++;
-            return inner.Trace(ray, spectrum);
-        }
-
-        public IEnumerable<ISceneObject> Clip(AxisAlignedPlane plane) => inner.Clip(plane);
+        await Assert.That(boxes.Sum(b => b.Counter.Count)).IsLessThan(8);
     }
 }

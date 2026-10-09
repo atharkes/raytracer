@@ -73,8 +73,8 @@ public class SpatialBVH : BoundingVolumeHierarchy {
         }).ToArray();
         Split? bestSplit = null;
         for (var i = 1; i < SpatialBinAmount; i++) {
-            SpatialBin left = new(clipPlaneCreator, binStart, binSize * i);
-            SpatialBin right = new(clipPlaneCreator, binSize * i, binEnd);
+            SpatialBin left = new(clipPlaneCreator, binStart, binStart + binSize * i);
+            SpatialBin right = new(clipPlaneCreator, binStart + binSize * i, binEnd);
             // Populate Split
             foreach (var (primitive, binID1, binID2) in binnedItems) {
                 if (binID1 < i && binID2 < i) left.Aggregate.Add(primitive);

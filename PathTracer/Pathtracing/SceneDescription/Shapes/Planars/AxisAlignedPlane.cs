@@ -23,19 +23,19 @@ public readonly struct AxisAlignedPlane : IPlanarShape {
     /// <param name="positive">Whether the normal is positive or not</param>
     /// <param name="xPosition">The position of the <see cref="AxisAlignedPlane"/></param>
     /// <returns>The <see cref="AxisAlignedPlane"/></returns>
-    public static AxisAlignedPlane X(bool positive, float xPosition) => new(positive ? Unit3.X : Unit3.MinX, xPosition);
+    public static AxisAlignedPlane X(bool positive, float xPosition) => new(new Position3(xPosition, 0, 0), positive ? Unit3.X : Unit3.MinX);
 
     /// <summary> Create an <see cref="AxisAlignedPlane"/> with a normal in the Y-direction </summary>
     /// <param name="positive">Whether the normal is positive or not</param>
     /// <param name="yPosition">The position of the <see cref="AxisAlignedPlane"/></param>
     /// <returns>The <see cref="AxisAlignedPlane"/></returns>
-    public static AxisAlignedPlane Y(bool positive, float yPosition) => new(positive ? Unit3.Y : Unit3.MinY, yPosition);
+    public static AxisAlignedPlane Y(bool positive, float yPosition) => new(new Position3(0, yPosition, 0), positive ? Unit3.Y : Unit3.MinY);
 
     /// <summary> Create an <see cref="AxisAlignedPlane"/> with a normal in the Z-direction </summary>
     /// <param name="positive">Whether the normal is positive or not</param>
     /// <param name="zPosition">The position of the <see cref="AxisAlignedPlane"/></param>
     /// <returns>The <see cref="AxisAlignedPlane"/></returns>
-    public static AxisAlignedPlane Z(bool positive, float zPosition) => new(positive ? Unit3.Z : Unit3.MinZ, zPosition);
+    public static AxisAlignedPlane Z(bool positive, float zPosition) => new(new Position3(0, 0, zPosition), positive ? Unit3.Z : Unit3.MinZ);
 
     /// <summary> Create a new <see cref="AxisAlignedPlane"/> using a <paramref name="unit"/> and a <paramref name="distance"/> </summary>
     /// <param name="unit">The normal of the <see cref="AxisAlignedPlane"/></param>

@@ -1,6 +1,7 @@
 using PathTracer.Pathtracing.SceneDescription;
 using PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates.AccelerationStructures.BVH;
 using PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates.AccelerationStructures.SBVH;
+using PathTracer.Pathtracing.SceneDescription.SceneObjects.Primitives;
 using PathTracer.Utilities.Extensions;
 
 namespace PathTracer.Tests;
@@ -32,6 +33,17 @@ public class BoundingVolumeHierarchyTests {
         var sut = new SpatialBVH(RandomPrimitives(1_000));
 
         await Assert.That(Depth(sut)).IsGreaterThan(2);
+    }
+
+    [Test]
+    [Timeout(30_000)]
+    public async Task SpatialConstructor_ShouldKeepAllPrimitives(CancellationToken cancellationToken) {
+        var primitives = RandomPrimitives(500);
+
+        var sut = new SpatialBVH(primitives);
+
+        var originals = Leaves(sut).Select(leaf => leaf is PrimitiveFragment fragment ? fragment.Original : leaf).Distinct();
+        await Assert.That(originals.Count()).IsEqualTo(primitives.Count);
     }
 
     private static IEnumerable<ISceneObject> Leaves(BoundingVolumeHierarchy node) => node.Leaf

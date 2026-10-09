@@ -177,7 +177,7 @@ public readonly struct AxisAlignedBox : IVolumetricShape, IEquatable<AxisAligned
         if (plane.Normal == Normal3.UnitX) {
             minCorner = new(Position1.Max(MinCorner.X, plane.Position.X), MinCorner.Y, MinCorner.Z);
         } else if (plane.Normal == -Normal3.UnitX) {
-            maxCorner = new(Position1.Min(MinCorner.X, plane.Position.X), MaxCorner.Y, MaxCorner.Z);
+            maxCorner = new(Position1.Min(MaxCorner.X, plane.Position.X), MaxCorner.Y, MaxCorner.Z);
         } else if (plane.Normal == Normal3.UnitY) {
             minCorner = new(MinCorner.X, Position1.Max(MinCorner.Y, plane.Position.Y), MinCorner.Z);
         } else if (plane.Normal == -Normal3.UnitY) {
@@ -189,7 +189,7 @@ public readonly struct AxisAlignedBox : IVolumetricShape, IEquatable<AxisAligned
         }
         if (minCorner == MinCorner && maxCorner == MaxCorner) {
             yield return this;
-        } else if (minCorner.X < maxCorner.X && minCorner.Y < maxCorner.Y && minCorner.Z < maxCorner.Z) {
+        } else if (minCorner.X <= maxCorner.X && minCorner.Y <= maxCorner.Y && minCorner.Z <= maxCorner.Z) {
             yield return new AxisAlignedBox(minCorner, maxCorner);
         }
     }

@@ -44,7 +44,7 @@ public class BackwardsSampler : IIntegrator {
             Direction2 direction = new(random.NextSingle(), random.NextSingle());
             var ray = scene.Camera.GetCameraRay(position, direction);
             try {
-                var light = Sample(scene, ray, RGBSpectrum.White, random, 0);
+                var light = Sample(scene, ray, random);
                 var sample = new Sample() { Position = position, Direction = direction, Light = light, PrimaryBVHTraversals = ray.BVHTraversals };
                 scene.Camera.Film.RegisterSample(sample);
             } catch (Exception ex) {
@@ -52,6 +52,13 @@ public class BackwardsSampler : IIntegrator {
             }
         }
     }
+
+    /// <summary> Sample the light arriving along a <paramref name="ray"/> through the <paramref name="scene"/> </summary>
+    /// <param name="scene">The <see cref="IScene"/> to sample</param>
+    /// <param name="ray">The <see cref="IRay"/> to trace through the <paramref name="scene"/></param>
+    /// <param name="random">The <see cref="Random"/> to sample with</param>
+    /// <returns>The light found along the <paramref name="ray"/></returns>
+    public static RGBSpectrum Sample(IScene scene, IRay ray, Random random) => Sample(scene, ray, RGBSpectrum.White, random, 0);
 
     /// <summary> Sample the <paramref name="scene"/> with a <paramref name="sample"/> returning a color found </summary>
     /// <param name="scene">The <see cref="IScene"/> to sample </param>

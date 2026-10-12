@@ -52,7 +52,7 @@ public class Accumulator : IAccumulator {
         var y = (int)(sample.Position.Y * Height);
         var index = y * Width + x;
         try {
-            cavities[index].AddSample(sample.Light, sample.PrimaryBVHTraversals, sample.Intersection);
+            cavities[index].AddSample(sample.Light, sample.PrimaryBVHTraversals);
             SampleCount++;
         } catch (IndexOutOfRangeException) {
             Console.WriteLine($"Exception when adding a sample on index '{index}' with position '{sample.Position}' to the Accumulator. Has the screen be resized?");
@@ -74,9 +74,6 @@ public class Accumulator : IAccumulator {
                     break;
                 case DrawingMode.BVHNodeTraversals:
                     tasks[i] = () => { for (var i = lowerbound; i < higherbound; i++) screen.Plot(i, cavities[i].AverageBVHTraversalColor.ToRGBInt()); };
-                    break;
-                case DrawingMode.Intersections:
-                    tasks[i] = () => { for (var i = lowerbound; i < higherbound; i++) screen.Plot(i, cavities[i].IntersectionChanceColor.ToRGBInt()); };
                     break;
             }
         }

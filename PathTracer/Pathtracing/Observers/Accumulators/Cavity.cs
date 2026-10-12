@@ -11,8 +11,6 @@ public class Cavity {
     public int Samples { get; private set; } = 0;
     /// <summary> Amount of times the bvh is traversed by photons in the cavity </summary>
     public int BVHTraversals { get; private set; } = 0;
-    /// <summary> How many samples have intersected something </summary>
-    public int Intersections { get; private set; } = 0;
 
     /// <summary> Average light of the photons in the cavity </summary>
     public RGBSpectrum AverageLight => Samples == 0 ? RGBSpectrum.Black : Light / Samples;
@@ -20,17 +18,12 @@ public class Cavity {
     public float AverageBVHTraversals => Samples > 0 ? BVHTraversals / Samples : 0f;
     /// <summary> The green to red color fade for the BVH traversals </summary>
     public RGBSpectrum AverageBVHTraversalColor => Utils.ColorScaleBlackGreenYellowRed(AverageBVHTraversals, 0, 255);
-    /// <summary> The average chance of intersections per sample </summary>
-    public float IntersectionChance => Samples > 0 ? (float)Intersections / Samples : 0f;
-    /// <summary> The color for intersection chance </summary>
-    public RGBSpectrum IntersectionChanceColor => Utils.ColorScaleBlackGreenYellowRed(IntersectionChance, 0, 1);
 
     /// <summary> Add a sample to the cavity </summary>
     /// <param name="light">The light to add to the cavity</param>
-    public void AddSample(RGBSpectrum light, int bvhTraversals, bool intersection) {
+    public void AddSample(RGBSpectrum light, int bvhTraversals) {
         Light += light;
         BVHTraversals += bvhTraversals;
-        if (intersection) Intersections++;
         Samples++;
     }
 
@@ -38,7 +31,6 @@ public class Cavity {
     public void Clear() {
         Light = RGBSpectrum.Black;
         BVHTraversals = 0;
-        Intersections = 0;
         Samples = 0;
     }
 

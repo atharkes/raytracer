@@ -105,6 +105,8 @@ public class Config {
         if (!File.Exists(FilePath)) return new Config();
 
         using var fileStream = File.Open(FilePath, FileMode.Open);
-        return JsonSerializer.Deserialize<Config>(fileStream, Options) ?? new Config();
+        var config = JsonSerializer.Deserialize<Config>(fileStream, Options) ?? new Config();
+        if (!Enum.IsDefined(config.Drawing)) config.Drawing = DrawingMode.Light;
+        return config;
     }
 }

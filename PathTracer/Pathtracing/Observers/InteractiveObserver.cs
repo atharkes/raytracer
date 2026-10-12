@@ -14,7 +14,6 @@ namespace PathTracer.Pathtracing.Observers;
 public enum DrawingMode {
     Light,
     BVHNodeTraversals,
-    Intersections,
 }
 
 /// <summary> The different debug outputs </summary>

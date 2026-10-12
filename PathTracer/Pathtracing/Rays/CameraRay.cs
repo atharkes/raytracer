@@ -19,10 +19,6 @@ public sealed class CameraRay : IRay {
     public IFilm Film { get; }
     /// <summary> How many BVH node bounding boxes the ray is tested against </summary>
     public int BVHTraversals { get; set; } = 0;
-    /// <summary> Whether the camera ray interacted with something </summary>
-    public int Intersections { get; set; } = 0;
-
-    public bool Intersection => Intersections != 0;
 
     /// <summary> Create a new camera ray </summary>
     /// <param name="origin">The origin of the ray</param>

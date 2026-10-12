@@ -14,8 +14,6 @@ public interface ISample {
     RGBSpectrum Light { get; }
     /// <summary> The amount of bounding box traversels by the primary ray </summary>
     int PrimaryBVHTraversals { get; }
-    /// <summary> Whether the <see cref="ISample"/> intersected anything </summary>
-    bool Intersection { get; }
 }
 
 public readonly record struct Sample : ISample {
@@ -23,5 +21,4 @@ public readonly record struct Sample : ISample {
     public required Direction2 Direction { get; init; }
     public required RGBSpectrum Light { get; init; }
     public required int PrimaryBVHTraversals { get; init; }
-    public required bool Intersection { get; init; }
 }

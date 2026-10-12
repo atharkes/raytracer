@@ -45,7 +45,7 @@ public class BackwardsSampler : IIntegrator {
             var ray = scene.Camera.GetCameraRay(position, direction);
             try {
                 var light = Sample(scene, ray, RGBSpectrum.White, random, 0);
-                var sample = new Sample() { Position = position, Direction = direction, Light = light, Intersection = ray.Intersection, PrimaryBVHTraversals = ray.BVHTraversals };
+                var sample = new Sample() { Position = position, Direction = direction, Light = light, PrimaryBVHTraversals = ray.BVHTraversals };
                 scene.Camera.Film.RegisterSample(sample);
             } catch (Exception ex) {
                 Console.WriteLine(ex.ToString());

@@ -24,6 +24,11 @@ public class Material : IMaterial {
         EmittanceProfile = emittanceProfile;
     }
 
+    /// <summary> Create a copy of the <see cref="Material"/> with a different <paramref name="densityProfile"/> </summary>
+    /// <param name="densityProfile">The <see cref="IDensityProfile"/> of the copy</param>
+    /// <returns>A copy of the <see cref="Material"/> with the specified <paramref name="densityProfile"/></returns>
+    public Material WithDensity(IDensityProfile densityProfile) => new(densityProfile, AbsorptionProfile, OrientationProfile, ReflectionProfile, EmittanceProfile);
+
     public static Material Emitter(RGBSpectrum spectrum) => new(IDensityProfile.Surface,
                    IAbsorptionProfile.BlackBody,
                    IOrientationProfile.Flat,

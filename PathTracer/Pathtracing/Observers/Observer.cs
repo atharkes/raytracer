@@ -1,4 +1,5 @@
-﻿using PathTracer.Pathtracing.Observers.Accumulators;
+﻿using PathTracer.Multithreading;
+using PathTracer.Pathtracing.Observers.Accumulators;
 using PathTracer.Pathtracing.Observers.Cameras;
 
 namespace PathTracer.Pathtracing.Observers;
@@ -9,9 +10,9 @@ public class Observer : IObserver {
     /// <summary> The <see cref="IAccumulator"/> of the <see cref="Observer"/> </summary>
     public IAccumulator Accumulator { get; protected set; }
 
-    public Observer(ICamera camera, int imageWidth, int imageHeight) {
+    public Observer(ICamera camera, int imageWidth, int imageHeight, Threadpool threadpool) {
         Camera = camera;
-        Accumulator = new Accumulator(imageWidth, imageHeight);
+        Accumulator = new Accumulator(imageWidth, imageHeight, threadpool);
         Camera.AspectRatio = (float)Accumulator.Width / Accumulator.Height;
         Camera.OnMoved += (_, _) => Accumulator.Clear();
         Camera.Film.SampleRegistered += (_, sample) => Accumulator.Add(sample);

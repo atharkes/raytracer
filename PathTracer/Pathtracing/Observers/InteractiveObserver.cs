@@ -1,6 +1,7 @@
 ﻿using OpenTK.Windowing.GraphicsLibraryFramework;
 using PathTracer.Geometry.Normals;
 using PathTracer.Geometry.Vectors;
+using PathTracer.Multithreading;
 using PathTracer.Pathtracing.Observers.Accumulators;
 using PathTracer.Pathtracing.Observers.Cameras;
 using PathTracer.Pathtracing.Rays;
@@ -52,9 +53,9 @@ public class InteractiveObserver : Observer, IInteractiveObserver {
     /// <summary> Create a new <see cref="InteractiveObserver"/> </summary>
     /// <param name="screen">The <see cref="IScreen"/> of the <see cref="InteractiveObserver"/></param>
     /// <param name="camera">The <see cref="ICamera"/> of the <see cref="InteractiveObserver"/></param>
-    public InteractiveObserver(IScreen screen, ICamera camera) : base(camera, screen.Width, screen.Height) {
+    public InteractiveObserver(IScreen screen, ICamera camera, Threadpool threadpool) : base(camera, screen.Width, screen.Height, threadpool) {
         Screen = screen;
-        Screen.Resize += (e) => Accumulator = new Accumulator(e.Width, e.Height);
+        Screen.Resize += (e) => Accumulator = new Accumulator(e.Width, e.Height, threadpool);
         Screen.Resize += (e) => Camera.AspectRatio = (float)e.Width / e.Height;
     }
 

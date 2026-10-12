@@ -53,6 +53,6 @@ public class Renderer : IRenderer {
             var sampleCountFactor = 1 + (integrationTime / previousTime - 1) * 0.1;
             sampleCount = (int)(sampleCountFactor * Statistics.SampleCountLastTick);
         }
-        return Math.Max(BackwardsSampler.MinimumSampleCount, sampleCount);
+        return Math.Max(Integrator.MinimumSampleCount, sampleCount);
     }
 }

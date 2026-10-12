@@ -1,4 +1,5 @@
-﻿using PathTracer.Pathtracing.Spectra;
+﻿using PathTracer.Multithreading;
+using PathTracer.Pathtracing.Spectra;
 
 namespace PathTracer.Pathtracing.Observers.Accumulators;
 
@@ -22,12 +23,16 @@ public class Accumulator : IAccumulator {
     }
 
     private readonly Cavity[] cavities;
+    private readonly Threadpool threadpool;
 
     /// <summary> Create a new accumulator </summary>
-    /// <param name="pixelCount">The amount of cavities in the accumulator</param>
-    public Accumulator(int width, int height) {
+    /// <param name="width">The width (in pixels) of the accumulator</param>
+    /// <param name="height">The height (in pixels) of the accumulator</param>
+    /// <param name="threadpool">The <see cref="Threadpool"/> to draw the image on</param>
+    public Accumulator(int width, int height, Threadpool threadpool) {
         Width = width;
         Height = height;
+        this.threadpool = threadpool;
         cavities = new Cavity[width * height];
         for (var i = 0; i < cavities.Length; i++) {
             cavities[i] = new Cavity();
@@ -58,7 +63,7 @@ public class Accumulator : IAccumulator {
     /// <param name="screen">The <see cref="IScreen"/> to draw to</param>
     /// <param name="drawingMode">The <see cref="DrawingMode"/></param>
     public void DrawImage(IScreen screen, DrawingMode drawingMode) {
-        var tasks = new Action[Program.Threadpool.MultithreadingTaskCount];
+        var tasks = new Action[threadpool.MultithreadingTaskCount];
         var size = (float)cavities.Length / tasks.Length;
         for (var i = 0; i < tasks.Length; i++) {
             var lowerbound = (int)(i * size);
@@ -75,8 +80,8 @@ public class Accumulator : IAccumulator {
                     break;
             }
         }
-        Program.Threadpool.DoTasks(tasks);
-        Program.Threadpool.WaitTillDone();
+        threadpool.DoTasks(tasks);
+        threadpool.WaitTillDone();
     }
 
     /// <summary> Clear the samples in the <see cref="Accumulator"/> </summary>

@@ -9,7 +9,14 @@ using PathTracer.Utilities.Extensions;
 namespace PathTracer.Pathtracing.SceneDescription.Materials.Profiles.Density;
 
 public class InverseMultiplicative : IDensityProfile {
-    public static uint IntervalLength { get; set; } = 64;
+    /// <summary> The amount of floats before the surface that the distance is sampled in </summary>
+    public uint IntervalLength { get; }
+
+    /// <summary> Create a new <see cref="InverseMultiplicative"/> density profile </summary>
+    /// <param name="intervalLength">The amount of floats before the surface that the distance is sampled in</param>
+    public InverseMultiplicative(uint intervalLength = 64) {
+        IntervalLength = intervalLength;
+    }
 
     public IRay GetRay(Position3 position, Normal3 orientation, Normal3 direction) => new Ray(position, direction);
 

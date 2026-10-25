@@ -49,4 +49,21 @@ public class CombinedDistanceQueryTests {
         await Assert.That(sut.DistanceDistribution.CumulativeProbability(1.5f)).IsEqualTo(1 - .25 * .75).Within(1e-6);
         await Assert.That((float)sut.DistanceDistribution.Domain.Entry).IsEqualTo(0);
     }
+
+    [Test]
+    public async Task GetPrimitives_ShouldKeepQueriesThatEnterAtTheSameDistance() {
+        var sut = (Uniform(0, 2, A) + Uniform(0, 2, B))!;
+
+        var primitives = sut.GetPrimitives(1);
+
+        await Assert.That(primitives.ProbabilityMass(A)).IsEqualTo(.5).Within(1e-6);
+        await Assert.That(primitives.ProbabilityMass(B)).IsEqualTo(.5).Within(1e-6);
+    }
+
+    [Test]
+    public async Task DistanceDistribution_ShouldKeepQueriesThatEnterAtTheSameDistance() {
+        var sut = (Uniform(0, 2, A) + Uniform(0, 2, B))!;
+
+        await Assert.That(sut.DistanceDistribution.CumulativeProbability(1)).IsEqualTo(1 - .5 * .5).Within(1e-6);
+    }
 }

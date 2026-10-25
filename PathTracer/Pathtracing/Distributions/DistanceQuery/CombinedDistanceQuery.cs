@@ -29,18 +29,14 @@ public class CombinedDistanceQuery : IDistanceQuery, ICollection<IDistanceQuery>
         }
     }
 
-    private bool Insert(IDistanceQuery query) {
+    private void Insert(IDistanceQuery query) {
         var entry = query.DistanceDistribution.Domain.Entry;
         var index = queries.Count;
-        while (index > 0) {
-            var comparison = queries[index - 1].DistanceDistribution.Domain.Entry.CompareTo(entry);
-            if (comparison == 0) return false;
-            if (comparison < 0) break;
+        while (index > 0 && queries[index - 1].DistanceDistribution.Domain.Entry.CompareTo(entry) > 0) {
             index--;
         }
         queries.Insert(index, query);
         distanceDistribution = null;
-        return true;
     }
 
     private CombinedDistanceDistribution CombineDistributions() {

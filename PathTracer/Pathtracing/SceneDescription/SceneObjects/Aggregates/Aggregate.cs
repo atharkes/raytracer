@@ -22,6 +22,7 @@ public class Aggregate : IAggregate {
     public Aggregate() { }
 
     public Aggregate(IEnumerable<ISceneObject> items) {
+        if (items.TryGetNonEnumeratedCount(out var count)) this.items.EnsureCapacity(count);
         AddRange(items);
     }
 
@@ -46,6 +47,7 @@ public class Aggregate : IAggregate {
 
     public void Clear() {
         items.Clear();
+        items.TrimExcess();
         shape = null;
         ItemsChanged();
     }

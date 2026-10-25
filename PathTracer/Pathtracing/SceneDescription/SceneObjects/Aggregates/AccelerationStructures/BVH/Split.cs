@@ -6,10 +6,17 @@ namespace PathTracer.Pathtracing.SceneDescription.SceneObjects.Aggregates.Accele
 public class Split {
     /// <summary> Along which direction the split is </summary>
     public Normal3 Direction { get; }
+    /// <summary> The items left of the split </summary>
+    public IEnumerable<ISceneObject> LeftItems { get; }
+    /// <summary> The items right of the split </summary>
+    public IEnumerable<ISceneObject> RightItems { get; }
     /// <summary> The left AABB of the split </summary>
-    public IAggregate Left { get; }
+    public IAggregate Left => left ??= new Aggregate(LeftItems);
     /// <summary> The right AABB of the split </summary>
-    public IAggregate Right { get; }
+    public IAggregate Right => right ??= new Aggregate(RightItems);
+
+    private IAggregate? left;
+    private IAggregate? right;
 
     /// <summary> The Surface Area Heuristic of the split </summary>
     public float SurfaceAreaHeuristic => BoundingVolumeHierarchy.SurfaceAreaHeuristic(Left.ItemCount, Left.Shape.BoundingBox.SurfaceArea)
@@ -20,8 +27,8 @@ public class Split {
     /// <param name="right">The right AABB</param>
     public Split(Normal3 direction, IAggregate left, IAggregate right) {
         Direction = direction;
-        Left = left;
-        Right = right;
+        LeftItems = this.left = left;
+        RightItems = this.right = right;
     }
 
     /// <summary> Create a new split with primitives </summary>
@@ -29,7 +36,7 @@ public class Split {
     /// <param name="primitivesRight">The primitives for the right AABB</param>
     public Split(Normal3 direction, IEnumerable<ISceneObject> primitivesLeft, IEnumerable<ISceneObject> primitivesRight) {
         Direction = direction;
-        Left = new Aggregate(primitivesLeft);
-        Right = new Aggregate(primitivesRight);
+        LeftItems = primitivesLeft as ICollection<ISceneObject> ?? primitivesLeft.ToArray();
+        RightItems = primitivesRight as ICollection<ISceneObject> ?? primitivesRight.ToArray();
     }
 }

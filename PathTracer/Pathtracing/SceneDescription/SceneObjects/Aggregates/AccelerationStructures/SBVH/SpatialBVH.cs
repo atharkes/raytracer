@@ -58,8 +58,8 @@ public class SpatialBVH : BoundingVolumeHierarchy {
     /// <summary> Split this node </summary>
     /// <param name="split">The split to split this node with</param>
     protected override void Split(Split split) {
-        Left = new SpatialBVH(split.Left, RootSurfaceArea, Depth + 1);
-        Right = new SpatialBVH(split.Right, RootSurfaceArea, Depth + 1);
+        Left = new SpatialBVH(split.LeftItems, RootSurfaceArea, Depth + 1);
+        Right = new SpatialBVH(split.RightItems, RootSurfaceArea, Depth + 1);
         SplitDirection = split.Direction;
         Clear();
         Add(Left);

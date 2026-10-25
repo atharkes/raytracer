@@ -1,4 +1,5 @@
 ﻿using PathTracer.Geometry.Normals;
+using PathTracer.Geometry.Positions;
 using PathTracer.Geometry.Vectors;
 using PathTracer.Pathtracing.Distributions.DistanceQuery;
 using PathTracer.Pathtracing.Rays;
@@ -68,8 +69,8 @@ public class BoundingVolumeHierarchy : AccelerationStructure, IBinaryTree {
     /// <summary> Split this node into smaller nodes if beneficial </summary>
     protected void Build() {
         TrySplit();
-        // Fill the cached bounds now, so render threads only ever read them
-        bounds = Shape.BoundingBox;
+        // Fix the bounds now, so render threads only ever read them
+        bounds = Leaf ? ItemBounds() : AxisAlignedBox.Encompass(Left!.Bounds, Right!.Bounds);
     }
 
     /// <summary> The bounding box of this node, cached by <see cref="Build"/> until the items change </summary>
@@ -115,8 +116,8 @@ public class BoundingVolumeHierarchy : AccelerationStructure, IBinaryTree {
     /// <summary> Split this node </summary>
     /// <param name="split">The split to split this node with</param>
     protected virtual void Split(Split split) {
-        Left = new BoundingVolumeHierarchy(split.Left);
-        Right = new BoundingVolumeHierarchy(split.Right);
+        Left = new BoundingVolumeHierarchy(split.LeftItems);
+        Right = new BoundingVolumeHierarchy(split.RightItems);
         SplitDirection = split.Direction;
         Clear();
         Add(Left);
@@ -126,53 +127,83 @@ public class BoundingVolumeHierarchy : AccelerationStructure, IBinaryTree {
     /// <summary> Get the best split for this node </summary>
     /// <returns>The best split for this BVH node</returns>
     protected virtual Split? GetSplit() {
-        return Bin && Items.Count > BinAmount ? BestBinSplit() : BestSweepSplit();
+        var items = new (ISceneObject Item, AxisAlignedBox Box)[Items.Count];
+        var index = 0;
+        foreach (var item in Items) {
+            items[index++] = (item, item.Shape.BoundingBox);
+        }
+        var surfaceArea = Encompass(items).SurfaceArea;
+        return Bin && items.Length > BinAmount ? BestBinSplit(items, surfaceArea) : BestSweepSplit(items, surfaceArea);
     }
 
     /// <summary> Check all possible splits </summary>
+    /// <param name="items">The items of this node with their bounding boxes</param>
+    /// <param name="surfaceArea">The surface area of this node</param>
     /// <returns>The best split for every axis</returns>
-    private Split? BestSweepSplit() {
-        var bestSplitCost = LeafCost;
+    private static Split? BestSweepSplit((ISceneObject Item, AxisAlignedBox Box)[] items, float surfaceArea) {
+        var bestSplitCost = SurfaceAreaHeuristic(items.Length, surfaceArea);
         Split? bestSplit = null;
+        var order = new (float Center, int Index)[items.Length];
+        var rightAreas = new float[items.Length];
         foreach (var (direction, axis) in new (Normal3, Func<Vector3, float>)[] { (Normal3.UnitX, v => v.X), (Normal3.UnitY, v => v.Y), (Normal3.UnitZ, v => v.Z) }) {
-            var split = BestLinearSplitAfterSort(direction, axis, ref bestSplitCost);
+            var split = BestLinearSplitAfterSort(items, surfaceArea, direction, axis, order, rightAreas, ref bestSplitCost);
             if (split is not null) bestSplit = split;
         }
         return bestSplit;
     }
 
     /// <summary> Split linearly over primitives after sorting them along an axis </summary>
+    /// <param name="items">The items of this node with their bounding boxes</param>
+    /// <param name="surfaceArea">The surface area of this node</param>
     /// <param name="sortDirection">The direction the primitives are sorted in</param>
     /// <param name="axis">The axis selector to sort the bounding box centers with</param>
+    /// <param name="order">A buffer for the sorted order of the <paramref name="items"/></param>
+    /// <param name="rightAreas">A buffer for the surface areas right of each split</param>
     /// <param name="bestSplitCost">The cost to beat, lowered when a better split is found</param>
     /// <returns>The best split along the axis if it beats <paramref name="bestSplitCost"/></returns>
-    private Split? BestLinearSplitAfterSort(Normal3 sortDirection, Func<Vector3, float> axis, ref float bestSplitCost) {
-        var sorted = Items.Select(item => (Item: item, Box: item.Shape.BoundingBox)).OrderBy(p => axis(p.Box.Center.Vector)).ToArray();
-        var rightAreas = new float[sorted.Length];
+    private static Split? BestLinearSplitAfterSort((ISceneObject Item, AxisAlignedBox Box)[] items, float surfaceArea, Normal3 sortDirection, Func<Vector3, float> axis,
+        (float Center, int Index)[] order, float[] rightAreas, ref float bestSplitCost) {
+        for (var i = 0; i < items.Length; i++) {
+            order[i] = (axis(items[i].Box.Center.Vector), i);
+        }
+        Array.Sort(order);
         AxisAlignedBox? right = null;
-        for (var i = sorted.Length - 1; i > 0; i--) {
-            right = Encompass(right, sorted[i].Box);
+        for (var i = items.Length - 1; i > 0; i--) {
+            right = Encompass(right, items[order[i].Index].Box);
             rightAreas[i] = right.Value.SurfaceArea;
         }
         var bestLeftCount = 0;
         AxisAlignedBox? left = null;
-        for (var leftCount = 1; leftCount < sorted.Length; leftCount++) {
-            left = Encompass(left, sorted[leftCount - 1].Box);
-            var splitCost = SplitCost(SurfaceAreaHeuristic(leftCount, left.Value.SurfaceArea) + SurfaceAreaHeuristic(sorted.Length - leftCount, rightAreas[leftCount]));
+        for (var leftCount = 1; leftCount < items.Length; leftCount++) {
+            left = Encompass(left, items[order[leftCount - 1].Index].Box);
+            var splitCost = SplitCost(surfaceArea, SurfaceAreaHeuristic(leftCount, left.Value.SurfaceArea) + SurfaceAreaHeuristic(items.Length - leftCount, rightAreas[leftCount]));
             if (splitCost < bestSplitCost) {
                 bestSplitCost = splitCost;
                 bestLeftCount = leftCount;
             }
         }
         if (bestLeftCount == 0) return null;
-        return new Split(sortDirection, sorted[..bestLeftCount].Select(p => p.Item), sorted[bestLeftCount..].Select(p => p.Item));
+        var leftItems = new ISceneObject[bestLeftCount];
+        var rightItems = new ISceneObject[items.Length - bestLeftCount];
+        for (var i = 0; i < items.Length; i++) {
+            if (i < bestLeftCount) leftItems[i] = items[order[i].Index].Item;
+            else rightItems[i - bestLeftCount] = items[order[i].Index].Item;
+        }
+        return new Split(sortDirection, leftItems, rightItems);
     }
 
     /// <summary> Get the best binning split along the axis on which the centers of the items are spread widest </summary>
+    /// <param name="items">The items of this node with their bounding boxes</param>
+    /// <param name="surfaceArea">The surface area of this node</param>
     /// <returns>The best binning split, if any beats keeping this node a leaf</returns>
-    private Split? BestBinSplit() {
-        var items = Items.Select(item => (Item: item, Box: item.Shape.BoundingBox)).ToArray();
-        var centers = new AxisAlignedBox(items.Select(item => item.Box.Center).ToArray());
+    private static Split? BestBinSplit((ISceneObject Item, AxisAlignedBox Box)[] items, float surfaceArea) {
+        var minCenter = Position3.PositiveInfinity;
+        var maxCenter = Position3.NegativeInfinity;
+        foreach (var (_, box) in items) {
+            minCenter = Position3.ComponentMin(minCenter, box.Center);
+            maxCenter = Position3.ComponentMax(maxCenter, box.Center);
+        }
+        var centers = new AxisAlignedBox(minCenter, maxCenter);
         var size = centers.Size;
         var (binningDirection, axis) = size.X > size.Y && size.X > size.Z
             ? (Normal3.UnitX, (Func<Vector3, float>)(v => v.X))
@@ -183,12 +214,13 @@ public class BoundingVolumeHierarchy : AccelerationStructure, IBinaryTree {
         var k1 = BinAmount * BinningEpsilon / extent;
         var binStart = axis(centers.MinCorner.Vector);
         // Populate bins
-        var binIDs = new Dictionary<ISceneObject, int>(items.Length);
+        var binIDs = new int[items.Length];
         var binCounts = new int[BinAmount];
         var binBoxes = new AxisAlignedBox?[BinAmount];
-        foreach (var (item, box) in items) {
+        for (var i = 0; i < items.Length; i++) {
+            var box = items[i].Box;
             var binID = Math.Clamp((int)(k1 * (axis(box.Center.Vector) - binStart)), 0, BinAmount - 1);
-            binIDs[item] = binID;
+            binIDs[i] = binID;
             binCounts[binID]++;
             binBoxes[binID] = Encompass(binBoxes[binID], box);
         }
@@ -202,22 +234,54 @@ public class BoundingVolumeHierarchy : AccelerationStructure, IBinaryTree {
             rightCounts[i] = count;
             rightAreas[i] = right?.SurfaceArea ?? 0;
         }
-        var bestSplitCost = LeafCost;
+        var bestSplitCost = SurfaceAreaHeuristic(items.Length, surfaceArea);
         var bestSplitBin = 0;
+        var bestLeftCount = 0;
         AxisAlignedBox? left = null;
         for (int i = 1, leftCount = 0; i < BinAmount; i++) {
             leftCount += binCounts[i - 1];
             if (binBoxes[i - 1] is { } binBox) left = Encompass(left, binBox);
             if (leftCount == 0 || rightCounts[i] == 0) continue;
-            var splitCost = SplitCost(SurfaceAreaHeuristic(leftCount, left!.Value.SurfaceArea) + SurfaceAreaHeuristic(rightCounts[i], rightAreas[i]));
+            var splitCost = SplitCost(surfaceArea, SurfaceAreaHeuristic(leftCount, left!.Value.SurfaceArea) + SurfaceAreaHeuristic(rightCounts[i], rightAreas[i]));
             if (splitCost < bestSplitCost) {
                 bestSplitCost = splitCost;
                 bestSplitBin = i;
+                bestLeftCount = leftCount;
             }
         }
         if (bestSplitBin == 0) return null;
-        return new Split(binningDirection, Items.Where(item => binIDs[item] < bestSplitBin), Items.Where(item => binIDs[item] >= bestSplitBin));
+        var leftItems = new ISceneObject[bestLeftCount];
+        var rightItems = new ISceneObject[items.Length - bestLeftCount];
+        for (int i = 0, leftIndex = 0, rightIndex = 0; i < items.Length; i++) {
+            if (binIDs[i] < bestSplitBin) leftItems[leftIndex++] = items[i].Item;
+            else rightItems[rightIndex++] = items[i].Item;
+        }
+        return new Split(binningDirection, leftItems, rightItems);
     }
 
+    /// <summary> The area weighted cost of splitting a node </summary>
+    /// <param name="surfaceArea">The surface area of the node</param>
+    /// <param name="childrenCost">The summed <see cref="SurfaceAreaHeuristic"/> of the children</param>
+    /// <returns>The cost of traversing the node plus that of its children</returns>
+    private static float SplitCost(float surfaceArea, float childrenCost) => TraversalCost * surfaceArea + childrenCost;
+
     private static AxisAlignedBox Encompass(AxisAlignedBox? box, AxisAlignedBox other) => box is { } b ? AxisAlignedBox.Encompass(b, other) : other;
+
+    private static AxisAlignedBox Encompass((ISceneObject Item, AxisAlignedBox Box)[] items) {
+        AxisAlignedBox? bounds = null;
+        foreach (var (_, box) in items) {
+            bounds = Encompass(bounds, box);
+        }
+        return bounds ?? new AxisAlignedBox(ReadOnlySpan<AxisAlignedBox>.Empty);
+    }
+
+    /// <summary> The box around the items of this node </summary>
+    /// <returns>The <see cref="AxisAlignedBox"/> encompassing the bounding boxes of the items</returns>
+    private AxisAlignedBox ItemBounds() {
+        AxisAlignedBox? bounds = null;
+        foreach (var item in Items) {
+            bounds = Encompass(bounds, item.Shape.BoundingBox);
+        }
+        return bounds ?? new AxisAlignedBox(ReadOnlySpan<AxisAlignedBox>.Empty);
+    }
 }

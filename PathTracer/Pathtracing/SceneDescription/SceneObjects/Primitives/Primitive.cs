@@ -1,5 +1,6 @@
 ﻿using PathTracer.Pathtracing.Distributions.Distance;
 using PathTracer.Pathtracing.Distributions.DistanceQuery;
+using PathTracer.Pathtracing.Distributions.Intervals;
 using PathTracer.Pathtracing.Rays;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Planars;
 using PathTracer.Pathtracing.Spectra;
@@ -36,10 +37,13 @@ public class Primitive : IPrimitive {
         // the conversion from intervals to distance distributions
         // has to be moved to, and specified by the material itself.
         IDistanceDistribution? result = null;
-        foreach (var interval in intervals) {
-            var distanceDistribution = Material.DensityProfile.GetDistances(ray, spectrum, interval);
-            if (distanceDistribution is not null) {
-                result += distanceDistribution;
+        if (intervals is Interval[] array) {
+            foreach (var interval in array) {
+                result += Material.DensityProfile.GetDistances(ray, spectrum, interval);
+            }
+        } else {
+            foreach (var interval in intervals) {
+                result += Material.DensityProfile.GetDistances(ray, spectrum, interval);
             }
         }
         return result is not null ? new DistanceQuery(result, this) : null;

@@ -2,6 +2,7 @@
 using PathTracer.Geometry.Normals;
 using PathTracer.Geometry.Positions;
 using PathTracer.Geometry.Vectors;
+using PathTracer.Pathtracing.Distributions.Intervals;
 using PathTracer.Pathtracing.Rays;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics;
 
@@ -19,6 +20,10 @@ public struct InfinityPlane : IShape, IEquatable<InfinityPlane> {
     public override int GetHashCode() => 399527027;
     public override bool Equals(object? obj) => obj is InfinityPlane infPlane && Equals(infPlane);
     public bool Equals(InfinityPlane other) => true;
+
+    private static readonly Interval[] Intervals = [new(Position1.NegativeInfinity, Position1.MinValue), new(Position1.MaxValue, Position1.PositiveInfinity)];
+
+    public IEnumerable<Interval> Intersect(IRay ray) => Intervals;
 
     public IEnumerable<Position1> IntersectDistances(IRay ray) {
         yield return Position1.MinValue;

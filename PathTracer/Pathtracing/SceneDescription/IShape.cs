@@ -70,29 +70,37 @@ public interface IShape : IIntersectable, IBoundable, IDivisible<IShape> {
     /// <param name="ray">The <see cref="IRay"/> to intersect the <see cref="IShape"/></param>
     /// <returns>The collection of intersections with the <see cref="IShape"/>, if there are any</returns>
     IEnumerable<Interval> IIntersectable.Intersect(IRay ray) {
-        var distances = IntersectDistances(ray);
-
-        Queue<Position1> entries = new();
-        foreach (var distance in distances) {
+        Span<Position1> entries = stackalloc Position1[4];
+        Span<Interval> intervals = stackalloc Interval[4];
+        int firstEntry = 0, entryCount = 0, intervalCount = 0;
+        foreach (var distance in IntersectDistances(ray)) {
             var position = IntersectPosition(ray, distance);
             var normal = SurfaceNormal(position);
             var enters = !IDirection3.InSameOpenHemisphere(normal, ray.Direction);
             if (enters) {
-                entries.Enqueue(distance);
+                Append(ref entries, ref entryCount, distance);
+            } else if (firstEntry < entryCount) {
+                Append(ref intervals, ref intervalCount, new Interval(entries[firstEntry++], distance));
             } else {
-                if (entries.Count > 0) {
-                    yield return new Interval(entries.Dequeue(), distance);
-                } else {
-                    // Edge case: More exits than entries.
-                    // Planar shapes and inverted volumetrics rely on this.
-                    yield return new Interval(Position1.NegativeInfinity, distance);
-                }
+                // Edge case: More exits than entries.
+                // Planar shapes and inverted volumetrics rely on this.
+                Append(ref intervals, ref intervalCount, new Interval(Position1.NegativeInfinity, distance));
             }
         }
-        foreach (var entry in entries) {
+        for (var i = firstEntry; i < entryCount; i++) {
             // Edge case: more entries than exists.
             // Planar shapes and inverted volumetrics rely on this.
-            yield return new Interval(entry, Position1.PositiveInfinity);
+            Append(ref intervals, ref intervalCount, new Interval(entries[i], Position1.PositiveInfinity));
+        }
+        return intervalCount == 0 ? [] : intervals[..intervalCount].ToArray();
+
+        static void Append<T>(ref Span<T> items, ref int count, T item) {
+            if (count == items.Length) {
+                var grown = new T[items.Length * 2];
+                items.CopyTo(grown);
+                items = grown;
+            }
+            items[count++] = item;
         }
     }
 

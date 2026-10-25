@@ -20,8 +20,8 @@ public interface IDirection1 : IDirection<Vector1>, IComparable<IDirection1>, IE
     static Position1 operator *(IDirection1 left, IDirection1 right) => left.Vector * right.Vector;
     static Position1 operator /(IDirection1 left, IDirection1 right) => left.Vector / right.Vector;
 
-    static Direction1 Dot(IDirection1 left, IDirection1 right) => new(left.Vector * right.Vector);
-    static Direction1 Abs(IDirection1 direction) => Vector1.Abs(direction.Vector);
+    static Direction1 Dot<TLeft, TRight>(TLeft left, TRight right) where TLeft : IDirection1 where TRight : IDirection1 => new(left.Vector * right.Vector);
+    static Direction1 Abs<TDirection>(TDirection direction) where TDirection : IDirection1 => Vector1.Abs(direction.Vector);
 
     bool Equals(object? obj) => obj is IDirection1 direction && Equals(direction);
     bool IEquatable<IDirection1>.Equals(IDirection1? other) => Vector.Equals(other?.Vector);

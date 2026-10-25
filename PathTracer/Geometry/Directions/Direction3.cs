@@ -56,8 +56,8 @@ public readonly struct Direction3 : IDirection3, IEquatable<Direction3> {
     public static Direction3 operator /(Position1 scale, Direction3 direction) => scale.Vector / direction.Vector;
     public static Direction3 operator /(Direction3 direction, Position3 scale) => direction.Vector / scale.Vector;
 
-    public static Direction1 Dot(IDirection3 left, IDirection3 right) => new(Vector3.Dot(left.Vector, right.Vector));
-    public static Direction3 Lerp(IDirection3 a, IDirection3 b, Vector1 blend) => Vector3.Lerp(a.Vector, b.Vector, blend);
+    public static Direction1 Dot<TLeft, TRight>(TLeft left, TRight right) where TLeft : IDirection3 where TRight : IDirection3 => new(Vector3.Dot(left.Vector, right.Vector));
+    public static Direction3 Lerp<TLeft, TRight>(TLeft a, TRight b, Vector1 blend) where TLeft : IDirection3 where TRight : IDirection3 => Vector3.Lerp(a.Vector, b.Vector, blend);
 
     public override bool Equals(object? obj) => obj is Direction3 direction && Equals(direction);
     public bool Equals(Direction3 other) => Vector.Equals(other.Vector);

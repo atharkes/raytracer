@@ -28,10 +28,10 @@ public readonly struct Direction1 : IDirection1, IEquatable<Direction1> {
     public static bool operator ==(Direction1 left, Direction1 right) => left.Equals(right);
     public static bool operator !=(Direction1 left, Direction1 right) => !(left == right);
 
-    public static bool operator <=(Direction1 left, Direction1 right) => (left as IDirection1).CompareTo(right) <= 0;
-    public static bool operator >=(Direction1 left, Direction1 right) => (left as IDirection1).CompareTo(right) >= 0;
-    public static bool operator <(Direction1 left, Direction1 right) => (left as IDirection1).CompareTo(right) < 0;
-    public static bool operator >(Direction1 left, Direction1 right) => (left as IDirection1).CompareTo(right) > 0;
+    public static bool operator <=(Direction1 left, Direction1 right) => left.Vector.CompareTo(right.Vector) <= 0;
+    public static bool operator >=(Direction1 left, Direction1 right) => left.Vector.CompareTo(right.Vector) >= 0;
+    public static bool operator <(Direction1 left, Direction1 right) => left.Vector.CompareTo(right.Vector) < 0;
+    public static bool operator >(Direction1 left, Direction1 right) => left.Vector.CompareTo(right.Vector) > 0;
 
     public static Direction1 operator +(Direction1 left, Direction1 right) => left.Vector + right.Vector;
     public static Direction1 operator -(Direction1 direction) => -direction.Vector;

@@ -1,4 +1,5 @@
 ﻿using PathTracer.Geometry.Directions;
+using PathTracer.Geometry.Normals;
 using PathTracer.Geometry.Vectors;
 
 namespace PathTracer.Geometry.Positions;
@@ -42,9 +43,13 @@ public readonly struct Position3 : IPosition<Vector3>, IEquatable<Position3> {
 
     public static Position3 operator +(Position3 position, IDirection3 direction) => new(position.Vector + direction.Vector);
     public static Position3 operator -(Position3 position, IDirection3 direction) => new(position.Vector - direction.Vector);
+    public static Position3 operator +(Position3 position, Direction3 direction) => new(position.Vector + direction.Vector);
+    public static Position3 operator -(Position3 position, Direction3 direction) => new(position.Vector - direction.Vector);
+    public static Position3 operator +(Position3 position, Normal3 direction) => new(position.Vector + direction.Vector);
+    public static Position3 operator -(Position3 position, Normal3 direction) => new(position.Vector - direction.Vector);
 
     public static Position3 Lerp(Position3 left, Position3 right, Vector1 blend) => Vector3.Lerp(left.Vector, right.Vector, blend);
-    public static Position1 Dot(Position3 position, IDirection3 direction) => Vector3.Dot(position.Vector, direction.Vector);
+    public static Position1 Dot<TDirection>(Position3 position, TDirection direction) where TDirection : IDirection3 => Vector3.Dot(position.Vector, direction.Vector);
     public static Position3 ComponentMin(Position3 left, Position3 right) => Vector3.ComponentMin(left.Vector, right.Vector);
     public static Position3 ComponentMax(Position3 left, Position3 right) => Vector3.ComponentMax(left.Vector, right.Vector);
 

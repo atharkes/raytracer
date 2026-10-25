@@ -81,8 +81,8 @@ public readonly struct Normal3 : IDirection3, IEquatable<Normal3> {
     public static Normal3 operator -(Normal3 normal) => new(-normal.Vector);
     public static Normal3 operator *(OpenTK.Mathematics.Quaternion left, Normal3 right) => new(left * right.Vector);
 
-    public static Direction3 operator *(Normal3 normal, Position1 position) => (normal as IDirection3) * position;
-    public static Direction3 operator /(Normal3 normal, Position1 position) => (normal as IDirection3) / position;
+    public static Direction3 operator *(Normal3 normal, Position1 position) => normal.Vector * position.Vector;
+    public static Direction3 operator /(Normal3 normal, Position1 position) => normal.Vector / position.Vector;
 
     public static Normal3 AnyPerpendicular(Normal3 normal) => normal.Equals(UnitX) || normal.Equals(-UnitX) ? Perpendicular(normal, UnitY) : Perpendicular(normal, UnitX);
 

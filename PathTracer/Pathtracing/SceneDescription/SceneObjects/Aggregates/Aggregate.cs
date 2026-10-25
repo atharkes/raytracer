@@ -26,7 +26,9 @@ public class Aggregate : IAggregate {
     }
 
     public void Add(ISceneObject item) {
-        if (items.Add(item)) shape?.Add(item.Shape);
+        if (!items.Add(item)) return;
+        shape?.Add(item.Shape);
+        ItemsChanged();
     }
 
     public void AddRange(IEnumerable<ISceneObject> items) {
@@ -38,13 +40,18 @@ public class Aggregate : IAggregate {
     public bool Remove(ISceneObject item) {
         if (!items.Remove(item)) return false;
         shape = null;
+        ItemsChanged();
         return true;
     }
 
     public void Clear() {
         items.Clear();
         shape = null;
+        ItemsChanged();
     }
+
+    /// <summary> Called after an item is added or removed </summary>
+    protected virtual void ItemsChanged() { }
 
     public IEnumerator<ISceneObject> GetEnumerator() => items.GetEnumerator();
 

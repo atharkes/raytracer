@@ -63,12 +63,19 @@ public class BoundingVolumeHierarchy : AccelerationStructure, IBinaryTree {
         if (build) Build();
     }
 
+    private AxisAlignedBox? bounds;
+
     /// <summary> Split this node into smaller nodes if beneficial </summary>
     protected void Build() {
         TrySplit();
         // Fill the cached bounds now, so render threads only ever read them
-        _ = Shape.BoundingBox;
+        bounds = Shape.BoundingBox;
     }
+
+    /// <summary> The bounding box of this node, cached by <see cref="Build"/> until the items change </summary>
+    private AxisAlignedBox Bounds => bounds ?? Shape.BoundingBox;
+
+    protected override void ItemsChanged() => bounds = null;
 
     /// <summary> Trace a <paramref name="ray"/> through the nearest child first, skipping the other child when nothing passes the first hit </summary>
     /// <param name="ray">The <see cref="IRay"/> to trace</param>
@@ -77,7 +84,7 @@ public class BoundingVolumeHierarchy : AccelerationStructure, IBinaryTree {
     public override IDistanceQuery? Trace(IRay ray, ISpectrum spectrum) {
         var boxRay = new BoxRay(ray.Origin.Vector, ray.InvDirection.Vector, ray.Length);
         var boxTests = 1;
-        var result = Shape.BoundingBox.EntryDistance(boxRay.Origin, boxRay.InverseDirection, boxRay.Length) is null ? null : TraceEntered(ray, boxRay, spectrum, ref boxTests);
+        var result = Bounds.EntryDistance(boxRay.Origin, boxRay.InverseDirection, boxRay.Length) is null ? null : TraceEntered(ray, boxRay, spectrum, ref boxTests);
         if (ray is CameraRay cameraRay) cameraRay.BVHTraversals += boxTests;
         return result;
     }
@@ -85,8 +92,8 @@ public class BoundingVolumeHierarchy : AccelerationStructure, IBinaryTree {
     private IDistanceQuery? TraceEntered(IRay ray, in BoxRay boxRay, ISpectrum spectrum, ref int boxTests) {
         if (Leaf) return base.Trace(ray, spectrum);
         boxTests += 2;
-        var leftEntry = Left!.Shape.BoundingBox.EntryDistance(boxRay.Origin, boxRay.InverseDirection, boxRay.Length);
-        var rightEntry = Right!.Shape.BoundingBox.EntryDistance(boxRay.Origin, boxRay.InverseDirection, boxRay.Length);
+        var leftEntry = Left!.Bounds.EntryDistance(boxRay.Origin, boxRay.InverseDirection, boxRay.Length);
+        var rightEntry = Right!.Bounds.EntryDistance(boxRay.Origin, boxRay.InverseDirection, boxRay.Length);
         if (leftEntry is null) return rightEntry is null ? null : Right.TraceEntered(ray, boxRay, spectrum, ref boxTests);
         if (rightEntry is null) return Left.TraceEntered(ray, boxRay, spectrum, ref boxTests);
         var (near, far, farEntry) = leftEntry <= rightEntry ? (Left, Right, rightEntry.Value) : (Right, Left, leftEntry.Value);

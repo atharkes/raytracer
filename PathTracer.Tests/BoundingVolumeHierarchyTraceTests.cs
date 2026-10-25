@@ -72,4 +72,16 @@ public class BoundingVolumeHierarchyTraceTests {
         await Assert.That(ray.BVHTraversals).IsGreaterThanOrEqualTo(3);
         await Assert.That(ray.BVHTraversals).IsLessThan(2 * 64);
     }
+
+    [Test]
+    public async Task Trace_ShouldFindAnItemAddedAfterTheBuild() {
+        var sut = new BoundingVolumeHierarchy([new Primitive(new AxisAlignedBox(new Position3(0, 0, 0), new Position3(1, 1, 1)), Material.Diffuse(RGBColors.Gray))]);
+        sut.Trace(new Ray(new Position3(-1, .5f, .5f), Normal3.UnitX), RGBSpectrum.White);
+        sut.Add(new Primitive(new AxisAlignedBox(new Position3(10, 10, 10), new Position3(11, 11, 11)), Material.Diffuse(RGBColors.Gray)));
+
+        var result = sut.Trace(new Ray(new Position3(-1, 10.5f, 10.5f), Normal3.UnitX), RGBSpectrum.White);
+
+        await Assert.That(result is null).IsFalse();
+        await Assert.That((float)result!.DistanceDistribution.Domain.Entry).IsEqualTo(11f).Within(0.001f);
+    }
 }

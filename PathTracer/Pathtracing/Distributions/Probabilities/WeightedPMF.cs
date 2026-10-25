@@ -6,68 +6,77 @@ namespace PathTracer.Pathtracing.Distributions.Probabilities;
 /// Sampling can be improved using Vose's Alias Method to O(1). </summary>
 /// <typeparam name="T">The type of the <see cref="WeightedPMF{T}"/></typeparam>
 public class WeightedPMF<T> : IPMF<T>, IEquatable<WeightedPMF<T>> where T : notnull {
-    public bool SingleSolution => items.Count == 1;
-    public int DomainSize => items.Count;
+    public bool SingleSolution => count == 1;
+    public int DomainSize => count;
 
     private readonly double totalWeight;
-    private readonly HashSet<T> items = new();
-    private readonly Dictionary<T, double> weights = new();
-    private readonly Dictionary<T, double> probabilities = new();
-    private readonly Dictionary<T, double> cummulativeProbabilities = new();
+    private readonly Entry[] entries;
+    private int count;
 
-    public WeightedPMF(params (T Item, double Weight)[] pairs) {
-        totalWeight = pairs.Sum(i => i.Weight);
+    public WeightedPMF(params ReadOnlySpan<(T Item, double Weight)> pairs) {
+        foreach (var pair in pairs) totalWeight += pair.Weight;
         Debug.Assert(totalWeight > 0 && double.IsFinite(totalWeight));
-        for (var i = 0; i < pairs.Length; i++) {
-            (var item, var weight) = pairs[i];
-            if (items.Contains(item)) {
-                weights[item] += weight;
-                probabilities[item] = weights[item] / totalWeight;
-            } else {
-                items.Add(item);
-                weights.Add(item, weight);
-                probabilities.Add(item, weights[item] / totalWeight);
-            }
+        entries = new Entry[pairs.Length];
+        foreach ((var item, var weight) in pairs) {
+            Add(item, weight);
         }
-        double cummulativeProbability = 0;
-        foreach (var item in items) {
-            cummulativeProbability += probabilities[item];
-            cummulativeProbabilities.Add(item, cummulativeProbability);
-        }
+        var cummulativeProbability = Accumulate();
         Debug.Assert(cummulativeProbability >= 1);
     }
 
-    public WeightedPMF(params (WeightedPMF<T> PMF, double Weight)[] weightedPmfs) {
-        totalWeight = weightedPmfs.Sum(p => p.PMF.totalWeight * p.Weight);
-        Debug.Assert(totalWeight > 0 && double.IsFinite(totalWeight));
+    public WeightedPMF(params ReadOnlySpan<(WeightedPMF<T> PMF, double Weight)> weightedPmfs) {
+        var length = 0;
         foreach ((var pmf, var pmfWeight) in weightedPmfs) {
-            foreach ((var item, var weight) in pmf.weights) {
-                if (items.Contains(item)) {
-                    weights[item] += weight * pmfWeight;
-                    probabilities[item] = weights[item] / totalWeight;
-                } else {
-                    items.Add(item);
-                    weights.Add(item, weight * pmfWeight);
-                    probabilities.Add(item, weights[item] / totalWeight);
-                }
+            totalWeight += pmf.totalWeight * pmfWeight;
+            length += pmf.count;
+        }
+        Debug.Assert(totalWeight > 0 && double.IsFinite(totalWeight));
+        entries = new Entry[length];
+        foreach ((var pmf, var pmfWeight) in weightedPmfs) {
+            for (var i = 0; i < pmf.count; i++) {
+                Add(pmf.entries[i].Item, pmf.entries[i].Weight * pmfWeight);
             }
         }
-        double cummulativeProbability = 0;
-        foreach (var item in items) {
-            cummulativeProbability += probabilities[item];
-            cummulativeProbabilities.Add(item, cummulativeProbability);
+        Accumulate();
+    }
+
+    private void Add(T item, double weight) {
+        var index = IndexOf(item);
+        if (index < 0) {
+            entries[count++] = new Entry(item, weight);
+        } else {
+            entries[index].Weight += weight;
         }
     }
 
-    public bool Contains(T sample) => items.Contains(sample);
+    private double Accumulate() {
+        double cummulativeProbability = 0;
+        for (var i = 0; i < count; i++) {
+            cummulativeProbability += entries[i].Weight / totalWeight;
+            entries[i].CummulativeProbability = cummulativeProbability;
+        }
+        return cummulativeProbability;
+    }
 
-    public double ProbabilityMass(T sample) => probabilities[sample];
+    private int IndexOf(T item) {
+        for (var i = 0; i < count; i++) {
+            if (EqualityComparer<T>.Default.Equals(entries[i].Item, item)) return i;
+        }
+        return -1;
+    }
+
+    public bool Contains(T sample) => IndexOf(sample) >= 0;
+
+    public double ProbabilityMass(T sample) {
+        var index = IndexOf(sample);
+        return index >= 0 ? entries[index].Weight / totalWeight : throw new KeyNotFoundException($"{sample} is not in the {nameof(WeightedPMF<T>)}");
+    }
 
     public T Sample(Random random) {
         var sample = random.NextDouble();
-        foreach ((var item, var cummulativeProbability) in cummulativeProbabilities) {
-            if (sample < cummulativeProbability) {
-                return item;
+        for (var i = 0; i < count; i++) {
+            if (sample < entries[i].CummulativeProbability) {
+                return entries[i].Item;
             }
         }
         throw new InvalidOperationException("Probabilities don't add up to 1");
@@ -75,9 +84,15 @@ public class WeightedPMF<T> : IPMF<T>, IEquatable<WeightedPMF<T>> where T : notn
 
     public override bool Equals(object? obj) => obj is WeightedPMF<T> wpmf && Equals(wpmf);
     public bool Equals(IProbabilityDistribution<T>? other) => other is WeightedPMF<T> wpmf && Equals(wpmf);
-    public bool Equals(WeightedPMF<T>? other) => other is not null && weights.Equals(other.weights);
-    public override int GetHashCode() => HashCode.Combine(571118491, weights);
+    public bool Equals(WeightedPMF<T>? other) => other is not null && entries.Equals(other.entries);
+    public override int GetHashCode() => HashCode.Combine(571118491, entries);
 
     public static bool operator ==(WeightedPMF<T> left, WeightedPMF<T> right) => left.Equals(right);
     public static bool operator !=(WeightedPMF<T> left, WeightedPMF<T> right) => !(left == right);
+
+    private struct Entry(T item, double weight) {
+        public readonly T Item = item;
+        public double Weight = weight;
+        public double CummulativeProbability;
+    }
 }

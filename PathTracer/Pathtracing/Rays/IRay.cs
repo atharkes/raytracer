@@ -17,9 +17,14 @@ public interface IRay {
     Position3 Destination => Travel(Length);
 
     /// <summary> The inverted <see cref="Direction"/>. Useful for quick <see cref="AxisAlignedBox"/> intersections </summary>
-    Direction3 InvDirection => 1 / (Direction as IDirection3);
+    Direction3 InvDirection => 1 / Direction.Vector;
     /// <summary> Whether the individual components of the <see cref="InvDirection"/> of the <see cref="IRay"/> are negative </summary>
-    OpenTK.Mathematics.Vector3i Sign => new(InvDirection.X < 0 ? 1 : 0, InvDirection.Y < 0 ? 1 : 0, InvDirection.Z < 0 ? 1 : 0);
+    OpenTK.Mathematics.Vector3i Sign {
+        get {
+            var inverse = InvDirection.Vector;
+            return new(inverse.X < 0 ? 1 : 0, inverse.Y < 0 ? 1 : 0, inverse.Z < 0 ? 1 : 0);
+        }
+    }
 
     /// <summary> Get a point by travelling from the <see cref="Origin"/> a specified <paramref name="distance"/> towards the <see cref="Direction"/> </summary>
     /// <param name="distance">The distance to travel along the <see cref="IRay"/></param>

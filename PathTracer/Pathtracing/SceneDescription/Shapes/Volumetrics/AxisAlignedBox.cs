@@ -128,17 +128,20 @@ public readonly struct AxisAlignedBox : IVolumetricShape, IEquatable<AxisAligned
     /// <param name="ray">The <see cref="Ray"/> to intersect the <see cref="IAxisAlignedBox"/> with</param>
     /// <returns>Whether and when the <see cref="Ray"/> intersects the <see cref="IAxisAlignedBox"/></returns>
     public IEnumerable<Position1> IntersectDistances(IRay ray) {
-        var tmin = (Bounds[ray.Sign.X].X - ray.Origin.X) * ray.InvDirection.X;
-        var tmax = (Bounds[1 - ray.Sign.X].X - ray.Origin.X) * ray.InvDirection.X;
+        var sign = ray.Sign;
+        var origin = ray.Origin;
+        var inverseDirection = ray.InvDirection;
+        var tmin = (Bounds[sign.X].X - origin.X) * inverseDirection.X;
+        var tmax = (Bounds[1 - sign.X].X - origin.X) * inverseDirection.X;
 
-        var tymin = (Bounds[ray.Sign.Y].Y - ray.Origin.Y) * ray.InvDirection.Y;
-        var tymax = (Bounds[1 - ray.Sign.Y].Y - ray.Origin.Y) * ray.InvDirection.Y;
+        var tymin = (Bounds[sign.Y].Y - origin.Y) * inverseDirection.Y;
+        var tymax = (Bounds[1 - sign.Y].Y - origin.Y) * inverseDirection.Y;
         if (tmin > tymax || tmax < tymin) yield break;
         tmin = Position1.Max(tmin, tymin);
         tmax = Position1.Min(tmax, tymax);
 
-        var tzmin = (Bounds[ray.Sign.Z].Z - ray.Origin.Z) * ray.InvDirection.Z;
-        var tzmax = (Bounds[1 - ray.Sign.Z].Z - ray.Origin.Z) * ray.InvDirection.Z;
+        var tzmin = (Bounds[sign.Z].Z - origin.Z) * inverseDirection.Z;
+        var tzmax = (Bounds[1 - sign.Z].Z - origin.Z) * inverseDirection.Z;
         if (tmin > tzmax || tmax < tzmin) yield break;
         yield return Position1.Max(tmin, tzmin);
         yield return Position1.Min(tmax, tzmax);
@@ -149,15 +152,14 @@ public readonly struct AxisAlignedBox : IVolumetricShape, IEquatable<AxisAligned
     /// <returns>The entry distance, negative when the <paramref name="ray"/> starts inside; <see langword="null"/> if the <paramref name="ray"/> misses</returns>
     public float? EntryDistance(IRay ray) {
         var origin = ray.Origin.Vector;
-        var direction = ray.Direction.Vector;
+        var inverseDirection = ray.InvDirection.Vector;
         var entry = float.NegativeInfinity;
         var exit = float.PositiveInfinity;
         for (var axis = 0; axis < 3; axis++) {
             float o = axis == 0 ? origin.X : axis == 1 ? origin.Y : origin.Z;
-            float d = axis == 0 ? direction.X : axis == 1 ? direction.Y : direction.Z;
+            float inverse = axis == 0 ? inverseDirection.X : axis == 1 ? inverseDirection.Y : inverseDirection.Z;
             float min = axis == 0 ? MinCorner.X : axis == 1 ? MinCorner.Y : MinCorner.Z;
             float max = axis == 0 ? MaxCorner.X : axis == 1 ? MaxCorner.Y : MaxCorner.Z;
-            var inverse = 1f / d;
             var near = (min - o) * inverse;
             var far = (max - o) * inverse;
             if (inverse < 0) (near, far) = (far, near);

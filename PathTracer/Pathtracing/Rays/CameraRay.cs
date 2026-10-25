@@ -1,4 +1,5 @@
-﻿using PathTracer.Geometry.Normals;
+﻿using PathTracer.Geometry.Directions;
+using PathTracer.Geometry.Normals;
 using PathTracer.Geometry.Positions;
 using PathTracer.Pathtracing.Observers.Cameras.Parts;
 
@@ -14,6 +15,10 @@ public sealed class CameraRay : IRay {
     public Normal3 Direction => Ray.Direction;
 
     public Position1 Length => Ray.Length;
+
+    public Direction3 InvDirection => Ray.InvDirection;
+
+    public OpenTK.Mathematics.Vector3i Sign => Ray.Sign;
 
     /// <summary> The <see cref="IFilm"/> from which the <see cref="CameraRay"/> originates </summary>
     public IFilm Film { get; }

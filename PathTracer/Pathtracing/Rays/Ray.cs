@@ -1,4 +1,5 @@
-﻿using PathTracer.Geometry.Normals;
+﻿using PathTracer.Geometry.Directions;
+using PathTracer.Geometry.Normals;
 using PathTracer.Geometry.Positions;
 using PathTracer.Geometry.Vectors;
 
@@ -14,7 +15,7 @@ public readonly record struct Ray : IRay {
     public Position1 Length { get; }
 
     /// <summary> The inverted direction. Used for quick AABB intersection </summary>
-    public Vector3 InvDirection { get; }
+    public Direction3 InvDirection { get; }
     /// <summary> Whether the individual components of the inverted direction of the ray is negative </summary>
     public OpenTK.Mathematics.Vector3i Sign { get; }
 
@@ -27,8 +28,9 @@ public readonly record struct Ray : IRay {
         Origin = origin;
         Direction = direction;
         Length = length;
-        InvDirection = new(1f / Direction.Vector.X, 1f / Direction.Vector.Y, 1f / Direction.Vector.Z);
-        Sign = new(InvDirection.X < 0 ? 1 : 0, InvDirection.Y < 0 ? 1 : 0, InvDirection.Z < 0 ? 1 : 0);
+        var inverse = new Vector3(1f / Direction.Vector.X, 1f / Direction.Vector.Y, 1f / Direction.Vector.Z);
+        InvDirection = inverse;
+        Sign = new(inverse.X < 0 ? 1 : 0, inverse.Y < 0 ? 1 : 0, inverse.Z < 0 ? 1 : 0);
     }
 
     /// <summary> Create a <see cref="string"/> that represents the <see cref="Ray"/> </summary>

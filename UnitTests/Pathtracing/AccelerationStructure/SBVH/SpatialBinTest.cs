@@ -36,8 +36,8 @@ public class SpatialBinTest {
             bin.Aggregate.Add(Random.Shared.Primitive(0f, 1f));
             bin.ClipAndAdd(Random.Shared.Primitive(1f, 3f));
         }
-        var bounds = bin.Aggregate.Shape.BoundingBox.Bounds;
-        Assert.AreEqual(-1f, bounds[0].Vector.X);
-        Assert.AreEqual(1f, bounds[1].Vector.X);
+        var bounds = bin.Aggregate.Shape.BoundingBox;
+        Assert.AreEqual(-1f, bounds.MinCorner.Vector.X);
+        Assert.AreEqual(1f, bounds.MaxCorner.Vector.X);
     }
 }

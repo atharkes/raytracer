@@ -8,20 +8,28 @@ namespace PathTracer.Pathtracing.SceneDescription.Shapes.Volumetrics;
 
 /// <summary> An axis aligned box primitive </summary>
 public readonly struct AxisAlignedBox : IVolumetricShape, IEquatable<AxisAlignedBox> {
-    /// <summary> The bounds of the <see cref="AxisAlignedBox"/> </summary>
-    public Position3[] Bounds { get; }
     /// <summary> The minimum bound of the <see cref="AxisAlignedBox"/> </summary>
-    public Position3 MinCorner => Bounds[0];
+    public Position3 MinCorner { get; }
     /// <summary> The maximum bound of the <see cref="AxisAlignedBox"/> </summary>
-    public Position3 MaxCorner => Bounds[1];
+    public Position3 MaxCorner { get; }
     /// <summary> The size of the <see cref="AxisAlignedBox"/> </summary>
-    public IDirection3 Size => MaxCorner - MinCorner;
+    public Direction3 Size => MaxCorner - MinCorner;
     /// <summary> The center of the <see cref="AxisAlignedBox"/> </summary>
     public Position3 Center => MinCorner + Size / 2;
     /// <summary> The surface area of the <see cref="AxisAlignedBox"/> </summary>
-    public float SurfaceArea => (Size.X * Size.Y + Size.Y * Size.Z + Size.X * Size.Z) * 2;
+    public float SurfaceArea {
+        get {
+            var size = Size;
+            return (size.X * size.Y + size.Y * size.Z + size.X * size.Z) * 2;
+        }
+    }
     /// <summary> The volume of the <see cref="AxisAlignedBox"/> </summary>
-    public float Volume => Size.X * Size.Y * Size.Z;
+    public float Volume {
+        get {
+            var size = Size;
+            return size.X * size.Y * size.Z;
+        }
+    }
     /// <summary> The bounding box of the <see cref="AxisAlignedBox"/> </summary>
     public AxisAlignedBox BoundingBox => this;
 
@@ -29,26 +37,35 @@ public readonly struct AxisAlignedBox : IVolumetricShape, IEquatable<AxisAligned
     /// <param name="corner1">The first corner of the <see cref="AxisAlignedBox"/></param>
     /// <param name="corner2">The corner on the opposite side of the <see cref="AxisAlignedBox"/></param>
     public AxisAlignedBox(Position3 corner1, Position3 corner2) {
-        var minCorner = Position3.ComponentMin(corner1, corner2);
-        var maxCorner = Position3.ComponentMax(corner1, corner2);
-        Bounds = new Position3[] { minCorner, maxCorner };
+        MinCorner = Position3.ComponentMin(corner1, corner2);
+        MaxCorner = Position3.ComponentMax(corner1, corner2);
     }
 
     /// <summary> Create an <see cref="AxisAlignedBox"/> that encompasses <paramref name="positions"/> </summary>
     /// <param name="positions">The positions that the <see cref="AxisAlignedBox"/> should encompass</param>
-    public AxisAlignedBox(params Position3[] positions) {
+    public AxisAlignedBox(params ReadOnlySpan<Position3> positions) {
         var minCorner = Position3.PositiveInfinity;
         var maxCorner = Position3.NegativeInfinity;
         foreach (var position in positions) {
             minCorner = Position3.ComponentMin(minCorner, position);
             maxCorner = Position3.ComponentMax(maxCorner, position);
         }
-        Bounds = [minCorner, maxCorner];
+        MinCorner = minCorner;
+        MaxCorner = maxCorner;
     }
 
     /// <summary> Create an <see cref="AxisAlignedBox"/> from <paramref name="boxes"/> </summary>
     /// <param name="boxes">The <see cref="AxisAlignedBox"/>s to create an <see cref="AxisAlignedBox"/> for</param>
-    public AxisAlignedBox(params AxisAlignedBox[] boxes) : this(boxes.SelectMany(b => b.Bounds).ToArray()) { }
+    public AxisAlignedBox(params ReadOnlySpan<AxisAlignedBox> boxes) {
+        var minCorner = Position3.PositiveInfinity;
+        var maxCorner = Position3.NegativeInfinity;
+        foreach (var box in boxes) {
+            minCorner = Position3.ComponentMin(minCorner, box.MinCorner);
+            maxCorner = Position3.ComponentMax(maxCorner, box.MaxCorner);
+        }
+        MinCorner = minCorner;
+        MaxCorner = maxCorner;
+    }
 
     /// <summary> Create the smallest <see cref="AxisAlignedBox"/> that encompasses both <paramref name="left"/> and <paramref name="right"/> </summary>
     /// <param name="left">The first <see cref="AxisAlignedBox"/> to encompass</param>
@@ -71,7 +88,7 @@ public readonly struct AxisAlignedBox : IVolumetricShape, IEquatable<AxisAligned
 
     /// <summary> Get the hashcode of the <see cref="AxisAlignedBox"/> </summary>
     /// <returns>The hashcode of the <see cref="AxisAlignedBox"/></returns>
-    public override int GetHashCode() => Bounds.GetHashCode();
+    public override int GetHashCode() => HashCode.Combine(MinCorner, MaxCorner);
 
     /// <summary> Check equality with an <paramref name="obj"/> </summary>
     /// <param name="obj">The <see cref="object"/> to check equality with</param>
@@ -81,7 +98,7 @@ public readonly struct AxisAlignedBox : IVolumetricShape, IEquatable<AxisAligned
     /// <summary> Check equality with an <paramref name="other"/> <see cref="AxisAlignedBox"/> </summary>
     /// <param name="other">The <see cref="AxisAlignedBox"/> to check equality with</param>
     /// <returns>Whether the <paramref name="other"/> is equal to this <see cref="AxisAlignedBox"/></returns>
-    public bool Equals(AxisAlignedBox other) => Bounds.Equals(other.Bounds);
+    public bool Equals(AxisAlignedBox other) => MinCorner.Equals(other.MinCorner) && MaxCorner.Equals(other.MaxCorner);
 
     /// <summary> Get a <paramref name="random"/> point on the surface of the <see cref="AxisAlignedBox"/> </summary>
     /// <param name="random">The <see cref="Random"/> to decide the position of the point on the surface</param>
@@ -131,21 +148,23 @@ public readonly struct AxisAlignedBox : IVolumetricShape, IEquatable<AxisAligned
         var sign = ray.Sign;
         var origin = ray.Origin;
         var inverseDirection = ray.InvDirection;
-        var tmin = (Bounds[sign.X].X - origin.X) * inverseDirection.X;
-        var tmax = (Bounds[1 - sign.X].X - origin.X) * inverseDirection.X;
+        var tmin = (Bound(sign.X).X - origin.X) * inverseDirection.X;
+        var tmax = (Bound(1 - sign.X).X - origin.X) * inverseDirection.X;
 
-        var tymin = (Bounds[sign.Y].Y - origin.Y) * inverseDirection.Y;
-        var tymax = (Bounds[1 - sign.Y].Y - origin.Y) * inverseDirection.Y;
+        var tymin = (Bound(sign.Y).Y - origin.Y) * inverseDirection.Y;
+        var tymax = (Bound(1 - sign.Y).Y - origin.Y) * inverseDirection.Y;
         if (tmin > tymax || tmax < tymin) yield break;
         tmin = Position1.Max(tmin, tymin);
         tmax = Position1.Min(tmax, tymax);
 
-        var tzmin = (Bounds[sign.Z].Z - origin.Z) * inverseDirection.Z;
-        var tzmax = (Bounds[1 - sign.Z].Z - origin.Z) * inverseDirection.Z;
+        var tzmin = (Bound(sign.Z).Z - origin.Z) * inverseDirection.Z;
+        var tzmax = (Bound(1 - sign.Z).Z - origin.Z) * inverseDirection.Z;
         if (tmin > tzmax || tmax < tzmin) yield break;
         yield return Position1.Max(tmin, tzmin);
         yield return Position1.Min(tmax, tzmax);
     }
+
+    private Position3 Bound(int index) => index == 0 ? MinCorner : MaxCorner;
 
     /// <summary> Get the distance at which a <paramref name="ray"/> enters the <see cref="AxisAlignedBox"/> </summary>
     /// <param name="ray">The <see cref="IRay"/> to intersect the <see cref="AxisAlignedBox"/> with</param>

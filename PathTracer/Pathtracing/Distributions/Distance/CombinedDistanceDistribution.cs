@@ -6,34 +6,79 @@ using System.Collections;
 namespace PathTracer.Pathtracing.Distributions.Distance;
 
 public class CombinedDistanceDistribution : IDistanceDistribution, IEnumerable<IDistanceDistribution>, IEquatable<CombinedDistanceDistribution> {
-    public IInterval Domain => new IntervalCollection(distributions.Select(x => x.Domain).ToArray());
-    public bool ContainsDelta => distributions.Any(d => d.ContainsDelta);
+    public IInterval Domain => domain ??= new IntervalCollection(Domains());
+    public bool ContainsDelta {
+        get {
+            foreach (var distribution in distributions) {
+                if (distribution.ContainsDelta) return true;
+            }
+            return false;
+        }
+    }
 
-    private readonly IOrderedEnumerable<IDistanceDistribution> distributions;
+    private readonly IDistanceDistribution[] distributions;
+    private IInterval? domain;
 
-    public CombinedDistanceDistribution(params IDistanceDistribution[] distributions) {
-        List<IDistanceDistribution> simpleDistributions = new();
+    public CombinedDistanceDistribution(params ReadOnlySpan<IDistanceDistribution> distributions) {
+        var length = 0;
+        foreach (var distribution in distributions) {
+            length += distribution is CombinedDistanceDistribution combinedDistribution ? combinedDistribution.distributions.Length : 1;
+        }
+        this.distributions = new IDistanceDistribution[length];
+        var count = 0;
         foreach (var distribution in distributions) {
             if (distribution is CombinedDistanceDistribution combinedDistribution) {
-                simpleDistributions.AddRange(combinedDistribution.distributions);
+                foreach (var inner in combinedDistribution.distributions) {
+                    Insert(inner, count++);
+                }
             } else {
-                simpleDistributions.Add(distribution);
+                Insert(distribution, count++);
             }
         }
-        this.distributions = simpleDistributions.OrderBy(d => d.Domain.Entry);
+    }
+
+    private void Insert(IDistanceDistribution distribution, int count) {
+        var entry = distribution.Domain.Entry;
+        var index = count;
+        while (index > 0 && distributions[index - 1].Domain.Entry.CompareTo(entry) > 0) {
+            distributions[index] = distributions[index - 1];
+            index--;
+        }
+        distributions[index] = distribution;
+    }
+
+    private IInterval[] Domains() {
+        var domains = new IInterval[distributions.Length];
+        for (var i = 0; i < distributions.Length; i++) {
+            domains[i] = distributions[i].Domain;
+        }
+        return domains;
     }
 
     /// <summary> Get the material density at the specified <paramref name="distance"/> </summary>
     /// <param name="distance">The distance to get the material density at</param>
     /// <returns>The material density at the specified <paramref name="distance"/></returns>
-    public double MaterialDensity(Position1 distance) => distributions.Sum(d => d.MaterialDensity(distance));
+    public double MaterialDensity(Position1 distance) {
+        double materialDensity = 0;
+        foreach (var distribution in distributions) {
+            materialDensity += distribution.MaterialDensity(distance);
+        }
+        return materialDensity;
+    }
+
+    public bool Contains(Position1 sample) {
+        foreach (var distribution in distributions) {
+            if (distribution.Domain.Includes(sample)) return true;
+        }
+        return false;
+    }
 
     public double ProbabilityDensity(Position1 sample) {
         double probabilityDensity = 0;
         var cdf = CumulativeProbability(sample);
         if (cdf == 1d) return 0f;
-        var contains = distributions.TakeWhile(d => d.Domain.Entry <= sample);
-        foreach (var current in contains) {
+        foreach (var current in distributions) {
+            if (current.Domain.Entry > sample) break;
             var currentCdf = current.CumulativeProbability(sample);
             var othersCdf = (currentCdf - cdf) / (currentCdf - 1);
             probabilityDensity += current.Probability(sample) * (1 - othersCdf);
@@ -42,9 +87,9 @@ public class CombinedDistanceDistribution : IDistanceDistribution, IEnumerable<I
     }
 
     public double CumulativeProbability(Position1 sample) {
-        var relevant = distributions.TakeWhile(d => d.Domain.Entry <= sample);
         var inverseCdf = 1d;
-        foreach (var d in relevant) {
+        foreach (var d in distributions) {
+            if (d.Domain.Entry > sample) break;
             inverseCdf *= 1d - d.CumulativeProbability(sample);
         }
         return 1d - inverseCdf;
@@ -69,8 +114,8 @@ public class CombinedDistanceDistribution : IDistanceDistribution, IEnumerable<I
     public bool Equals(IProbabilityDistribution<Position1>? other) => other is CombinedDistanceDistribution cdd && Equals(cdd);
     public bool Equals(CombinedDistanceDistribution? other) => other is not null && distributions.Equals(other.distributions);
     public override int GetHashCode() => HashCode.Combine(664311359, distributions);
-    public override string ToString() => $"Combined[{string.Join(',', distributions)}]";
+    public override string ToString() => $"Combined[{string.Join(',', (IEnumerable<IDistanceDistribution>)distributions)}]";
 
-    public IEnumerator<IDistanceDistribution> GetEnumerator() => distributions.GetEnumerator();
-    IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)distributions).GetEnumerator();
+    public IEnumerator<IDistanceDistribution> GetEnumerator() => ((IEnumerable<IDistanceDistribution>)distributions).GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator() => distributions.GetEnumerator();
 }

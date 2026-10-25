@@ -75,26 +75,28 @@ public class BoundingVolumeHierarchy : AccelerationStructure, IBinaryTree {
     /// <param name="spectrum">The <see cref="ISpectrum"/> of the <paramref name="ray"/></param>
     /// <returns>The <see cref="IDistanceQuery"/> through the hierarchy</returns>
     public override IDistanceQuery? Trace(IRay ray, ISpectrum spectrum) {
-        CountTraversals(ray, 1);
-        return Shape.BoundingBox.EntryDistance(ray) is null ? null : TraceEntered(ray, spectrum);
-    }
-
-    private IDistanceQuery? TraceEntered(IRay ray, ISpectrum spectrum) {
-        if (Leaf) return base.Trace(ray, spectrum);
-        CountTraversals(ray, 2);
-        var leftEntry = Left!.Shape.BoundingBox.EntryDistance(ray);
-        var rightEntry = Right!.Shape.BoundingBox.EntryDistance(ray);
-        if (leftEntry is null) return rightEntry is null ? null : Right.TraceEntered(ray, spectrum);
-        if (rightEntry is null) return Left.TraceEntered(ray, spectrum);
-        var (near, far, farEntry) = leftEntry <= rightEntry ? (Left, Right, rightEntry.Value) : (Right, Left, leftEntry.Value);
-        var result = near.TraceEntered(ray, spectrum);
-        if (result is not null && result.DistanceDistribution.CumulativeProbability(farEntry) >= 1) return result;
-        return result + far.TraceEntered(ray, spectrum);
-    }
-
-    private static void CountTraversals(IRay ray, int boxTests) {
+        var boxRay = new BoxRay(ray.Origin.Vector, ray.InvDirection.Vector, ray.Length);
+        var boxTests = 1;
+        var result = Shape.BoundingBox.EntryDistance(boxRay.Origin, boxRay.InverseDirection, boxRay.Length) is null ? null : TraceEntered(ray, boxRay, spectrum, ref boxTests);
         if (ray is CameraRay cameraRay) cameraRay.BVHTraversals += boxTests;
+        return result;
     }
+
+    private IDistanceQuery? TraceEntered(IRay ray, in BoxRay boxRay, ISpectrum spectrum, ref int boxTests) {
+        if (Leaf) return base.Trace(ray, spectrum);
+        boxTests += 2;
+        var leftEntry = Left!.Shape.BoundingBox.EntryDistance(boxRay.Origin, boxRay.InverseDirection, boxRay.Length);
+        var rightEntry = Right!.Shape.BoundingBox.EntryDistance(boxRay.Origin, boxRay.InverseDirection, boxRay.Length);
+        if (leftEntry is null) return rightEntry is null ? null : Right.TraceEntered(ray, boxRay, spectrum, ref boxTests);
+        if (rightEntry is null) return Left.TraceEntered(ray, boxRay, spectrum, ref boxTests);
+        var (near, far, farEntry) = leftEntry <= rightEntry ? (Left, Right, rightEntry.Value) : (Right, Left, leftEntry.Value);
+        var result = near.TraceEntered(ray, boxRay, spectrum, ref boxTests);
+        if (result is not null && result.DistanceDistribution.CumulativeProbability(farEntry) >= 1) return result;
+        return result + far.TraceEntered(ray, boxRay, spectrum, ref boxTests);
+    }
+
+    /// <summary> The parts of a ray that box tests read, taken from the <see cref="IRay"/> once per trace </summary>
+    private readonly record struct BoxRay(Vector3 Origin, Vector3 InverseDirection, float Length);
 
     /// <summary> Try split node into two smaller nodes </summary>
     private void TrySplit() {

@@ -1,6 +1,7 @@
 ﻿using PathTracer.Geometry.Directions;
 using PathTracer.Geometry.Normals;
 using PathTracer.Geometry.Positions;
+using PathTracer.Geometry.Vectors;
 using PathTracer.Pathtracing.Rays;
 using PathTracer.Pathtracing.SceneDescription.Shapes.Planars;
 
@@ -169,23 +170,32 @@ public readonly struct AxisAlignedBox : IVolumetricShape, IEquatable<AxisAligned
     /// <summary> Get the distance at which a <paramref name="ray"/> enters the <see cref="AxisAlignedBox"/> </summary>
     /// <param name="ray">The <see cref="IRay"/> to intersect the <see cref="AxisAlignedBox"/> with</param>
     /// <returns>The entry distance, negative when the <paramref name="ray"/> starts inside; <see langword="null"/> if the <paramref name="ray"/> misses</returns>
-    public float? EntryDistance(IRay ray) {
-        var origin = ray.Origin.Vector;
-        var inverseDirection = ray.InvDirection.Vector;
+    public float? EntryDistance(IRay ray) => EntryDistance(ray.Origin.Vector, ray.InvDirection.Vector, ray.Length);
+
+    /// <summary> Get the distance at which a ray enters the <see cref="AxisAlignedBox"/> </summary>
+    /// <param name="origin">The origin of the ray</param>
+    /// <param name="inverseDirection">The inverse of the direction of the ray</param>
+    /// <param name="length">The length of the ray</param>
+    /// <returns>The entry distance, negative when the ray starts inside; <see langword="null"/> if the ray misses</returns>
+    public float? EntryDistance(Vector3 origin, Vector3 inverseDirection, float length) {
+        var min = MinCorner.Vector.Value;
+        var max = MaxCorner.Vector.Value;
+        var o = origin.Value;
+        var inverse = inverseDirection.Value;
         var entry = float.NegativeInfinity;
         var exit = float.PositiveInfinity;
-        for (var axis = 0; axis < 3; axis++) {
-            float o = axis == 0 ? origin.X : axis == 1 ? origin.Y : origin.Z;
-            float inverse = axis == 0 ? inverseDirection.X : axis == 1 ? inverseDirection.Y : inverseDirection.Z;
-            float min = axis == 0 ? MinCorner.X : axis == 1 ? MinCorner.Y : MinCorner.Z;
-            float max = axis == 0 ? MaxCorner.X : axis == 1 ? MaxCorner.Y : MaxCorner.Z;
-            var near = (min - o) * inverse;
-            var far = (max - o) * inverse;
+        Slab(min.X, max.X, o.X, inverse.X, ref entry, ref exit);
+        Slab(min.Y, max.Y, o.Y, inverse.Y, ref entry, ref exit);
+        Slab(min.Z, max.Z, o.Z, inverse.Z, ref entry, ref exit);
+        return entry <= exit && exit >= 0 && entry <= length ? entry : null;
+
+        static void Slab(float min, float max, float origin, float inverse, ref float entry, ref float exit) {
+            var near = (min - origin) * inverse;
+            var far = (max - origin) * inverse;
             if (inverse < 0) (near, far) = (far, near);
             if (near > entry) entry = near;
             if (far < exit) exit = far;
         }
-        return entry <= exit && exit >= 0 && entry <= ray.Length ? entry : null;
     }
 
     /// <summary> Clip the <see cref="AxisAlignedBox"/> by a <paramref name="plane"/> </summary>
